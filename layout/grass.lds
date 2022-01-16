@@ -1,12 +1,3 @@
-/*
- * (C) 2022, Cornell University
- * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
- * Description: memory layout of the grass kernel
- */
-
 OUTPUT_ARCH("riscv")
 
 ENTRY(_enter)
@@ -23,6 +14,9 @@ PHDRS
 
 SECTIONS
 {
+    __heap_size = 0x400;    
+    __stack_size = 0x2000;
+
     .text : ALIGN(8) {
         *(.text .text.*)
     } >ram :ram
@@ -49,11 +43,13 @@ SECTIONS
     } >ram :ram
 
     .heap (NOLOAD) : ALIGN(8) {
-        . = 0x1000;
+          PROVIDE( HEAP_START = . );
+          . = __heap_size;
+          PROVIDE( HEAP_END = . );
     } >ram :ram
 
 
     .stack (NOLOAD) : ALIGN(16) {
-        . += 0x2000;
+        . += __stack_size;
     } >ram :ram
 }
