@@ -4,9 +4,10 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: the grass kernel that initializes the process control block
- * and spawns a few key kernel processes
+ * Description: initialize the process control block and 
+ * spawns some kernel processes, including file system and shell
  */
+
 #include <stdlib.h>
 
 int global_var1;
@@ -19,5 +20,6 @@ int main() {
     global_var3++;
 
     char* buf = malloc(512);
+    free(buf);
     return 0;
 }

@@ -1,6 +1,16 @@
+/*
+ * (C) 2022, Cornell University
+ * All rights reserved.
+ */
+
+/* Author: Yunhao Zhang
+ * Description: provide the _sbrk function to glibc malloc()
+ */
+
+
 #include <stddef.h>
 
-/* heap start/end are defined in the memory layout scripts */
+/* heap region is defined in the memory layout scripts */
 extern char HEAP_START;
 extern char HEAP_END;
 

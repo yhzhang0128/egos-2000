@@ -14,7 +14,7 @@ PHDRS
 
 SECTIONS
 {
-    __heap_size = 0x400;    
+    __heap_size = 0x400;
     __stack_size = 0x2000;
 
     .text : ALIGN(8) {
@@ -22,6 +22,7 @@ SECTIONS
     } >ram :ram
 
     .rodata : ALIGN(8) {
+        *(.rdata)
         *(.rodata .rodata.*)
         . = ALIGN(8);
         *(.srodata.cst16)
@@ -38,6 +39,7 @@ SECTIONS
     } >ram : ram
 
     .bss (NOLOAD): ALIGN(8) {
+        *(.sbss*)
         *(.bss .bss.*)
         *(COMMON)
     } >ram :ram
