@@ -1,11 +1,4 @@
-/* Copyright (c) 2020 SiFive Inc. */
-/* SPDX-License-Identifier: Apache-2.0 */
 OUTPUT_ARCH("riscv")
-
-/* Default Linker Script
- *
- * This is the default linker script for all Freedom Metal applications.
- */
 
 ENTRY(_enter)
 
@@ -26,58 +19,11 @@ PHDRS
 
 SECTIONS
 {
+    __heap_size = 0x800;
     __stack_size = 0x2000;
-    PROVIDE(__stack_size = __stack_size);
 
-    /* The size of the heap can be overriden at build-time by adding the
-     * following to CFLAGS:
-     *
-     *     -Xlinker --defsym=__heap_size=0xf00
-     *
-     * where 0xf00 can be replaced with the value of your choice.
-     *
-     * Altertatively, the heap can be grown to fill the entire remaining region
-     * of RAM by adding the following to CFLAGS:
-     *
-     *     -Xlinker --defsym=__heap_max=1
-     *
-     * Note that depending on the memory layout, the bitness (32/64bit) of the
-     * target, and the code model in use, this might cause a relocation error.
-     */
-    __heap_size = DEFINED(__heap_size) ? __heap_size : 0x800;
-
-    /* The boot hart sets which hart runs the pre-main initialization routines,
-     * including copying .data into RAM, zeroing the BSS region, running
-     * constructors, etc. After initialization, the boot hart is also the only
-     * hart which runs application code unless the application overrides the
-     * secondary_main() function to start execution on secondary harts.
-     */
-    PROVIDE(__metal_boot_hart = 0);
-
-    /* The chicken bit is used by pre-main initialization to enable/disable
-     * certain core features */
-    PROVIDE(__metal_chicken_bit = 1);
-
-    /* The memory_ecc_scrub bit is used by _entry code to enable/disable
-     * memories scrubbing to zero  */
-    PROVIDE(__metal_eccscrub_bit = 0);
-
-    /* The RAM memories map for ECC scrubbing */
-    PROVIDE( metal_dtim_0_memory_start = 0x80000000 );
-    PROVIDE( metal_dtim_0_memory_end = 0x80000000 + 0x4000 );
-    PROVIDE( metal_itim_0_memory_start = 0x8000000 );
-    PROVIDE( metal_itim_0_memory_end = 0x8000000 + 0x4000 );
-
-    /* ROM SECTION
-     *
-     * The following sections contain data which lives in read-only memory, if
-     * such memory is present in the design, for the entire duration of program
-     * execution.
-     */
-
+    /* ROM Sections */
     .init : {
-        /* The _enter symbol is placed in the .text.metal.init.enter section
-         * and must be placed at the beginning of the program */
         KEEP (*(.text.metal.init.enter))
         KEEP (*(.text.metal.init.*))
         KEEP (*(SORT_NONE(.init)))
@@ -114,9 +60,7 @@ SECTIONS
         KEEP (*(SORT_BY_INIT_PRIORITY(.metal.fini_array.*)));
         KEEP (*(.metal.fini_array));
         PROVIDE_HIDDEN ( metal_destructors_end = .);
-    } >rom :rom
-
- 
+    } >rom :rom 
 
     .ctors : {
         KEEP (*crtbegin.o(.ctors))
@@ -148,40 +92,6 @@ SECTIONS
         *(.srodata .srodata.*)
     } >rom :rom
 
-    /* ITIM SECTION
-     *
-     * The following sections contain data which is copied from read-only
-     * memory into an instruction tightly-integrated memory (ITIM), if one
-     * is present in the design, during pre-main program initialization.
-     *
-     * Generally, the data copied into the ITIM should be performance-critical
-     * functions which benefit from low instruction-fetch latency.
-     */
-
-    PROVIDE( metal_segment_itim_source_start = LOADADDR(.data) );
-    PROVIDE( metal_segment_itim_target_start = ADDR(.data) );
-    PROVIDE( metal_segment_itim_target_end = ADDR(.data) + SIZEOF(.data) );
-
-    /* LIM SECTION
-     *
-     * The following sections contain data which is copied from read-only
-     * memory into a loosely integrated memory (LIM), which is shared with L2
-     * cache, during pre-main program initialization.
-     *
-     * Generally, the data copied into the LIM should be performance-critical
-     * functions which benefit from low instruction-fetch latency.
-     */
-
-    PROVIDE( metal_segment_lim_source_start = LOADADDR(.data) );
-    PROVIDE( metal_segment_lim_target_start = ADDR(.data) );
-    PROVIDE( metal_segment_lim_target_end = ADDR(.data) + SIZEOF(.data) );
-
-    /* TEXT SECTION
-     *
-     * The following section contains the code of the program, excluding
-     * everything that's been allocated into the ITIM/LIM already
-     */
-
     .text : {
         *(.text.unlikely .text.unlikely.*)
         *(.text.startup .text.startup.*)
@@ -189,18 +99,7 @@ SECTIONS
         *(.gnu.linkonce.t.*)
     } >rom :text
 
-    /* RAM SECTION
-     *
-     * The following sections contain data which is copied from read-only
-     * memory into a read-write-capable memory such as data tightly-integrated
-     * memory (DTIM) or another main memory, as well as the BSS, stack, and
-     * heap.
-     *
-     * You might notice that .data, .tdata, .tbss, .tbss_space, and .bss all
-     * have an apparently unnecessary ALIGN at their top. This is because
-     * the implementation of _start in Freedom Metal libgloss depends on the
-     * ADDR and LOADADDR being 8-byte aligned.
-     */
+    /* RAM Sections */
 
     .data : ALIGN(8) {
         *(.data .data.*)
@@ -216,20 +115,11 @@ SECTIONS
 	*(.tdata .tdata.* .gnu.linkonce.td.*)
     } >ram AT>rom :tls :ram_init
 
-    PROVIDE( __tdata_source = LOADADDR(.tdata) );
-    PROVIDE( __tdata_size = SIZEOF(.tdata) );
-
-    PROVIDE( metal_segment_data_source_start = LOADADDR(.data) );
-    PROVIDE( metal_segment_data_target_start = ADDR(.data) );
-    PROVIDE( metal_segment_data_target_end = ADDR(.tdata) + SIZEOF(.tdata) );
-
     .tbss : ALIGN(8) {
 	*(.tbss .tbss.* .gnu.linkonce.tb.*)
 	*(.tcommon .tcommon.*)
 	PROVIDE( __tls_end = . );
     } >ram AT>ram :tls :ram
-    PROVIDE( __tbss_size = SIZEOF(.tbss) );
-    PROVIDE( __tls_size = __tls_end - __tls_base );
 
     .tbss_space : ALIGN(8) {
 	. = . + __tbss_size;
@@ -241,13 +131,7 @@ SECTIONS
         *(.bss .bss.*)
         *(.gnu.linkonce.b.*)
         *(COMMON)
-    } >ram :ram
-
-    PROVIDE( metal_segment_bss_source_start = LOADADDR(.tbss) );
-    PROVIDE( metal_segment_bss_target_start = ADDR(.tbss) );
-    PROVIDE( metal_segment_bss_target_end = ADDR(.bss) + SIZEOF(.bss) );
-
- 
+    } >ram :ram 
 
     .stack (NOLOAD) : ALIGN(16) {
         PROVIDE(metal_segment_stack_begin = .);
@@ -260,19 +144,41 @@ SECTIONS
         PROVIDE( __end = . );
         PROVIDE( __heap_start = . );
         PROVIDE( metal_segment_heap_target_start = . );
-        /* If __heap_max is defined, grow the heap to use the rest of RAM,
-         * otherwise set the heap size to __heap_size */
-        . = DEFINED(__heap_max) ? MIN( LENGTH(ram) - ( . - ORIGIN(ram)) , 0x10000000) : __heap_size;
+        . =  __heap_size;
         PROVIDE( metal_segment_heap_target_end = . );
         PROVIDE( _heap_end = . );
         PROVIDE( __heap_end = . );
     } >ram :ram
 
-    /* C++ exception handling information is
-     * not useful with our current runtime environment,
-     * and it consumes flash space. Discard it until
-     * we have something that can use it
-     */
+
+
+    /* Symbols for the Metal library */
+    PROVIDE(__metal_boot_hart = 0);
+    PROVIDE(__metal_chicken_bit = 1);
+    PROVIDE(__metal_eccscrub_bit = 0);
+    PROVIDE( metal_dtim_0_memory_start = 0x80000000 );
+    PROVIDE( metal_dtim_0_memory_end = 0x80000000 + 0x4000 );
+    PROVIDE( metal_itim_0_memory_start = 0x8000000 );
+    PROVIDE( metal_itim_0_memory_end = 0x8000000 + 0x4000 );
+    PROVIDE( metal_segment_itim_source_start = LOADADDR(.data) );
+    PROVIDE( metal_segment_itim_target_start = ADDR(.data) );
+    PROVIDE( metal_segment_itim_target_end = ADDR(.data) + SIZEOF(.data) );
+    PROVIDE( metal_segment_lim_source_start = LOADADDR(.data) );
+    PROVIDE( metal_segment_lim_target_start = ADDR(.data) );
+    PROVIDE( metal_segment_lim_target_end = ADDR(.data) + SIZEOF(.data) );
+
+    PROVIDE( __tdata_source = LOADADDR(.tdata) );
+    PROVIDE( __tdata_size = SIZEOF(.tdata) );
+
+    PROVIDE( metal_segment_data_source_start = LOADADDR(.data) );
+    PROVIDE( metal_segment_data_target_start = ADDR(.data) );
+    PROVIDE( metal_segment_data_target_end = ADDR(.tdata) + SIZEOF(.tdata) );
+    PROVIDE( __tbss_size = SIZEOF(.tbss) );
+    PROVIDE( __tls_size = __tls_end - __tls_base );
+    PROVIDE( metal_segment_bss_source_start = LOADADDR(.tbss) );
+    PROVIDE( metal_segment_bss_target_start = ADDR(.tbss) );
+    PROVIDE( metal_segment_bss_target_end = ADDR(.bss) + SIZEOF(.bss) );
+
     /DISCARD/ : {
 	*(.eh_frame .eh_frame.*)
     }
