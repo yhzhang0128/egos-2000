@@ -11,11 +11,11 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-EARTH_SRCS = earth/earth.c
+EARTH_SRCS = earth/earth.c lib/log.c
 EARTH_LAYOUT = -Tearth/layout.lds
 ARTY_FLAGS = -Learth/arty -Iearth/arty
 
-GRASS_SRCS = grass/enter.S lib/malloc.c grass/grass.c
+GRASS_SRCS = grass/enter.S grass/grass.c lib/*.c
 GRASS_LAYOUT = -Tgrass/layout.lds
 
 
@@ -31,6 +31,6 @@ CFLAGS += -ffunction-sections -fdata-sections
 
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
-DEFAULT_LDLIBS = -Wl,--start-group -lc -lgcc -lm -Wl,--end-group
-EARTH_LDLIBS = -Wl,--start-group -lc -lgcc -lm -lmetal -lmetal-gloss -Wl,--end-group
+DEFAULT_LDLIBS = -Ilib/include -Wl,--start-group -lc -lgcc -lm -Wl,--end-group
+EARTH_LDLIBS = -Ilib/include -Wl,--start-group -lc -lgcc -lm -lmetal -lmetal-gloss -Wl,--end-group
 

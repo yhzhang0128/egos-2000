@@ -1,13 +1,10 @@
 #include <stdio.h>
 #include <metal/uart.h>
 
+#include "log.h"
+
 int uart_init();
 struct metal_uart* uart;
-
-#define KNRM  "\x1B[0m"
-#define KRED  "\x1B[31m"
-#define KGRN  "\x1B[32m"
-#define ERROR(x) printf("%s[ERROR] %s%s\r\n", KRED, x, KNRM);
 
 int main() {
     if (uart_init())
@@ -18,8 +15,8 @@ int main() {
 
         int c;
         for (c = -1; c == -1; metal_uart_getc(uart, &c));
-        
-        printf("Got char: 0x%.2x\r\n", (char) c);
+
+        SUCCESS("Got char: 0x%.2x", (char) c);
     }
     return 0;
 }
