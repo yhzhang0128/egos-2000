@@ -14,7 +14,7 @@ PHDRS
 
 SECTIONS
 {
-    __heap_size = 0x400;
+    __heap_size = 0x800;
     __stack_size = 0x2000;
 
     .text : ALIGN(8) {
