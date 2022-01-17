@@ -1,11 +1,11 @@
 all:
-	mkdir -p release
+	mkdir -p debug release
 	@echo "---------------- Compile the Earth Layer ----------------"
 	$(CC) $(CFLAGS) $(LDFLAGS) $(ARTY_FLAGS) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) -o release/earth.elf
-	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide ./release/earth.elf > ./release/earth.lst
+	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide ./release/earth.elf > ./debug/earth.lst
 	@echo "---------------- Compile the Grass Layer ----------------"
 	$(CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) -o release/grass.elf
-	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide ./release/grass.elf > ./release/grass.lst
+	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide ./release/grass.elf > ./debug/grass.lst
 
 
 EARTH_SRCS = earth/earth.c
