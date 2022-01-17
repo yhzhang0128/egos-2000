@@ -10,11 +10,10 @@ MEMORY
 
 PHDRS
 {
-    rom PT_LOAD;
-    ram_init PT_LOAD;
-    tls PT_TLS;
     ram PT_LOAD;
+    rom PT_LOAD;
     text PT_LOAD;
+    ram_init PT_LOAD;
 }
 
 SECTIONS
@@ -113,13 +112,13 @@ SECTIONS
     .tdata : ALIGN(8) {
         PROVIDE( __tls_base = . );
 	*(.tdata .tdata.* .gnu.linkonce.td.*)
-    } >ram AT>rom :tls :ram_init
+    } >ram AT>rom :ram_init
 
     .tbss : ALIGN(8) {
 	*(.tbss .tbss.* .gnu.linkonce.tb.*)
 	*(.tcommon .tcommon.*)
 	PROVIDE( __tls_end = . );
-    } >ram AT>ram :tls :ram
+    } >ram AT>ram :ram
 
     .tbss_space : ALIGN(8) {
 	. = . + __tbss_size;
@@ -149,8 +148,6 @@ SECTIONS
         PROVIDE( _heap_end = . );
         PROVIDE( __heap_end = . );
     } >ram :ram
-
-
 
     /* Symbols for the Metal library */
     PROVIDE(__metal_boot_hart = 0);
