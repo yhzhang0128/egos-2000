@@ -1,7 +1,5 @@
-#include <stdio.h>
-#include <metal/uart.h>
-
 #include "log.h"
+#include <metal/uart.h>
 
 int uart_init();
 struct metal_uart* uart;
@@ -11,7 +9,7 @@ int main() {
         return -1;
 
     while (1) {
-        printf("This is the earthbox. Enter a key:\r\n");
+        INFO("This is the earthbox. Enter a key:");
 
         int c;
         for (c = -1; c == -1; metal_uart_getc(uart, &c));
