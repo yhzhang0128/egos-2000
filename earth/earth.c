@@ -24,7 +24,7 @@ int main() {
 
     /* Put earth interface to a widely known address */
     memcpy((void*)EARTH_ADDR, &earth, sizeof(earth));
-    INFO("Put earth interface at 0x%.8x with size %d", EARTH_ADDR, sizeof(earth));
+    INFO("Put earth interface at 0x%.8x with size 0x%x", EARTH_ADDR, sizeof(earth));
 
     INFO("Start to load the grass layer");
     return 0;
@@ -58,6 +58,12 @@ int earth_init() {
     earth.intr_disable = intr_disable;
     earth.intr_register = intr_register;
     SUCCESS("Finished initializing the CPU interrupts");
+
+    earth.log.log_info = INFO;
+    earth.log.log_highlight = HIGHLIGHT;
+    earth.log.log_success = SUCCESS;
+    earth.log.log_error = ERROR;
+    earth.log.log_fatal = FATAL;
 
     return 0;
 }
