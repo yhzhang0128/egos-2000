@@ -14,6 +14,12 @@
 
 static struct earth earth;
 
+int intr_cnt;
+void timer_handler(int id, void* arg) {
+    intr_cnt++;
+    SUCCESS("Within timer interrupt %d, intr_cnt %d", id, intr_cnt);
+}
+
 int main() {
     INFO("Start to initialize the earth layer");
 
@@ -39,8 +45,13 @@ int main() {
     }
     earth.intr_enable = intr_enable;
     earth.intr_disable = intr_disable;
+    earth.intr_register = intr_register;
     SUCCESS("Finished initializing the CPU interrupts");
-    
+
+
+    intr_register(TIMER_INTR_ID, timer_handler);
+    intr_enable();
+    while(1);
 
     return 0;
 }

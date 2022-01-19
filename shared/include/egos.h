@@ -1,5 +1,9 @@
 #pragma once
 
+#define TIMER_INTR_ID 7
+#define QUANTUM_NCYCLES 5000
+typedef void (*handler_t)(int, void*);
+
 struct earth {
     int (*tty_read)(char* buf, int len);
     int (*tty_write)(const char *format, ...);    
@@ -9,4 +13,5 @@ struct earth {
 
     int (*intr_enable)();
     int (*intr_disable)();
+    int (*intr_register)(int id, handler_t handler);
 };

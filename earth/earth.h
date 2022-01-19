@@ -17,6 +17,8 @@ int disk_init();
 int disk_read(int block_no, int nblocks, char* dst);
 int disk_write(int block_no, int nblocks, char* src);
 
+typedef void (*handler_t)(int, void*);
 int intr_init();
 int intr_enable();
 int intr_disable();
+int intr_register(int id, handler_t handler);
