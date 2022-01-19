@@ -2,8 +2,6 @@
 
 #include "log.h"
 
-/* interface between earth and grass */
-
 #define TIMER_INTR_ID   7
 #define QUANTUM_NCYCLES 2000
 #define EARTH_ADDR      (0x8004000 - 0x40)
@@ -23,5 +21,3 @@ struct earth {
 
     struct dev_log log;
 };
-
-/* interface between grass and apps */
