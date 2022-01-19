@@ -36,7 +36,7 @@ SECTIONS
         *(.data .data.*)
         . = ALIGN(8);
         *(.sdata .sdata.* .sdata2.*)
-    } >ram : ram
+    } >ram :ram
 
     .bss (NOLOAD): ALIGN(8) {
         *(.sbss*)
