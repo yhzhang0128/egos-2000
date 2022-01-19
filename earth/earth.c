@@ -25,7 +25,6 @@ int main() {
     earth.tty_write = tty_write;
     SUCCESS("Finished initializing the tty device");
     
-
     if (disk_init()) {
         ERROR("Failed at initializing the disk device");
         return -1;
@@ -33,5 +32,13 @@ int main() {
     earth.disk_read = disk_read;
     earth.disk_write = disk_write;
     SUCCESS("Finished initializing the disk device");
+
+    if (intr_init()) {
+        ERROR("Failed at initializing the CPU interrupts");
+        return -1;
+    }
+    SUCCESS("Finished initializing the CPU interrupts");
+    
+
     return 0;
 }
