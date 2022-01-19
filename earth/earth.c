@@ -34,7 +34,6 @@ void test_tty() {
         INFO("This is the earthbox. Enter a sentence:");
 
         tty_read(buf, 100);
-
-        INFO("Got sentence: %s", buf);
+        tty_write("Got sentence: %s\r\n", buf);
     }
 }
