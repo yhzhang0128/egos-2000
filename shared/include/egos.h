@@ -1,20 +1,14 @@
 #pragma once
 
-/* Interface between earth and grass */
+#include "log.h"
+
+/* interface between earth and grass */
 
 #define TIMER_INTR_ID   7
 #define QUANTUM_NCYCLES 2000
 #define EARTH_ADDR      (0x8004000 - 0x40)
 
 typedef void (*handler_t)(int, void*);
-
-struct dev_log {
-    int (*log_info)(const char *format, ...);
-    int (*log_highlight)(const char *format, ...);
-    int (*log_success)(const char *format, ...);
-    int (*log_error)(const char *format, ...);
-    int (*log_fatal)(const char *format, ...);
-};
 
 struct earth {
     int (*tty_read)(char* buf, int len);
@@ -30,4 +24,4 @@ struct earth {
     struct dev_log log;
 };
 
-/* Interface between grass and apps */
+/* interface between grass and apps */
