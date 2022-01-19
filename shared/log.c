@@ -1,3 +1,12 @@
+/*
+ * (C) 2022, Cornell University
+ * All rights reserved.
+ */
+
+/* Author: Yunhao Zhang
+ * Description: log printing functions with colors
+ */
+
 #include <stdio.h>
 #include <stdarg.h>
 

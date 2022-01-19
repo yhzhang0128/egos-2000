@@ -1,41 +1,40 @@
-#include "log.h"
-#include <metal/uart.h>
+/*
+ * (C) 2022, Cornell University
+ * All rights reserved.
+ */
 
-int uart_init();
-struct metal_uart* uart;
+/* Author: Yunhao Zhang
+ * Description: initialize dev_tty, dev_disk, cpu_intr and cpu_mmu
+ */
+
+
+#include "egos.h"
+#include "earth.h"
+
+static struct earth earth;
+
+void test_tty();
 
 int main() {
-    if (uart_init())
-        return -1;
-
-    while (1) {
-        INFO("This is the earthbox. Enter a key:");
-
-        int c;
-        for (c = -1; c == -1; metal_uart_getc(uart, &c));
-
-        SUCCESS("Got char: 0x%.2x", (char) c);
-    }
-    return 0;
-}
-
-int uart_init() {
-    uart = metal_uart_get_device(0);
-    metal_uart_init(uart, 115200);
-    for (int i = 0; i < 2000000; i++);
-    
-    if (!uart) {
-        ERROR("Unable to get uart handle");
+    if (tty_init()) {
+        ERROR("Failed at initializing tty device");
         return -1;
     }
+    earth.tty_read = tty_read;
+    earth.tty_write = tty_write;
 
-    // clear up some initial input to uart
-    while (1) {
-        int tmp;
-        int r = metal_uart_getc(uart, &tmp);
-        if (tmp == -1)
-            break;
-    }
+    test_tty();
+
     return 0;
+}    
+
+void test_tty() {
+    char buf[100];
+    while (1) {
+        INFO("This is the earthbox. Enter a sentence:");
+
+        tty_read(buf, 100);
+
+        INFO("Got sentence: %s", buf);
+    }
 }
-    
