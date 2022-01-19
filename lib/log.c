@@ -18,9 +18,9 @@ int INFO(const char *format, ...)
     printf("\r\n");
 }
 
-int SUCCESS(const char *format, ...)
+int HIGHLIGHT(const char *format, ...)
 {
-    printf("%s[SUCCESS] ", KGRN);
+    printf("%s[HIGHLIGHT] ", KYEL);
     
     va_list args;
     va_start(args, format);
@@ -30,9 +30,9 @@ int SUCCESS(const char *format, ...)
     printf("%s\r\n", KNRM);
 }
 
-int WARNING(const char *format, ...)
+int SUCCESS(const char *format, ...)
 {
-    printf("%s[WARNING] ", KYEL);
+    printf("%s[SUCCESS] ", KGRN);
     
     va_list args;
     va_start(args, format);
