@@ -11,7 +11,7 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-EARTH_SRCS = earth/*.c shared/*.c
+EARTH_SRCS = earth/*.c earth/sdlib/*.c shared/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
 
 GRASS_SRCS = grass/enter.S grass/*.c shared/*.c

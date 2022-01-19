@@ -13,27 +13,24 @@
 
 static struct earth earth;
 
-void test_tty();
-
 int main() {
+    INFO("Start to initialize the earth layer");
+
     if (tty_init()) {
-        ERROR("Failed at initializing tty device");
+        ERROR("Failed at initializing the tty device");
         return -1;
     }
     earth.tty_read = tty_read;
     earth.tty_write = tty_write;
+    SUCCESS("Finished initializing the tty device");
+    
 
-    test_tty();
-
-    return 0;
-}    
-
-void test_tty() {
-    char buf[100];
-    while (1) {
-        INFO("This is the earthbox. Enter a sentence:");
-
-        tty_read(buf, 100);
-        tty_write("Got sentence: %s\r\n", buf);
+    if (disk_init()) {
+        ERROR("Failed at initializing the disk device");
+        return -1;
     }
+    earth.disk_read = disk_read;
+    earth.disk_write = disk_write;
+    SUCCESS("Finished initializing the disk device");
+    return 0;
 }
