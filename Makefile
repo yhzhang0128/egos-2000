@@ -6,12 +6,14 @@ all:
 	@echo "---------------- Compile the Grass Layer ----------------"
 	$(CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
-
+	@echo "---------------- Create the Install Image ----------------"
+	$(GCC) install/mkfs.c -o $(BUILD_DIR)/mkfs
+	cd install; ./mkfs
 loc:
 	cloc . --fullpath --not-match-d=earth/arty
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(DEBUG_DIR) $(RELEASE_DIR) $(BUILD_DIR)/mkfs $(BUILD_DIR)/disk.img
 
 
 EARTH_SRCS = earth/*.c earth/sdlib/*.c shared/*.c
@@ -20,11 +22,11 @@ EARTH_LAYOUT = -Tearth/layout.lds
 GRASS_SRCS = grass/enter.S grass/*.c shared/*.c
 GRASS_LAYOUT = -Tgrass/layout.lds
 
-
+GCC = gcc
 CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 
-BUILD_DIR = build
+BUILD_DIR = install
 DEBUG_DIR = $(BUILD_DIR)/debug
 RELEASE_DIR = $(BUILD_DIR)/release
 
