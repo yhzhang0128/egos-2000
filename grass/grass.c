@@ -18,6 +18,8 @@ int global_var2;
 int global_var3 = 1;
 
 int main() {
+    INFO("Enter the grass layer");
+    
     global_var1++;
     global_var2++;
     global_var3++;
