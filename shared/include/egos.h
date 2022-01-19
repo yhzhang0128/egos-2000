@@ -1,7 +1,9 @@
 #pragma once
 
-#define TIMER_INTR_ID 7
+#define TIMER_INTR_ID   7
 #define QUANTUM_NCYCLES 2000
+#define EARTH_ADDR      (0x8004000 - 0x40)
+
 typedef void (*handler_t)(int, void*);
 
 struct earth {

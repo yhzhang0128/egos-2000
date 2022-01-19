@@ -11,6 +11,6 @@
         .global _enter
 _enter:
         li sp,0x08008000
-        addi sp,sp,-16
+        addi sp,sp,-64
         jal main
         jal _enter

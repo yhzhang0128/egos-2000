@@ -12,11 +12,25 @@
 #include "egos.h"
 #include "earth.h"
 
+int earth_init();
 static struct earth earth;
 
 int main() {
+    INFO("-----------------------------------");
     INFO("Start to initialize the earth layer");
 
+    if (earth_init())
+        return -1;
+
+    /* Put earth interface to a widely known address */
+    memcpy((void*)EARTH_ADDR, &earth, sizeof(earth));
+    INFO("Put earth interface at 0x%.8x with size %d", EARTH_ADDR, sizeof(earth));
+
+    INFO("Start to load the grass layer");
+    return 0;
+}
+
+int earth_init() {
     /* Initialize TTY */
     if (tty_init()) {
         ERROR("Failed at initializing the tty device");
