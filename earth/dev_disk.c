@@ -1,3 +1,13 @@
+/*
+ * (C) 2022, Cornell University
+ * All rights reserved.
+ */
+
+/* Author: Yunhao Zhang
+ * Description: a simple disk device driver
+ */
+
+
 #include "earth.h"
 #include "sdlib/sdlib.h"
 
