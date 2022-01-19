@@ -7,6 +7,9 @@ all:
 	$(CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
 
+loc:
+	cloc . --fullpath --not-match-d=earth/arty
+
 clean:
 	rm -rf $(BUILD_DIR)
 
