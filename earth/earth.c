@@ -17,7 +17,8 @@ static struct earth earth;
 int intr_cnt;
 void timer_handler(int id, void* arg) {
     intr_cnt++;
-    SUCCESS("Within timer interrupt %d, intr_cnt %d", id, intr_cnt);
+    int local;
+    SUCCESS("Within timer interrupt round #%d, stack @0x%.8x", intr_cnt, &local);
 }
 
 int main() {
@@ -51,7 +52,14 @@ int main() {
 
     intr_register(TIMER_INTR_ID, timer_handler);
     intr_enable();
-    while(1);
+
+    int cnt = 0;
+    while(1) {
+        if (cnt < intr_cnt) {
+            INFO("Normal program flow with stack variable @0x%.8x", &cnt);
+            cnt++;
+        }
+    }
 
     return 0;
 }
