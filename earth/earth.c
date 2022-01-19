@@ -37,6 +37,8 @@ int main() {
         ERROR("Failed at initializing the CPU interrupts");
         return -1;
     }
+    earth.intr_enable = intr_enable;
+    earth.intr_disable = intr_disable;
     SUCCESS("Finished initializing the CPU interrupts");
     
 
