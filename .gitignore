@@ -1,2 +1,5 @@
 debug
 release
+
+disk.img
+mkfs
