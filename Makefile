@@ -13,7 +13,6 @@ clean:
 
 EARTH_SRCS = earth/earth.c lib/log.c
 EARTH_LAYOUT = -Tearth/layout.lds
-ARTY_FLAGS = -Learth/arty -Iearth/arty
 
 GRASS_SRCS = grass/enter.S grass/grass.c lib/*.c
 GRASS_LAYOUT = -Tgrass/layout.lds
@@ -29,6 +28,7 @@ RELEASE_DIR = $(BUILD_DIR)/release
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
+ARTY_FLAGS = -Learth/arty -Iearth/arty
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -Ilib/include -Wl,--start-group -lc -lgcc -lm -Wl,--end-group
