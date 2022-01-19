@@ -45,9 +45,9 @@ SECTIONS
     } >ram :ram
 
     .heap (NOLOAD) : ALIGN(8) {
-          PROVIDE( HEAP_START = . );
+          PROVIDE( __heap_start = . );
           . = __heap_size;
-          PROVIDE( HEAP_END = . );
+          PROVIDE( __heap_end = . );
     } >ram :ram
 
 
