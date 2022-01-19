@@ -1,7 +1,7 @@
 #pragma once
 
 #define TIMER_INTR_ID 7
-#define QUANTUM_NCYCLES 5000
+#define QUANTUM_NCYCLES 2000
 typedef void (*handler_t)(int, void*);
 
 struct earth {
