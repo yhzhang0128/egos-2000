@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: initialize the stack pointer for the grass kernel
+ * Description: initialize the stack pointer for the application
  */
 
         .section .text
