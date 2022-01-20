@@ -1,0 +1,16 @@
+#pragma once
+
+#define PAGE_SIZE       4096
+#define MAX_NFRAMES     100
+#define CACHED_NFRAMES  20
+#define CACHE_START     0x8000C000
+
+struct frame_cache {
+    char content[PAGE_SIZE];
+};
+
+struct mapping {
+    int pid;
+    int page_no;
+    int flag;
+};
