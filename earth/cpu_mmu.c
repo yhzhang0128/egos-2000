@@ -13,23 +13,15 @@
 #include "egos.h"
 #include "earth.h"
 
-#define PAGE_SIZE       4096
-#define MAX_NFRAMES     100
-#define CACHED_NFRAMES  20
-#define CACHE_START     0x8000C000
-
 /* cached physical frames */
-struct frame_cache {
-    char content[PAGE_SIZE];
-};
 struct frame_cache *cache = (void*)CACHE_START;
 int cache_frame_no[CACHED_NFRAMES];
 
-static void* cache_read(int frame_no) {
+static int cache_read(int frame_no) {
     int free_no = 0;
     for (int i = 0; i < CACHED_NFRAMES; i++) {
         if (cache_frame_no[i] == frame_no)
-            return cache + i;
+            return (int)(cache + i);
         if (cache_frame_no[i] == -1 && free_no == 0)
             free_no = i;
     }
@@ -38,31 +30,27 @@ static void* cache_read(int frame_no) {
         cache_frame_no[free_no] = frame_no;
         int group = PAGE_SIZE / BLOCK_SIZE;
         disk_read(free_no * group, group, (char*)(cache + free_no));
-        return cache + free_no;
+
+        return (int)(cache + free_no);
     } else {
         FATAL("Cache is full and eviction is not implemented");
     }
 }
 
 /* mapping for address translation */
-struct mapping {
-    int pid;
-    int page_no;
-    int flag;
-};
+int curr_pid;
 struct mapping mappings[MAX_NFRAMES];
 
-int curr_pid;
-
-int mmu_alloc(int* frame_no, void** addr) {
+int mmu_alloc(int* frame_no, int* addr) {
     for (int i = 0; i < MAX_NFRAMES; i++) {
         if (!(mappings[i].flag | F_INUSE)) {
             mappings[i].flag |= F_INUSE;
             *frame_no = i;
             *addr = cache_read(i);
+            return 0;
         }
     }
-    return 0;
+    return -1;
 }
 
 int mmu_map(int pid, int page_no, int frame_no, int flag) {

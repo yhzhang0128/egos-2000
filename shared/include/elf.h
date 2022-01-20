@@ -1,12 +1,16 @@
 #pragma once
 
 #include "fs.h"
+#include "mmu.h"
 
 #define uint32_t unsigned int
 #define uint16_t unsigned short int
 
 #define GRASS_BASE 0x08004000
 #define GRASS_SIZE 0x00004000
+
+#define APPS_BASE  0x80000000
+#define APPS_SIZE  0x0000c000
 
 #define APP_BASE   0x80000000
 #define APP_SIZE   0x0000c000

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "egos.h"
-struct earth *earth = (void*)EARTH_ADDR;
 
+struct earth *earth = (void*)EARTH_ADDR;
 #define printf    earth->tty_write
 
 #define INFO      earth->log.log_info

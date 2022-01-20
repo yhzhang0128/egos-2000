@@ -11,6 +11,7 @@
 #include "egos.h"
 #include "elf.h"
 #include "log.h"
+#include "grass.h"
 #include <string.h>
 
 void elf_load(struct block_store* bs, struct earth* earth) {
@@ -50,6 +51,28 @@ void elf_load(struct block_store* bs, struct earth* earth) {
         /* call the grass kernel entry and never return */
         void (*grass_entry)() = (void*)GRASS_BASE;
         grass_entry();
+    } else if (pheader.p_vaddr == APPS_BASE) {
+        INFO("App starts at vaddr: 0x%.8x", pheader.p_vaddr);
+        INFO("App memory size: 0x%.8x bytes", pheader.p_memsz);
+
+        if (pheader.p_offset % BLOCK_SIZE) {
+            FATAL("TODO: program offset not aligned by %d", BLOCK_SIZE);
+        }
+
+        /* load the application */
+        int base, frame_no, page_no = 0;
+        int block_offset = pheader.p_offset / BLOCK_SIZE;
+        for (int size = 0; size < pheader.p_filesz; size += BLOCK_SIZE) {
+            if (size % PAGE_SIZE == 0) {
+                earth->mmu_alloc(&frame_no, &base);
+                INFO("Allocated physical frame %d with base 0x%.8x", frame_no, (uint32_t)base);
+            }
+            bs->read(block_offset++, 1, ((char*)base) + (size % PAGE_SIZE));
+        }
+
+        earth->mmu_alloc(&frame_no, &base);
+        INFO("Allocated physical frame %d with base 0x%.8x", frame_no, (uint32_t)base);
+        
     } else {
         FATAL("ELF gives invalid starting vaddr: 0x%.8x", pheader.p_vaddr);
     }
