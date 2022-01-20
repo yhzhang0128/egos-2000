@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "elf.h"
+#include "mmu.h"
 
 extern struct earth *earth;
 #define printf    earth->tty_write

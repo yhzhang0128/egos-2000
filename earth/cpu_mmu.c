@@ -13,6 +13,8 @@
 #include "egos.h"
 #include "earth.h"
 
+#include "mmu.h"
+
 /* cached physical frames */
 struct frame_cache *cache = (void*)CACHE_START;
 int cache_frame_no[CACHED_NFRAMES];

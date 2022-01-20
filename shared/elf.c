@@ -8,11 +8,14 @@
  * program header and not using the multiple section headers
  */
 
+#include <string.h>
+
 #include "egos.h"
+#include "fs.h"
 #include "elf.h"
+#include "mmu.h"
 #include "log.h"
 #include "grass.h"
-#include <string.h>
 
 void elf_load(int pid, struct block_store* bs, struct earth* earth) {
     char buf[512];

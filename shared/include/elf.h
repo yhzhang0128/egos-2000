@@ -1,8 +1,5 @@
 #pragma once
 
-#include "fs.h"
-#include "mmu.h"
-
 #define uint32_t unsigned int
 #define uint16_t unsigned short int
 
@@ -43,5 +40,7 @@ struct elf32_program_header{
   uint32_t      p_align;
 };
 
+#include "fs.h"
 struct earth;
+
 void elf_load(int pid, struct block_store* bs, struct earth* earth);
