@@ -39,4 +39,5 @@ struct elf32_program_header{
   uint32_t      p_align;
 };
 
-void elf_load_grass(struct block_store* bs);
+struct earth;
+void elf_load(struct block_store* bs, struct earth* earth);

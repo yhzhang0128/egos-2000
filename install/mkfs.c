@@ -5,7 +5,7 @@
 
 char* kernel_processes[] = {
                             "release/grass.elf",
-                            //"release/fs.elf",
+                            "release/echo.elf",
                             //"release/dir.elf",
                             //"release/shell.elf"
 };

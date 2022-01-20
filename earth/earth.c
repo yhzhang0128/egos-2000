@@ -85,13 +85,8 @@ static int grass_read(int block_no, int nblocks, char* dst) {
     return earth.disk_read(GRASS_EXEC_START + block_no, nblocks, dst);
 }
 
-static int grass_write(int block_no, int nblocks, char* src) {
-    return earth.disk_write(GRASS_EXEC_START + block_no, nblocks, src);
-}
-
 void grass_load() {
     struct block_store bs;
     bs.read = grass_read;
-    bs.write = grass_write;
-    elf_load_grass(&bs);
+    elf_load(&bs, &earth);
 }

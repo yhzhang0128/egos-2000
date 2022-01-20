@@ -8,11 +8,12 @@
  * program header and not using the multiple section headers
  */
 
+#include "egos.h"
 #include "elf.h"
 #include "log.h"
 #include <string.h>
 
-void elf_load_grass(struct block_store* bs) {
+void elf_load(struct block_store* bs, struct earth* earth) {
     char buf[512];
     bs->read(0, 1, buf);
 
