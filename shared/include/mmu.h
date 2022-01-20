@@ -7,10 +7,10 @@
 #define CACHED_NFRAMES  20
 
 #define VADDR_START     0x80000000
-#define VADDR_SIZE      VADDR_START + PAGE_SIZE * MAX_NPAGES
+#define VADDR_SIZE      PAGE_SIZE * MAX_NPAGES
 
 #define CACHE_START     0x8000C000
-#define CACHE_SIZE      CACHE_START + PAGE_SIZE * CACHED_NFRAMES
+#define CACHE_SIZE      PAGE_SIZE * CACHED_NFRAMES
 
 struct frame {
     char content[PAGE_SIZE];
