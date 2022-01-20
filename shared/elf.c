@@ -41,9 +41,10 @@ void elf_load_grass(struct block_store* bs) {
         /* load the grass kernel */
         int block_offset = pheader.p_offset / BLOCK_SIZE;
         for (int size = 0; size < pheader.p_filesz; size += BLOCK_SIZE) {
-            bs->read(++block_offset, 1, (char*)GRASS_BASE + size);
+            bs->read(block_offset++, 1, (char*)GRASS_BASE + size);
         }
         memset((char*)GRASS_BASE + pheader.p_filesz, 0, GRASS_SIZE - pheader.p_filesz);
+
 
         /* call the grass kernel entry and never return */
         void (*grass_entry)() = (void*)GRASS_BASE;
