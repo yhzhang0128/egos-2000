@@ -28,7 +28,7 @@ static void elf_load_app(int pid,
 
 
 void elf_load(int pid, struct block_store* bs, struct earth* earth) {
-    char buf[512];
+    char buf[BLOCK_SIZE];
     bs->read(0, 1, buf);
     struct elf32_header *header = (void*) buf;
     if (header->e_phnum != 1 ||
