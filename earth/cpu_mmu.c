@@ -43,7 +43,7 @@ struct mapping mappings[MAX_NFRAMES];
 
 int mmu_alloc(int* frame_no, int* addr) {
     for (int i = 0; i < MAX_NFRAMES; i++) {
-        if (!(mappings[i].flag | F_INUSE)) {
+        if (!(mappings[i].flag & F_INUSE)) {
             mappings[i].flag |= F_INUSE;
             *frame_no = i;
             *addr = cache_read(i);
@@ -54,7 +54,7 @@ int mmu_alloc(int* frame_no, int* addr) {
 }
 
 int mmu_map(int pid, int page_no, int frame_no, int flag) {
-    if (!(mappings[frame_no].flag | F_INUSE)) {
+    if (!(mappings[frame_no].flag & F_INUSE)) {
         ERROR("Frame %d has not been allocated", frame_no);
         return -1;
     }
