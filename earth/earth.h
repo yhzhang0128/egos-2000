@@ -8,6 +8,7 @@
 #include <metal/interrupt.h>
 
 #include "log.h"
+#include "elf.h"
 
 int tty_init();
 int tty_read(char* buf, int len);

@@ -26,6 +26,6 @@ int main() {
 
     char* buf = malloc(512);
     free(buf);
-    SUCCESS("Within grass kernel with stack variable @0x%.8x", &buf);
+    SUCCESS("stack variable @0x%.8x and heap variable @0x%.8x", &buf, buf);
     return 0;
 }

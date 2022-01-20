@@ -13,6 +13,7 @@
 #include "earth.h"
 
 int earth_init();
+void grass_load();
 static struct earth earth;
 
 int main() {
@@ -22,11 +23,13 @@ int main() {
     if (earth_init())
         return -1;
 
-    /* Put earth interface to a widely known address */
-    memcpy((void*)EARTH_ADDR, &earth, sizeof(earth));
     INFO("Put earth interface at 0x%.8x with size 0x%x", EARTH_ADDR, sizeof(earth));
+    memcpy((void*)EARTH_ADDR, &earth, sizeof(earth));
 
     INFO("Start to load the grass layer");
+    /* this function should never return */
+    grass_load();
+
     return 0;
 }
 
@@ -66,4 +69,20 @@ int earth_init() {
     earth.log.log_fatal = FATAL;
 
     return 0;
+}
+
+static int grass_read(int block_no, int nblocks, char* dst) {
+    return earth.disk_read(GRASS_EXEC_START + block_no, nblocks, dst);
+}
+
+static int grass_write(int block_no, int nblocks, char* src) {
+    return earth.disk_write(GRASS_EXEC_START + block_no, nblocks, src);
+}
+
+void grass_load() {
+    struct block_store bs;
+    bs.read = grass_read;
+    bs.write = grass_write;
+
+    elf_load(&bs);
 }

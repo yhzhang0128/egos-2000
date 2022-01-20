@@ -13,4 +13,7 @@ _enter:
         li sp,0x08008000
         addi sp,sp,-64
         jal main
-        jal _enter
+        jal _stop
+
+_stop:
+        jal _stop

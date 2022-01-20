@@ -17,7 +17,6 @@ enum {
 };
 
 static int type;
-#define BLOCK_SIZE      SD_BLOCK_SIZE
 #define FLASH_ROM_START 0x20800000
 
 int disk_read(int block_no, int nblocks, char* dst) {
