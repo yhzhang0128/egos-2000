@@ -132,23 +132,23 @@ SECTIONS
         *(COMMON)
     } >ram :ram 
 
-    .stack (NOLOAD) : ALIGN(16) {
-        PROVIDE(metal_segment_stack_begin = .);
-        . += __stack_size; /* Hart 0 */
-        PROVIDE( _sp = . );
-        PROVIDE(metal_segment_stack_end = .);
-    } >ram :ram
-
     .heap (NOLOAD) : ALIGN(8) {
         PROVIDE( __end = . );
         PROVIDE( __heap_start = . );
         PROVIDE( metal_segment_heap_target_start = . );
-        . =  __heap_size;
+        . +=  __heap_size;
         PROVIDE( metal_segment_heap_target_end = . );
         PROVIDE( _heap_end = . );
         PROVIDE( __heap_end = . );
     } >ram :ram
 
+    .stack (NOLOAD) : ALIGN(16) {
+        PROVIDE(metal_segment_stack_begin = .);
+        . = __stack_size; /* Hart 0 */
+        PROVIDE( _sp = . );
+        PROVIDE(metal_segment_stack_end = .);
+    } >ram :ram
+    
     /* Symbols for the Metal library */
     PROVIDE(__metal_boot_hart = 0);
     PROVIDE(__metal_chicken_bit = 1);
