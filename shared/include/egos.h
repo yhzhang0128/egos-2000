@@ -32,3 +32,11 @@ struct earth {
 
     struct dev_log log;
 };
+
+enum {
+      PID_PROCESS,
+      PID_FS,
+      PID_DIR,
+      PID_SHELL,
+      PID_KERNEL_TOTAL
+}; 

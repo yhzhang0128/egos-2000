@@ -72,6 +72,7 @@ int earth_init() {
     earth.mmu_switch = mmu_switch;
     SUCCESS("Finished initializing the CPU memory management unit");
 
+    /* Initialize the logging functions */
     earth.log.log_info = INFO;
     earth.log.log_highlight = HIGHLIGHT;
     earth.log.log_success = SUCCESS;

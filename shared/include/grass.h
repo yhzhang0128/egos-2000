@@ -13,4 +13,3 @@ extern struct earth *earth;
 #define SUCCESS   earth->log.log_success
 #define ERROR     earth->log.log_error
 #define FATAL     earth->log.log_fatal
-
