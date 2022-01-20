@@ -3,3 +3,6 @@ release
 
 disk.img
 mkfs
+
+*.elf
+*.lst
