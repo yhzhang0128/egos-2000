@@ -32,7 +32,6 @@ int main() {
     INFO("Load the file system as process #%d", next_pid);
     bs.read = elf_fs_read;
 
-    INFO("FS at addr %.8x", FS_EXEC_START);
     int fs_pid = next_pid++;
     elf_load(fs_pid, &bs, earth);
     earth->mmu_switch(fs_pid);

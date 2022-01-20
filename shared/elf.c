@@ -17,10 +17,7 @@
 void elf_load(int pid, struct block_store* bs, struct earth* earth) {
     char buf[512];
     bs->read(0, 1, buf);
-
     struct elf32_header *header = (void*) buf;
-    INFO("ELF program header table entry count: %d", header->e_phnum);
-
     if (header->e_phnum != 1) {
         FATAL("Grass exec region of the disk seems to be corrupted");
     }
