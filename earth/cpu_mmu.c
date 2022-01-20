@@ -66,7 +66,19 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
 }
 
 int mmu_switch(int pid) {
-    FATAL("mmu_switch not implemented");
+    if (curr_pid != -1) {
+        FATAL("context switch not implemented");
+    }
+
+    char* base = (void*) VADDR_START;
+    for (int i = 0; i < MAX_NFRAMES; i++) {
+        if ((mappings[i].flag & F_INUSE) &&
+            mappings[i].pid == pid) {
+            int addr = cache_read(i);
+            memcpy(base + PAGE_SIZE * mappings[i].page_no, (char*)addr, PAGE_SIZE);
+            INFO("Map frame #%d to page #%d of process #%d", i, mappings[i].page_no, pid);
+        }
+    }
     return 0;
 }
 

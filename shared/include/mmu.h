@@ -5,6 +5,7 @@
 #define CACHED_NFRAMES  20
 #define CACHE_START     0x8000C000
 
+#define VADDR_START     0x80000000
 #define MAX_NPAGES      12
 
 struct frame_cache {

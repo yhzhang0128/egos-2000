@@ -69,7 +69,6 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
             if (size % PAGE_SIZE == 0) {
                 earth->mmu_alloc(&frame_no, &base);
                 earth->mmu_map(pid, page_no++, frame_no, F_ALL);
-                INFO("Map frame #%d to page #%d", frame_no, page_no - 1);
             }
             bs->read(block_offset++, 1, ((char*)base) + (size % PAGE_SIZE));
         }
@@ -77,16 +76,13 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
         /* one more page for the heap */
         earth->mmu_alloc(&frame_no, &base);
         earth->mmu_map(pid, page_no++, frame_no, F_ALL);
-        INFO("Map frame #%d to page #%d", frame_no, page_no - 1);        
 
         /* two more pages for the stack */
         earth->mmu_alloc(&frame_no, &base);
         earth->mmu_map(pid, MAX_NPAGES - 2, frame_no, F_ALL);
-        INFO("Map frame #%d to page #%d", frame_no, MAX_NPAGES - 2);
 
         earth->mmu_alloc(&frame_no, &base);
         earth->mmu_map(pid, MAX_NPAGES - 1, frame_no, F_ALL);
-        INFO("Map frame #%d to page #%d", frame_no, MAX_NPAGES - 1);
     } else {
         FATAL("ELF gives invalid starting vaddr: 0x%.8x", pheader.p_vaddr);
     }

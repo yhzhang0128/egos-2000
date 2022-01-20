@@ -27,7 +27,10 @@ int main() {
     bs.read = elf_fs_read;
 
     INFO("FS at addr %.8x", FS_EXEC_START);
-    elf_load(next_pid++, &bs, earth);
+    int fs_pid = next_pid++;
+    elf_load(fs_pid, &bs, earth);
+
+    earth->mmu_switch(fs_pid);
 
     return 0;
 }
