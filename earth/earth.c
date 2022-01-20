@@ -62,6 +62,16 @@ int earth_init() {
     earth.intr_register = intr_register;
     SUCCESS("Finished initializing the CPU interrupts");
 
+    /* Initialize CPU memory management unit */
+    if (mmu_init()) {
+        ERROR("Failed at initializing the CPU interrupts");
+        return -1;
+    }
+    earth.mmu_alloc = mmu_alloc;
+    earth.mmu_map = mmu_map;
+    earth.mmu_switch = mmu_switch;
+    SUCCESS("Finished initializing the CPU memory management unit");
+
     earth.log.log_info = INFO;
     earth.log.log_highlight = HIGHLIGHT;
     earth.log.log_success = SUCCESS;

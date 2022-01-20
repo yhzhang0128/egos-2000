@@ -23,3 +23,8 @@ int intr_init();
 int intr_enable();
 int intr_disable();
 int intr_register(int id, handler_t handler);
+
+int mmu_init();
+int mmu_alloc(int* frame_no, void** addr);
+int mmu_map(int pid, int page_no, int frame_no, int flag);
+int mmu_switch(int pid);

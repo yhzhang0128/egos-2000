@@ -4,6 +4,12 @@
 
 #define TIMER_INTR_ID   7
 #define QUANTUM_NCYCLES 2000
+
+#define F_INUSE         0x1
+#define F_READ          0x2
+#define F_WRITE         0x4
+#define F_EXEC          0x8
+
 #define EARTH_ADDR      (0x8004000 - 0x40)
 
 typedef void (*handler_t)(int, void*);
@@ -18,6 +24,10 @@ struct earth {
     int (*intr_enable)();
     int (*intr_disable)();
     int (*intr_register)(int id, handler_t handler);
+
+    int (*mmu_alloc)(int* frame_no, void** addr);
+    int (*mmu_map)(int pid, int page_no, int frame_no, int flag);
+    int (*mmu_switch)(int pid);
 
     struct dev_log log;
 };
