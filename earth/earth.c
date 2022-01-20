@@ -89,4 +89,8 @@ void grass_load() {
     struct block_store bs;
     bs.read = grass_read;
     elf_load(0, &bs, &earth);
+
+    /* call the grass kernel entry and never return */
+    void (*grass_entry)() = (void*)GRASS_BASE;
+    grass_entry();
 }

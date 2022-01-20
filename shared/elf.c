@@ -46,11 +46,6 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
             bs->read(block_offset++, 1, (char*)GRASS_BASE + size);
         }
         memset((char*)GRASS_BASE + pheader.p_filesz, 0, GRASS_SIZE - pheader.p_filesz);
-
-
-        /* call the grass kernel entry and never return */
-        void (*grass_entry)() = (void*)GRASS_BASE;
-        grass_entry();
     }
 
     /* load an application */

@@ -32,5 +32,9 @@ int main() {
 
     earth->mmu_switch(fs_pid);
 
+    /* call the grass kernel entry and never return */
+    void (*app_entry)() = (void*)VADDR_START;
+    app_entry();
+
     return 0;
 }
