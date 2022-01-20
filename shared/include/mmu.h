@@ -8,7 +8,7 @@
 #define VADDR_START     0x80000000
 #define MAX_NPAGES      12
 
-struct frame_cache {
+struct frame {
     char content[PAGE_SIZE];
 };
 
