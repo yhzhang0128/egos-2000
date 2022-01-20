@@ -83,6 +83,5 @@ void grass_load() {
     struct block_store bs;
     bs.read = grass_read;
     bs.write = grass_write;
-
-    elf_load(&bs);
+    elf_load_grass(&bs);
 }
