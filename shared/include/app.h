@@ -3,6 +3,7 @@
 #include "egos.h"
 
 struct earth *earth = (void*)EARTH_ADDR;
+#define read      earth->tty_read
 #define printf    earth->tty_write
 
 #define INFO      earth->log.log_info

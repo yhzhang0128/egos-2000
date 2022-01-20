@@ -12,11 +12,17 @@
 #include "grass.h"
 
 struct earth *earth = (void*)EARTH_ADDR;
-
-
 static int next_pid = 1;
+
 static int elf_fs_read(int block_no, int nblocks, char* dst) {
     return earth->disk_read(FS_EXEC_START + block_no, nblocks, dst);    
+}
+
+static int timer_cnt;
+void timer_handler(int id, void* arg) {
+    timer_cnt++;
+    if (timer_cnt % 20 == 0)
+        INFO("Timer interrupt count: %d", timer_cnt);
 }
 
 int main() {
@@ -29,9 +35,11 @@ int main() {
     INFO("FS at addr %.8x", FS_EXEC_START);
     int fs_pid = next_pid++;
     elf_load(fs_pid, &bs, earth);
-
     earth->mmu_switch(fs_pid);
 
+    earth->intr_register(TIMER_INTR_ID, timer_handler);
+    earth->intr_enable();
+    
     /* call the grass kernel entry and never return */
     void (*app_entry)() = (void*)VADDR_START;
     app_entry();

@@ -11,5 +11,10 @@
 #include "app.h"
 
 int main() {
-    HIGHLIGHT("Hello World!");
+    char buf[100];
+    
+    while (1) {
+        read(buf, 100);
+        SUCCESS("echo got: %s", buf);
+    }
 }
