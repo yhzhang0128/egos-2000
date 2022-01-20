@@ -10,7 +10,7 @@ all:
 	$(CC) install/mkfs.c -o $(BUILD_DIR)/mkfs
 	cd install; ./mkfs
 loc:
-	cloc . --fullpath --not-match-d=earth/board
+	cloc . --fullpath --not-match-d=earth/boardlib
 
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR) $(BUILD_DIR)/mkfs $(BUILD_DIR)/disk.img
@@ -33,7 +33,7 @@ INCLUDE = -Ishared/include
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-ARTY_FLAGS = -Learth/board -Iearth/board
+ARTY_FLAGS = -Learth/boardlib -Iearth/boardlib
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
