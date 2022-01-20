@@ -46,6 +46,7 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
             bs->read(block_offset++, 1, (char*)GRASS_BASE + size);
         }
         memset((char*)GRASS_BASE + pheader.p_filesz, 0, GRASS_SIZE - pheader.p_filesz);
+        return;
     }
 
     /* load an application */
@@ -78,8 +79,9 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
 
         earth->mmu_alloc(&frame_no, &base);
         earth->mmu_map(pid, MAX_NPAGES - 1, frame_no, F_ALL);
-    } else {
-        FATAL("ELF gives invalid starting vaddr: 0x%.8x", pheader.p_vaddr);
+        return;
     }
+    
+    FATAL("ELF gives invalid starting vaddr: 0x%.8x", pheader.p_vaddr);
 }
 
