@@ -5,6 +5,8 @@
 #define CACHED_NFRAMES  20
 #define CACHE_START     0x8000C000
 
+#define MAX_NPAGES      12
+
 struct frame_cache {
     char content[PAGE_SIZE];
 };
@@ -14,3 +16,4 @@ struct mapping {
     int page_no;
     int flag;
 };
+extern struct mapping mappings[MAX_NFRAMES];

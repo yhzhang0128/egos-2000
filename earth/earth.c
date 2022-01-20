@@ -88,5 +88,5 @@ static int grass_read(int block_no, int nblocks, char* dst) {
 void grass_load() {
     struct block_store bs;
     bs.read = grass_read;
-    elf_load(&bs, &earth);
+    elf_load(0, &bs, &earth);
 }

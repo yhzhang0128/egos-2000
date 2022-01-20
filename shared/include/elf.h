@@ -44,4 +44,4 @@ struct elf32_program_header{
 };
 
 struct earth;
-void elf_load(struct block_store* bs, struct earth* earth);
+void elf_load(int pid, struct block_store* bs, struct earth* earth);

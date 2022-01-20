@@ -14,7 +14,7 @@
 #include "grass.h"
 #include <string.h>
 
-void elf_load(struct block_store* bs, struct earth* earth) {
+void elf_load(int pid, struct block_store* bs, struct earth* earth) {
     char buf[512];
     bs->read(0, 1, buf);
 
@@ -32,6 +32,7 @@ void elf_load(struct block_store* bs, struct earth* earth) {
     struct elf32_program_header pheader;
     memcpy(&pheader, buf + header->e_phoff, sizeof(pheader));
 
+    /* load the grass kernel */
     if (pheader.p_vaddr == GRASS_BASE) {
         INFO("Grass kernel starts at vaddr: 0x%.8x", pheader.p_vaddr);
         INFO("Grass kernel memory size: 0x%.8x bytes", pheader.p_memsz);
@@ -40,7 +41,6 @@ void elf_load(struct block_store* bs, struct earth* earth) {
             FATAL("TODO: program offset not aligned by %d", BLOCK_SIZE);
         }
 
-        /* load the grass kernel */
         int block_offset = pheader.p_offset / BLOCK_SIZE;
         for (int size = 0; size < pheader.p_filesz; size += BLOCK_SIZE) {
             bs->read(block_offset++, 1, (char*)GRASS_BASE + size);
@@ -51,7 +51,10 @@ void elf_load(struct block_store* bs, struct earth* earth) {
         /* call the grass kernel entry and never return */
         void (*grass_entry)() = (void*)GRASS_BASE;
         grass_entry();
-    } else if (pheader.p_vaddr == APPS_BASE) {
+    }
+
+    /* load an application */
+    if (pheader.p_vaddr == APPS_BASE) {
         INFO("App starts at vaddr: 0x%.8x", pheader.p_vaddr);
         INFO("App memory size: 0x%.8x bytes", pheader.p_memsz);
 
@@ -65,14 +68,25 @@ void elf_load(struct block_store* bs, struct earth* earth) {
         for (int size = 0; size < pheader.p_filesz; size += BLOCK_SIZE) {
             if (size % PAGE_SIZE == 0) {
                 earth->mmu_alloc(&frame_no, &base);
-                INFO("Allocated physical frame %d with base 0x%.8x", frame_no, (uint32_t)base);
+                earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+                INFO("Map frame #%d to page #%d", frame_no, page_no - 1);
             }
             bs->read(block_offset++, 1, ((char*)base) + (size % PAGE_SIZE));
         }
 
+        /* one more page for the heap */
         earth->mmu_alloc(&frame_no, &base);
-        INFO("Allocated physical frame %d with base 0x%.8x", frame_no, (uint32_t)base);
-        
+        earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+        INFO("Map frame #%d to page #%d", frame_no, page_no - 1);        
+
+        /* two more pages for the stack */
+        earth->mmu_alloc(&frame_no, &base);
+        earth->mmu_map(pid, MAX_NPAGES - 2, frame_no, F_ALL);
+        INFO("Map frame #%d to page #%d", frame_no, MAX_NPAGES - 2);
+
+        earth->mmu_alloc(&frame_no, &base);
+        earth->mmu_map(pid, MAX_NPAGES - 1, frame_no, F_ALL);
+        INFO("Map frame #%d to page #%d", frame_no, MAX_NPAGES - 1);
     } else {
         FATAL("ELF gives invalid starting vaddr: 0x%.8x", pheader.p_vaddr);
     }

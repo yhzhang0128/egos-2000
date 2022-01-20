@@ -9,6 +9,7 @@
 #define F_READ          0x2
 #define F_WRITE         0x4
 #define F_EXEC          0x8
+#define F_ALL           0xf
 
 #define EARTH_ADDR      (0x8004000 - 0x40)
 

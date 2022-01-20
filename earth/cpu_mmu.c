@@ -18,15 +18,15 @@ struct frame_cache *cache = (void*)CACHE_START;
 int cache_frame_no[CACHED_NFRAMES];
 
 static int cache_read(int frame_no) {
-    int free_no = 0;
+    int free_no = -1;
     for (int i = 0; i < CACHED_NFRAMES; i++) {
         if (cache_frame_no[i] == frame_no)
             return (int)(cache + i);
-        if (cache_frame_no[i] == -1 && free_no == 0)
+        if (cache_frame_no[i] == -1 && free_no == -1)
             free_no = i;
     }
 
-    if (free_no) {
+    if (free_no != -1) {
         cache_frame_no[free_no] = frame_no;
         int group = PAGE_SIZE / BLOCK_SIZE;
         disk_read(free_no * group, group, (char*)(cache + free_no));
