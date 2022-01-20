@@ -15,7 +15,7 @@
 #include "elf.h"
 #include "mmu.h"
 #include "log.h"
-#include "grass.h"
+#include "print.h"
 
 static void elf_load_grass(struct block_store* bs,
                            struct earth* earth,
