@@ -9,7 +9,7 @@
 
 
 #include <stdio.h>
-#include "sdlib.h"
+#include "sd.h"
 #include "sdutil.h"
 
 static int sd_spi_reset(struct metal_spi*);
@@ -253,13 +253,7 @@ static int sd_spi_configure(struct metal_spi *spi) {
     /* Set CS line */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = config->csid;
 
-    /* Toggle off memory-mapped SPI flash mode, toggle on programmable IO mode
-     * It seems that with this line uncommented, the debugger cannot have access
-     * to the chip at all because it assumes the chip is in memory-mapped mode.
-     * I have to compile the code with this line commented and launch gdb,
-     * reset cores, reset $pc, set *((int *) 0x20004060) = 0, (set the flash
-     * interface control register to programmable I/O mode) and then continue
-     * Alternative, comment out the "flash" line in openocd.cfg */
+    /* Toggle off memory-mapped SPI flash mode, toggle on programmable IO mode */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FCTRL) = METAL_SPI_CONTROL_IO;
 
     return 0;

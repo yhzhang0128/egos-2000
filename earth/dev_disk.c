@@ -9,7 +9,7 @@
 
 
 #include "earth.h"
-#include "sdlib/sdlib.h"
+#include "sd/sd.h"
 
 enum {
       SD_CARD,

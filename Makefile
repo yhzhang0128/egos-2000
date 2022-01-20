@@ -18,7 +18,7 @@ loc:
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR) $(BUILD_DIR)/mkfs $(BUILD_DIR)/disk.img
 
-EARTH_SRCS = earth/*.c earth/sdlib/*.c shared/*.c
+EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
 
 GRASS_SRCS = grass/enter.S grass/*.c shared/*.c
@@ -38,7 +38,7 @@ INCLUDE = -Ishared/include
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-ARTY_FLAGS = -Linstall/metal -Iearth/include
+ARTY_FLAGS = -Linstall/arty -Iinstall/arty
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
