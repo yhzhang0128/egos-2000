@@ -54,6 +54,9 @@ int mmu_alloc(int* frame_no, int* addr) {
 }
 
 int mmu_map(int pid, int page_no, int frame_no, int flag) {
+    if (flag != F_ALL)
+        FATAL("Memory protection not implemented in earth");
+    
     if (!INUSE(trans_table->frame[frame_no])) {
         ERROR("Frame %d has not been allocated", frame_no);
         return -1;
