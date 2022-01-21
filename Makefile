@@ -2,10 +2,10 @@ all: apps/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
 	@echo "---------------- Compile the Apps Layer ----------------"
 	for FILE_NAME in $^ ; do \
-	    export APP_NAME=$$(basename $${FILE_NAME} .c); \
-	    echo "Compile" $${FILE_NAME} "=>" $(RELEASE_DIR)/$${APP_NAME}.elf; \
-	    $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_LIB) $${FILE_NAME} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP_NAME}.elf;\
-	    $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP_NAME}.elf > $(DEBUG_DIR)/$${APP_NAME}.lst;\
+	  export APP_NAME=$$(basename $${FILE_NAME} .c); \
+	  echo "Compile" $${FILE_NAME} "=>" $(RELEASE_DIR)/$${APP_NAME}.elf; \
+	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE_NAME} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP_NAME}.elf;\
+	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP_NAME}.elf > $(DEBUG_DIR)/$${APP_NAME}.lst;\
 	done
 	@echo "---------------- Compile the Grass Layer ----------------"
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
@@ -30,7 +30,7 @@ EARTH_LAYOUT = -Tearth/layout.lds
 GRASS_SRCS = grass/enter.S grass/*.c shared/*.c
 GRASS_LAYOUT = -Tgrass/layout.lds
 
-APPS_LIB = apps/enter.S shared/*.c
+APPS_SRCS = apps/enter.S shared/*.c
 APPS_LAYOUT = -Tapps/layout.lds
 
 RISCV_CC = riscv64-unknown-elf-gcc
