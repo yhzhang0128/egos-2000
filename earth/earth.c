@@ -23,11 +23,12 @@ int main() {
     if (earth_init())
         return -1;
 
-    INFO("Put earth interface at 0x%.8x with size 0x%x", EARTH_ADDR, sizeof(earth));
+    if (sizeof(earth) > 0x40)
+        FATAL("Size of earth (%d bytes) exceeds 64 bytes", sizeof(earth));
+    INFO("Put earth interface at 0x%.8x", EARTH_ADDR);
     memcpy((void*)EARTH_ADDR, &earth, sizeof(earth));
 
     INFO("Start to load the grass layer");
-    /* this function should never return */
     grass_load();
 
     return 0;
