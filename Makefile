@@ -1,8 +1,12 @@
-all:
+all: apps/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
 	@echo "---------------- Compile the Apps Layer ----------------"
-	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(ECHO_LAYOUT) $(ECHO_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/echo.elf
-	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/echo.elf > $(DEBUG_DIR)/echo.lst
+	for FILE_NAME in $^ ; do \
+	    export APP_NAME=$$(basename $${FILE_NAME} .c); \
+	    echo "Compile" $${FILE_NAME} "=>" $(RELEASE_DIR)/$${APP_NAME}.elf; \
+	    $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_LIB) $${FILE_NAME} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP_NAME}.elf;\
+	    $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP_NAME}.elf > $(DEBUG_DIR)/$${APP_NAME}.lst;\
+	done
 	@echo "---------------- Compile the Grass Layer ----------------"
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
@@ -13,6 +17,7 @@ all:
 	@echo "---------------- Create the Install Image ----------------"
 	$(CC) install/mkfs.c -o $(BUILD_DIR)/mkfs
 	cd install; ./mkfs
+
 loc:
 	cloc . --fullpath --not-match-d=earth/include/metal
 
@@ -25,8 +30,8 @@ EARTH_LAYOUT = -Tearth/layout.lds
 GRASS_SRCS = grass/enter.S grass/*.c shared/*.c
 GRASS_LAYOUT = -Tgrass/layout.lds
 
-ECHO_SRCS = apps/enter.S apps/echo.c shared/*.c
-ECHO_LAYOUT = -Tapps/layout.lds
+APPS_LIB = apps/enter.S shared/*.c
+APPS_LAYOUT = -Tapps/layout.lds
 
 RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
