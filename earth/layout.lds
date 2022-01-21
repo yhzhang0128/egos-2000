@@ -4,7 +4,7 @@ ENTRY(_enter)
 
 MEMORY
 {
-    ram (arw!xi) : ORIGIN = 0x8000000, LENGTH = 0x3000
+    ram (arw!xi) : ORIGIN = 0x08000000, LENGTH = 0x3000
     rom (irx!wa) : ORIGIN = 0x20400000, LENGTH = 0x1fc00000
 }
 
@@ -155,8 +155,8 @@ SECTIONS
     PROVIDE(__metal_eccscrub_bit = 0);
     PROVIDE( metal_dtim_0_memory_start = 0x80000000 );
     PROVIDE( metal_dtim_0_memory_end = 0x80000000 + 0x4000 );
-    PROVIDE( metal_itim_0_memory_start = 0x8000000 );
-    PROVIDE( metal_itim_0_memory_end = 0x8000000 + 0x4000 );
+    PROVIDE( metal_itim_0_memory_start = 0x08000000 );
+    PROVIDE( metal_itim_0_memory_end = 0x08000000 + 0x4000 );
     PROVIDE( metal_segment_itim_source_start = LOADADDR(.data) );
     PROVIDE( metal_segment_itim_target_start = ADDR(.data) );
     PROVIDE( metal_segment_itim_target_end = ADDR(.data) + SIZEOF(.data) );
