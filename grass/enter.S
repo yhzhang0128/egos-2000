@@ -11,7 +11,7 @@
         .global _enter
 _enter:
         li sp,0x08008000
-        addi sp,sp,-64
+        addi sp,sp,-64   /* 64 bytes reserved for struct earth */
         jal main
         jal _stop
 

@@ -11,7 +11,7 @@
 #define F_EXEC          0x8
 #define F_ALL           0xf
 
-#define EARTH_ADDR      (0x8004000 - 0x40)
+#define EARTH_ADDR      (0x8008000 - 0x40)
 
 typedef void (*handler_t)(int, void*);
 

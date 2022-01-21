@@ -3,7 +3,7 @@
 #define PAGE_SIZE       4096
 
 #define MAX_NPAGES      12
-#define MAX_NFRAMES     100
+#define MAX_NFRAMES     256
 #define CACHED_NFRAMES  20
 
 #define VADDR_START     0x80000000
@@ -21,4 +21,7 @@ struct mapping {
     int page_no;
     int flag;
 };
-extern struct mapping mappings[MAX_NFRAMES];
+
+#define VM_MAPS_START      0x80003000
+#define VM_MAPS_SIZE       MAX_NFRAMES * sizeof(struct mapping)
+#define VM_MAPS_TOP        0x80004000

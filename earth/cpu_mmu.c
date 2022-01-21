@@ -25,7 +25,7 @@ static int cache_write(int frame_no, struct frame* src);
 
 /* mapping for address translation */
 int curr_vm_pid;
-struct mapping mappings[MAX_NFRAMES];
+struct mapping *mappings;
 
 int mmu_alloc(int* frame_no, int* addr) {
     for (int i = 0; i < MAX_NFRAMES; i++) {
@@ -70,6 +70,12 @@ int mmu_switch(int pid) {
 
 int mmu_init() {
     curr_vm_pid = -1;
+
+    mappings = (void*) VM_MAPS_START;
+    if (VM_MAPS_START + VM_MAPS_SIZE > VM_MAPS_TOP)
+        FATAL("%d VM mappings exceed the memory limit", MAX_NFRAMES);
+    
+    memset(mappings, 0, sizeof(struct mapping) * MAX_NFRAMES);
     memset(cache_frame_no, 0xff, sizeof(cache_frame_no));
     return 0;
 }
