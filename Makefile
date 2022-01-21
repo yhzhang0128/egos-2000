@@ -14,11 +14,11 @@ app: apps/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
 	@echo "---------------- Compile the Apps Layer ----------------"
 	for FILE in $^ ; do \
-	  export APP_NAME=$$(basename $${FILE} .c);\
-	  echo "Compile" $${FILE} "=>" $(RELEASE_DIR)/$${APP_NAME}.elf;\
-	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP_NAME}.elf;\
-	  echo "Compile" $${FILE} "=>" $(DEBUG_DIR)/$${APP_NAME}.lst;\
-	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP_NAME}.elf > $(DEBUG_DIR)/$${APP_NAME}.lst;\
+	  export APP=$$(basename $${FILE} .c);\
+	  echo "Compile" $${FILE} "=>" $(RELEASE_DIR)/$${APP}.elf;\
+	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP}.elf;\
+	  echo "Compile" $${FILE} "=>" $(DEBUG_DIR)/$${APP}.lst;\
+	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP}.elf > $(DEBUG_DIR)/$${APP}.lst;\
 	done
 
 loc:
