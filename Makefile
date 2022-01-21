@@ -5,6 +5,7 @@ all: apps/*.c
 	  export APP_NAME=$$(basename $${FILE_NAME} .c);\
 	  echo "Compile" $${FILE_NAME} "=>" $(RELEASE_DIR)/$${APP_NAME}.elf;\
 	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE_NAME} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP_NAME}.elf;\
+	  echo "Compile" $${FILE_NAME} "=>" $(DEBUG_DIR)/$${APP_NAME}.lst;\
 	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP_NAME}.elf > $(DEBUG_DIR)/$${APP_NAME}.lst;\
 	done
 	@echo "---------------- Compile the Grass Layer ----------------"
