@@ -20,7 +20,7 @@ all: apps/*.c
 	cd install; ./mkfs
 
 loc:
-	cloc . --fullpath --not-match-d=earth/include/metal
+	cloc . --fullpath --not-match-d=install
 
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR) $(BUILD_DIR)/mkfs $(BUILD_DIR)/disk.img $(BUILD_DIR)/earth.elf
