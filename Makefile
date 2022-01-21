@@ -2,8 +2,8 @@ all: apps/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
 	@echo "---------------- Compile the Apps Layer ----------------"
 	for FILE_NAME in $^ ; do \
-	  export APP_NAME=$$(basename $${FILE_NAME} .c); \
-	  echo "Compile" $${FILE_NAME} "=>" $(RELEASE_DIR)/$${APP_NAME}.elf; \
+	  export APP_NAME=$$(basename $${FILE_NAME} .c);\
+	  echo "Compile" $${FILE_NAME} "=>" $(RELEASE_DIR)/$${APP_NAME}.elf;\
 	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE_NAME} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP_NAME}.elf;\
 	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP_NAME}.elf > $(DEBUG_DIR)/$${APP_NAME}.lst;\
 	done
