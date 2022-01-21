@@ -5,9 +5,11 @@
 
 /* Author: Yunhao Zhang
  * Description: abstractions of the CPU memory management unit (MMU);
- * physical frame allocation + address translation + protection;
- * physical frames are stored on SD card and there is a cache of 20
- * frames (80KB) in the memory
+ * there are 256 physical frames at the start of the SD card and 20 of
+ * them are cached in the memory (more precisely, in the CPU L1 cache);
+ * the first 12 pages in memory are used as the virtual memory address
+ * space for a process; there are totally 20 + 12 = 32 pages used by
+ * kernel/user processes; find more details in the documentation
  */
 
 #include "egos.h"
