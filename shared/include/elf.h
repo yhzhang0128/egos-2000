@@ -26,7 +26,7 @@ struct elf32_header {
     uint16_t       e_shstrndx;
 };
 
-struct elf32_program_header{
+struct elf32_program_header {
     uint32_t       p_type;
     uint32_t       p_offset;
     uint32_t       p_vaddr;
