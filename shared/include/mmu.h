@@ -12,16 +12,18 @@
 #define CACHE_START     0x8000C000
 #define CACHE_SIZE      PAGE_SIZE * CACHED_NFRAMES
 
-struct frame {
-    char content[PAGE_SIZE];
+struct frame_t {
+    char byte[PAGE_SIZE];
 };
 
-struct mapping {
-    int pid;
-    int page_no;
-    int flag;
+struct translation_table_t {
+    struct {
+        int pid;
+        int page_no;
+        int flag;
+    } frame[MAX_NFRAMES];
 };
 
-#define VM_MAPS_START      0x80003000
-#define VM_MAPS_SIZE       MAX_NFRAMES * sizeof(struct mapping)
-#define VM_MAPS_TOP        0x80004000
+#define TRANS_TABLE_START      0x80003000
+#define TRANS_TABLE_SIZE       sizeof(struct translation_table_t)
+#define TRANS_TABLE_TOP        0x80004000
