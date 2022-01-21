@@ -8,8 +8,9 @@
  * there are 256 physical frames at the start of the SD card and 20 of
  * them are cached in the memory (more precisely, in the CPU L1 cache);
  * the first 12 pages in memory are used as the virtual memory address
- * space for a process; there are totally 20 + 12 = 32 pages used by
- * kernel/user processes; find more details in the documentation
+ * space for a process; there are 20 + 12 = 32 pages in memory used by
+ * kernel/user processes; other pages are used by earth and grass;
+ * find more information in the documents
  */
 
 #include "egos.h"
