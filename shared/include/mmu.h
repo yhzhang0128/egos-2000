@@ -25,5 +25,5 @@ struct translation_table_t {
 };
 
 #define TRANS_TABLE_START      0x80003000
-#define TRANS_TABLE_SIZE       sizeof(struct translation_table_t)
 #define TRANS_TABLE_TOP        0x80004000
+#define TRANS_TABLE_SIZE       sizeof(struct translation_table_t)
