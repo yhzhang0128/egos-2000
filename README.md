@@ -35,8 +35,7 @@ EGOS is our teaching operating system at Cornell for CS4411. It has 3 layers:
     * inter-process communication
 * the application layer on top of the operating system provides
     * file system
-    * shell
-    * common shell commands
+    * shell and common shell commands
 
 ## Hardware requirements
 * an Artix-7 35T [Arty FPGA Development Board](https://digilent.com/shop/arty-a7-artix-7-fpga-development-board/)
