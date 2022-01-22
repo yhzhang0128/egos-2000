@@ -3,16 +3,23 @@
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
 ```
+> cloc . --exclude-dir=install
+      31 text files.
+      31 unique files.                              
+       5 files ignored.
+
+github.com/AlDanial/cloc v 1.82  T=0.02 s (1657.9 files/s, 91367.4 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 C                               13            228            137            757
-C/C++ Header                    11             64              2            205
+C/C++ Header                    11             64              5            205
 make                             1             11              0             43
 Assembly                         2              6             14             18
 -------------------------------------------------------------------------------
-SUM:                            27            309            153           1023
+SUM:                            27            309            156           1023
 -------------------------------------------------------------------------------
+
 ```
 # The earth and grass operating system (EGOS)
 
