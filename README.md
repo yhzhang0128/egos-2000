@@ -14,7 +14,7 @@ The earth and grass operating system (EGOS) is our teaching operating system at 
     * file system
     * shell and common shell commands
 
-EGOS is minimal and very suitable for teaching an undergraduate operating system course.
+EGOS is minimal and very suitable for an undergraduate operating system course.
 
 ```shell
 > make loc
