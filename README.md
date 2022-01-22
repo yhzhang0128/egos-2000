@@ -32,7 +32,7 @@ EGOS is our teaching operating system at Cornell. It has 3 layers:
 ## Hardware requirements
 * an Artix-7 35T Arty FPGA Development Board ([link](https://digilent.com/shop/arty-a7-artix-7-fpga-development-board/))
 * a microUSB cable, such as [microUSB-to-USB](https://www.amazon.com/CableCreation-Charging-Shielded-Charger-Compatible/dp/B07CKXQ9NB?ref_=ast_sto_dp&th=1&psc=1) or [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details)
-* an **SDHC** microSD card and a microSD Pmod ([link](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1))
+* an **SDHC** microSD card, a microSD Pmod ([link](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1)) and a [microSD card reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details)
 
 ## Software requirements
 * Sifive freedom toolchain ([link](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only))
