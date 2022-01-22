@@ -50,5 +50,5 @@ EGOS is our teaching operating system at Cornell. It has 3 layers:
     * such as [PuTTY](https://www.putty.org/) for Windows or [screen](https://linux.die.net/man/1/screen) for Linux and Mac
 
 ## Compile, install and further information
-Please read the documents in the [EGOS documentation Github repo](). 
+Please read the documents in the [EGOS documentation repository](). 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
