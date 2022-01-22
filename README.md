@@ -2,7 +2,21 @@
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
-## Lines of code
+The earth and grass operating system (EGOS) is our teaching operating system at Cornell. It has 3 layers: 
+
+* the earth layer provides **hardware-specific** abstractions
+    * tty and disk device driver interface
+    * cpu interrupt and memory management interface
+* the grass layer provides **hardware-independent** abstractions
+    * processes
+    * system calls
+    * inter-process communication
+* the application layer on top of the operating system provides
+    * file system
+    * shell and common shell commands
+
+EGOS is minimal and very suitable for teaching an undergraduate operating system course.
+
 ```shell
 > make loc
 cloc . --exclude-dir=install
@@ -23,19 +37,6 @@ SUM:                            27            309            156           1023
 -------------------------------------------------------------------------------
 
 ```
-# Earth and grass operating system (EGOS)
-
-EGOS is our teaching operating system at Cornell for CS4411. It has 3 layers: 
-* the earth layer provides **hardware-specific** abstractions
-    * tty and disk device driver interface
-    * cpu interrupt and memory management interface
-* the grass layer provides **hardware-independent** abstractions
-    * processes
-    * system calls
-    * inter-process communication
-* the application layer on top of the operating system provides
-    * file system
-    * shell and common shell commands
 
 ## Hardware requirements
 * an Artix-7 35T [Arty FPGA Development Board](https://digilent.com/shop/arty-a7-artix-7-fpga-development-board/)
