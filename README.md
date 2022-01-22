@@ -1,4 +1,4 @@
-# EGOS: A minimal operating system on a $99 RISC-V board
+# EGOS: A minimal operating system on a RISC-V board
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
