@@ -8,8 +8,7 @@ The earth and grass operating system (EGOS) is our teaching operating system at 
     * tty and disk device driver interface
     * cpu interrupt and memory management interface
 * the grass layer provides **hardware-independent** abstractions
-    * processes
-    * system calls
+    * processes and system calls
     * inter-process communication
 * the application layer on top of the operating system provides
     * file system
