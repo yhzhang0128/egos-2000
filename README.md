@@ -39,7 +39,7 @@ EGOS is our teaching operating system at Cornell. It has 3 layers:
 * Vivado lab solutions ([link](https://www.xilinx.com/support/download.html))
 * a tool to program a disk image file to the microSD card 
     * such as [balena Etcher](https://www.balena.io/etcher/)
-* a tool to connect with usbTTY
+* a tool to connect with ttyUSB
     * such as [PuTTY](https://www.putty.org/) for Windows
     * or [screen](https://linux.die.net/man/1/screen) for Linux or Mac
 
