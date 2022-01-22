@@ -1,4 +1,4 @@
-# Minimal operating system on $99 RISC-V board
+# A minimal operating system on a $99 RISC-V board
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
