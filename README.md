@@ -25,8 +25,8 @@ SUM:                            27            309            153           1023
 
 EGOS is our teaching operating system at Cornell. It has two layers: 
 * the earth layer provides hardware-specific abstractions, including 
- ** tty and disk device driver interface
- ** cpu interrupt and memory management interface
+ - tty and disk device driver interface
+ - cpu interrupt and memory management interface
 * the grass layer provides hardware-independent abstractions, including 
- ** processes
- ** system calls
+ - processes
+ - system calls
