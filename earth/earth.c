@@ -83,8 +83,8 @@ int earth_init() {
     return 0;
 }
 
-static int grass_read(int block_no, int nblocks, char* dst) {
-    return earth.disk_read(GRASS_EXEC_START + block_no, nblocks, dst);
+static int grass_read(int block_no, char* dst) {
+    return earth.disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
 void grass_load() {

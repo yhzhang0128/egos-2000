@@ -29,7 +29,7 @@ static void elf_load_app(int pid,
 
 void elf_load(int pid, struct block_store* bs, struct earth* earth) {
     char buf[BLOCK_SIZE];
-    bs->read(0, 1, buf);
+    bs->read(0, buf);
     struct elf32_header *header = (void*) buf;
     if (header->e_phnum != 1 ||
         header->e_phoff + header->e_phentsize > BLOCK_SIZE) {
@@ -60,7 +60,7 @@ static void elf_load_grass(struct block_store* bs,
 
     int block_offset = pheader->p_offset / BLOCK_SIZE;
     for (int size = 0; size < pheader->p_filesz; size += BLOCK_SIZE) {
-        bs->read(block_offset++, 1, (char*)GRASS_BASE + size);
+        bs->read(block_offset++, (char*)GRASS_BASE + size);
     }
 
     /* the last 0x40 bytes are reserved for struct earth */
@@ -86,7 +86,7 @@ static void elf_load_app(int pid,
             earth->mmu_alloc(&frame_no, &base);
             earth->mmu_map(pid, page_no++, frame_no, F_ALL);
         }
-        bs->read(block_offset++, 1, ((char*)base) + (size % PAGE_SIZE));
+        bs->read(block_offset++, ((char*)base) + (size % PAGE_SIZE));
     }
 
     /* one more page for the heap */

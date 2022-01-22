@@ -32,8 +32,8 @@ int main() {
     return 0;
 }
 
-static int read_fs_elf(int block_no, int nblocks, char* dst) {
-    return earth->disk_read(FS_EXEC_START + block_no, nblocks, dst);    
+static int read_fs_elf(int block_no, char* dst) {
+    return earth->disk_read(FS_EXEC_START + block_no, 1, dst);
 }
 
 static void fs_init() {

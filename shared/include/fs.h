@@ -9,6 +9,6 @@
 #define FS_EXEC_START       GRASS_EXEC_START + GRASS_EXEC_SEGMENT
 
 struct block_store {
-    int (*read)(int block_no, int nblocks, char* dst);
-    int (*write)(int block_no, int nblocks, char* src);
+    int (*read)(int block_no, char* dst);
+    int (*write)(int block_no, char* src);
 };
