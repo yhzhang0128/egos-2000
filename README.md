@@ -36,5 +36,19 @@ EGOS is our teaching operating system at Cornell. There are three layers:
     * shell
     * common shell commands
 
-For more information, please read the documents in the [EGOS documentation Github repo](). 
-For any questions, please contact [Yunhao Zhang](mailto:yz2327@cornell.edu) or [Robbert van Renesse](mailto:rvr@cs.cornell.edu).
+## Hardware requirements
+* an Artix-7 35T Arty FPGA Development Board [link](https://digilent.com/shop/arty-a7-artix-7-fpga-development-board/)
+* a microUSB cable, such as [microUSB-to-USB](https://www.amazon.com/CableCreation-Charging-Shielded-Charger-Compatible/dp/B07CKXQ9NB?ref_=ast_sto_dp&th=1&psc=1) or [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details)
+* [optional] a Pmod MicroSD [link](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1)
+* [optional] an **SDHC** microSD card, such as [link](https://www.amazon.com/dp/B089DPCJS1?psc=1&ref=ppx_yo2_dt_b_product_details)
+
+## Software requirements
+* Sifive Freedom toolchain [link](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
+* Vivado Lab Solutions [link](https://www.xilinx.com/support/download.html)
+* `PuTTY` for Windows [link](https://www.putty.org/)
+* `screen` for Linux or Mac [link](https://linux.die.net/man/1/screen)
+* [optional] `balena Etcher` for programming a disk image file to an SD card [link](https://www.balena.io/etcher/)
+
+## Compile, install and further information
+Please read the documents in the [EGOS documentation Github repo](). 
+For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
