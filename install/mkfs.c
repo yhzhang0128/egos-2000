@@ -30,7 +30,7 @@ int main() {
     for (int i = 0; i < n; i++) {
         struct stat st;
         stat(kernel_processes[i], &st);
-        fprintf(stderr, "[INFO] Loading %s: %ld bytes\n", kernel_processes[i], st.st_size);
+        fprintf(stderr, "[INFO] Loading %s: %lld bytes\n", kernel_processes[i], st.st_size);
 
         if (st.st_size > 128 * 1024) {
             fprintf(stderr, "[ERROR] file larger than 128KB\n");
