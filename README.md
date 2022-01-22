@@ -51,9 +51,9 @@ SUM:                            27            309            156           1023
 * a tool to connect with ttyUSB
     * such as [PuTTY](https://www.putty.org/) for Windows or [screen](https://linux.die.net/man/1/screen) for Linux and Mac
 
-## Compile, install and further information
+## Tutorial and further information
 
-**TODO**: a Youtube video tutorial
+**TODO**: a Youtube video tutorial of compiling and installing EGOS
 
 Please read the documents in the [EGOS documentation repository](). 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
