@@ -40,8 +40,7 @@ EGOS is our teaching operating system at Cornell. It has 3 layers:
 * a tool to program a disk image file to the microSD card 
     * such as [balena Etcher](https://www.balena.io/etcher/)
 * a tool to connect with ttyUSB
-    * such as [PuTTY](https://www.putty.org/) for Windows
-    * or [screen](https://linux.die.net/man/1/screen) for Linux or Mac
+    * such as [PuTTY](https://www.putty.org/) for Windows or [screen](https://linux.die.net/man/1/screen) for Linux or Mac
 
 ## Compile, install and further information
 Please read the documents in the [EGOS documentation Github repo](). 
