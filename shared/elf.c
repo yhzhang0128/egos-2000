@@ -88,8 +88,10 @@ static void elf_load_app(int pid,
         }
         bs->read(block_offset++, ((char*)base) + (size % PAGE_SIZE));
     }
-    int diff = size - pheader->p_filesz;
-    memset(((char*)base) + (size % PAGE_SIZE) - diff, 0, diff);
+    int last_page_filled = pheader->p_filesz % PAGE_SIZE;
+    int last_page_nzeros = PAGE_SIZE - last_page_filled;
+    if (last_page_filled)
+        memset(((char*)base) + last_page_filled, 0, last_page_nzeros);
 
     /* one more page for the heap */
     earth->mmu_alloc(&frame_no, &base);
