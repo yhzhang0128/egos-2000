@@ -1,4 +1,4 @@
-# EGOS for RISC-V: A minimal operating system on a real board
+# EGOS: A minimal operating system on a real RISC-V board
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
