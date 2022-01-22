@@ -35,8 +35,8 @@ EGOS is our teaching operating system at Cornell. It has 3 layers:
 * an **SDHC** microSD card and a microSD Pmod ([link](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1))
 
 ## Software requirements
-* Sifive Freedom toolchain ([link](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only))
-* Vivado Lab Solutions ([link](https://www.xilinx.com/support/download.html))
+* Sifive freedom toolchain ([link](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only))
+* Vivado lab solutions ([link](https://www.xilinx.com/support/download.html))
 * a tool to program a disk image file to the microSD card 
     * such as [balena Etcher](https://www.balena.io/etcher/)
 * a tool to connect with usbTTY
