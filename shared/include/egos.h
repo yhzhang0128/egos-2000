@@ -16,12 +16,14 @@
 typedef void (*handler_t)(int, void*);
 
 struct earth {
+    /* TTY and disk device driver interface */
     int (*tty_read)(char* buf, int len);
     int (*tty_write)(const char *format, ...);
 
     int (*disk_read)(int block_no, int nblocks, char* dst);
     int (*disk_write)(int block_no, int nblocks, char* src);
 
+    /* ISA-specific cpu interface */
     int (*intr_enable)();
     int (*intr_disable)();
     int (*intr_register)(int id, handler_t handler);
@@ -30,6 +32,7 @@ struct earth {
     int (*mmu_map)(int pid, int page_no, int frame_no, int flag);
     int (*mmu_switch)(int pid);
 
+    /* helper functions for logging */
     struct dev_log log;
 };
 
