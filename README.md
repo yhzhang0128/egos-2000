@@ -23,10 +23,11 @@ SUM:                            27            309            153           1023
 ```
 # EGOS: the earth and grass operating system
 
-EGOS is our teaching operating system at Cornell. It has two layers: 
-* the earth layer provides *hardware-specific* abstractions, including 
+EGOS is our teaching operating system at Cornell. As the name suggests, it has two layers: 
+* the earth layer provides *hardware-specific* abstractions
     * tty and disk device driver interface
     * cpu interrupt and memory management interface
-* the grass layer provides *hardware-independent* abstractions, including 
+* the grass layer provides *hardware-independent* abstractions
     * processes
     * system calls
+    * inter-process communication
