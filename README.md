@@ -2,14 +2,7 @@
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
-```shell
-> make loc
-cloc . --exclude-dir=install
-      31 text files.
-      27 unique files.                              
-       5 files ignored.
-
-github.com/AlDanial/cloc v 1.92  T=0.02 s (1120.1 files/s, 61602.9 lines/s)
+```
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
