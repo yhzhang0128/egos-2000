@@ -1,0 +1,23 @@
+# A minimal operating system on a real board
+
+![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
+
+```shell
+> make loc
+cloc . --exclude-dir=install
+      31 text files.
+      27 unique files.                              
+       5 files ignored.
+
+github.com/AlDanial/cloc v 1.92  T=0.02 s (1120.1 files/s, 61602.9 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+C                               13            228            137            757
+C/C++ Header                    11             64              2            205
+make                             1             11              0             43
+Assembly                         2              6             14             18
+-------------------------------------------------------------------------------
+SUM:                            27            309            153           1023
+-------------------------------------------------------------------------------
+```
