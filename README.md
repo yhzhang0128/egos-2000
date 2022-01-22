@@ -21,7 +21,7 @@ Assembly                         2              6             14             18
 SUM:                            27            309            153           1023
 -------------------------------------------------------------------------------
 ```
-# EGOS: the earth and grass operating system
+# The earth and grass operating system (EGOS)
 
 EGOS is our teaching operating system at Cornell. There are three layers: 
 * the earth layer provides **hardware-specific** abstractions
