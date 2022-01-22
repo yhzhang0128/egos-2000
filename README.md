@@ -31,6 +31,10 @@ EGOS is our teaching operating system at Cornell. As the name suggests, it has t
     * processes
     * system calls
     * inter-process communication
+* the application layer on top of earth and grass provides
+    * file system
+    * shell
+    * common shell commands
 
 For more information, please read the documents in the [EGOS documentation Github repo](). 
 For any questions, please contact [Yunhao Zhang](mailto:yz2327@cornell.edu) or [Robbert van Renesse](mailto:rvr@cs.cornell.edu).
