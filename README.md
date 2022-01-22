@@ -1,4 +1,4 @@
-# Minimal RISC-V operating system on $99 FPGA board
+# Minimal operating system on $99 RISC-V board
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
