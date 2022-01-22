@@ -79,19 +79,22 @@ static void elf_load_app(int pid,
     }
 
     /* load the application */
-    int base, frame_no, page_no = 0;
+    int base, size, frame_no, page_no = 0;
     int block_offset = pheader->p_offset / BLOCK_SIZE;
-    for (int size = 0; size < pheader->p_filesz; size += BLOCK_SIZE) {
+    for (size = 0; size < pheader->p_filesz; size += BLOCK_SIZE) {
         if (size % PAGE_SIZE == 0) {
             earth->mmu_alloc(&frame_no, &base);
             earth->mmu_map(pid, page_no++, frame_no, F_ALL);
         }
         bs->read(block_offset++, ((char*)base) + (size % PAGE_SIZE));
     }
+    int diff = size - pheader->p_filesz;
+    memset(((char*)base) + (size % PAGE_SIZE) - diff, 0, diff);
 
     /* one more page for the heap */
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+    memset((char*)base, 0, PAGE_SIZE);
 
     /* two more pages for the stack */
     earth->mmu_alloc(&frame_no, &base);
