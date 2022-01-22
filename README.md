@@ -39,15 +39,16 @@ EGOS is our teaching operating system at Cornell. It has 3 layers:
 ## Hardware requirements
 * an Artix-7 35T Arty FPGA Development Board [link](https://digilent.com/shop/arty-a7-artix-7-fpga-development-board/)
 * a microUSB cable, such as [microUSB-to-USB](https://www.amazon.com/CableCreation-Charging-Shielded-Charger-Compatible/dp/B07CKXQ9NB?ref_=ast_sto_dp&th=1&psc=1) or [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details)
-* [optional] a Pmod MicroSD [link](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1)
-* [optional] an **SDHC** microSD card, such as [link](https://www.amazon.com/dp/B089DPCJS1?psc=1&ref=ppx_yo2_dt_b_product_details)
+* an **SDHC** microSD card and a microSD Pmod [link](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1)
 
 ## Software requirements
 * Sifive Freedom toolchain [link](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
 * Vivado Lab Solutions [link](https://www.xilinx.com/support/download.html)
-* `PuTTY` for Windows [link](https://www.putty.org/)
-* `screen` for Linux or Mac [link](https://linux.die.net/man/1/screen)
-* [optional] `balena Etcher` for programming a disk image file to an SD card [link](https://www.balena.io/etcher/)
+* a tool to program a disk image file to the microSD card 
+    * such as [balena Etcher](https://www.balena.io/etcher/)
+* a tool to connect with usbTTY
+    * such as `PuTTY` for Windows [link](https://www.putty.org/)
+    * or `screen` for Linux or Mac [link](https://linux.die.net/man/1/screen)
 
 ## Compile, install and further information
 Please read the documents in the [EGOS documentation Github repo](). 
