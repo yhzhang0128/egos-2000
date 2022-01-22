@@ -54,5 +54,5 @@ SUM:                            27            309            156           1023
 
 **TODO**: a Youtube video tutorial of compiling and installing EGOS
 
-Please read the documents in the [EGOS documentation repository](). 
+Please also read the documents in the [EGOS documentation repository](). 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
