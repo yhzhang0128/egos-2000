@@ -2,8 +2,10 @@
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
-```
-> cloc . --exclude-dir=install
+## Lines of code
+```shell
+> make loc
+cloc . --exclude-dir=install
       31 text files.
       31 unique files.                              
        5 files ignored.
