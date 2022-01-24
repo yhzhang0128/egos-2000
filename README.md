@@ -1,8 +1,8 @@
-# A minimal operating system on a real RISC-V board
+# A minimal operating system for a real RISC-V board
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
-The earth and grass operating system (EGOS) is our teaching operating system at Cornell. It has 3 layers: 
+The earth and grass operating system (EGOS) is our teaching OS at Cornell. It has three layers: 
 
 * the earth layer provides **hardware-specific** abstractions
     * tty and disk device driver interface
