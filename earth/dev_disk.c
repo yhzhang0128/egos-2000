@@ -16,26 +16,42 @@ enum {
       FLASH_ROM
 };
 
-static int type;
+enum {
+      DISK_IDLE,
+      DISK_BUSY
+};
+
+static int type, status;
 #define FLASH_ROM_START 0x20800000
 
 int disk_read(int block_no, int nblocks, char* dst) {
+    status = DISK_BUSY;
     if (type == SD_CARD) {
-        return sdread(block_no, nblocks, dst);
+        int r = sdread(block_no, nblocks, dst);
+        status = DISK_IDLE;
+        return r;
     } else {
         char* src = (void*)FLASH_ROM_START;
         src += block_no * BLOCK_SIZE;
         memcpy(dst, src, nblocks * BLOCK_SIZE);
+        status = DISK_IDLE;
         return 0;
     }
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
+    status = DISK_BUSY;
     if (type == SD_CARD) {
-        return sdwrite(block_no, nblocks, src);
+        int r = sdwrite(block_no, nblocks, src);
+        status = DISK_IDLE;
+        return r;
     } else {
         FATAL("on-board flash ROM cannot be written");
     }    
+}
+
+int disk_busy() {
+    return status;
 }
 
 int disk_init() {
@@ -46,6 +62,7 @@ int disk_init() {
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; tty_read(buf, 2));
 
+    status = DISK_IDLE;
     if (buf[0] == '0') {
         type = SD_CARD;
         INFO("microSD card is chosen");

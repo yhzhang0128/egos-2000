@@ -22,6 +22,7 @@ struct earth {
 
     int (*disk_read)(int block_no, int nblocks, char* dst);
     int (*disk_write)(int block_no, int nblocks, char* src);
+    int (*disk_busy)();
 
     /* ISA-specific cpu interface */
     int (*intr_enable)();
