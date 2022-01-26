@@ -43,7 +43,7 @@ SUM:                            28            321            156           1072
 * an [SDHC microSD card](https://www.amazon.com/dp/B073K14CVB?ref=ppx_yo2_dt_b_product_details&th=1), a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1) and a [USB microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details)
 
 ## Software requirements
-* Sifive [freedom riscv-gcc toolchain](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
+* Sifive [freedom riscv-gcc compiler toolchain](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
 * Vivado [lab solutions](https://www.xilinx.com/support/download.html) or any edition with the hardware manager
 * a tool to program a disk image file to the microSD card 
     * e.g., [balena Etcher](https://www.balena.io/etcher/)
