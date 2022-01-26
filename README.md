@@ -48,7 +48,7 @@ SUM:                            28            321            156           1072
 * a tool to program a disk image file to the microSD card 
     * e.g., [balena Etcher](https://www.balena.io/etcher/)
 * a tool to connect with ttyUSB
-    * e.g., [PuTTY](https://www.putty.org/) for Windows or [screen](https://linux.die.net/man/1/screen) for Linux and Mac
+    * e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows
 
 ## Tutorial and further information
 
