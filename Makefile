@@ -25,7 +25,7 @@ install:
 	$(CC) install/mkfs.c -o $(BUILD_DIR)/mkfs
 	cd install; ./mkfs
 	@echo "--------------- Create the Bootrom Image --------------"
-	cd install; vivado_lab -nojournal -mode batch -source arty/write_cfgmem.tcl
+	cd install; vivado_lab -nojournal -mode batch -source arty/write_cfgmem.tcl; rm *.log *.prm
 
 loc:
 	cloc . --exclude-dir=install
