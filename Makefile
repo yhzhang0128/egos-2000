@@ -25,8 +25,8 @@ install:
 	$(CC) install/mkfs.c -o $(BUILD_DIR)/mkfs
 	cd install; ./mkfs
 	@echo "--------------- Create the Bootrom Image --------------"
-	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the command in install/arty/write_cfgmem.tcl manually in Vivado."
-	cd install; vivado_lab -nojournal -mode batch -source arty/write_cfgmem.tcl; rm *.log *.prm
+	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the command in install/arty_board/write_cfgmem.tcl manually in Vivado."
+	cd install; vivado_lab -nojournal -mode batch -source arty_board/write_cfgmem.tcl; rm *.log *.prm
 	srec_info install/egos_bootROM.mcs -Intel
 
 loc:
@@ -57,7 +57,7 @@ INCLUDE = -Ishared/include
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-ARTY_FLAGS = -Linstall/arty -Iinstall/arty
+ARTY_FLAGS = -Linstall/arty_board -Iinstall/arty_board
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
