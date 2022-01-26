@@ -1,7 +1,6 @@
 debug
 release
 
-disk.img
 mkfs
 
 *.elf
@@ -9,4 +8,5 @@ mkfs
 *.bin
 *.log
 *.mcs
+*.img
 *.prm
