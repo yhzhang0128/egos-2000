@@ -6,3 +6,7 @@ mkfs
 
 *.elf
 *.lst
+*.bin
+*.log
+*.mcs
+*.prm
