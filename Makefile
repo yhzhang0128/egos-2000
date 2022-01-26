@@ -25,7 +25,7 @@ install:
 	$(CC) install/mkfs.c -o $(BUILD_DIR)/mkfs
 	cd install; ./mkfs
 	@echo "--------------- Create the Bootrom Image --------------"
-	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the command in install/arty_board/write_cfgmem.tcl manually in Vivado."
+	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the tcl command in install/arty_board/write_cfgmem.tcl manually in Vivado (the input box at the bottom of hardware manager)."
 	cd install; vivado_lab -nojournal -mode batch -source arty_board/write_cfgmem.tcl; rm *.log *.prm
 	srec_info install/egos_bootROM.mcs -Intel
 
