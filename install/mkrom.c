@@ -54,7 +54,7 @@ void write_mcs() {
     write_section(mem_earth, 0x40, earth_size);
     fprintf(stderr, "[INFO] Earth written\n");
 
-    write_section(mem_disk, 0x90, disk_size);
+    write_section(mem_disk, 0x80, disk_size);
     fprintf(stderr, "[INFO] Disk image written\n");
     printf(":00000001FF\n");
     
