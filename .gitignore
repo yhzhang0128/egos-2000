@@ -2,6 +2,7 @@ debug
 release
 
 mkfs
+mkrom
 
 *.elf
 *.lst
