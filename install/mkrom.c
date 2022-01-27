@@ -83,7 +83,7 @@ void load_disk() {
     struct stat st;
     stat(disk_file, &st);
     disk_size = (int)st.st_size;
-    printf("[INFO] Disk image file has 0x%x bytes\n", disk_size);
+    printf("[INFO] Disk  image  has 0x%.6x bytes\n", disk_size);
     assert(disk_size <= 6 * 1024 * 1024);
 
     freopen(disk_file, "r", stdin);
@@ -95,7 +95,7 @@ void load_earth() {
     struct stat st;
     stat(earth_file, &st);
     earth_size = (int)st.st_size;
-    printf("[INFO] Earth binary file has 0x%x bytes\n", earth_size);
+    printf("[INFO] Earth binary has 0x%.6x bytes\n", earth_size);
 
     freopen(earth_file, "r", stdin);
     read(0, mem_earth, earth_size);
@@ -140,7 +140,7 @@ void load_fe310() {
     third = getchar();
     fourth = getchar();
     fe310_size = (first << 24) + (second << 16) + (third << 8) + fourth;
-    printf("[INFO] FE310 binary section has 0x%x bytes\n", fe310_size);
+    printf("[INFO] FE310 binary has 0x%.6x bytes\n", fe310_size);
 
     for (int i = 0; i < fe310_size; i++)
         mem_fe310[i] = getchar();
