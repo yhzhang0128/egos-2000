@@ -33,6 +33,7 @@ void load_earth();
 void load_disk();
 void write_mcs();
 void write_mcs_section();
+
 int fe310_size, earth_size, disk_size;
 
 int main() {
@@ -62,7 +63,7 @@ void write_mcs() {
 
 void write_mcs_section(char* mem, int base, int size) {
     /* using a dummy checksum */
-    char chk = 0xff;
+    char chk;
 
     int ngroups = (size >> 16) + 1;
     for (int i = 0; i < ngroups; i++) {
@@ -141,6 +142,7 @@ void load_fe310() {
     fe310_size = (first << 24) + (second << 16) + (third << 8) + fourth;
     printf("[INFO] FE310 binary section has 0x%x bytes\n", fe310_size);
 
-    read(0, mem_fe310, fe310_size);
+    for (int i = 0; i < fe310_size; i++)
+        mem_fe310[i] = getchar();
     fclose(stdin);
 }
