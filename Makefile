@@ -18,7 +18,8 @@ apps: apps/*.c
 	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP}.elf > $(DEBUG_DIR)/$${APP}.lst;\
 	done
 
-images:
+.PHONY: install
+install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
 	$(CC) $(BUILD_DIR)/mkfs.c -o $(BUILD_DIR)/mkfs
 	cd $(BUILD_DIR); ./mkfs
@@ -27,9 +28,6 @@ images:
 	$(CC) $(BUILD_DIR)/mkrom.c -o $(BUILD_DIR)/mkrom
 	cd $(BUILD_DIR); ./mkrom
 	rm $(BUILD_DIR)/earth.bin
-
-loc:
-	cloc . --exclude-dir=$(BUILD_DIR)
 
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
