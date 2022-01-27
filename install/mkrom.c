@@ -22,7 +22,7 @@
 char disk_file[]  = "disk.img";
 char earth_file[] = "earth.bin";
 char fe310_file[] = "arty_board/fe310_cpu.bit";
-char output_file[]= "egos_bootROM.mcs";
+char output_file[]= "bootROM.mcs";
 
 char mem_fe310[4 * 1024 * 1024];
 char mem_earth[4 * 1024 * 1024];

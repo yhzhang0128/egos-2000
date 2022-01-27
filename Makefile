@@ -32,7 +32,7 @@ install:
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
 	rm -rf $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom
-	rm -rf $(BUILD_DIR)/disk.img $(BUILD_DIR)/egos_bootROM.*
+	rm -rf $(BUILD_DIR)/disk.img $(BUILD_DIR)/bootROM.mcs
 	rm -rf $(BUILD_DIR)/earth.bin $(BUILD_DIR)/*.log
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
