@@ -27,9 +27,7 @@ images:
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
 	$(CC) $(BUILD_DIR)/mkrom.c -o $(BUILD_DIR)/mkrom
 	cd $(BUILD_DIR); ./mkrom
-	#cd $(BUILD_DIR); vivado_lab -nojournal -mode batch -source arty_board/write_cfgmem.tcl; rm *.log *.prm
-	#srec_info $(BUILD_DIR)/egos_bootROM.mcs -Intel
-	#rm $(BUILD_DIR)/earth.bin
+	rm $(BUILD_DIR)/earth.bin
 
 loc:
 	cloc . --exclude-dir=$(BUILD_DIR)
@@ -37,8 +35,8 @@ loc:
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
 	rm -rf $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom
-	rm $(BUILD_DIR)/disk.img $(BUILD_DIR)/egos_bootROM.*
-	rm $(BUILD_DIR)/earth.bin $(BUILD_DIR)/*.log
+	rm -rf $(BUILD_DIR)/disk.img $(BUILD_DIR)/egos_bootROM.*
+	rm -rf $(BUILD_DIR)/earth.bin $(BUILD_DIR)/*.log
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
