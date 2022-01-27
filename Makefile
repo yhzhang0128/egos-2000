@@ -23,7 +23,7 @@ images:
 	$(CC) $(BUILD_DIR)//mkfs.c -o $(BUILD_DIR)/mkfs
 	cd $(BUILD_DIR)/; ./mkfs
 	@echo "\e[1;33m-------- Create the BootROM Image --------\e[0m"
-	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the command in $(BUILD_DIR)/arty_board/write_cfgmem.tcl manually in Vivado."
+	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the tcl command in $(BUILD_DIR)/arty_board/write_cfgmem.tcl manually in Vivado (the input box at the bottom of hardware manager)."
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
 	cd $(BUILD_DIR); vivado_lab -nojournal -mode batch -source arty_board/write_cfgmem.tcl; rm *.log *.prm
 	srec_info $(BUILD_DIR)/egos_bootROM.mcs -Intel
