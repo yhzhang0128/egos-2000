@@ -1,16 +1,15 @@
 all: apps
-	@echo "---------------- Compile the Grass Layer ----------------"
+	@echo "\e[1;32m-------- Compile the Grass Layer --------\e[0m"
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
-	@echo "---------------- Compile the Earth Layer ----------------"
+	@echo "\e[1;34m-------- Compile the Earth Layer --------\e[0m"
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(ARTY_FLAGS) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/earth.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
-	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
 
 .PHONY: apps
 apps: apps/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
-	@echo "---------------- Compile the Apps Layer ----------------"
+	@echo "\e[1;33m-------- Compile the Apps Layer --------\e[0m"
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
 	  echo "Compile" $${FILE} "=>" $(RELEASE_DIR)/$${APP}.elf;\
@@ -19,18 +18,19 @@ apps: apps/*.c
 	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP}.elf > $(DEBUG_DIR)/$${APP}.lst;\
 	done
 
-.PHONY: install
-install:
-	@echo "---------------- Create the Disk Image ----------------"
-	$(CC) install/mkfs.c -o $(BUILD_DIR)/mkfs
-	cd install; ./mkfs
-	@echo "--------------- Create the Bootrom Image --------------"
-	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the command in install/arty_board/write_cfgmem.tcl manually in Vivado."
-	cd install; vivado_lab -nojournal -mode batch -source arty_board/write_cfgmem.tcl; rm *.log *.prm
-	srec_info install/egos_bootROM.mcs -Intel
+images:
+	@echo "\e[1;33m-------- Create the Disk Image --------\e[0m"
+	$(CC) $(BUILD_DIR)//mkfs.c -o $(BUILD_DIR)/mkfs
+	cd $(BUILD_DIR)/; ./mkfs
+	@echo "\e[1;33m-------- Create the BootROM Image --------\e[0m"
+	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the command in $(BUILD_DIR)/arty_board/write_cfgmem.tcl manually in Vivado."
+	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
+	cd $(BUILD_DIR); vivado_lab -nojournal -mode batch -source arty_board/write_cfgmem.tcl; rm *.log *.prm
+	srec_info $(BUILD_DIR)/egos_bootROM.mcs -Intel
+	rm $(BUILD_DIR)/earth.bin
 
 loc:
-	cloc . --exclude-dir=install
+	cloc . --exclude-dir=$(BUILD_DIR)
 
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
@@ -57,7 +57,7 @@ INCLUDE = -Ishared/include
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-ARTY_FLAGS = -Linstall/arty_board -Iinstall/arty_board
+ARTY_FLAGS = -L$(BUILD_DIR)/arty_board -I$(BUILD_DIR)/arty_board
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
