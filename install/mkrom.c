@@ -32,7 +32,7 @@ void load_fe310();
 void load_earth();
 void load_disk();
 void write_mcs();
-void write_mcs_section();
+void write_section(char* mem, int base, int size);
 
 int fe310_size, earth_size, disk_size;
 
@@ -48,20 +48,21 @@ int main() {
 void write_mcs() {
     freopen(output_file, "w", stdout);
 
-    write_mcs_section(mem_fe310, 0x00, fe310_size);
+    write_section(mem_fe310, 0x00, fe310_size);
     fprintf(stderr, "[INFO] FE310 written\n");
-    write_mcs_section(mem_earth, 0x40, earth_size);
+
+    write_section(mem_earth, 0x40, earth_size);
     fprintf(stderr, "[INFO] Earth written\n");
-    write_mcs_section(mem_disk,  0x80, disk_size);
+
+    write_section(mem_disk, 0x90, disk_size);
     fprintf(stderr, "[INFO] Disk image written\n");
     printf(":00000001FF\n");
     
     fclose(stdout);
-
     fprintf(stderr, "[INFO] Finish making the bootROM image\n");
 }
 
-void write_mcs_section(char* mem, int base, int size) {
+void write_section(char* mem, int base, int size) {
     /* using a dummy checksum */
     char chk;
 
