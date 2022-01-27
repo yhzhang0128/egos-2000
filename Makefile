@@ -27,7 +27,7 @@ install:
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
 	$(CC) $(BUILD_DIR)/mkrom.c -o $(BUILD_DIR)/mkrom
 	cd $(BUILD_DIR); ./mkrom
-	rm $(BUILD_DIR)/earth.bin
+	rm $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom $(BUILD_DIR)/earth.bin 
 
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
@@ -49,8 +49,8 @@ OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
 BUILD_DIR = install
-DEBUG_DIR = $(BUILD_DIR)/debug
-RELEASE_DIR = $(BUILD_DIR)/release
+DEBUG_DIR = $(BUILD_DIR)/exec/debug
+RELEASE_DIR = $(BUILD_DIR)/exec/release
 
 INCLUDE = -Ishared/include
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
