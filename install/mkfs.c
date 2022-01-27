@@ -14,11 +14,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
 #include <sys/stat.h>
 
 char* kernel_processes[] = {
-                            "release/grass.elf",
-                            "release/echo.elf",
+                            "exec/release/grass.elf",
+                            "exec/release/echo.elf",
                             //"release/dir.elf",
                             //"release/shell.elf"
 };
@@ -44,15 +45,18 @@ int main() {
         struct stat st;
         stat(kernel_processes[i], &st);
         fprintf(stderr, "[INFO] Loading %s: %ld bytes\n", kernel_processes[i], (long)st.st_size);
+        assert(st.st_size > 0);
 
         if (st.st_size > 128 * 1024) {
             fprintf(stderr, "[ERROR] file larger than 128KB\n");
             return -1;
         }
 
-        int size = 0;
         freopen(kernel_processes[i], "r", stdin);
-        for (; size < st.st_size; size += read(0, buf, 128 * 1024));
+        int nread = 0;
+        while (nread < st.st_size)
+            nread += read(0, buf + nread, 128 * 1024 - nread);
+
         write(1, buf, st.st_size);
         write(1, buf, 128 * 1024 - st.st_size);
     }

@@ -88,7 +88,9 @@ void load_disk() {
     assert(disk_size <= 6 * 1024 * 1024);
 
     freopen(disk_file, "r", stdin);
-    read(0, mem_disk, disk_size);
+    int nread = 0;
+    while (nread < disk_size)
+        nread += read(0, mem_disk + nread, disk_size - nread);
     fclose(stdin);
 }
 
@@ -99,7 +101,9 @@ void load_earth() {
     printf("[INFO] Earth binary has 0x%.6x bytes\n", earth_size);
 
     freopen(earth_file, "r", stdin);
-    read(0, mem_earth, earth_size);
+    int nread = 0;
+    while (nread < earth_size)
+        nread += read(0, mem_earth + nread, earth_size - nread);
     fclose(stdin);
 }
 
