@@ -17,8 +17,7 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
 EGOS is minimal and very suitable for an undergraduate operating system course.
 
 ```shell
-> make loc
-cloc . --exclude-dir=install
+> cloc . --exclude-dir=install
       31 text files.
       31 unique files.                              
        5 files ignored.
