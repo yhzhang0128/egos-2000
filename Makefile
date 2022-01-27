@@ -1,15 +1,15 @@
 all: apps
-	@echo "\e[1;32m-------- Compile the Grass Layer --------\e[0m"
+	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
-	@echo "\e[1;34m-------- Compile the Earth Layer --------\e[0m"
+	@echo "$(CYAN)-------- Compile the Earth Layer --------$(END)"
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(ARTY_FLAGS) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/earth.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
 
 .PHONY: apps
 apps: apps/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
-	@echo "\e[1;33m-------- Compile the Apps Layer --------\e[0m"
+	@echo "$(YELLOW)-------- Compile the Apps Layer --------$(END)"
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
 	  echo "Compile" $${FILE} "=>" $(RELEASE_DIR)/$${APP}.elf;\
@@ -19,10 +19,10 @@ apps: apps/*.c
 	done
 
 images:
-	@echo "\e[1;33m-------- Create the Disk Image --------\e[0m"
+	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
 	$(CC) $(BUILD_DIR)//mkfs.c -o $(BUILD_DIR)/mkfs
 	cd $(BUILD_DIR)/; ./mkfs
-	@echo "\e[1;33m-------- Create the BootROM Image --------\e[0m"
+	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	@echo "[Note] Require vivado_lab in your \$$PATH. Otherwise, you can execute the tcl command in $(BUILD_DIR)/arty_board/write_cfgmem.tcl manually in Vivado (the input box at the bottom of hardware manager)."
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
 	cd $(BUILD_DIR); vivado_lab -nojournal -mode batch -source arty_board/write_cfgmem.tcl; rm *.log *.prm
@@ -62,3 +62,8 @@ LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
 EARTH_LDLIBS = -Wl,--start-group -lc -lgcc -lm -lmetal -lmetal-gloss -Wl,--end-group
+
+GREEN = \033[1;32m
+YELLOW = \033[1;33m
+CYAN = \033[1;36m
+END = \033[0m
