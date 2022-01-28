@@ -117,5 +117,5 @@ INFO: [Common 17-206] Exiting Vivado at Thu Jan 27 16:45:59 2022...
 
 # copy the processor binary from docker container
 # to the egos-riscv repository in the host machine
-root@579c433a6161:/# cp builds/e300artydevkit/obj/E300ArtyDevKitFPGAChip.bit /root/host/.../egos-riscv/install/arty_board/fe310_cpu.bit
+root@579c433a6161:/# cp builds/e300artydevkit/obj/E300ArtyDevKitFPGAChip.bit /root/host/egos-riscv/install/arty_board/fe310_cpu.bit
 ```
