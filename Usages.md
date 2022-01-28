@@ -88,11 +88,8 @@ We prepared a docker image encapsulating the toolchain environment.
 	--mount type=bind,source=$ARTY,target=/root/host \
 	yhzhang0128/arty-toolchain:latest
 # enter the shell of docker container
-# $ARTY on host is mapped to /root/host in the docker container
+# $ARTY on the host machine is mapped to /root/host in the docker container
 
-root@579c433a6161:/# cd /root
-root@579c433a6161:/# ls
-fe310-cpu  fe310-deps  fe310-sdk  host
 root@579c433a6161:/# cd /root/fe310-cpu
 # do your modifications in this directory
 
@@ -118,7 +115,7 @@ write_cfgmem completed successfully
 INFO: [Common 17-206] Exiting Vivado at Thu Jan 27 16:45:59 2022...
 
 
-# copy the new processor binary from docker
+# copy the processor binary from docker container
 # to the egos-riscv repository in the host machine
 root@579c433a6161:/# cp builds/e300artydevkit/obj/E300ArtyDevKitFPGAChip.bit /root/host/.../egos-riscv/install/arty_board/fe310_cpu.bit
 ```
