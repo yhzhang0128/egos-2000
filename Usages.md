@@ -49,7 +49,7 @@ You can use tools like [balena Etcher](https://www.balena.io/etcher/) to program
 
 ## Step3: Program the Arty FPGA board
 
-Install the Xilinx Vivado Lab Edition which can be downloaded [here](https://drive.google.com/file/d/1VS6_mxb6yrAxdDtlXkHdB-8jg9CScacw/view?usp=sharing) or [here](https://www.xilinx.com/support/download.html). You may need to register a Xilinx account, but the software is free.
+Install Vivado Lab Edition which can be downloaded [here](https://drive.google.com/file/d/1VS6_mxb6yrAxdDtlXkHdB-8jg9CScacw/view?usp=sharing) or [here](https://www.xilinx.com/support/download.html). You may need to register a Xilinx account, but the software is free.
 
 1. Connect the Arty FPGA board to your computer with the USB cable
 2. Open Vivado Lab Edition
