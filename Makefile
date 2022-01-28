@@ -30,7 +30,7 @@ install:
 	rm $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom $(BUILD_DIR)/earth.bin 
 
 clean:
-	rm -rf $(BUILD_DIR)/exec
+	rm -rf $(BUILD_DIR)/bin
 	rm -rf $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom
 	rm -rf $(BUILD_DIR)/disk.img $(BUILD_DIR)/bootROM.mcs
 	rm -rf $(BUILD_DIR)/earth.bin $(BUILD_DIR)/*.log
@@ -49,8 +49,8 @@ OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
 BUILD_DIR = install
-DEBUG_DIR = $(BUILD_DIR)/exec/debug
-RELEASE_DIR = $(BUILD_DIR)/exec/release
+DEBUG_DIR = $(BUILD_DIR)/bin/debug
+RELEASE_DIR = $(BUILD_DIR)/bin/release
 
 INCLUDE = -Ishared/include
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow

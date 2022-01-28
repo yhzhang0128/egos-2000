@@ -21,7 +21,7 @@ Download the SiFive [riscv-gcc compiler](https://github.com/sifive/freedom-tools
 > tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
 > export PATH=$PATH:$ARTY/riscv64-unknown...../bin
 > make
-mkdir -p install/exec/debug install/exec/release
+mkdir -p install/bin/debug install/bin/release
 -------- Compile the Apps Layer --------
 ......
 -------- Compile the Grass Layer --------
@@ -30,7 +30,7 @@ mkdir -p install/exec/debug install/exec/release
 ......
 ```
 
-This will create two directories `debug` and `release` in `install/exec`. 
+This will create two directories `debug` and `release` in `install/bin`. 
 `release` holds the ELF format binary executables and `debug` holds the human readable assembly files.
 
 ## Step2: Create the disk and bootROM images

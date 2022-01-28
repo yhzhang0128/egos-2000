@@ -18,8 +18,8 @@
 #include <sys/stat.h>
 
 char* kernel_processes[] = {
-                            "exec/release/grass.elf",
-                            "exec/release/echo.elf",
+                            "bin/release/grass.elf",
+                            "bin/release/echo.elf",
                             //"release/dir.elf",
                             //"release/shell.elf"
 };
