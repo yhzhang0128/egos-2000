@@ -5,8 +5,8 @@
 The earth and grass operating system (EGOS) is our teaching OS at Cornell. It has three layers: 
 
 * the earth layer provides **hardware-specific** abstractions
-    * tty and disk device driver interface
-    * cpu interrupt and memory management interface
+    * tty and disk device interfaces
+    * cpu interrupt and memory management interfaces
 * the grass layer provides **hardware-independent** abstractions
     * processes and system calls
     * inter-process communication
@@ -14,7 +14,7 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
     * file system
     * shell and common shell commands
 
-EGOS is minimal and very suitable for an undergraduate operating system course.
+EGOS is minimal and very suitable for teaching an undergraduate operating system course.
 
 ```shell
 > cloc . --exclude-dir=install
