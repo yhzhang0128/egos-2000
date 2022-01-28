@@ -49,9 +49,11 @@ SUM:                            28            321            156           1072
 * a tool to connect with ttyUSB
     * e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows
 
-## Tutorial and further information
+## Tutorial and documentation
 
 **TODO**: a Youtube video tutorial of compiling and installing EGOS
 
-Please also read the documents in the [EGOS documentation repository](). 
-For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
+For compiling and installing egos-riscv, you can also read the `Usages.md` document in the [EGOS documentation repository]().
+This repository also contains documents about the design, architecture and teaching plans of egos-riscv.
+
+For further questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
