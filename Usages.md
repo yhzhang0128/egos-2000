@@ -94,6 +94,7 @@ root@579c433a6161:/# cd /root/fe310-cpu
 # do your modifications in this directory
 
 # compile the processor
+# may take 15-20 minutes
 root@579c433a6161:/# ./4411.sh
 ......
 ......
