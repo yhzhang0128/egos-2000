@@ -44,8 +44,8 @@ This will create two directories `debug` and `release` in `install/exec`.
 ......
 ```
 
-This will create two files `disk.img` and `bootROM.mcs` in `install`.
-You can use tools like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
+This will create `disk.img` and `bootROM.mcs` in `install`.
+You can use tools like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD.
 
 ## Step3: Program the Arty FPGA board
 
