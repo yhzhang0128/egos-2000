@@ -52,6 +52,6 @@ SUM:                            28            321            156           1072
 ## Tutorial and documentation
 
 For compiling and running egos-riscv, you can watch our video Tutorial ([Youtube](), [Bilibili]()) or read [Usages.md](Usages.md). 
-The [documentation repository]() further introduces the teaching plans, architecture and development history of egos-riscv.
+The [documentation]() further introduces the teaching plans, architecture and development history of egos-riscv.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
