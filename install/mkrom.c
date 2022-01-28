@@ -31,7 +31,7 @@ char mem_disk [6 * 1024 * 1024];
 void load_fe310();
 void load_earth();
 void load_disk();
-void write_mcs();
+void write_intel_mcs();
 void write_section(char* mem, int base, int size);
 
 int fe310_size, earth_size, disk_size;
@@ -40,12 +40,12 @@ int main() {
     load_fe310();
     load_earth();
     load_disk();
-    write_mcs();
+    write_intel_mcs();
     
     return 0;
 }
 
-void write_mcs() {
+void write_intel_mcs() {
     freopen(output_file, "w", stdout);
 
     write_section(mem_fe310, 0x00, fe310_size);
