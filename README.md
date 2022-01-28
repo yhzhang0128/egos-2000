@@ -51,9 +51,9 @@ SUM:                            28            321            156           1072
 
 ## Tutorial and documentation
 
-**TODO**: a Youtube video tutorial of compiling and installing EGOS
+**TODO**: a Youtube video tutorial of compiling and running EGOS
 
-For compiling and installing egos-riscv, you can also read the `Usages.md` document in the [EGOS documentation repository]().
+For compiling and running egos-riscv, you can also read the `Usages.md` document in the [EGOS documentation repository]().
 This repository also contains documents about the design, architecture and teaching plans of egos-riscv.
 
 For further questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
