@@ -43,7 +43,7 @@ SUM:                            28            321            156           1072
 
 ## Software requirements
 * SiFive [freedom riscv-gcc compiler toolchain](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
-* Vivado [lab solutions](https://www.xilinx.com/support/download.html) or any edition with the hardware manager
+* [Vivado lab solutions](https://www.xilinx.com/support/download.html) or any edition with the hardware manager
 * a tool to program a disk image file to the microSD card 
     * e.g., [balena Etcher](https://www.balena.io/etcher/)
 * a tool to connect with ttyUSB
