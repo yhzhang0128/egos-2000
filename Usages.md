@@ -60,7 +60,7 @@ Install Vivado Lab Edition which can be downloaded [here](https://drive.google.c
 7. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
 8. Click "OK" and wait for the program to finish
 9. Click the `program` red button on the left-top corner of the Arty FPGA board.
-10. Click the `reset` red button on the right-top corner of the Arty FPGA board.
+10. Click the `reset` red button on the right-top corner of the Arty FPGA board, for rebooting EGOS.
 11. For Linux users, type in your shell
 ```shell
 > sudo chmod 666 /dev/ttyUSB1
