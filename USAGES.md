@@ -77,7 +77,7 @@ If you choose the wrong one, step8 will tell you.
 ## Appendix: Modify and recompile the processor
 
 In rare cases, you may want to modify the FE310 RISC-V processor.
-For example, we have modified the processor to increase the memory size from 32KB to 160KB and connect its SPI bus controller to the microSD card.
+For example, we have modified the processor to increase the memory size from 32KB to 160KB, increase the clock frequency from 32MHz to 65MHz and connect its SPI bus controller to the microSD card.
 
 We prepared a docker image encapsulating the toolchain environment.
 
