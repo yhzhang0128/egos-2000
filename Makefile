@@ -2,14 +2,14 @@ all: apps
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
-	@echo "$(CYAN)-------- Compile the Earth Layer --------$(END)"
+	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(ARTY_FLAGS) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/earth.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
 
 .PHONY: apps
 apps: apps/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
-	@echo "$(YELLOW)-------- Compile the Apps Layer --------$(END)"
+	@echo "$(CYAN)-------- Compile the Apps Layer --------$(END)"
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
 	  echo "Compile" $${FILE} "=>" $(RELEASE_DIR)/$${APP}.elf;\
