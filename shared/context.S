@@ -12,8 +12,8 @@
 
 ctx_switch:
         addi sp,sp,-64
-        sw ra,0(sp)      /* return address */
-        sw s0,4(sp)      /* callee saved registers */
+        sw ra,0(sp)      /* save return address */
+        sw s0,4(sp)      /* save callee-saved registers */
         sw s1,8(sp)
         sw s2,12(sp)
         sw s3,16(sp)
@@ -27,8 +27,8 @@ ctx_switch:
         sw s11,48(sp)
         sw sp,0(a0)       /* save the current stack pointer */
         mv sp,a1          /* switch the stack */
-        lw ra,0(sp)
-        lw s0,4(sp)
+        lw ra,0(sp)       /* restore return address */
+        lw s0,4(sp)       /* restore callee-saved registers */
         lw s1,8(sp)
         lw s2,12(sp)
         lw s3,16(sp)
@@ -45,8 +45,8 @@ ctx_switch:
 
 ctx_start:
         addi sp,sp,-64
-        sw ra,0(sp)      /* return address */
-        sw s0,4(sp)      /* callee saved registers */
+        sw ra,0(sp)      /* save return address */
+        sw s0,4(sp)      /* save callee-saved registers */
         sw s1,8(sp)
         sw s2,12(sp)
         sw s3,16(sp)
@@ -60,4 +60,4 @@ ctx_start:
         sw s11,48(sp)
         sw sp,0(a0)       /* save the current stack pointer */
         mv sp,a1          /* switch the stack */
-        jal ctx_entry     /* call ctx_entry function */
+        jal ctx_entry     /* call ctx_entry() */
