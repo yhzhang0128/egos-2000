@@ -6,10 +6,9 @@
 /* Author: Yunhao Zhang
  * Description: context switch and context start
  */
-
-        .section .text
-        .global ctx_start ctx_switch
-
+    .section .text
+    .global ctx_start
+    .global ctx_switch
 ctx_switch:
         addi sp,sp,-64
         sw ra,0(sp)      /* save return address */

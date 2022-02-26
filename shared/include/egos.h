@@ -48,3 +48,7 @@ enum {
     GPID_SHELL,
     GPID_USER_START
 }; 
+
+void ctx_switch(void** old_sp, void* new_sp);
+void ctx_start(void** old_sp, void* new_sp);
+void ctx_entry(void);

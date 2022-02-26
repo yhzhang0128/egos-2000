@@ -38,7 +38,7 @@ clean:
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
 
-GRASS_SRCS = grass/enter.S grass/*.c shared/*.c
+GRASS_SRCS = grass/enter.S grass/*.c shared/*.c shared/*.S
 GRASS_LAYOUT = -Tgrass/layout.lds
 
 APPS_SRCS = apps/enter.S shared/*.c

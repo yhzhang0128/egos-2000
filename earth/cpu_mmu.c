@@ -69,11 +69,22 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
 }
 
 int mmu_switch(int pid) {
-    if (curr_vm_pid != -1) {
-        FATAL("context switch not implemented");
-    }
+    if (pid == curr_vm_pid)
+        return 0;
 
     char* base = (void*) VADDR_START;
+
+    /* unmap curr_vm_pid from virtual address space */
+    for (int i = 0; i < MAX_NFRAMES; i++) {
+        if (INUSE(trans_table->frame[i])
+            && trans_table->frame[i].pid == curr_vm_pid) {
+            struct frame_t* src = (void*)(base + PAGE_SIZE * trans_table->frame[i].page_no);
+            cache_write(i, src);
+            INFO("Unmap page #%d of process #%d to frame #%d", trans_table->frame[i].page_no, curr_vm_pid, i);
+        }
+    }
+
+    /* map pid to virtual address space */
     for (int i = 0; i < MAX_NFRAMES; i++) {
         if (INUSE(trans_table->frame[i])
             && trans_table->frame[i].pid == pid) {
@@ -82,16 +93,23 @@ int mmu_switch(int pid) {
             INFO("Map frame #%d to page #%d of process #%d", i, trans_table->frame[i].page_no, pid);
         }
     }
+
+    curr_vm_pid = pid;
     return 0;
 }
 
 static int cache_read(int frame_no) {
-    int free_no = -1;
     for (int i = 0; i < CACHED_NFRAMES; i++) {
         if (cache_frame_no[i] == frame_no)
             return (int)(cache + i);
-        if (cache_frame_no[i] == -1 && free_no == -1)
+    }
+
+    int free_no = -1;
+    for (int i = 0; i < CACHED_NFRAMES; i++) {
+        if (cache_frame_no[i] == -1 && free_no == -1) {
             free_no = i;
+            break;
+        }
     }
 
     if (free_no != -1) {
@@ -101,7 +119,18 @@ static int cache_read(int frame_no) {
 
         return (int)(cache + free_no);
     } else {
-        FATAL("Cache is full and eviction is not implemented");
+        FATAL("Cache is full in cache_read(), cpu_mmu.c");
     }
 }
 
+static int cache_write(int frame_no, struct frame_t* src) {
+    int found_no = -1;
+    for (int i = 0; i < CACHED_NFRAMES; i++) {
+        if (cache_frame_no[i] == frame_no) {
+            memcpy(cache + i, src, PAGE_SIZE);
+            return 0;
+        }
+    }
+
+    FATAL("Cache is full in cache_write(), cpu_mmu.c");
+}
