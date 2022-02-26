@@ -79,6 +79,18 @@ int intr_init() {
     }
     metal_interrupt_init(cpu_int);
 
+    int mode = metal_interrupt_get_vector_mode(cpu_int);
+    switch (mode) {
+    case METAL_DIRECT_MODE:
+        INFO("CPU interrupt is in direct mode");
+        break;
+    case METAL_VECTOR_MODE:
+        INFO("CPU interrupt is in vector mode");
+        break;
+    default:
+        ERROR("CPU interrupt is in unknown mode %d", mode);
+    }
+
     tmr_int = metal_cpu_timer_interrupt_controller(cpu);
     if (tmr_int == NULL) {
         ERROR("Unable to get CPU timer interrupt handle");
