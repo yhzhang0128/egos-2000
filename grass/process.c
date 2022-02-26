@@ -13,6 +13,7 @@
 #include <string.h>
 
 int proc_nprocs;
+int proc_current;
 #define MAX_NPROCESS  64
 struct process proc_set[MAX_NPROCESS];
 
@@ -25,6 +26,7 @@ void proc_init() {
 
     /* the first process is now running */
     int pid = proc_alloc();
+    proc_current = pid;
     proc_set_running(pid);
 }
 
