@@ -18,19 +18,21 @@ static void sys_proc_init();
 int main() {
     SUCCESS("Enter the grass layer");
 
-    proc_init();      // process control block
-    timer_init();     // timer
-    sys_proc_init();  // first kernel process
+    /* Initialization */
+    proc_init();                       // process control block
+    timer_init();                      // timer
+    sys_proc_init();                   // first kernel process
+    pcb.proc_alloc = proc_alloc;       // pcb interface to sys_proc
+    pcb.proc_free = proc_free;
+    pcb.proc_set_ready = proc_set_ready;
 
-    void (*app_entry)(void*) = (void*)VADDR_START;
-    pcb.timer_reset = timer_reset;
-    pcb.proc_alloc = proc_alloc;
-    pcb.proc_set_running = proc_set_running;
-    pcb.proc_set_runnable = proc_set_runnable;
-
-    earth->mmu_switch(GPID_PROCESS);
-    proc_set_running(GPID_PROCESS);
-    app_entry(&pcb);
+    /* Enter kernel process sys_proc */
+    void (*sys_proc_entry)(void*) = (void*)VADDR_START;
+    earth->mmu_switch(GPID_PROCESS);   // setup virtual address space
+    proc_set_running(GPID_PROCESS);    // set status
+    timer_reset();                     // start timer
+    earth->intr_enable();              // enable interrupt
+    sys_proc_entry(&pcb);
     FATAL("Should never return to the grass kernel main()");
 
     return 0;
@@ -41,12 +43,8 @@ static int read_sys_proc(int block_no, char* dst) {
 }
 
 static void sys_proc_init() {
-    int pid = proc_alloc();
-    if (pid != GPID_PROCESS)
-        FATAL("Process ID mismatch: %d != %d", pid, GPID_PROCESS);
-
-    INFO("Load kernel process #%d: process spawn and kill", pid);
+    INFO("Load kernel process #%d: process spawn and kill", GPID_PROCESS);
     struct block_store bs;
     bs.read = read_sys_proc;
-    elf_load(pid, &bs, earth);
+    elf_load(GPID_PROCESS, &bs, earth);
 }

@@ -22,37 +22,10 @@ void proc_init() {
 
     proc_nprocs = 0;
     memset(proc_set, 0, sizeof(struct process) * MAX_NPROCESS);
-}
 
-int proc_alloc() {
-    proc_nprocs++;
-    for (int i = 0; i < MAX_NPROCESS; i++) {
-        if (proc_set[i].pid == 0) {
-            proc_set[i].pid = proc_nprocs;
-            proc_set[i].status = PROC_UNUSED;
-            return proc_nprocs;
-        }
-    }
-    FATAL("Reach the limit of %d processes", MAX_NPROCESS);
-    return -1;
-}
-
-void proc_set_running(int pid) {
-    for (int i = 0; i < MAX_NPROCESS; i++) {
-        if (proc_set[i].pid == pid) {
-            proc_set[i].status = PROC_RUNNING;
-            return;
-        }
-    }
-}
-
-void proc_set_runnable(int pid) {
-    for (int i = 0; i < MAX_NPROCESS; i++) {
-        if (proc_set[i].pid == pid) {
-            proc_set[i].status = PROC_RUNNABLE;
-            return;
-        }
-    }    
+    /* the first process is now running */
+    int pid = proc_alloc();
+    proc_set_running(pid);
 }
 
 static void timer_or_syscall(int id) {
@@ -69,4 +42,43 @@ static void timer_or_syscall(int id) {
     } else {
         FATAL("Got unknown interrupt #%d", id);
     }
+}
+
+
+int proc_alloc() {
+    proc_nprocs++;
+    for (int i = 0; i < MAX_NPROCESS; i++) {
+        if (proc_set[i].pid == 0) {
+            proc_set[i].pid = proc_nprocs;
+            proc_set[i].status = PROC_UNUSED;
+            return proc_nprocs;
+        }
+    }
+    FATAL("Reach the limit of %d processes", MAX_NPROCESS);
+    return -1;
+}
+
+static void proc_set_status(int pid, int status) {
+    for (int i = 0; i < MAX_NPROCESS; i++) {
+        if (proc_set[i].pid == pid) {
+            proc_set[i].status = status;
+            return;
+        }
+    }
+}
+
+void proc_free(int pid) {
+    FATAL("proc_free not implemented");
+}
+
+void proc_set_ready(int pid) {
+    proc_set_status(pid, PROC_READY);
+}
+
+void proc_set_running(int pid) {
+    proc_set_status(pid, PROC_RUNNING);
+}
+
+void proc_set_runnable(int pid) {
+    proc_set_status(pid, PROC_RUNNABLE);
 }

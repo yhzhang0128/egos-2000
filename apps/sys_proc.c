@@ -13,11 +13,9 @@
 
 /* same as the struct pcb_intf in grass/process.h */
 struct pcb_intf {
-    long long (*timer_reset)();
     int (*proc_alloc)();
     void (*proc_free)(int);
-    void (*proc_set_running)(int);
-    void (*proc_set_runnable)(int);
+    void (*proc_set_ready)(int);
 } pcb;
 
 int main(struct pcb_intf* _pcb) {
@@ -28,10 +26,6 @@ int main(struct pcb_intf* _pcb) {
     if (file_pid != GPID_FILE)
         FATAL("Process ID mismatch: %d != %d", file_pid, GPID_FILE);
     INFO("Load kernel process #%d: file server", file_pid);
-
-
-    earth->intr_enable();
-    pcb.timer_reset();
 
     while (1);
 }
