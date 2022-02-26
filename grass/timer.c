@@ -1,3 +1,13 @@
+/*
+ * (C) 2022, Cornell University
+ * All rights reserved.
+ */
+
+/* Author: Yunhao Zhang
+ * Description: read mtime register and write mtimecmp register;
+ * see section 3.1.15 of the RISC-V manual, volume2, v1.10
+ */
+
 #include "egos.h"
 #include "grass.h"
 

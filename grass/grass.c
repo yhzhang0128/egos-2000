@@ -44,8 +44,6 @@ static void fs_init() {
     elf_load(PID_FS, &bs, earth);
 }
 
-
-
 static int intr_cnt;
 static void intr_handler(int id) {
     long long mtime = timer_reset();
