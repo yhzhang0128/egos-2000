@@ -16,7 +16,7 @@ int main() {
 
     int cnt = 0;
     while (1) {
-        read(buf, 100);
+        tty_read(buf, 100);
         SUCCESS("echo got: %s", buf);
         
         sys_exit(cnt++);
