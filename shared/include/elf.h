@@ -37,7 +37,7 @@ struct elf32_program_header {
     uint32_t       p_align;
 };
 
-#include "fs.h"
+#include "file/block_store.h"
 struct earth;
 
 void elf_load(int pid, struct block_store* bs, struct earth* earth);
