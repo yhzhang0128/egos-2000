@@ -1,5 +1,4 @@
-#ifndef SDLIB_H
-#define SDLIB_H
+#pragma once
 
 /* SD card library interface */
 #define SD_BLOCK_SIZE 512
@@ -16,4 +15,3 @@ enum {
 };
 extern int SD_CARD_TYPE;
 
-#endif
