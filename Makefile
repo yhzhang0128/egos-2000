@@ -56,7 +56,7 @@ INCLUDE = -Ishared/include
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-ARTY_FLAGS = -L$(BUILD_DIR)/arty_board -I$(BUILD_DIR)/arty_board
+ARTY_FLAGS = -L$(BUILD_DIR)/arty_board
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
