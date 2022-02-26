@@ -5,6 +5,7 @@ enum {
     PROC_READY,     // loaded into memory but haven't started running
     PROC_RUNNING,
     PROC_RUNNABLE,
+    PROC_ZOMBIE
 };
 
 struct process{

@@ -17,9 +17,10 @@ int proc_current;
 #define MAX_NPROCESS  64
 struct process proc_set[MAX_NPROCESS];
 
-static void timer_or_syscall(int id);
+static void intr_entry(int id);
+
 void proc_init() {
-    earth->intr_register(timer_or_syscall);
+    earth->intr_register(intr_entry);
 
     proc_nprocs = 0;
     memset(proc_set, 0, sizeof(struct process) * MAX_NPROCESS);
@@ -30,7 +31,7 @@ void proc_init() {
     proc_set_running(pid);
 }
 
-static void timer_or_syscall(int id) {
+static void intr_entry(int id) {
     if (id == INTR_ID_TMR) {
         /* timer interrupt for scheduling */
         timer_reset();
