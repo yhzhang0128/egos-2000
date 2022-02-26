@@ -20,15 +20,12 @@ int main() {
     SUCCESS("Enter the grass layer");
 
     proc_init();
-
-    fs_init();
-    earth->mmu_switch(PID_FS);
-
     timer_init();
+    fs_init();
+
+    earth->mmu_switch(GPID_FS);
     earth->intr_enable();
     timer_reset();
-
-    /* call the shell application entry and never return */
     void (*app_entry)() = (void*)VADDR_START;
     app_entry();
 
@@ -40,8 +37,8 @@ static int read_fs_elf(int block_no, char* dst) {
 }
 
 static void fs_init() {
-    INFO("Load the file system as process #%d", PID_FS);
+    INFO("Load the file system as process #%d", GPID_FS);
     struct block_store bs;
     bs.read = read_fs_elf;
-    elf_load(PID_FS, &bs, earth);
+    elf_load(GPID_FS, &bs, earth);
 }

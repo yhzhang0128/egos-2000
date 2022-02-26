@@ -7,9 +7,6 @@
  * Description: the earth kernel system calls
  */
 
-//#include "egos.h"
-//#include "print.h"
-
 #include "syscall.h"
 
 #define RISCV_CLINT0_MSIP_BASE 0x2000000

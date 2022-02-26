@@ -39,10 +39,11 @@ struct earth {
     struct dev_log log;
 };
 
+
 enum {
-      PID_PROCESS,
-      PID_FS,
-      PID_DIR,
-      PID_SHELL,
-      PID_KERNEL_TOTAL
+      GPID_PROCESS,
+      GPID_FS,
+      GPID_DIR,
+      GPID_SHELL,
+      GPID_KERNEL_TOTAL
 }; 
