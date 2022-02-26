@@ -17,22 +17,22 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
 EGOS is minimal and very suitable for teaching an undergraduate operating system course.
 
 ```shell
-> cloc . --exclude-dir=install
-      31 text files.
-      31 unique files.                              
-       5 files ignored.
+> cloc .
+      41 text files.
+      33 unique files.                              
+      16 files ignored.
 
-github.com/AlDanial/cloc v 1.82  T=0.02 s (1657.9 files/s, 91367.4 lines/s)
+github.com/AlDanial/cloc v 1.92  T=0.03 s (1089.7 files/s, 70829.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               13            228            137            760
-C/C++ Header                    11             64              5            205
-Markdown                         1             12              0             46
-make                             1             11              0             43
-Assembly                         2              6             14             18
+C                               16            275            186            966
+C/C++ Header                    11             76             17            276
+Markdown                         2             35              0            145
+Assembly                         3             10             21             70
+make                             1             12              0             56
 -------------------------------------------------------------------------------
-SUM:                            28            321            156           1072
+SUM:                            33            408            224           1513
 -------------------------------------------------------------------------------
 ```
 
