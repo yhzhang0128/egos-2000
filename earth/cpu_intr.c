@@ -15,11 +15,8 @@ static handler_t excp_handler;
 static void trap_entry()  __attribute__((interrupt, aligned(128)));
 
 #define METAL_MTVEC_CLIC_VECTORED 0x03
-#define METAL_LOCAL_INTERRUPT_SW  0x008
-#define METAL_LOCAL_INTERRUPT_TMR 0x080 
-#define METAL_MSTATUS_MIE 0x00000008UL
 #define METAL_MCAUSE_INTR 0x80000000UL
-#define METAL_MCAUSE_CAUSE 0x000003FFUL
+#define METAL_MCAUSE_IDMASK 0x000003FFUL
 
 int intr_init() {
     INFO("Use direct mode for CPU interrupt handling");
@@ -33,7 +30,7 @@ static void trap_entry() {
     int mcause;
     __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
 
-    int id = mcause & METAL_MCAUSE_CAUSE;
+    int id = mcause & METAL_MCAUSE_IDMASK;
     if (mcause & METAL_MCAUSE_INTR) {
         if (intr_handler != NULL)
             intr_handler(id);
@@ -51,6 +48,11 @@ int intr_register(handler_t _handler) {
     intr_handler = _handler;
     return 0;
 }
+
+
+#define METAL_MSTATUS_MIE 0x00000008UL
+#define METAL_LOCAL_INTERRUPT_SW  0x008
+#define METAL_LOCAL_INTERRUPT_TMR 0x080 
 
 int intr_enable() {
     int tmp;
