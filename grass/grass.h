@@ -7,9 +7,13 @@
 #include "print.h"
 #include "syscall.h"
 
+struct earth *earth;
+
 #define RISCV_CLINT0_MSIP_BASE           0x2000000
 #define RISCV_CLINT0_MTIME_BASE          0x200bff8
 #define RISCV_CLINT0_MTIMECMP_BASE       0x2004000
+
+void proc_init();
 
 void timer_init();
 long long timer_reset();

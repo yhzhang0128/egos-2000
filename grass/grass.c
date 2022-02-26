@@ -19,9 +19,10 @@ static void intr_handler(int id);
 int main() {
     SUCCESS("Enter the grass layer");
 
+    proc_init();
+
     fs_init();
     earth->mmu_switch(PID_FS);
-    earth->intr_register(intr_handler);
 
     timer_init();
     earth->intr_enable();
@@ -43,18 +44,4 @@ static void fs_init() {
     struct block_store bs;
     bs.read = read_fs_elf;
     elf_load(PID_FS, &bs, earth);
-}
-
-static void intr_handler(int id) {
-    if (id == INTR_ID_TMR) {
-        timer_reset();
-    } else if (id == INTR_ID_SOFT) {
-        struct syscall *sc = (struct syscall*)SYSCALL_ARGS_BASE;
-        sc->type = SYS_UNUSED;
-        *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
-
-        INFO("Got system call #%d with arg %d", sc->type, sc->args.exit.status);        
-    } else {
-        FATAL("Got unknown interrupt #%d", id);
-    }
 }
