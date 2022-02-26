@@ -81,10 +81,8 @@ int tty_init() {
     metal_uart_init(uart, 115200);
     for (int i = 0; i < 2000000; i++);
     
-    if (!uart) {
-        ERROR("Unable to get uart handle");
-        return -1;
-    }
+    if (!uart)
+        FATAL("Unable to get uart handle");
 
     /* wait for the tty device to be ready */
     for (int c = 0; c != -1; metal_uart_getc(uart, &c));

@@ -35,12 +35,12 @@ static void trap_entry() {
         if (intr_handler != NULL)
             intr_handler(id);
         else
-            ERROR("Got interrupt but handler not registered");
+            FATAL("Got interrupt but handler not registered");
     } else {
         if (excp_handler != NULL)
             excp_handler(id);
         else
-            ERROR("Got exception but handler not registered");        
+            FATAL("Got exception but handler not registered");
     }
 }
 

@@ -36,29 +36,23 @@ int main() {
 
 int earth_init() {
     /* Initialize TTY */
-    if (tty_init()) {
-        ERROR("Failed at initializing the tty device");
-        return -1;
-    }
+    if (tty_init())
+        FATAL("Failed at initializing the tty device");
     earth.tty_read = tty_read;
     earth.tty_write = tty_write;
     SUCCESS("Finished initializing the tty device");
     
     /* Initialize disk */
-    if (disk_init()) {
-        ERROR("Failed at initializing the disk device");
-        return -1;
-    }
+    if (disk_init())
+        FATAL("Failed at initializing the disk device");
     earth.disk_read = disk_read;
     earth.disk_write = disk_write;
     earth.disk_busy = disk_busy;
     SUCCESS("Finished initializing the disk device");
 
     /* Initialize CPU interrupt */
-    if (intr_init()) {
-        ERROR("Failed at initializing the CPU interrupts");
-        return -1;
-    }
+    if (intr_init())
+        FATAL("Failed at initializing the CPU interrupts");
     earth.intr_enable = intr_enable;
     earth.intr_disable = intr_disable;
     earth.intr_register = intr_register;
@@ -66,10 +60,8 @@ int earth_init() {
     SUCCESS("Finished initializing the CPU interrupts");
 
     /* Initialize CPU memory management unit */
-    if (mmu_init()) {
-        ERROR("Failed at initializing the CPU interrupts");
-        return -1;
-    }
+    if (mmu_init())
+        FATAL("Failed at initializing the CPU interrupts");
     earth.mmu_alloc = mmu_alloc;
     earth.mmu_map = mmu_map;
     earth.mmu_switch = mmu_switch;
@@ -79,7 +71,6 @@ int earth_init() {
     earth.log.log_info = INFO;
     earth.log.log_highlight = HIGHLIGHT;
     earth.log.log_success = SUCCESS;
-    earth.log.log_error = ERROR;
     earth.log.log_fatal = FATAL;
 
     return 0;
