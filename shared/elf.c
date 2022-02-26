@@ -11,7 +11,6 @@
 #include <string.h>
 
 #include "egos.h"
-#include "file/block_store.h"
 #include "elf.h"
 #include "mmu.h"
 #include "log.h"

@@ -19,9 +19,9 @@
 
 char* kernel_processes[] = {
                             "bin/release/grass.elf",
-                            "bin/release/echo.elf",
-                            //"release/dir.elf",
-                            //"release/shell.elf"
+                            "bin/release/sys_proc.elf",
+                            //"bin/release/sys_dir.elf",
+                            //"bin/release/sys_shell.elf"
 };
 char buf[1024 * 1024];
 

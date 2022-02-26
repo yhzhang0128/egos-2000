@@ -6,6 +6,7 @@
 #include "mmu.h"
 #include "print.h"
 #include "syscall.h"
+#include "process.h"
 
 struct earth *earth;
 
@@ -14,6 +15,10 @@ struct earth *earth;
 #define RISCV_CLINT0_MTIMECMP_BASE       0x2004000
 
 void proc_init();
+int proc_alloc();
+void proc_free(int);
+void proc_set_runnable(int);
+void proc_set_running (int);
 
 void timer_init();
 long long timer_reset();

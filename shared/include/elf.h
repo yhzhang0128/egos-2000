@@ -37,6 +37,7 @@ struct elf32_program_header {
     uint32_t       p_align;
 };
 
+#include "file/disk.h"
 #include "file/block_store.h"
 struct earth;
 
