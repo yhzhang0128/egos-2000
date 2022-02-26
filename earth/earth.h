@@ -22,6 +22,7 @@ int intr_init();
 int intr_enable();
 int intr_disable();
 int intr_register(handler_t handler);
+int excp_register(handler_t handler);
 
 int mmu_init();
 int mmu_alloc(int* frame_no, int* addr);

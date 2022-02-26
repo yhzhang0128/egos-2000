@@ -23,8 +23,8 @@ int main() {
     if (earth_init())
         return -1;
 
-    if (sizeof(earth) > 0x40)
-        FATAL("Size of earth interface (%d bytes) exceeds 64 bytes", sizeof(earth));
+    if (sizeof(earth) > 0x80)
+        FATAL("Size of earth interface (%d bytes) exceeds 128 bytes", sizeof(earth));
     INFO("Put earth interface (%d bytes) at 0x%.8x", sizeof(earth), EARTH_ADDR);
     memcpy((void*)EARTH_ADDR, &earth, sizeof(earth));
 
@@ -62,6 +62,7 @@ int earth_init() {
     earth.intr_enable = intr_enable;
     earth.intr_disable = intr_disable;
     earth.intr_register = intr_register;
+    earth.excp_register = excp_register;
     SUCCESS("Finished initializing the CPU interrupts");
 
     /* Initialize CPU memory management unit */

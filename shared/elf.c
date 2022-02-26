@@ -63,8 +63,8 @@ static void elf_load_grass(struct block_store* bs,
         bs->read(block_offset++, (char*)GRASS_BASE + size);
     }
 
-    /* the last 0x40 bytes are reserved for struct earth */
-    memset((char*)GRASS_BASE + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz - 0x40);
+    /* the last 0x80 bytes are reserved for struct earth */
+    memset((char*)GRASS_BASE + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz - 0x80);
 }
 
 static void elf_load_app(int pid,

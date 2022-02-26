@@ -12,7 +12,7 @@
 #define F_EXEC          0x8
 #define F_ALL           0xf
 
-#define EARTH_ADDR      (0x08008000 - 0x40)
+#define EARTH_ADDR      (0x08008000 - 0x80)
 
 typedef void (*handler_t)(int);
 
@@ -25,10 +25,11 @@ struct earth {
     int (*disk_write)(int block_no, int nblocks, char* src);
     int (*disk_busy)();
 
-    /* ISA-specific cpu interface */
+    /* CPU interface */
     int (*intr_enable)();
     int (*intr_disable)();
     int (*intr_register)(handler_t handler);
+    int (*excp_register)(handler_t handler);
 
     int (*mmu_alloc)(int* frame_no, int* addr);
     int (*mmu_map)(int pid, int page_no, int frame_no, int flag);

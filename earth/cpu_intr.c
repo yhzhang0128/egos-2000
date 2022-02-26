@@ -49,6 +49,11 @@ int intr_register(handler_t _handler) {
     return 0;
 }
 
+int excp_register(handler_t _handler) {
+    excp_handler = _handler;
+    return 0;
+}
+
 
 #define METAL_MSTATUS_MIE 0x00000008UL
 #define METAL_LOCAL_INTERRUPT_SW  0x008
