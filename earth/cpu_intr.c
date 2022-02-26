@@ -35,12 +35,12 @@ static void trap_entry() {
         if (intr_handler != NULL)
             intr_handler(id);
         else
-            FATAL("Got interrupt but handler not registered");
+            FATAL("Got interrupt %d but handler not registered", id);
     } else {
         if (excp_handler != NULL)
             excp_handler(id);
         else
-            FATAL("Got exception but handler not registered");
+            FATAL("Got exception %d but handler not registered", id);
     }
 }
 
@@ -73,7 +73,6 @@ int intr_enable() {
     __asm__ volatile("csrrs %0, mie, %1"
                      : "=r"(tmp)
                      : "r"(METAL_LOCAL_INTERRUPT_TMR));
-
     return 0;
 }
 

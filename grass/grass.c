@@ -21,11 +21,12 @@ int main() {
 
     fs_init();
     earth->mmu_switch(PID_FS);
-
     earth->intr_register(intr_handler);
+
+    timer_init();
     earth->intr_enable();
     timer_reset();
-    
+
     /* call the shell application entry and never return */
     void (*app_entry)() = (void*)VADDR_START;
     app_entry();
@@ -44,10 +45,16 @@ static void fs_init() {
     elf_load(PID_FS, &bs, earth);
 }
 
-static int intr_cnt;
 static void intr_handler(int id) {
-    long long mtime = timer_reset();
-    intr_cnt++;
-    if (intr_cnt % 20 == 0)
-        INFO("Interrupt count: %d, current intr id=%d, mtime=%lld", intr_cnt, id, mtime);
+    if (id == INTR_ID_TMR) {
+        timer_reset();
+    } else if (id == INTR_ID_SOFT) {
+        struct syscall *sc = (struct syscall*)SYSCALL_ARGS_BASE;
+        sc->type = SYS_UNUSED;
+        *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
+
+        INFO("Got system call #%d with arg %d", sc->type, sc->args.exit.status);        
+    } else {
+        FATAL("Got unknown interrupt #%d", id);
+    }
 }
