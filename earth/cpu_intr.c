@@ -22,7 +22,7 @@ static void trap_entry()  __attribute__((interrupt, aligned(128)));
 #define METAL_MCAUSE_CAUSE 0x000003FFUL
 
 int intr_init() {
-    INFO("Use direct mode for CPU interrupt");
+    INFO("Use direct mode for CPU interrupt handling");
     INFO("Put the address of trap_entry() to CSR register mtvec");
     __asm__ volatile("csrw mtvec, %0" ::"r"((unsigned int)trap_entry & ~METAL_MTVEC_CLIC_VECTORED));
         
