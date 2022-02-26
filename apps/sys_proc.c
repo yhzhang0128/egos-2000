@@ -28,7 +28,11 @@ int main(struct pcb_intf* _pcb) {
 
     sys_file_init();
 
-    while (1);
+    static int cnt = 0;
+    while (1) {
+        /* if (cnt++ % 50 == 0) */
+        /*     INFO("In sys_proc"); */
+    }
 }
 
 static int read_sys_file(int block_no, char* dst) {

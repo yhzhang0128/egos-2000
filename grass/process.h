@@ -22,5 +22,5 @@ struct pcb_intf {
 };
 
 #define MAX_NPROCESS       64
-#define KERNEL_STACK_TOP   0x08008000 - 128
+#define KERNEL_STACK_TOP   0x08007f80       //0x08008000 - 128
 #define PID(x)             proc_set[x].pid

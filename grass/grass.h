@@ -19,6 +19,7 @@ int  proc_alloc();
 void proc_free(int);
 void proc_set_ready (int);
 void proc_set_running (int);
+void proc_set_runnable (int);
 
 void timer_init();
 long long timer_reset();

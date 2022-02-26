@@ -78,9 +78,8 @@ int mmu_switch(int pid) {
     for (int i = 0; i < MAX_NFRAMES; i++) {
         if (INUSE(trans_table->frame[i])
             && trans_table->frame[i].pid == curr_vm_pid) {
-            struct frame_t* src = (void*)(base + PAGE_SIZE * trans_table->frame[i].page_no);
-            cache_write(i, src);
-            INFO("Unmap page #%d of process #%d to frame #%d", trans_table->frame[i].page_no, curr_vm_pid, i);
+            cache_write(i, (void*)(base + PAGE_SIZE * trans_table->frame[i].page_no));
+            INFO("Unmap page #%d of process #%d from frame #%d", trans_table->frame[i].page_no, curr_vm_pid, i);
         }
     }
 

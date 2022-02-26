@@ -75,9 +75,41 @@ static void proc_yield() {
         return;
     }
 
+    int curr_pid = PID(proc_curr_idx);
     int next_pid = PID(proc_next_idx);
+    int next_status = proc_set[proc_next_idx].status;
+
     earth->mmu_switch(next_pid);
-    FATAL("Switching from proc %d to proc %d", PID(proc_curr_idx), next_pid);
+    proc_set_running(next_pid);
+    proc_set_runnable(curr_pid);
+    proc_curr_idx = proc_next_idx;
+    timer_reset();
+
+    if (next_status == PROC_READY) {
+        INFO("0x80000000: %.8x", *(int*)VADDR_START);
+        INFO("0x80000004: %.8x", *(int*)(VADDR_START + 4));
+        INFO("0x80000008: %.8x", *(int*)(VADDR_START + 8));
+        INFO("0x8000000c: %.8x", *(int*)(VADDR_START + 12));
+        INFO("0x80000010: %.8x", *(int*)(VADDR_START + 16));
+        INFO("0x80000014: %.8x", *(int*)(VADDR_START + 20));
+        INFO("0x80000018: %.8x", *(int*)(VADDR_START + 24));
+        INFO("0x8000001c: %.8x", *(int*)(VADDR_START + 28));
+        INFO("0x80000020: %.8x", *(int*)(VADDR_START + 32));
+        INFO("0x80000024: %.8x", *(int*)(VADDR_START + 36));
+        INFO("0x80000028: %.8x", *(int*)(VADDR_START + 40));
+        INFO("0x8000002c: %.8x", *(int*)(VADDR_START + 44));
+        INFO("saved stack pointer: %.8x", proc_set[0].sp);
+        INFO("earth log: %.8x", earth->log);
+        INFO("earth log info: %.8x", earth->log.log_info);
+        __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
+        __asm__ volatile("mret");
+    } else if (next_status == PROC_RUNNABLE) {
+        INFO("here2");
+        void* tmp;
+        ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
+    }
+
+    FATAL("Reach the end of proc_yield without switching to any process");
 }
 
 
@@ -94,6 +126,10 @@ int proc_alloc() {
     return -1;
 }
 
+void proc_free(int pid) {
+    FATAL("proc_free not implemented");
+}
+
 static void proc_set_status(int pid, int status) {
     for (int i = 0; i < MAX_NPROCESS; i++) {
         if (proc_set[i].pid == pid) {
@@ -101,10 +137,6 @@ static void proc_set_status(int pid, int status) {
             return;
         }
     }
-}
-
-void proc_free(int pid) {
-    FATAL("proc_free not implemented");
 }
 
 void proc_set_ready(int pid) {
