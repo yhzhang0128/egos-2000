@@ -11,26 +11,23 @@
 #include "egos.h"
 #include "grass.h"
 
-#define __METAL_ACCESS_ONCE(x) (*(__typeof__(*x) volatile *)(x))
+#define ACCESS(x) (*(__typeof__(*(unsigned int*)x) volatile *)((unsigned int*)(x)))
 
 static long long mtime_get() {
     unsigned int time_lo, time_hi;
     /* Guard against rollover when reading */
     do {
-        time_hi = __METAL_ACCESS_ONCE(
-            (unsigned int*)(RISCV_CLINT0_MTIME_BASE + 4));
-        time_lo = __METAL_ACCESS_ONCE(
-            (unsigned int*)(RISCV_CLINT0_MTIME_BASE));
-    } while (__METAL_ACCESS_ONCE((unsigned int*)(RISCV_CLINT0_MTIME_BASE + 4)) != time_hi);
+        time_hi = ACCESS(RISCV_CLINT0_MTIME_BASE + 4);
+        time_lo = ACCESS(RISCV_CLINT0_MTIME_BASE);
+    } while (ACCESS(RISCV_CLINT0_MTIME_BASE + 4) != time_hi);
 
     return (((unsigned long long)time_hi) << 32) | time_lo;
 }
 
 static void mtimecmp_set(long long time) {
-    __METAL_ACCESS_ONCE((unsigned int*)(RISCV_CLINT0_MTIMECMP_BASE + 4)) = 0xFFFFFFFF;
-    __METAL_ACCESS_ONCE((unsigned int*)(RISCV_CLINT0_MTIMECMP_BASE)) = (unsigned int)time;
-    __METAL_ACCESS_ONCE((unsigned int*)(RISCV_CLINT0_MTIMECMP_BASE +
-                                           4)) = (unsigned int)(time >> 32);
+    ACCESS(RISCV_CLINT0_MTIMECMP_BASE + 4) = 0xFFFFFFFF;
+    ACCESS(RISCV_CLINT0_MTIMECMP_BASE) = (unsigned int)time;
+    ACCESS(RISCV_CLINT0_MTIMECMP_BASE + 4) = (unsigned int)(time >> 32);
 }
 
 void timer_init() {
