@@ -11,12 +11,12 @@
 #include "egos.h"
 #include "grass.h"
 
-static void intr_handler(int id);
+static void timer_or_syscall(int id);
 void proc_init() {
-    earth->intr_register(intr_handler);
+    earth->intr_register(timer_or_syscall);
 }
 
-static void intr_handler(int id) {
+static void timer_or_syscall(int id) {
     if (id == INTR_ID_TMR) {
         /* timer interrupt for scheduling */
         timer_reset();
