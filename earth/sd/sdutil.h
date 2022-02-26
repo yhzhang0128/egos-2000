@@ -2,7 +2,6 @@
 #define SDLIB_UTIL_H
 
 #include <metal/spi.h>
-#include <metal/machine.h>
 
 char recv_data_byte(struct metal_spi*);
 char send_data_byte(struct metal_spi*, char);
@@ -10,6 +9,8 @@ char sd_exec_cmd(struct metal_spi *, char*);
 char sd_exec_acmd(struct metal_spi *, char*);
 
 /* FE310 SPI interface */
+#define SPI_BASE_ADDR 0x10024000
+
 #define METAL_SPI_SCKDIV_MASK 0xFFF
 
 #define METAL_SPI_SCKMODE_PHA_SHIFT 0
@@ -41,12 +42,21 @@ char sd_exec_acmd(struct metal_spi *, char*);
 #define METAL_SPI_CONTROL_IO 0
 #define METAL_SPI_CONTROL_MAPPED 1
 
+#define METAL_SIFIVE_SPI0_FMT 64UL
+#define METAL_SIFIVE_SPI0_CSID 16UL
+#define METAL_SIFIVE_SPI0_FCTRL 96UL
+#define METAL_SIFIVE_SPI0_CSDEF 20UL
+#define METAL_SIFIVE_SPI0_CSMODE 24UL
+#define METAL_SIFIVE_SPI0_TXDATA 72UL
+#define METAL_SIFIVE_SPI0_RXDATA 76UL
+#define METAL_SIFIVE_SPI0_SCKMODE 4UL
 
+#define __METAL_ACCESS_ONCE(x) (*(__typeof__(*x) volatile *)(x))
 #define METAL_SPI_REG(offset) (((unsigned long)control_base + offset))
 #define METAL_SPI_REGB(offset)                                                 \
-    (__METAL_ACCESS_ONCE((__metal_io_u8 *)METAL_SPI_REG(offset)))
+    (__METAL_ACCESS_ONCE((unsigned char*)METAL_SPI_REG(offset)))
 #define METAL_SPI_REGW(offset)                                                 \
-    (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_SPI_REG(offset)))
+    (__METAL_ACCESS_ONCE((unsigned int*)METAL_SPI_REG(offset)))
 
 
 #endif

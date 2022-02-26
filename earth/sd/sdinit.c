@@ -148,8 +148,8 @@ static int sd_check_capacity(struct metal_spi *spi) {
 
 static int sd_spi_reset(struct metal_spi *spi) {
     printf("[INFO] Set CS and MOSI to 1 and toggle clock.\r\n");
-    long control_base =
-        __metal_driver_sifive_spi0_control_base(spi);
+    long control_base = SPI_BASE_ADDR;
+    printf("[INFO] UART base address is 0x%x.\r\n", control_base);
     /* Keep chip select line high */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) |= METAL_SPI_CSMODE_HOLD;
@@ -194,8 +194,8 @@ static int sd_spi_configure(struct metal_spi *spi) {
     spi_config.cmd_num = spi_config.addr_num = spi_config.dummy_num = 0;
     spi_config.multi_wire = MULTI_WIRE_ALL;
 
-    long control_base =
-        __metal_driver_sifive_spi0_control_base((struct metal_spi *)spi);
+    long control_base = SPI_BASE_ADDR;
+
     /* Set protocol */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     switch (config->protocol) {

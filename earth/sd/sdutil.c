@@ -11,8 +11,7 @@
 #include "sdutil.h"
 
 char send_data_byte(struct metal_spi *spi, char byte) {
-    long rxdata, control_base =
-        __metal_driver_sifive_spi0_control_base(spi);
+    long rxdata, control_base = SPI_BASE_ADDR;
 
     while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL);
     METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = byte;
