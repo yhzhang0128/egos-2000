@@ -10,94 +10,79 @@
 #include "egos.h"
 #include "earth.h"
 
-static int tmr_id;
-static struct metal_cpu *cpu;
-static struct metal_interrupt *cpu_int, *tmr_int;
+static handler_t intr_handler;
+static handler_t excp_handler;
+static void trap_entry()  __attribute__((interrupt, aligned(128)));
+
+#define METAL_MTVEC_CLIC_VECTORED 0x03
+#define METAL_MSTATUS_MIE 0x00000008UL
+#define METAL_LOCAL_INTERRUPT_SW  0x008
+#define METAL_LOCAL_INTERRUPT_TMR 0x080 
+#define METAL_MCAUSE_INTR 0x80000000UL
+#define METAL_MCAUSE_CAUSE 0x000003FFUL
+
+int intr_init() {
+    INFO("Put the address of trap_entry() to CSR register mtvec");
+    __asm__ volatile("csrw mtvec, %0" ::"r"((unsigned int)trap_entry & ~METAL_MTVEC_CLIC_VECTORED));
+        
+    return 0;
+}
+
+static void trap_entry() {
+    int mcause;
+    __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
+
+    int id = mcause & METAL_MCAUSE_CAUSE;
+    if (mcause & METAL_MCAUSE_INTR) {
+        if (intr_handler != NULL)
+            intr_handler(id);
+        else
+            ERROR("Got interrupt but handler not registered");
+    } else {
+        if (excp_handler != NULL)
+            excp_handler(id);
+        else
+            ERROR("Got exception but handler not registered");        
+    }
+}
+
+int intr_register(handler_t _handler) {
+    intr_handler = _handler;
+    return 0;
+}
 
 int intr_enable() {
-    if (metal_interrupt_enable(tmr_int, tmr_id)) {
-        ERROR("Failed to enable timer interrupt");
-        return -1;
-    }   
+    int tmp;
+    /* Enable global interrupt */
+    __asm__ volatile("csrrs %0, mstatus, %1"
+                     : "=r"(tmp)
+                     : "r"(METAL_MSTATUS_MIE));
+    /* Enable software interrupt */
+    __asm__ volatile("csrrs %0, mie, %1"
+                     : "=r"(tmp)
+                     : "r"(METAL_LOCAL_INTERRUPT_SW));
+    /* Enable timer interrupt */
+    __asm__ volatile("csrrs %0, mie, %1"
+                     : "=r"(tmp)
+                     : "r"(METAL_LOCAL_INTERRUPT_TMR));
 
-    if(metal_interrupt_enable(cpu_int, 0)) {
-        ERROR("Failed to enable CPU interrupt");
-        return -1;
-    }
     return 0;
 }
 
 int intr_disable() {
-    if (metal_interrupt_disable(tmr_int, tmr_id)) {
-        ERROR("Failed to disable timer interrupt");
-        return -1;
-    }
-
-    if(metal_interrupt_disable(cpu_int, 0)) {
-        ERROR("Failed to disable the CPU interrupt");
-        return -1;
-    }
-    return 0;
-}
-
-static handler_t handler;
-static void handler_wrapper(int id, void* arg) {
-    handler(id, arg);
-    metal_cpu_set_mtimecmp(cpu, metal_cpu_get_mtime(cpu) + QUANTUM_NCYCLES);
-}
-
-int intr_register(int id, handler_t _handler) {
-    handler = _handler;
-    tmr_id = metal_cpu_timer_get_interrupt_id(cpu);
-
-    INFO("Timer interrupt id is %d", tmr_id);
-    if (id != tmr_id) {
-        ERROR("Interrupt id %d not supported for register", id);
-        return -1;
-    }
-
-    if (0 > metal_interrupt_register_handler(tmr_int, tmr_id, handler_wrapper, cpu)) {
-        ERROR("Failed at registering timer interrupt handler");
-        return -1;
-    }
-    metal_cpu_set_mtimecmp(cpu, QUANTUM_NCYCLES);
-
-    return 0;
-}
-
-int intr_init() {
-    cpu = metal_cpu_get(0);
-    if(cpu == NULL) {
-        ERROR("Unable to get CPU handle");
-        return -1;
-    }
-    
-    cpu_int = metal_cpu_interrupt_controller(cpu);
-    if(cpu_int == NULL) {
-        ERROR("Unable to get CPU interrupt handle");
-        return -1;
-    }
-    metal_interrupt_init(cpu_int);
-
-    int mode = metal_interrupt_get_vector_mode(cpu_int);
-    switch (mode) {
-    case METAL_DIRECT_MODE:
-        INFO("CPU interrupt is in direct mode");
-        break;
-    case METAL_VECTOR_MODE:
-        INFO("CPU interrupt is in vector mode");
-        break;
-    default:
-        ERROR("CPU interrupt is in unknown mode %d", mode);
-    }
-
-    tmr_int = metal_cpu_timer_interrupt_controller(cpu);
-    if (tmr_int == NULL) {
-        ERROR("Unable to get CPU timer interrupt handle");
-        return -1;
-    }
-    metal_interrupt_init(tmr_int);
-    
+    int tmp;
+    /* Disable global interrupt */
+    __asm__ volatile("csrrc %0, mstatus, %1"
+                     : "=r"(tmp)
+                     : "r"(METAL_MSTATUS_MIE));
+    /* Disable software interrupt */
+    __asm__ volatile("csrrc %0, mie, %1"
+                     : "=r"(tmp)
+                     : "r"(METAL_LOCAL_INTERRUPT_SW));
+    /* Disable timer interrupt */
+    __asm__ volatile("csrrc %0, mie, %1"
+                     : "=r"(tmp)
+                     : "r"(METAL_LOCAL_INTERRUPT_TMR));
     return 0;
 }
 

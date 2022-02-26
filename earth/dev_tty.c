@@ -14,11 +14,10 @@
 #define ENTER  0x0d
 #define CTRL_C 0x03
 
-static struct metal_uart* uart;
-
+int metal_tty_getc(int *c);
 int tty_read(char* buf, int len) {
     for (int c, i = 0; i < len - 1; i++) {
-        for (c = -1; c == -1; metal_uart_getc(uart, &c));
+        for (c = -1; c == -1; metal_tty_getc(&c));
         buf[i] = (char)c;
 
         switch (c) {
@@ -51,6 +50,7 @@ int tty_write(const char *format, ...)
 }
 
 int tty_init() {
+    struct metal_uart* uart;
     uart = metal_uart_get_device(0);
     metal_uart_init(uart, 115200);
     for (int i = 0; i < 2000000; i++);

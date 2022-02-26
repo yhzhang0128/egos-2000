@@ -14,7 +14,7 @@
 struct earth *earth = (void*)EARTH_ADDR;
 
 static void fs_init();
-static void timer_handler(int id, void* arg);
+static void intr_handler(int id);
 
 int main() {
     SUCCESS("Enter the grass layer");
@@ -22,8 +22,9 @@ int main() {
     fs_init();
     earth->mmu_switch(PID_FS);
 
-    earth->intr_register(TIMER_INTR_ID, timer_handler);
+    earth->intr_register(intr_handler);
     earth->intr_enable();
+    timer_reset();
     
     /* call the shell application entry and never return */
     void (*app_entry)() = (void*)VADDR_START;
@@ -43,10 +44,12 @@ static void fs_init() {
     elf_load(PID_FS, &bs, earth);
 }
 
-static int timer_cnt;
-static void timer_handler(int id, void* arg) {
-    timer_cnt++;
-    if (timer_cnt % 20 == 0)
-        INFO("Timer interrupt count: %d", timer_cnt);
-}
 
+
+static int intr_cnt;
+static void intr_handler(int id) {
+    long long mtime = timer_reset();
+    intr_cnt++;
+    if (intr_cnt % 20 == 0)
+        INFO("Interrupt count: %d, current intr id=%d, mtime=%lld", intr_cnt, id, mtime);
+}

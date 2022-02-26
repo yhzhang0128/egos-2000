@@ -2,8 +2,9 @@
 
 #include "log.h"
 
-#define TIMER_INTR_ID   7
-#define QUANTUM_NCYCLES 2000
+#define INTR_ID_TMR     7
+#define INTR_ID_SOFT    3
+#define QUANTUM_NCYCLES 500
 
 #define F_INUSE         0x1
 #define F_READ          0x2
@@ -13,7 +14,7 @@
 
 #define EARTH_ADDR      (0x08008000 - 0x40)
 
-typedef void (*handler_t)(int, void*);
+typedef void (*handler_t)(int);
 
 struct earth {
     /* TTY and disk device driver interface */
@@ -27,7 +28,7 @@ struct earth {
     /* ISA-specific cpu interface */
     int (*intr_enable)();
     int (*intr_disable)();
-    int (*intr_register)(int id, handler_t handler);
+    int (*intr_register)(handler_t handler);
 
     int (*mmu_alloc)(int* frame_no, int* addr);
     int (*mmu_map)(int pid, int page_no, int frame_no, int flag);
