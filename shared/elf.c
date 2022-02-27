@@ -50,7 +50,7 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
 static void elf_load_grass(struct block_store* bs,
                            struct earth* earth,
                            struct elf32_program_header* pheader) {
-    INFO("Grass kernel starts at vaddr: 0x%.8x", pheader->p_vaddr);
+    INFO("Grass kernel file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("Grass kernel memory size: 0x%.8x bytes", pheader->p_memsz);
 
     if (pheader->p_offset % BLOCK_SIZE) {
@@ -70,7 +70,7 @@ static void elf_load_app(int pid,
                          struct block_store* bs,
                          struct earth* earth,
                          struct elf32_program_header* pheader) {
-    INFO("App starts at vaddr: 0x%.8x", pheader->p_vaddr);
+    INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
 
     if (pheader->p_offset % BLOCK_SIZE) {
@@ -97,7 +97,7 @@ static void elf_load_app(int pid,
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);
     memset((char*)base, 0, PAGE_SIZE);
 
-    /* two more pages for the stack */
+    /* two pages for the stack */
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, MAX_NPAGES - 2, frame_no, F_ALL);
 

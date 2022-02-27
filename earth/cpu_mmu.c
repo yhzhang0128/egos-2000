@@ -38,6 +38,7 @@ int mmu_init() {
     
     memset(cache_frame_no, 0xff, sizeof(cache_frame_no));
     memset(trans_table, 0, sizeof(struct translation_table_t));
+
     return 0;
 }
 
@@ -79,7 +80,6 @@ int mmu_switch(int pid) {
         if (INUSE(trans_table->frame[i])
             && trans_table->frame[i].pid == curr_vm_pid) {
             cache_write(i, (void*)(base + PAGE_SIZE * trans_table->frame[i].page_no));
-            INFO("Unmap page #%d of process #%d from frame #%d", trans_table->frame[i].page_no, curr_vm_pid, i);
         }
     }
 
@@ -89,7 +89,6 @@ int mmu_switch(int pid) {
             && trans_table->frame[i].pid == pid) {
             int addr = cache_read(i);
             memcpy(base + PAGE_SIZE * trans_table->frame[i].page_no, (char*)addr, PAGE_SIZE);
-            INFO("Map frame #%d to page #%d of process #%d", i, trans_table->frame[i].page_no, pid);
         }
     }
 
