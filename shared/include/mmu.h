@@ -16,6 +16,11 @@
 #define TRANS_TABLE_TOP     0x08004000
 #define TRANS_TABLE_SIZE    sizeof(struct translation_table_t)
 
+#define F_INUSE             0x1
+#define F_READ              0x2
+#define F_WRITE             0x4
+#define F_EXEC              0x8
+#define F_ALL               0xf
 
 struct frame_t {
     char byte[PAGE_SIZE];

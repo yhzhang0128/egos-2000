@@ -12,7 +12,7 @@
 #include "grass.h"
 
 struct pcb_intf pcb;
-struct earth *earth = (void*)EARTH_ADDR;
+struct earth *earth = (void*)KERNEL_STACK_TOP;
 static void sys_proc_init();
 
 int main() {

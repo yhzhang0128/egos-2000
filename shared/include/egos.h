@@ -1,16 +1,13 @@
 #pragma once
 
-#include "log.h"
+#define KERNEL_STACK_TOP      0x08007f80 //0x08008000 - 128
 
-#define F_INUSE         0x1
-#define F_READ          0x2
-#define F_WRITE         0x4
-#define F_EXEC          0x8
-#define F_ALL           0xf
-
-#define EARTH_ADDR      (0x08008000 - 0x80)
-
-typedef void (*handler_t)(int);
+struct dev_log {
+    int (*log_info)(const char *format, ...);
+    int (*log_highlight)(const char *format, ...);
+    int (*log_success)(const char *format, ...);
+    int (*log_fatal)(const char *format, ...);
+};
 
 struct earth {
     /* TTY and disk device driver interface */
@@ -23,8 +20,8 @@ struct earth {
     /* CPU interface */
     int (*intr_enable)();
     int (*intr_disable)();
-    int (*intr_register)(handler_t handler);
-    int (*excp_register)(handler_t handler);
+    int (*intr_register)(void (*handler)(int));
+    int (*excp_register)(void (*handler)(int));
 
     int (*mmu_alloc)(int* frame_no, int* addr);
     int (*mmu_map)(int pid, int page_no, int frame_no, int flag);
@@ -33,7 +30,6 @@ struct earth {
     /* helper functions for logging */
     struct dev_log log;
 };
-
 
 enum {
     GPID_UNUSED,
