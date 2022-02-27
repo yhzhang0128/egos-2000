@@ -9,8 +9,8 @@
 
 struct earth *earth;
 
-#define INTR_ID_TMR     7
-#define INTR_ID_SOFT    3
+#define INTR_ID_TMR                      7
+#define INTR_ID_SOFT                     3
 #define RISCV_CLINT0_MSIP_BASE           0x2000000
 #define RISCV_CLINT0_MTIME_BASE          0x200bff8
 #define RISCV_CLINT0_MTIMECMP_BASE       0x2004000
@@ -49,3 +49,7 @@ void proc_free(int);
 void proc_set_ready (int);
 void proc_set_running (int);
 void proc_set_runnable (int);
+
+void ctx_entry(void);
+void ctx_start(void** old_sp, void* new_sp);
+void ctx_switch(void** old_sp, void* new_sp);
