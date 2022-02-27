@@ -11,7 +11,6 @@
 #include "grass.h"
 #include <string.h>
 
-static int proc_nprocs;
 extern int proc_curr_idx;
 extern struct process proc_set[MAX_NPROCESS];
 
@@ -19,8 +18,6 @@ void intr_entry(int id);
 
 void proc_init() {
     earth->intr_register(intr_entry);
-
-    proc_nprocs = 0;
     memset(proc_set, 0, sizeof(struct process) * MAX_NPROCESS);
 
     /* the first process is now running */
@@ -30,14 +27,15 @@ void proc_init() {
 }
 
 int proc_alloc() {
-    proc_nprocs++;
+    static int proc_nprocs = 0;
     for (int i = 0; i < MAX_NPROCESS; i++) {
         if (proc_set[i].pid == 0) {
-            proc_set[i].pid = proc_nprocs;
+            proc_set[i].pid = ++proc_nprocs;
             proc_set[i].status = PROC_UNUSED;
             return proc_nprocs;
         }
     }
+
     FATAL("Reach the limit of %d processes", MAX_NPROCESS);
     return -1;
 }
