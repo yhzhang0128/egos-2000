@@ -42,7 +42,7 @@ static void trap_entry() {
             excp_handler(id);
         else {
             if (id == 2 && mepc == 0) {
-                /* This might be a bug of the CPU */
+                /* This may be a bug of CPU implementation */
                 INFO("Got spurious exception %d (mepc=%x)", id, mepc);
                 __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
                 return;
