@@ -19,6 +19,7 @@ static void (*kernel_entry)();
 static void proc_yield();
 static void intr_entry(int id);
 
+
 void proc_init() {
     earth->intr_register(intr_entry);
 
@@ -31,9 +32,10 @@ void proc_init() {
     proc_set_running(PID(proc_curr_idx));
 }
 
+
 static void intr_entry(int id) {
     if (id == INTR_ID_TMR) {
-        /* timer interrupt for scheduling */
+        /* switch to kernel stack and call kernel_entry */
         kernel_entry = proc_yield;
         ctx_start(&proc_set[proc_curr_idx].sp, (void*)KERNEL_STACK_TOP);
     } else if (id == INTR_ID_SOFT) {
@@ -48,17 +50,14 @@ static void intr_entry(int id) {
     }
 }
 
+
 void ctx_entry() {
     kernel_entry();
+    /* switch back to user application */
     void* tmp;
     ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
 }
 
-
-static void proc_entry()  __attribute__((interrupt, aligned(128)));
-static void proc_entry() {
-        __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
-}
 
 static void proc_yield() {
     int mepc;
@@ -96,8 +95,8 @@ static void proc_yield() {
 
     if (next_status == PROC_READY) {
         timer_reset();
-        proc_entry();
-        FATAL("proc_entry should never return");
+        __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
+        __asm__ volatile("mret");
     } else if (next_status == PROC_RUNNABLE) {
         timer_reset();
         void* tmp;
@@ -121,9 +120,11 @@ int proc_alloc() {
     return -1;
 }
 
+
 void proc_free(int pid) {
     FATAL("proc_free not implemented");
 }
+
 
 static void proc_set_status(int pid, int status) {
     for (int i = 0; i < MAX_NPROCESS; i++) {
