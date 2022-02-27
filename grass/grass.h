@@ -31,6 +31,7 @@ struct process{
     int pid;
     int status;
     void* sp;
+    int receiver_pid; // used when status is PROC_WAIT_TO_SEND
 };
 
 /* interface for kernel process sys_proc */

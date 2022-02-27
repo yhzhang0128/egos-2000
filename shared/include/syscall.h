@@ -1,5 +1,6 @@
 #pragma once
 
+#define SYSCALL_MSG_LEN    1000
 #define SYSCALL_ARGS_BASE  0x8000bc00
 
 enum syscall_type {
@@ -17,7 +18,7 @@ struct sys_exit {
 struct sys_msg {
     int sender;
     int receiver;
-    char msg[1000];
+    char msg[SYSCALL_MSG_LEN];
 };
 
 struct syscall {
@@ -25,10 +26,10 @@ struct syscall {
 	union {
 		struct sys_exit exit;
         struct sys_msg msg;
-	} args;
+	} payload;
     int retval;
 };
 
-int sys_send(char* msg);
-int sys_recv(char* buf);
 void sys_exit(int status);
+int sys_send(char* msg, int size);
+int sys_recv(char* buf, int size);

@@ -11,13 +11,15 @@
 
 #include "egos.h"
 #include "grass.h"
+#include <string.h>
 
 static void proc_yield();
 static void proc_syscall();
 static void (*kernel_entry)();
 
-int proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
+int proc_curr_idx;
+#define curr_pid  PID(proc_curr_idx)
 
 void ctx_entry() {
     kernel_entry();
@@ -27,26 +29,29 @@ void ctx_entry() {
 }
 
 void intr_entry(int id) {
-    if (id == INTR_ID_TMR) {
+    int mepc;
+    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
+    if (mepc < VADDR_START) {
+        /* IO may be busy; do not interrupt */
+        timer_reset();
+        return;
+    }
+
+    switch(id) {
+    case INTR_ID_TMR:
         kernel_entry = proc_yield;
         ctx_start(&proc_set[proc_curr_idx].sp, (void*)KERNEL_STACK_TOP);
-    } else if (id == INTR_ID_SOFT) {
+        break;
+    case INTR_ID_SOFT:
         kernel_entry = proc_syscall;
         ctx_start(&proc_set[proc_curr_idx].sp, (void*)KERNEL_STACK_TOP);
-    } else {
+        break;
+    default:
         FATAL("Got unknown interrupt #%d", id);
     }
 }
 
 static void proc_yield() {
-    int mepc;
-    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
-    if (mepc < VADDR_START) {
-        /* IO may be busy; do not switch context */
-        timer_reset();
-        return;
-    }
-
     int proc_next_idx = -1;
     for (int i = 1; i <= MAX_NPROCESS; i++) {
         int tmp_next = (proc_curr_idx + i) % MAX_NPROCESS;
@@ -65,7 +70,6 @@ static void proc_yield() {
         return;
     }
 
-    int curr_pid = PID(proc_curr_idx);
     int next_pid = PID(proc_next_idx);
     int next_status = proc_set[proc_next_idx].status;
 
@@ -98,8 +102,7 @@ static void proc_syscall() {
     sc->type = SYS_UNUSED;
     *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
 
-    INFO("Got system call #%d with arg %d", sc->type, sc->args.exit.status);
-
+    INFO("Got system call #%d", sc->type);
     switch (type) {
     case SYS_RECV:
         proc_send(sc);
@@ -113,8 +116,65 @@ static void proc_syscall() {
 }
 
 static void proc_send(struct syscall *sc) {
-    
+    sc->retval = 0;
+    sc->payload.msg.sender = curr_pid;
+    int receiver = sc->payload.msg.sender;
+
+    int receiver_idx = -1;
+    for (int i = 0; i < MAX_NPROCESS; i++) {
+        if (proc_set[i].pid == receiver) {
+            receiver_idx = i;
+            break;
+        }
+    }
+
+    if (receiver_idx == -1) {
+        sc->retval = -1;
+        return;
+    }
+
+    if (proc_set[receiver_idx].status != PROC_WAIT_TO_RECV) {
+        proc_set[proc_curr_idx].status = PROC_WAIT_TO_SEND;
+        proc_yield();
+    } else {
+        struct sys_msg tmp;
+        memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
+        earth->mmu_switch(PID(receiver_idx));
+
+        memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
+        earth->mmu_switch(curr_pid);
+
+        proc_set_runnable(PID(receiver_idx));
+    }
 }
 
 static void proc_recv(struct syscall *sc) {
+    sc->retval = 0;
+    sc->payload.msg.sender = 0;
+    sc->payload.msg.receiver = curr_pid;
+
+    int sender = -1;
+    for (int i = 0; i < MAX_NPROCESS; i++) {
+        if (proc_set[i].status == PROC_WAIT_TO_SEND &&
+            proc_set[i].receiver_pid == curr_pid) {
+            sender = proc_set[i].pid;
+            break;
+        }
+    }
+
+    if (sender == -1) {
+        proc_set[proc_curr_idx].status = PROC_WAIT_TO_RECV;
+        proc_yield();
+    } else {
+        sc->payload.msg.sender = sender;
+
+        struct sys_msg tmp;
+        earth->mmu_switch(sender);
+        memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
+
+        earth->mmu_switch(curr_pid);
+        memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
+
+        proc_set_runnable(sender);
+    }
 }
