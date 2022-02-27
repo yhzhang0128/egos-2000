@@ -20,10 +20,11 @@ long long timer_reset();
 
 enum {
     PROC_UNUSED,
-    PROC_READY,     // loaded into memory but haven't started running
+    PROC_READY,       // finish loading but haven't started running
     PROC_RUNNING,
     PROC_RUNNABLE,
-    PROC_ZOMBIE
+    PROC_WAIT_TO_SEND,
+    PROC_WAIT_TO_RECV
 };
 
 struct process{
