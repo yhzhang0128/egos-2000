@@ -2,10 +2,6 @@
 
 #include "log.h"
 
-#define INTR_ID_TMR     7
-#define INTR_ID_SOFT    3
-#define QUANTUM_NCYCLES 5000
-
 #define F_INUSE         0x1
 #define F_READ          0x2
 #define F_WRITE         0x4
@@ -48,6 +44,6 @@ enum {
     GPID_USER_START
 }; 
 
+void ctx_entry(void);
 void ctx_switch(void** old_sp, void* new_sp);
 void ctx_start(void** old_sp, void* new_sp);
-void ctx_entry(void);

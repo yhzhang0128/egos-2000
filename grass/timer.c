@@ -12,6 +12,7 @@
 #include "egos.h"
 #include "grass.h"
 
+#define QUANTUM_NCYCLES 5000
 #define ACCESS(x) (*(__typeof__(*(unsigned int*)x) volatile *)((unsigned int*)(x)))
 
 static long long mtime_get() {

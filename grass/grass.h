@@ -9,6 +9,8 @@
 
 struct earth *earth;
 
+#define INTR_ID_TMR     7
+#define INTR_ID_SOFT    3
 #define RISCV_CLINT0_MSIP_BASE           0x2000000
 #define RISCV_CLINT0_MTIME_BASE          0x200bff8
 #define RISCV_CLINT0_MTIMECMP_BASE       0x2004000
