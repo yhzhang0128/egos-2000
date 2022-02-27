@@ -54,8 +54,17 @@ void ctx_entry() {
     ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
 }
 
+
+static void proc_entry()  __attribute__((interrupt, aligned(128)));
+static void proc_entry() {
+        __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
+}
+
 static void proc_yield() {
-    if (earth->disk_busy()) {
+    int mepc;
+    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
+
+    if (earth->disk_busy() || mepc < VADDR_START) {
         timer_reset();
         return;
     }
@@ -79,32 +88,18 @@ static void proc_yield() {
     int next_pid = PID(proc_next_idx);
     int next_status = proc_set[proc_next_idx].status;
 
+    /* HIGHLIGHT("Switch from process %d", curr_pid); */
     earth->mmu_switch(next_pid);
     proc_set_running(next_pid);
     proc_set_runnable(curr_pid);
     proc_curr_idx = proc_next_idx;
-    timer_reset();
 
     if (next_status == PROC_READY) {
-        INFO("0x80000000: %.8x", *(int*)VADDR_START);
-        INFO("0x80000004: %.8x", *(int*)(VADDR_START + 4));
-        INFO("0x80000008: %.8x", *(int*)(VADDR_START + 8));
-        INFO("0x8000000c: %.8x", *(int*)(VADDR_START + 12));
-        INFO("0x80000010: %.8x", *(int*)(VADDR_START + 16));
-        INFO("0x80000014: %.8x", *(int*)(VADDR_START + 20));
-        INFO("0x80000018: %.8x", *(int*)(VADDR_START + 24));
-        INFO("0x8000001c: %.8x", *(int*)(VADDR_START + 28));
-        INFO("0x80000020: %.8x", *(int*)(VADDR_START + 32));
-        INFO("0x80000024: %.8x", *(int*)(VADDR_START + 36));
-        INFO("0x80000028: %.8x", *(int*)(VADDR_START + 40));
-        INFO("0x8000002c: %.8x", *(int*)(VADDR_START + 44));
-        INFO("saved stack pointer: %.8x", proc_set[0].sp);
-        INFO("earth log: %.8x", earth->log);
-        INFO("earth log info: %.8x", earth->log.log_info);
-        __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
-        __asm__ volatile("mret");
+        timer_reset();
+        proc_entry();
+        FATAL("proc_entry should never return");
     } else if (next_status == PROC_RUNNABLE) {
-        INFO("here2");
+        timer_reset();
         void* tmp;
         ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
     }

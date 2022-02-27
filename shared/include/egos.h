@@ -4,7 +4,7 @@
 
 #define INTR_ID_TMR     7
 #define INTR_ID_SOFT    3
-#define QUANTUM_NCYCLES 500
+#define QUANTUM_NCYCLES 5000
 
 #define F_INUSE         0x1
 #define F_READ          0x2

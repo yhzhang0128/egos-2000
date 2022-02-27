@@ -27,8 +27,9 @@ int intr_init() {
 }
 
 static void trap_entry() {
-    int mcause;
+    int mcause, mepc;
     __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
+    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
 
     int id = mcause & METAL_MCAUSE_IDMASK;
     if (mcause & METAL_MCAUSE_INTR) {
@@ -39,9 +40,19 @@ static void trap_entry() {
     } else {
         if (excp_handler != NULL)
             excp_handler(id);
-        else
-            FATAL("Got exception %d but handler not registered", id);
+        else {
+            if (id == 2 && mepc == 0) {
+                /* This might be a bug of the CPU */
+                INFO("Got spurious exception %d (mepc=%x)", id, mepc);
+                __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
+                return;
+            } else {
+                FATAL("Got exception %d (mepc=%x) but handler not registered", id, mepc);  
+            }
+        }
     }
+
+    __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
 }
 
 int intr_register(handler_t _handler) {
