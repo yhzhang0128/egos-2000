@@ -30,7 +30,7 @@ install:
 	rm $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom $(BUILD_DIR)/earth.bin 
 
 clean:
-	rm -rf $(BUILD_DIR)/bin
+	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
 	rm -rf $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom
 	rm -rf $(BUILD_DIR)/disk.img $(BUILD_DIR)/bootROM.mcs
 	rm -rf $(BUILD_DIR)/earth.bin $(BUILD_DIR)/*.log
@@ -56,7 +56,7 @@ INCLUDE = -Ishared/include
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-ARTY_FLAGS = -L$(BUILD_DIR)/arty_board
+ARTY_FLAGS = -L$(BUILD_DIR)/bin
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
