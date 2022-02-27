@@ -42,10 +42,11 @@ static void trap_entry() {
         if (excp_handler != NULL)
             excp_handler(id);
         else {
-            if (id == 2 && mepc == 0) {
-                /* This seems to be a bug of CPU implementation */
+            if (id == 2 && mepc < 0x08000000) {
+                /* This seems to be a bug of libc memcpy */
                 INFO("Got spurious exception %d (mepc=%x)", id, mepc);
-                __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
+                if (mepc == 0)
+                    __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
             } else {
                 FATAL("Got exception %d (mepc=%x) but handler not registered", id, mepc);  
             }

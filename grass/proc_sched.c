@@ -56,6 +56,7 @@ static void proc_yield() {
     for (int i = 1; i <= MAX_NPROCESS; i++) {
         int tmp_next = (proc_curr_idx + i) % MAX_NPROCESS;
         if (proc_set[tmp_next].status == PROC_READY ||
+            proc_set[tmp_next].status == PROC_RUNNING ||
             proc_set[tmp_next].status == PROC_RUNNABLE) {
             proc_next_idx = tmp_next;
             break;
@@ -72,10 +73,12 @@ static void proc_yield() {
 
     int next_pid = PID(proc_next_idx);
     int next_status = proc_set[proc_next_idx].status;
+    int curr_status = proc_set[proc_curr_idx].status; 
 
-    earth->mmu_switch(next_pid);
+    if (curr_status == PROC_RUNNING)
+        proc_set_runnable(curr_pid);
     proc_set_running(next_pid);
-    proc_set_runnable(curr_pid);
+    earth->mmu_switch(next_pid);
     proc_curr_idx = proc_next_idx;
 
     if (next_status == PROC_READY) {
@@ -102,13 +105,13 @@ static void proc_syscall() {
     sc->type = SYS_UNUSED;
     *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
 
-    INFO("Got system call #%d", sc->type);
+    INFO("Got system call #%d", type);
     switch (type) {
     case SYS_RECV:
-        proc_send(sc);
+        proc_recv(sc);
         break;
     case SYS_SEND:
-        proc_recv(sc);
+        proc_send(sc);
         break;
     case SYS_EXIT:
         FATAL("proc_syscall: exit not implemented");
@@ -118,7 +121,7 @@ static void proc_syscall() {
 static void proc_send(struct syscall *sc) {
     sc->retval = 0;
     sc->payload.msg.sender = curr_pid;
-    int receiver = sc->payload.msg.sender;
+    int receiver = sc->payload.msg.receiver;
 
     int receiver_idx = -1;
     for (int i = 0; i < MAX_NPROCESS; i++) {
@@ -135,16 +138,17 @@ static void proc_send(struct syscall *sc) {
 
     if (proc_set[receiver_idx].status != PROC_WAIT_TO_RECV) {
         proc_set[proc_curr_idx].status = PROC_WAIT_TO_SEND;
+        proc_set[proc_curr_idx].receiver_pid = receiver;
         proc_yield();
     } else {
         struct sys_msg tmp;
         memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
-        earth->mmu_switch(PID(receiver_idx));
+        earth->mmu_switch(receiver);
 
         memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
         earth->mmu_switch(curr_pid);
 
-        proc_set_runnable(PID(receiver_idx));
+        proc_set_runnable(receiver);
     }
 }
 
@@ -164,6 +168,7 @@ static void proc_recv(struct syscall *sc) {
 
     if (sender == -1) {
         proc_set[proc_curr_idx].status = PROC_WAIT_TO_RECV;
+        INFO("proc_recv: set pid=%d to status=%d", proc_set[proc_curr_idx].pid, proc_set[proc_curr_idx].status);
         proc_yield();
     } else {
         sc->payload.msg.sender = sender;

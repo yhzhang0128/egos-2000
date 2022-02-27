@@ -18,11 +18,12 @@ static void sys_invoke() {
     while (sc->type != SYS_UNUSED);
 }
 
-int sys_send(char* msg, int size) {
+int sys_send(int receiver, char* msg, int size) {
     if (size > SYSCALL_MSG_LEN)
         return -1;
 
     sc->type = SYS_SEND;
+    sc->payload.msg.receiver = receiver;
     memcpy(sc->payload.msg.msg, msg, size);
     sys_invoke();
     return sc->retval;    

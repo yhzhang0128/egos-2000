@@ -29,9 +29,15 @@ int main(struct pcb_intf* _pcb) {
     sys_file_init();
 
     static int cnt = 0;
+    char buf[30];
+    char* msg = "Hi from GPID_PROCESS!";
     while (1) {
-        if (cnt++ % 50000 == 0)
-            INFO("In sys_proc");
+        if (cnt++ % 50000 == 0) {
+            sys_recv(buf, 30);
+            INFO("In sys_proc: received %s", buf);
+            memcpy(buf, msg, 30);
+            sys_send(GPID_FILE, buf, 30);
+        }
     }
 }
 

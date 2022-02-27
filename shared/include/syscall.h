@@ -1,7 +1,7 @@
 #pragma once
 
-#define SYSCALL_MSG_LEN    1000
-#define SYSCALL_ARGS_BASE  0x8000bc00
+#define SYSCALL_MSG_LEN        1000
+#define SYSCALL_ARGS_BASE      0x8000bc00
 
 enum syscall_type {
 	SYS_UNUSED,
@@ -31,5 +31,5 @@ struct syscall {
 };
 
 void sys_exit(int status);
-int sys_send(char* msg, int size);
 int sys_recv(char* buf, int size);
+int sys_send(int pid, char* msg, int size);
