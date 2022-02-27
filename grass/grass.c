@@ -18,20 +18,16 @@ static void sys_proc_init();
 int main() {
     SUCCESS("Enter the grass layer");
 
-    /* Initialization */
-    proc_init();                       // process control block
-    timer_init();                      // timer
-    sys_proc_init();                   // first kernel process
-    pcb.proc_alloc = proc_alloc;       // pcb interface to sys_proc
-    pcb.proc_free = proc_free;
-    pcb.proc_set_ready = proc_set_ready;
+    proc_init();
+    timer_init();
+    sys_proc_init();
 
-    /* Enter kernel process sys_proc */
+    /* Enter the first kernel process sys_proc */
     void (*sys_proc_entry)(void*) = (void*)VADDR_START;
     earth->mmu_switch(GPID_PROCESS);   // setup virtual address space
     timer_reset();                     // start timer
     earth->intr_enable();              // enable interrupt
-    sys_proc_entry(&pcb);              // enter the application layer
+    sys_proc_entry(&pcb);              // enter sys_proc
 
     FATAL("Should never return to the grass kernel main()");
     return 0;
@@ -46,4 +42,8 @@ static void sys_proc_init() {
     struct block_store bs;
     bs.read = read_sys_proc;
     elf_load(GPID_PROCESS, &bs, earth);
+
+    pcb.proc_alloc = proc_alloc;
+    pcb.proc_free = proc_free;
+    pcb.proc_set_ready = proc_set_ready;
 }
