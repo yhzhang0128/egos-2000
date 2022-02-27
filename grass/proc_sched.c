@@ -13,6 +13,7 @@
 #include "grass.h"
 
 static void proc_yield();
+static void proc_syscall();
 static void (*kernel_entry)();
 
 int proc_curr_idx;
@@ -27,16 +28,11 @@ void ctx_entry() {
 
 void intr_entry(int id) {
     if (id == INTR_ID_TMR) {
-        /* switch to kernel stack and call kernel_entry */
         kernel_entry = proc_yield;
         ctx_start(&proc_set[proc_curr_idx].sp, (void*)KERNEL_STACK_TOP);
     } else if (id == INTR_ID_SOFT) {
-        /* software interrupt for system call */
-        struct syscall *sc = (struct syscall*)SYSCALL_ARGS_BASE;
-        sc->type = SYS_UNUSED;
-        *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
-
-        INFO("Got system call #%d with arg %d", sc->type, sc->args.exit.status);        
+        kernel_entry = proc_syscall;
+        ctx_start(&proc_set[proc_curr_idx].sp, (void*)KERNEL_STACK_TOP);
     } else {
         FATAL("Got unknown interrupt #%d", id);
     }
@@ -60,6 +56,9 @@ static void proc_yield() {
             break;
         }
     }
+
+    if (proc_next_idx == -1)
+        FATAL("proc_yield: no more runnable process");
 
     if (proc_next_idx == proc_curr_idx) {
         timer_reset();
@@ -88,3 +87,34 @@ static void proc_yield() {
     FATAL("Reach the end of proc_yield without switching to any process");
 }
 
+
+static void proc_send(struct syscall *sc);
+static void proc_recv(struct syscall *sc);
+
+static void proc_syscall() {
+    /* software interrupt for system call */
+    struct syscall *sc = (struct syscall*)SYSCALL_ARGS_BASE;
+    int type = sc->type;
+    sc->type = SYS_UNUSED;
+    *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
+
+    INFO("Got system call #%d with arg %d", sc->type, sc->args.exit.status);
+
+    switch (type) {
+    case SYS_RECV:
+        proc_send(sc);
+        break;
+    case SYS_SEND:
+        proc_recv(sc);
+        break;
+    case SYS_EXIT:
+        FATAL("proc_syscall: exit not implemented");
+    }
+}
+
+static void proc_send(struct syscall *sc) {
+    
+}
+
+static void proc_recv(struct syscall *sc) {
+}

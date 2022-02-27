@@ -17,9 +17,16 @@ static void sys_invoke() {
     while (sc->type != SYS_UNUSED);
 }
 
-int sys_exit(int status){
+void sys_exit(int status) {
 	sc->type = SYS_EXIT;
 	sc->args.exit.status = status;
 	sys_invoke();
-	return sc->retval;
+}
+
+int sys_send(char* msg) {
+    return sc->retval;    
+}
+
+int sys_recv(char* buf) {
+    return sc->retval;
 }
