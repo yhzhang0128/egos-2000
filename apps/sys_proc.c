@@ -35,7 +35,7 @@ int main(struct pcb_intf* _pcb) {
     }
 }
 
-static int read_sys_file(int block_no, char* dst) {
+static int sys_file_read(int block_no, char* dst) {
     return earth->disk_read(SYS_FILE_EXEC_START + block_no, 1, dst);
 }
 
@@ -46,7 +46,7 @@ void sys_file_init() {
 
     INFO("Load kernel process #%d: file server", file_pid);
     struct block_store bs;
-    bs.read = read_sys_file;
+    bs.read = sys_file_read;
     elf_load(file_pid, &bs, earth);
     pcb.proc_set_ready(file_pid);
 }
