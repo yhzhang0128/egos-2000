@@ -30,8 +30,8 @@ int main(struct pcb_intf* _pcb) {
 
     static int cnt = 0;
     while (1) {
-        /* if (cnt++ % 50 == 0) */
-        /*     INFO("In sys_proc"); */
+        if (cnt++ % 50000 == 0)
+            INFO("In sys_proc");
     }
 }
 

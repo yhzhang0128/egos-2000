@@ -14,8 +14,8 @@ int main() {
 
     static int cnt = 0;
     while (1) {
-        /* if (cnt++ % 50 == 0) */
-        /*     HIGHLIGHT("In sys_file"); */
+        if (cnt++ % 50000 == 0)
+            HIGHLIGHT("In sys_file");
     }
     return 0;
 }
