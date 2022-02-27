@@ -12,8 +12,6 @@
 _enter:
         li sp,0x8000c000
         addi sp,sp,-0x400  /* 1KB reserved for system call */
-        jal main
-        jal _stop
-
-_stop:
-        jal _stop
+        call main
+_spin:
+        j _spin

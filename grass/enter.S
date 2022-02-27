@@ -12,8 +12,6 @@
 _enter:
         li sp,0x08008000
         addi sp,sp,-128   /* 128 bytes reserved for struct earth */
-        jal main
-        jal _stop
-
-_stop:
-        jal _stop
+        call main
+_spin:
+        j _spin
