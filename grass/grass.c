@@ -29,12 +29,11 @@ int main() {
     /* Enter kernel process sys_proc */
     void (*sys_proc_entry)(void*) = (void*)VADDR_START;
     earth->mmu_switch(GPID_PROCESS);   // setup virtual address space
-    proc_set_running(GPID_PROCESS);    // set status
     timer_reset();                     // start timer
     earth->intr_enable();              // enable interrupt
-    sys_proc_entry(&pcb);
-    FATAL("Should never return to the grass kernel main()");
+    sys_proc_entry(&pcb);              // enter the application layer
 
+    FATAL("Should never return to the grass kernel main()");
     return 0;
 }
 

@@ -8,32 +8,24 @@
  * system calls are basically inter-process communication
  */
 
+
 #include "egos.h"
 #include "grass.h"
-#include <string.h>
 
-int proc_nprocs, proc_curr_idx;
+static void proc_yield();
+static void (*kernel_entry)();
+
+int proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
 
-static void (*kernel_entry)();
-static void proc_yield();
-static void intr_entry(int id);
-
-
-void proc_init() {
-    earth->intr_register(intr_entry);
-
-    proc_nprocs = 0;
-    memset(proc_set, 0, sizeof(struct process) * MAX_NPROCESS);
-
-    /* the first process is now running */
-    proc_alloc();
-    proc_curr_idx = 0;
-    proc_set_running(PID(proc_curr_idx));
+void ctx_entry() {
+    kernel_entry();
+    /* switch back to user application */
+    void* tmp;
+    ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
 }
 
-
-static void intr_entry(int id) {
+void intr_entry(int id) {
     if (id == INTR_ID_TMR) {
         /* switch to kernel stack and call kernel_entry */
         kernel_entry = proc_yield;
@@ -49,15 +41,6 @@ static void intr_entry(int id) {
         FATAL("Got unknown interrupt #%d", id);
     }
 }
-
-
-void ctx_entry() {
-    kernel_entry();
-    /* switch back to user application */
-    void* tmp;
-    ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
-}
-
 
 static void proc_yield() {
     int mepc;
@@ -106,43 +89,3 @@ static void proc_yield() {
     FATAL("Reach the end of proc_yield without switching to any process");
 }
 
-
-int proc_alloc() {
-    proc_nprocs++;
-    for (int i = 0; i < MAX_NPROCESS; i++) {
-        if (proc_set[i].pid == 0) {
-            proc_set[i].pid = proc_nprocs;
-            proc_set[i].status = PROC_UNUSED;
-            return proc_nprocs;
-        }
-    }
-    FATAL("Reach the limit of %d processes", MAX_NPROCESS);
-    return -1;
-}
-
-
-void proc_free(int pid) {
-    FATAL("proc_free not implemented");
-}
-
-
-static void proc_set_status(int pid, int status) {
-    for (int i = 0; i < MAX_NPROCESS; i++) {
-        if (proc_set[i].pid == pid) {
-            proc_set[i].status = status;
-            return;
-        }
-    }
-}
-
-void proc_set_ready(int pid) {
-    proc_set_status(pid, PROC_READY);
-}
-
-void proc_set_running(int pid) {
-    proc_set_status(pid, PROC_RUNNING);
-}
-
-void proc_set_runnable(int pid) {
-    proc_set_status(pid, PROC_RUNNABLE);
-}

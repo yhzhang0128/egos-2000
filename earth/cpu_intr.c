@@ -37,22 +37,20 @@ static void trap_entry() {
             intr_handler(id);
         else
             FATAL("Got interrupt %d but handler not registered", id);
+        __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
     } else {
         if (excp_handler != NULL)
             excp_handler(id);
         else {
             if (id == 2 && mepc == 0) {
-                /* This may be a bug of CPU implementation */
+                /* This seems to be a bug of CPU implementation */
                 INFO("Got spurious exception %d (mepc=%x)", id, mepc);
                 __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
-                return;
             } else {
                 FATAL("Got exception %d (mepc=%x) but handler not registered", id, mepc);  
             }
         }
     }
-
-    __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
 }
 
 int intr_register(handler_t _handler) {
