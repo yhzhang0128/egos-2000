@@ -47,7 +47,6 @@ int earth_init() {
         FATAL("Failed at initializing the disk device");
     earth.disk_read = disk_read;
     earth.disk_write = disk_write;
-    earth.disk_busy = disk_busy;
     SUCCESS("Finished initializing the disk device");
 
     /* Initialize CPU interrupt */

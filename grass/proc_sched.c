@@ -45,8 +45,8 @@ void intr_entry(int id) {
 static void proc_yield() {
     int mepc;
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
-
-    if (earth->disk_busy() || mepc < VADDR_START) {
+    if (mepc < VADDR_START) {
+        /* IO may be busy; do not switch context */
         timer_reset();
         return;
     }
@@ -70,7 +70,6 @@ static void proc_yield() {
     int next_pid = PID(proc_next_idx);
     int next_status = proc_set[proc_next_idx].status;
 
-    /* HIGHLIGHT("Switch from process %d", curr_pid); */
     earth->mmu_switch(next_pid);
     proc_set_running(next_pid);
     proc_set_runnable(curr_pid);
