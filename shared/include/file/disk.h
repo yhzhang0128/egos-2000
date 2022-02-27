@@ -10,3 +10,8 @@
 #define SYS_FILE_EXEC_START   GRASS_EXEC_START + GRASS_EXEC_SEGMENT * 2
 #define SYS_DIR_EXEC_START    GRASS_EXEC_START + GRASS_EXEC_SEGMENT * 3
 #define SYS_SHELL_EXEC_START  GRASS_EXEC_START + GRASS_EXEC_SEGMENT * 4
+
+struct block_store {
+    int (*read)(int block_no, char* dst);
+    int (*write)(int block_no, char* src);
+};

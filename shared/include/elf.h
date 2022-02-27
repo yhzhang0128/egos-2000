@@ -38,7 +38,6 @@ struct elf32_program_header {
 };
 
 #include "file/disk.h"
-#include "file/block_store.h"
 struct earth;
 
 void elf_load(int pid, struct block_store* bs, struct earth* earth);
