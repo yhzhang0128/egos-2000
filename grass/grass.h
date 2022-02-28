@@ -2,8 +2,8 @@
 
 #include <stdlib.h>
 
+#include "mem.h"
 #include "elf.h"
-#include "mmu.h"
 #include "print.h"
 #include "syscall.h"
 

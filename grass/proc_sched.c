@@ -40,11 +40,11 @@ void intr_entry(int id) {
     switch(id) {
     case INTR_ID_TMR:
         kernel_entry = proc_yield;
-        ctx_start(&proc_set[proc_curr_idx].sp, (void*)KERNEL_STACK_TOP);
+        ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
         break;
     case INTR_ID_SOFT:
         kernel_entry = proc_syscall;
-        ctx_start(&proc_set[proc_curr_idx].sp, (void*)KERNEL_STACK_TOP);
+        ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
         break;
     default:
         FATAL("Got unknown interrupt #%d", id);

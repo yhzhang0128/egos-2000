@@ -25,8 +25,8 @@ int main() {
 
     if (sizeof(earth) > 0x80)
         FATAL("Size of earth interface (%d bytes) exceeds 128 bytes", sizeof(earth));
-    INFO("Put earth interface (%d bytes) at 0x%.8x", sizeof(earth), KERNEL_STACK_TOP);
-    memcpy((void*)KERNEL_STACK_TOP, &earth, sizeof(earth));
+    INFO("Put earth interface (%d bytes) at 0x%.8x", sizeof(earth), EARTH_STRUCT);
+    memcpy((void*)EARTH_STRUCT, &earth, sizeof(earth));
 
     INFO("Start to load the grass layer");
     grass_load();
@@ -85,6 +85,6 @@ void grass_load() {
     elf_load(0, &bs, &earth);
 
     /* call the grass kernel entry and never return */
-    void (*grass_entry)() = (void*)GRASS_BASE;
+    void (*grass_entry)() = (void*)GRASS_ENTRY;
     grass_entry();
 }

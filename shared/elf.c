@@ -11,8 +11,8 @@
 #include <string.h>
 
 #include "egos.h"
+#include "mem.h"
 #include "elf.h"
-#include "mmu.h"
 #include "log.h"
 #include "print.h"
 
@@ -38,7 +38,7 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
     struct elf32_program_header pheader;
     memcpy(&pheader, buf + header->e_phoff, sizeof(pheader));
 
-    if (pheader.p_vaddr == GRASS_BASE) {
+    if (pheader.p_vaddr == GRASS_ENTRY) {
         elf_load_grass(bs, earth, &pheader);
     } else if (pheader.p_vaddr == APPS_BASE) {
         elf_load_app(pid, bs, earth, &pheader);
@@ -59,11 +59,11 @@ static void elf_load_grass(struct block_store* bs,
 
     int block_offset = pheader->p_offset / BLOCK_SIZE;
     for (int size = 0; size < pheader->p_filesz; size += BLOCK_SIZE) {
-        bs->read(block_offset++, (char*)GRASS_BASE + size);
+        bs->read(block_offset++, (char*)GRASS_ENTRY + size);
     }
 
     /* the last 0x80 bytes are reserved for struct earth */
-    memset((char*)GRASS_BASE + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz - 0x80);
+    memset((char*)GRASS_ENTRY + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz - 0x80);
 }
 
 static void elf_load_app(int pid,

@@ -4,9 +4,9 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "log.h"
+#include "mem.h"
 #include "elf.h"
-#include "mmu.h"
+#include "log.h"
 
 int tty_init();
 int tty_read(char* buf, int len);

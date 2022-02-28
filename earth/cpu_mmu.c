@@ -16,9 +16,17 @@
 #include "egos.h"
 #include "earth.h"
 
-#include "mmu.h"
-#define INUSE(x) (x.flag & F_INUSE)
-#define USE(x)   x.flag |= F_INUSE
+struct frame_t {
+    char byte[PAGE_SIZE];
+};
+
+struct translation_table_t {
+    struct {
+        int pid;
+        int page_no;
+        int flag;
+    } frame[MAX_NFRAMES];
+};
 
 int curr_vm_pid;
 struct translation_table_t trans_table;

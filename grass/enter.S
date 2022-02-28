@@ -10,8 +10,7 @@
         .section .text
         .global _enter
 _enter:
-        li sp,0x08008000
-        addi sp,sp,-128   /* 128 bytes reserved for struct earth */
+        li sp,0x80003000
         call main
 _spin:
         j _spin

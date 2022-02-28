@@ -3,12 +3,6 @@
 #define uint32_t   unsigned int
 #define uint16_t   unsigned short int
 
-#define GRASS_BASE 0x08004000
-#define GRASS_SIZE 0x00004000
-
-#define APPS_BASE  0x80000000
-#define APPS_SIZE  0x0000c000
-
 struct elf32_header {
     unsigned char  e_ident[16];
     uint16_t       e_type;
