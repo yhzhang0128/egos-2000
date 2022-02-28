@@ -16,14 +16,14 @@
 #include "log.h"
 #include "print.h"
 
-static void elf_load_grass(struct block_store* bs,
-                           struct earth* earth,
-                           struct elf32_program_header* pheader);
+static void load_grass(struct block_store* bs,
+                       struct earth* earth,
+                       struct elf32_program_header* pheader);
 
-static void elf_load_app(int pid,
-                         struct block_store* bs,
-                         struct earth* earth,
-                         struct elf32_program_header* pheader);
+static void load_app(int pid,
+                     struct block_store* bs,
+                     struct earth* earth,
+                     struct elf32_program_header* pheader);
 
 
 void elf_load(int pid, struct block_store* bs, struct earth* earth) {
@@ -39,17 +39,17 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
     memcpy(&pheader, buf + header->e_phoff, sizeof(pheader));
 
     if (pheader.p_vaddr == GRASS_ENTRY) {
-        elf_load_grass(bs, earth, &pheader);
+        load_grass(bs, earth, &pheader);
     } else if (pheader.p_vaddr == APPS_BASE) {
-        elf_load_app(pid, bs, earth, &pheader);
+        load_app(pid, bs, earth, &pheader);
     } else {
         FATAL("ELF gives invalid starting vaddr: 0x%.8x", pheader.p_vaddr);
     }
 }
 
-static void elf_load_grass(struct block_store* bs,
-                           struct earth* earth,
-                           struct elf32_program_header* pheader) {
+static void load_grass(struct block_store* bs,
+                       struct earth* earth,
+                       struct elf32_program_header* pheader) {
     INFO("Grass kernel file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("Grass kernel memory size: 0x%.8x bytes", pheader->p_memsz);
 
@@ -66,10 +66,10 @@ static void elf_load_grass(struct block_store* bs,
     memset((char*)GRASS_ENTRY + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz - 0x80);
 }
 
-static void elf_load_app(int pid,
-                         struct block_store* bs,
-                         struct earth* earth,
-                         struct elf32_program_header* pheader) {
+static void load_app(int pid,
+                     struct block_store* bs,
+                     struct earth* earth,
+                     struct elf32_program_header* pheader) {
     INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
 
