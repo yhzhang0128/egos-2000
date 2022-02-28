@@ -1,7 +1,7 @@
 #pragma once
 
-#define SYSCALL_MSG_LEN        1000
-#define SYSCALL_ARGS_BASE      0x8000bc00
+#define SYSCALL_MSG_LEN        512
+#define RISCV_CLINT0_MSIP_BASE 0x2000000
 
 enum syscall_type {
 	SYS_UNUSED,

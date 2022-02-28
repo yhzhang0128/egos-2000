@@ -11,6 +11,7 @@
 
 #include "egos.h"
 #include "grass.h"
+#include "syscall.h"
 #include <string.h>
 
 static void proc_yield();
@@ -22,11 +23,19 @@ struct process proc_set[MAX_NPROCESS];
 #define curr_pid  PID(proc_curr_idx)
 
 void ctx_entry() {
+    int ra = *(int*)((char*)proc_set[0].sp + 52);
+    HIGHLIGHT("Save sp=%x, ra=%x", proc_set[0].sp, ra);
+    ra = *(int*)((char*)proc_set[1].sp + 52);
+    HIGHLIGHT("Save sp=%x, ra=%x", proc_set[1].sp, ra);
+
     kernel_entry();
     /* switch back to user application */
     void* tmp;
     int mepc = (int)proc_set[proc_curr_idx].mepc;
     __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
+
+    ra = *(int*)((char*)proc_set[proc_curr_idx].sp + 52);
+    INFO("Set mepc=%x, restore sp=%x, ra=%x", mepc, proc_set[proc_curr_idx].sp, ra);
     ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
 }
 
@@ -80,23 +89,20 @@ static void proc_yield() {
     int next_status = proc_set[proc_next_idx].status;
     int curr_status = proc_set[proc_curr_idx].status;
 
+    HIGHLIGHT("switch from %d to %d", curr_pid, next_pid);
+
     if (curr_status == PROC_RUNNING)
         proc_set_runnable(curr_pid);
     proc_set_running(next_pid);
     earth->mmu_switch(next_pid);
     proc_curr_idx = proc_next_idx;
 
+    timer_reset();
     if (next_status == PROC_READY) {
-        timer_reset();
         __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
         __asm__ volatile("mret");
-    } else if (next_status == PROC_RUNNABLE) {
-        timer_reset();
-        void* tmp;
-        ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
     }
-
-    FATAL("Reach the end of proc_yield without switching to any process");
+    HIGHLIGHT("switch instead of start", curr_pid, next_pid);
 }
 
 
@@ -105,7 +111,7 @@ static void proc_recv(struct syscall *sc);
 
 static void proc_syscall() {
     /* software interrupt for system call */
-    struct syscall *sc = (struct syscall*)SYSCALL_ARGS_BASE;
+    struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
     int type = sc->type;
     sc->type = SYS_UNUSED;
     *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
@@ -144,7 +150,6 @@ static void proc_send(struct syscall *sc) {
     if (proc_set[receiver_idx].status != PROC_WAIT_TO_RECV) {
         proc_set[proc_curr_idx].status = PROC_WAIT_TO_SEND;
         proc_set[proc_curr_idx].receiver_pid = receiver;
-        proc_yield();
     } else {
         struct sys_msg tmp;
         memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
@@ -155,6 +160,8 @@ static void proc_send(struct syscall *sc) {
 
         proc_set_runnable(receiver);
     }
+
+    proc_yield();
 }
 
 static void proc_recv(struct syscall *sc) {
@@ -173,8 +180,6 @@ static void proc_recv(struct syscall *sc) {
 
     if (sender == -1) {
         proc_set[proc_curr_idx].status = PROC_WAIT_TO_RECV;
-        INFO("proc_recv: set pid=%d to status=%d", proc_set[proc_curr_idx].pid, proc_set[proc_curr_idx].status);
-        proc_yield();
     } else {
         sc->payload.msg.sender = sender;
 
@@ -187,4 +192,6 @@ static void proc_recv(struct syscall *sc) {
 
         proc_set_runnable(sender);
     }
+
+    proc_yield();
 }

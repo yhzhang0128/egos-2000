@@ -8,10 +8,10 @@
  */
 
 #include <string.h>
+#include "mem.h"
 #include "syscall.h"
 
-#define RISCV_CLINT0_MSIP_BASE 0x2000000
-static struct syscall *sc = (struct syscall*)SYSCALL_ARGS_BASE;
+static struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
 
 static void sys_invoke() {
     *((int*)RISCV_CLINT0_MSIP_BASE) = 1;

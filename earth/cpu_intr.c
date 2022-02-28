@@ -30,6 +30,7 @@ static void trap_entry() {
     int mcause, mepc;
     __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
+    INFO("Trap at mepc=%x", mepc);
 
     int id = mcause & METAL_MCAUSE_IDMASK;
     if (mcause & METAL_MCAUSE_INTR) {
@@ -37,7 +38,6 @@ static void trap_entry() {
             intr_handler(id);
         else
             FATAL("Got interrupt %d but handler not registered", id);
-        __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
     } else {
         if (excp_handler != NULL)
             excp_handler(id);
@@ -52,6 +52,9 @@ static void trap_entry() {
             }
         }
     }
+
+    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
+    HIGHLIGHT("Exit trap with mepc=%x", mepc);
 }
 
 int intr_register(handler_t _handler) {

@@ -18,8 +18,8 @@ int main() {
     char* msg = "Hi from GPID_FILE!";
     while (1) {
         if (cnt++ % 50000 == 0) {
-            /* memcpy(buf, msg, 30); */
-            sys_send(GPID_PROCESS, msg, sizeof(msg));
+            memcpy(buf, msg, 30);
+            sys_send(GPID_PROCESS, buf, 30);
             sys_recv(buf, 30);
             HIGHLIGHT("In sys_file: received %s", buf);
         }

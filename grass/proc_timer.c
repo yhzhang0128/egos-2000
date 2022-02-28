@@ -12,7 +12,9 @@
 #include "egos.h"
 #include "grass.h"
 
-#define QUANTUM_NCYCLES 5000
+#define QUANTUM_NCYCLES                  5000
+#define RISCV_CLINT0_MTIME_BASE          0x200bff8
+#define RISCV_CLINT0_MTIMECMP_BASE       0x2004000
 #define ACCESS(x) (*(__typeof__(*(unsigned int*)x) volatile *)((unsigned int*)(x)))
 
 static long long mtime_get() {
