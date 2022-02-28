@@ -46,7 +46,7 @@ static void trap_entry() {
                 /* This seems to be a bug of libc memcpy */
                 INFO("Got spurious exception %d (mepc=%x)", id, mepc);
                 if (mepc == 0)
-                    __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
+                    __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
             } else {
                 FATAL("Got exception %d (mepc=%x) but handler not registered", id, mepc);  
             }

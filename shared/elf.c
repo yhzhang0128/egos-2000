@@ -38,12 +38,15 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
     struct elf32_program_header pheader;
     memcpy(&pheader, buf + header->e_phoff, sizeof(pheader));
 
-    if (pheader.p_vaddr == GRASS_ENTRY) {
-        load_grass(bs, earth, &pheader);
-    } else if (pheader.p_vaddr == APPS_BASE) {
+    switch (pheader.p_vaddr) {
+    case APPS_ENTRY:
         load_app(pid, bs, earth, &pheader);
-    } else {
-        FATAL("ELF gives invalid starting vaddr: 0x%.8x", pheader.p_vaddr);
+        break;
+    case GRASS_ENTRY:
+        load_grass(bs, earth, &pheader);
+        break;
+    default:
+        FATAL("ELF gives invalid p_vaddr: 0x%.8x", pheader.p_vaddr);
     }
 }
 
@@ -53,17 +56,18 @@ static void load_grass(struct block_store* bs,
     INFO("Grass kernel file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("Grass kernel memory size: 0x%.8x bytes", pheader->p_memsz);
 
-    if (pheader->p_offset % BLOCK_SIZE) {
-        FATAL("TODO: program offset not aligned by %d", BLOCK_SIZE);
+    if (pheader->p_filesz > GRASS_SIZE ||
+        pheader->p_offset % BLOCK_SIZE != 0) {
+        FATAL("Invalid grass binary file");
     }
 
+    char* entry = (char*)GRASS_ENTRY;
     int block_offset = pheader->p_offset / BLOCK_SIZE;
-    for (int size = 0; size < pheader->p_filesz; size += BLOCK_SIZE) {
-        bs->read(block_offset++, (char*)GRASS_ENTRY + size);
+    for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
+        bs->read(block_offset++, entry + off);
     }
 
-    /* the last 0x80 bytes are reserved for struct earth */
-    memset((char*)GRASS_ENTRY + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz - 0x80);
+    memset(entry + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz);
 }
 
 static void load_app(int pid,
@@ -73,36 +77,38 @@ static void load_app(int pid,
     INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
 
-    if (pheader->p_offset % BLOCK_SIZE) {
-        FATAL("TODO: program offset not aligned by %d", BLOCK_SIZE);
+    if (pheader->p_filesz > APPS_SIZE ||
+        pheader->p_offset % BLOCK_SIZE != 0) {
+        FATAL("Invalid app binary file");
     }
 
-    /* load the application */
-    int base, size, frame_no, page_no = 0;
+    /* load the app code & data */
+    int base, frame_no, page_no = 0;
     int block_offset = pheader->p_offset / BLOCK_SIZE;
-    for (size = 0; size < pheader->p_filesz; size += BLOCK_SIZE) {
-        if (size % PAGE_SIZE == 0) {
+    for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
+        if (off % PAGE_SIZE == 0) {
             earth->mmu_alloc(&frame_no, &base);
             earth->mmu_map(pid, page_no++, frame_no, F_ALL);
         }
-        bs->read(block_offset++, ((char*)base) + (size % PAGE_SIZE));
+        bs->read(block_offset++, ((char*)base) + (off % PAGE_SIZE));
     }
     int last_page_filled = pheader->p_filesz % PAGE_SIZE;
     int last_page_nzeros = PAGE_SIZE - last_page_filled;
     if (last_page_filled)
         memset(((char*)base) + last_page_filled, 0, last_page_nzeros);
 
-    /* one more page for the heap */
+    while (page_no < APPS_SIZE / PAGE_SIZE) {
+        earth->mmu_alloc(&frame_no, &base);
+        earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+        memset((char*)base, 0, PAGE_SIZE);
+    }
+
+    /* allocate two pages for the app stack */
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);
-    memset((char*)base, 0, PAGE_SIZE);
-
-    /* two pages for the stack */
-    earth->mmu_alloc(&frame_no, &base);
-    earth->mmu_map(pid, MAX_NPAGES - 2, frame_no, F_ALL);
 
     earth->mmu_alloc(&frame_no, &base);
-    earth->mmu_map(pid, MAX_NPAGES - 1, frame_no, F_ALL);    
+    earth->mmu_map(pid, page_no++, frame_no, F_ALL);
 }
 
 

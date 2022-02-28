@@ -23,13 +23,10 @@ int main() {
     sys_proc_init();
 
     /* Enter the first kernel process sys_proc */
-    void (*sys_proc_entry)(void*) = (void*)VADDR_START;
+    void (*sys_proc_entry)(void*) = (void*)APPS_ENTRY;
     earth->mmu_switch(GPID_PROCESS);   // setup virtual address space
     timer_reset();                     // start timer
     earth->intr_enable();              // enable interrupt
-
-    int tmp;
-    FATAL("Right before entering sys_proc, &tmp=%x", &tmp);
     sys_proc_entry(&pcb);              // enter sys_proc
 
     FATAL("Should never return to the grass kernel main()");

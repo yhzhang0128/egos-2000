@@ -35,8 +35,7 @@ int main(struct pcb_intf* _pcb) {
         if (cnt++ % 50000 == 0) {
             sys_recv(buf, 30);
             INFO("In sys_proc: received %s", buf);
-            memcpy(buf, msg, 30);
-            sys_send(GPID_FILE, buf, 30);
+            sys_send(GPID_FILE, msg, sizeof(msg));
         }
     }
 }

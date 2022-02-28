@@ -17,33 +17,38 @@ static void proc_yield();
 static void proc_syscall();
 static void (*kernel_entry)();
 
-struct process proc_set[MAX_NPROCESS];
 int proc_curr_idx;
+struct process proc_set[MAX_NPROCESS];
 #define curr_pid  PID(proc_curr_idx)
 
 void ctx_entry() {
     kernel_entry();
     /* switch back to user application */
     void* tmp;
+    int mepc = (int)proc_set[proc_curr_idx].mepc;
+    __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
     ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
 }
 
 void intr_entry(int id) {
     int mepc;
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
-    if (mepc < VADDR_START) {
+    if (mepc < APPS_ENTRY) {
         /* IO may be busy; do not interrupt */
         timer_reset();
         return;
     }
 
+    /* switch to the grass kernel */
     switch(id) {
     case INTR_ID_TMR:
         kernel_entry = proc_yield;
+        proc_set[proc_curr_idx].mepc = (void*) mepc;
         ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
         break;
     case INTR_ID_SOFT:
         kernel_entry = proc_syscall;
+        proc_set[proc_curr_idx].mepc = (void*) mepc;
         ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
         break;
     default:
@@ -73,7 +78,7 @@ static void proc_yield() {
 
     int next_pid = PID(proc_next_idx);
     int next_status = proc_set[proc_next_idx].status;
-    int curr_status = proc_set[proc_curr_idx].status; 
+    int curr_status = proc_set[proc_curr_idx].status;
 
     if (curr_status == PROC_RUNNING)
         proc_set_runnable(curr_pid);
@@ -83,7 +88,7 @@ static void proc_yield() {
 
     if (next_status == PROC_READY) {
         timer_reset();
-        __asm__ volatile("csrw mepc, %0" ::"r"(VADDR_START));
+        __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
         __asm__ volatile("mret");
     } else if (next_status == PROC_RUNNABLE) {
         timer_reset();

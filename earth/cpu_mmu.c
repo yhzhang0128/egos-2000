@@ -25,14 +25,12 @@ struct translation_table_t {
         int pid;
         int page_no;
         int flag;
-    } frame[MAX_NFRAMES];
-};
+    } frame[NFRAMES];
+} trans_table;
 
 int curr_vm_pid;
-struct translation_table_t trans_table;
-
 int cache_frame_no[CACHED_NFRAMES];
-struct frame_t* cache = (void*)CACHE_START;
+struct frame_t* cache = (void*)FRAME_CACHE_START;
 
 static int cache_read(int frame_no);
 static int cache_write(int frame_no, struct frame_t* src);
@@ -46,7 +44,7 @@ int mmu_init() {
 }
 
 int mmu_alloc(int* frame_no, int* addr) {
-    for (int i = 0; i < MAX_NFRAMES; i++) {
+    for (int i = 0; i < NFRAMES; i++) {
         if (!INUSE(trans_table.frame[i])) {
             *frame_no = i;
             *addr = cache_read(i);
@@ -73,25 +71,48 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
 }
 
 int mmu_switch(int pid) {
-    if (pid == curr_vm_pid)
-        return 0;
+    char* code_base  = (void*) APPS_ENTRY;
+    char* stack_base = (void*) DTIM_START;
+    int code_npages  = APPS_SIZE / PAGE_SIZE;
 
-    char* base = (void*) VADDR_START;
+    if (curr_vm_pid == -1)
+        goto map_only;
 
     /* unmap curr_vm_pid from virtual address space */
-    for (int i = 0; i < MAX_NFRAMES; i++) {
+    for (int i = 0; i < NFRAMES; i++) {
         if (INUSE(trans_table.frame[i])
             && trans_table.frame[i].pid == curr_vm_pid) {
-            cache_write(i, (void*)(base + PAGE_SIZE * trans_table.frame[i].page_no));
+
+            char* addr;
+            int page_no = trans_table.frame[i].page_no;
+            if (page_no < code_npages) {
+                addr = code_base + page_no * PAGE_SIZE;
+                cache_write(i, (void*)(addr));
+            } else {
+                addr = stack_base + (page_no - code_npages) * PAGE_SIZE;
+                cache_write(i, (void*)(addr));
+            }
+            INFO("Unmap(pid%d, frame%d, page%d, vaddr %.8x, paddr %.8x)", curr_vm_pid, i, page_no, addr, &cache[i]);
         }
     }
 
+ map_only:
     /* map pid to virtual address space */
-    for (int i = 0; i < MAX_NFRAMES; i++) {
+    for (int i = 0; i < NFRAMES; i++) {
         if (INUSE(trans_table.frame[i])
             && trans_table.frame[i].pid == pid) {
-            int addr = cache_read(i);
-            memcpy(base + PAGE_SIZE * trans_table.frame[i].page_no, (char*)addr, PAGE_SIZE);
+
+            char *dst_addr, *src_addr = (char*)cache_read(i);
+            int page_no = trans_table.frame[i].page_no;
+            if (page_no < code_npages) {
+                dst_addr = code_base + page_no * PAGE_SIZE;
+                memcpy(dst_addr, src_addr, PAGE_SIZE);
+            }
+            else {
+                dst_addr = stack_base + (page_no - code_npages) * PAGE_SIZE;
+                memcpy(dst_addr, src_addr, PAGE_SIZE);
+            }
+            INFO("Map(pid%d, frame%d, page%d, vaddr %.8x, paddr %.8x)", pid, i, page_no, dst_addr, src_addr);
         }
     }
 

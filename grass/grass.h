@@ -18,6 +18,9 @@ struct earth *earth;
 void timer_init();
 long long timer_reset();
 
+#define MAX_NPROCESS       64
+#define PID(x)    proc_set[x].pid
+
 enum {
     PROC_UNUSED,
     PROC_READY,       // finish loading but haven't started running
@@ -30,7 +33,7 @@ enum {
 struct process{
     int pid;
     int status;
-    void* sp;
+    void *sp, *mepc;
     int receiver_pid; // used when status is PROC_WAIT_TO_SEND
 };
 
@@ -40,9 +43,6 @@ struct pcb_intf {
     void (*proc_free)(int);
     void (*proc_set_ready)(int);
 };
-
-#define MAX_NPROCESS       64
-#define PID(x)             proc_set[x].pid
 
 void proc_init();
 int  proc_alloc();
