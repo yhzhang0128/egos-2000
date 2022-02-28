@@ -41,7 +41,7 @@ static int read_sys_proc(int block_no, char* dst) {
 }
 
 static void sys_proc_init() {
-    INFO("Load kernel process #%d: process spawn and kill", GPID_PROCESS);
+    INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
     struct block_store bs;
     bs.read = read_sys_proc;
     elf_load(GPID_PROCESS, &bs, earth);
