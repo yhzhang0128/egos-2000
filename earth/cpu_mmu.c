@@ -92,7 +92,7 @@ int mmu_switch(int pid) {
                 addr = stack_base + (page_no - code_npages) * PAGE_SIZE;
                 cache_write(i, (void*)(addr));
             }
-            INFO("Unmap(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", curr_vm_pid, i, page_no, addr, &cache[i]);
+            //INFO("Unmap(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", curr_vm_pid, i, page_no, addr, &cache[i]);
         }
     }
 
@@ -112,7 +112,7 @@ int mmu_switch(int pid) {
                 dst_addr = stack_base + (page_no - code_npages) * PAGE_SIZE;
                 memcpy(dst_addr, src_addr, PAGE_SIZE);
             }
-            INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst_addr, src_addr);
+            //INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst_addr, src_addr);
         }
     }
 

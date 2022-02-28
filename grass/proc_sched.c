@@ -23,19 +23,11 @@ struct process proc_set[MAX_NPROCESS];
 #define curr_pid  PID(proc_curr_idx)
 
 void ctx_entry() {
-    int ra = *(int*)((char*)proc_set[0].sp + 52);
-    HIGHLIGHT("Save sp=%x, ra=%x", proc_set[0].sp, ra);
-    ra = *(int*)((char*)proc_set[1].sp + 52);
-    HIGHLIGHT("Save sp=%x, ra=%x", proc_set[1].sp, ra);
-
     kernel_entry();
     /* switch back to user application */
     void* tmp;
     int mepc = (int)proc_set[proc_curr_idx].mepc;
     __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
-
-    ra = *(int*)((char*)proc_set[proc_curr_idx].sp + 52);
-    INFO("Set mepc=%x, restore sp=%x, ra=%x", mepc, proc_set[proc_curr_idx].sp, ra);
     ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
 }
 
@@ -89,8 +81,6 @@ static void proc_yield() {
     int next_status = proc_set[proc_next_idx].status;
     int curr_status = proc_set[proc_curr_idx].status;
 
-    HIGHLIGHT("switch from %d to %d", curr_pid, next_pid);
-
     if (curr_status == PROC_RUNNING)
         proc_set_runnable(curr_pid);
     proc_set_running(next_pid);
@@ -102,7 +92,6 @@ static void proc_yield() {
         __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
         __asm__ volatile("mret");
     }
-    HIGHLIGHT("switch instead of start", curr_pid, next_pid);
 }
 
 
@@ -116,7 +105,6 @@ static void proc_syscall() {
     sc->type = SYS_UNUSED;
     *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
 
-    INFO("Got system call #%d", type);
     switch (type) {
     case SYS_RECV:
         proc_recv(sc);

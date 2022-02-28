@@ -30,7 +30,6 @@ static void trap_entry() {
     int mcause, mepc;
     __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
-    INFO("Trap at mepc=%x", mepc);
 
     int id = mcause & METAL_MCAUSE_IDMASK;
     if (mcause & METAL_MCAUSE_INTR) {
@@ -42,19 +41,9 @@ static void trap_entry() {
         if (excp_handler != NULL)
             excp_handler(id);
         else {
-            if (id == 2 && mepc < 0x08000000) {
-                /* This seems to be a bug of libc memcpy */
-                INFO("Got spurious exception %d (mepc=%x)", id, mepc);
-                if (mepc == 0)
-                    __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
-            } else {
-                FATAL("Got exception %d (mepc=%x) but handler not registered", id, mepc);  
-            }
+            FATAL("Got exception %d (mepc=%x) but handler not registered", id, mepc);
         }
     }
-
-    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
-    HIGHLIGHT("Exit trap with mepc=%x", mepc);
 }
 
 int intr_register(handler_t _handler) {
