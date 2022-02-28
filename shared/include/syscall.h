@@ -1,6 +1,6 @@
 #pragma once
 
-#define SYSCALL_MSG_LEN        512
+#define SYSCALL_MSG_LEN        1024
 #define RISCV_CLINT0_MSIP_BASE 0x2000000
 
 enum syscall_type {
@@ -24,8 +24,8 @@ struct sys_msg {
 struct syscall {
 	enum syscall_type type;
 	union {
-		struct sys_exit exit;
-        struct sys_msg msg;
+            struct sys_exit exit;
+            struct sys_msg msg;
 	} payload;
     int retval;
 };

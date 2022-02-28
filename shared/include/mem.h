@@ -5,19 +5,19 @@
 #define CACHED_NFRAMES      28
 
 #define DTIM_END            0x80010000
-#define FRAME_CACHE_START   0x80004000
-#define EARTH_STRUCT        0x80003f80
-#define GRASS_SYSCALL_ARG   0x80003000
-#define GRASS_STACK_TOP     0x80003000
-#define APPS_STACK_TOP      0x80002000
+#define FRAME_CACHE_START   0x80004000  // 112KB  frame cache
+#define EARTH_STRUCT        0x80003f80  // 128B   earth interface
+#define GRASS_SYSCALL_ARG   0x80003800  // 2KB    syscall arg
+#define GRASS_STACK_TOP     0x80003800  // 6KB    kernel stack
+#define APPS_STACK_TOP      0x80002000  // 8KB    app stack
 #define DTIM_START          0x80000000
 
 #define ITIM_END            0x08008000
 #define APPS_SIZE           0x00002000
-#define APPS_ENTRY          0x08006000
+#define APPS_ENTRY          0x08006000  // 8KB    app code+data
 #define GRASS_SIZE          0x00002000
-#define GRASS_ENTRY         0x08004000
-#define ITIM_START          0x08000000
+#define GRASS_ENTRY         0x08004000  // 8KB    grass code+data
+#define ITIM_START          0x08000000  // 16KB   earth data
 
 /* F stands for memory frame */
 #define F_INUSE             0x1
