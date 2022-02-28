@@ -12,10 +12,6 @@
 #define CACHE_START         0x8000C000
 #define CACHE_SIZE          PAGE_SIZE * CACHED_NFRAMES
 
-#define TRANS_TABLE_START   0x08003000
-#define TRANS_TABLE_TOP     0x08004000
-#define TRANS_TABLE_SIZE    sizeof(struct translation_table_t)
-
 #define F_INUSE             0x1
 #define F_READ              0x2
 #define F_WRITE             0x4

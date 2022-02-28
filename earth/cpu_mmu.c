@@ -21,7 +21,7 @@
 #define USE(x)   x.flag |= F_INUSE
 
 int curr_vm_pid;
-struct translation_table_t* trans_table;
+struct translation_table_t trans_table;
 
 int cache_frame_no[CACHED_NFRAMES];
 struct frame_t* cache = (void*)CACHE_START;
@@ -31,23 +31,18 @@ static int cache_write(int frame_no, struct frame_t* src);
 
 int mmu_init() {
     curr_vm_pid = -1;
-
-    trans_table = (void*) TRANS_TABLE_START;
-    if (TRANS_TABLE_START + TRANS_TABLE_SIZE > TRANS_TABLE_TOP)
-        FATAL("Translation table exceeds memory limit", MAX_NFRAMES);
-    
     memset(cache_frame_no, 0xff, sizeof(cache_frame_no));
-    memset(trans_table, 0, sizeof(struct translation_table_t));
+    memset(&trans_table, 0, sizeof(struct translation_table_t));
 
     return 0;
 }
 
 int mmu_alloc(int* frame_no, int* addr) {
     for (int i = 0; i < MAX_NFRAMES; i++) {
-        if (!INUSE(trans_table->frame[i])) {
+        if (!INUSE(trans_table.frame[i])) {
             *frame_no = i;
             *addr = cache_read(i);
-            USE(trans_table->frame[i]);
+            USE(trans_table.frame[i]);
             return 0;
         }
     }
@@ -58,14 +53,14 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
     if (flag != F_ALL)
         FATAL("Memory protection not implemented in earth");
     
-    if (!INUSE(trans_table->frame[frame_no])) {
+    if (!INUSE(trans_table.frame[frame_no])) {
         INFO("Frame %d has not been allocated", frame_no);
         return -1;
     }
 
-    trans_table->frame[frame_no].pid = pid;
-    trans_table->frame[frame_no].page_no = page_no;
-    trans_table->frame[frame_no].flag = flag;
+    trans_table.frame[frame_no].pid = pid;
+    trans_table.frame[frame_no].page_no = page_no;
+    trans_table.frame[frame_no].flag = flag;
     return 0;
 }
 
@@ -77,18 +72,18 @@ int mmu_switch(int pid) {
 
     /* unmap curr_vm_pid from virtual address space */
     for (int i = 0; i < MAX_NFRAMES; i++) {
-        if (INUSE(trans_table->frame[i])
-            && trans_table->frame[i].pid == curr_vm_pid) {
-            cache_write(i, (void*)(base + PAGE_SIZE * trans_table->frame[i].page_no));
+        if (INUSE(trans_table.frame[i])
+            && trans_table.frame[i].pid == curr_vm_pid) {
+            cache_write(i, (void*)(base + PAGE_SIZE * trans_table.frame[i].page_no));
         }
     }
 
     /* map pid to virtual address space */
     for (int i = 0; i < MAX_NFRAMES; i++) {
-        if (INUSE(trans_table->frame[i])
-            && trans_table->frame[i].pid == pid) {
+        if (INUSE(trans_table.frame[i])
+            && trans_table.frame[i].pid == pid) {
             int addr = cache_read(i);
-            memcpy(base + PAGE_SIZE * trans_table->frame[i].page_no, (char*)addr, PAGE_SIZE);
+            memcpy(base + PAGE_SIZE * trans_table.frame[i].page_no, (char*)addr, PAGE_SIZE);
         }
     }
 
