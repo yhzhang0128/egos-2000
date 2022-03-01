@@ -8,7 +8,7 @@
 #include "elf.h"
 #include "log.h"
 #include "disk.h"
-#include "server.h"
+#include "servers.h"
 
 int tty_init();
 int tty_read(char* buf, int len);
