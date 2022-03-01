@@ -126,7 +126,7 @@ void mkfs() {
     char buf[BLOCK_SIZE * 10];
     int table_len = 0;
     for (int i = 0; i < n; i++) {
-        int len = sprintf(buf + table_len, "%s", names[i]);
+        int len = sprintf(buf + table_len, "%s", dir_names[i]);
         table_len += len;
     }
     buf[table_len++] = 0;
@@ -143,6 +143,13 @@ void mkfs() {
     fprintf(stderr, "[INFO] Write dir table:\n");
     fprintf(stderr, "%s", buf);
 
+    /* inode#1...#NINODE-1 */
+    for (int ino = 1; ino < NINODE; ino++) {
+        memset(buf, 0, BLOCK_SIZE);
+        strcpy(buf, contents[ino]);
+        treedisk->write(treedisk, ino, 0, (void*)buf);
+    }
+    fprintf(stderr, "[INFO] Write %d inodes\n", NINODE);
 }
 
 
