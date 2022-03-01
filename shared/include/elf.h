@@ -31,7 +31,6 @@ struct elf32_program_header {
     uint32_t       p_align;
 };
 
-#include "file/disk.h"
 struct earth;
-
-void elf_load(int pid, struct block_store* bs, struct earth* earth);
+typedef int (*elf_reader)(int block_no, char* dst);
+void elf_load(int pid, elf_reader reader, struct earth* earth);

@@ -31,7 +31,7 @@ struct earth {
     struct dev_log log;
 };
 
-enum {
+enum grass_servers {
     GPID_UNUSED,
     GPID_PROCESS,
     GPID_FILE,

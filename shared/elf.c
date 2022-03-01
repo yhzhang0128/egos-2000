@@ -14,21 +14,22 @@
 #include "mem.h"
 #include "elf.h"
 #include "log.h"
+#include "disk.h"
 #include "print.h"
 
-static void load_grass(struct block_store* bs,
+static void load_grass(elf_reader reader,
                        struct earth* earth,
                        struct elf32_program_header* pheader);
 
 static void load_app(int pid,
-                     struct block_store* bs,
+                     elf_reader reader,
                      struct earth* earth,
                      struct elf32_program_header* pheader);
 
 
-void elf_load(int pid, struct block_store* bs, struct earth* earth) {
+void elf_load(int pid, elf_reader reader, struct earth* earth) {
     char buf[BLOCK_SIZE];
-    bs->read(0, buf);
+    reader(0, buf);
     struct elf32_header *header = (void*) buf;
     if (header->e_phnum != 1 ||
         header->e_phoff + header->e_phentsize > BLOCK_SIZE) {
@@ -40,17 +41,17 @@ void elf_load(int pid, struct block_store* bs, struct earth* earth) {
 
     switch (pheader.p_vaddr) {
     case APPS_ENTRY:
-        load_app(pid, bs, earth, &pheader);
+        load_app(pid, reader, earth, &pheader);
         break;
     case GRASS_ENTRY:
-        load_grass(bs, earth, &pheader);
+        load_grass(reader, earth, &pheader);
         break;
     default:
         FATAL("ELF gives invalid p_vaddr: 0x%.8x", pheader.p_vaddr);
     }
 }
 
-static void load_grass(struct block_store* bs,
+static void load_grass(elf_reader reader,
                        struct earth* earth,
                        struct elf32_program_header* pheader) {
     INFO("Grass kernel file size: 0x%.8x bytes", pheader->p_filesz);
@@ -64,14 +65,14 @@ static void load_grass(struct block_store* bs,
     char* entry = (char*)GRASS_ENTRY;
     int block_offset = pheader->p_offset / BLOCK_SIZE;
     for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
-        bs->read(block_offset++, entry + off);
+        reader(block_offset++, entry + off);
     }
 
     memset(entry + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz);
 }
 
 static void load_app(int pid,
-                     struct block_store* bs,
+                     elf_reader reader,
                      struct earth* earth,
                      struct elf32_program_header* pheader) {
     INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
@@ -90,7 +91,7 @@ static void load_app(int pid,
             earth->mmu_alloc(&frame_no, &base);
             earth->mmu_map(pid, page_no++, frame_no, F_ALL);
         }
-        bs->read(block_offset++, ((char*)base) + (off % PAGE_SIZE));
+        reader(block_offset++, ((char*)base) + (off % PAGE_SIZE));
     }
     int last_page_filled = pheader->p_filesz % PAGE_SIZE;
     int last_page_nzeros = PAGE_SIZE - last_page_filled;

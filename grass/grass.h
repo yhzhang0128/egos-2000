@@ -4,6 +4,7 @@
 
 #include "mem.h"
 #include "elf.h"
+#include "disk.h"
 #include "print.h"
 #include "syscall.h"
 

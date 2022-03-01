@@ -10,6 +10,7 @@
 
 #include "elf.h"
 #include "app.h"
+#include "disk.h"
 #include <string.h>
 
 /* same as the struct pcb_intf in grass/process.h */
@@ -51,8 +52,6 @@ void sys_file_init() {
         FATAL("Process ID mismatch: %d != %d", file_pid, GPID_FILE);
 
     INFO("Load kernel process #%d: file server", file_pid);
-    struct block_store bs;
-    bs.read = sys_file_read;
-    elf_load(file_pid, &bs, earth);
+    elf_load(file_pid, sys_file_read, earth);
     pcb.proc_set_ready(file_pid);
 }

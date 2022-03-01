@@ -41,7 +41,7 @@ EARTH_LAYOUT = -Tearth/layout.lds
 GRASS_SRCS = grass/enter.S grass/*.c shared/*.c shared/*.S
 GRASS_LAYOUT = -Tgrass/layout.lds
 
-APPS_SRCS = apps/enter.S shared/*.c
+APPS_SRCS = apps/enter.S shared/*.c #shared/fs/*.c
 APPS_LAYOUT = -Tapps/layout.lds
 
 RISCV_CC = riscv64-unknown-elf-gcc
@@ -52,7 +52,7 @@ BUILD_DIR = install
 DEBUG_DIR = $(BUILD_DIR)/bin/debug
 RELEASE_DIR = $(BUILD_DIR)/bin/release
 
-INCLUDE = -Ishared/include
+INCLUDE = -Ishared/include -Ishared/fs
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
