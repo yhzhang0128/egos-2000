@@ -26,21 +26,19 @@ char* kernel_processes[] = {
 };
 
 char* names[] = {
-                 "/                      1",
-                 "/home                  2",
-                 "/home/yunhao           3",
-                 "/home/rvr              4",
-                 "/home/lorenzo          5",
-                 "/home/yunhao/README    6"
+                 "/                    1  dir\n",
+                 "/home                2  dir\n",
+                 "/home/yunhao         3  dir\n",
+                 "/home/rvr            4  dir\n",
+                 "/home/yunhao/README  6  file\n"
                  
 };
 
 char* contents[] = {
-                 "home    002 ",
-                 "yunhao  003 rvr     004 lorenzo 005 ",
-                 "README  006 ",
-                 "",
-                 "",
+                 ".         1 ..        1 home      2 \n",
+                 ".         2 ..        1 yunhao    3 rvr       x4 \n",
+                 ".         3 ..        2 README    6 ",
+                 ".         4 ..        2 ",
                  "This is the README file of egos-riscv!"
 };
 
