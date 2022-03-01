@@ -62,13 +62,10 @@ typedef struct block {
 
 typedef struct block_store {
     void *state;
-    int (*getninodes)(struct block_store *this_bs);
     int (*getsize)(struct block_store *this_bs, unsigned int ino);
     int (*setsize)(struct block_store *this_bs, unsigned int ino, block_no newsize);
     int (*read)(struct block_store *this_bs, unsigned int ino, block_no offset, block_t *block);
     int (*write)(struct block_store *this_bs, unsigned int ino, block_no offset, block_t *block);
-    void (*release)(struct block_store *this_bs);
-    int (*sync)(struct block_store *this_bs, unsigned int ino);
 } block_store_t;
 
 typedef block_store_t *block_if;			// block store interface

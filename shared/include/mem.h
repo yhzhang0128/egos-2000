@@ -13,10 +13,10 @@
 #define DTIM_START          0x80000000
 
 #define ITIM_END            0x08008000
-#define APPS_SIZE           0x00002000
-#define APPS_ENTRY          0x08006000  // 8KB    app code+data
+#define APPS_SIZE           0x00003000
+#define APPS_ENTRY          0x08005000  // 8KB    app code+data
 #define GRASS_SIZE          0x00002000
-#define GRASS_ENTRY         0x08004000  // 8KB    grass code+data
+#define GRASS_ENTRY         0x08003000  // 8KB    grass code+data
 #define ITIM_START          0x08000000  // 16KB   earth data
 
 /* F stands for memory frame */

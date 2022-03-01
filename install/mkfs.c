@@ -30,7 +30,7 @@ int main() {
     freopen("disk.img", "w", stdout);
 
     /* paging area */
-    memset(buf, 0, sizeof(buf));
+    memset(buf, 0, 1024 * 1024);
     write(1, buf, 1024 * 1024);
 
     /* grass kernel processes */
@@ -65,6 +65,9 @@ int main() {
         write(1, buf, 128 * 1024);
         
     /* file system */
+    memset(buf, 0, 1024 * 1024);
+    write(1, buf, 1024 * 1024);
+    write(1, buf, 1024 * 1024);
     
     fclose(stdout);
     return 0;
