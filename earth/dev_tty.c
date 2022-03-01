@@ -45,8 +45,9 @@ int tty_write(const char *format, ...)
     va_start(args, format);
     int r = vprintf(format, args);
     va_end(args);
+    fflush(stdout);
 
-    return r < 0 ? r : fflush(stdout);
+    return r;
 }
 
 
