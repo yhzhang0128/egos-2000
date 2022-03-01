@@ -19,8 +19,24 @@ int main() {
         FATAL("proc_file: can't create treedisk file system");
     block_if treedisk = treedisk_init(disk, 0);
 
+    char buf[BLOCK_SIZE];
+    treedisk->read(treedisk, 0, 0, (void*)buf);
+    HIGHLIGHT("Get dir table:");
+
+    for (int i = 0; i < BLOCK_SIZE; i++) {
+        switch (buf[i]) {
+        case 0:
+            i = BLOCK_SIZE;
+            break;
+        case '\n':
+            printf("\r\n");
+            break;
+        default:
+            printf("%c", buf[i]);
+        }
+    }
+
     static int cnt = 0;
-    char buf[30];
     char* msg = "Hi from GPID_FILE!";
     while (1) {
         if (cnt++ % 50000 == 0) {

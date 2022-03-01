@@ -15,6 +15,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 
 #include "disk.h"
@@ -34,14 +35,14 @@ char* names[] = {
                  "/home                2  dir\n",
                  "/home/yunhao         3  dir\n",
                  "/home/rvr            4  dir\n",
-                 "/home/yunhao/README  6  file\n"
+                 "/home/yunhao/README  5  file\n"
                  
 };
 
 char* contents[] = {
                  ".         1 ..        1 home      2 \n",
                  ".         2 ..        1 yunhao    3 rvr       x4 \n",
-                 ".         3 ..        2 README    6 ",
+                 ".         3 ..        2 README    5 ",
                  ".         4 ..        2 ",
                  "This is the README file of egos-riscv!"
 };
@@ -49,6 +50,8 @@ char* contents[] = {
 char fs[FS_DISK_SIZE];
 char exec[GRASS_EXEC_SIZE];
 char paging[PAGING_DEV_SIZE];
+
+void mkfs();
 
 int main() {
     freopen("disk.img", "w", stdout);
@@ -94,8 +97,86 @@ int main() {
         
     /* file system */
     memset(fs, 0, FS_DISK_SIZE);
+    mkfs();
     write(1, fs, FS_DISK_SIZE);
     
     fclose(stdout);
+
+    fprintf(stderr, "[INFO] Finish making the disk image (size=%d)\n", FS_DISK_SIZE + GRASS_EXEC_SIZE + PAGING_DEV_SIZE);
     return 0;
 }
+
+
+block_if ramdisk_init();
+
+void mkfs() {
+    fprintf(stderr, "[INFO] Making the file system with treedisk\n");
+
+    block_if ramdisk = ramdisk_init();    
+    if (treedisk_create(ramdisk, 0, NINODES) < 0) {
+        fprintf(stderr, "proc_file: can't create treedisk file system");
+        exit(1);
+    }
+    block_if treedisk = treedisk_init(ramdisk, 0);
+
+    int n = sizeof(names) / sizeof(char*);
+    int tmp = sizeof(contents) / sizeof(char*);
+
+    if (n != tmp) {
+        fprintf(stderr, "Check length of names and contents\n");
+        exit(1);
+    }
+
+    char buf[BLOCK_SIZE * 10];
+    int table_len = 0;
+    for (int i = 0; i < n; i++) {
+        int len = sprintf(buf + table_len, "%s", names[i]);
+        table_len += len;
+    }
+    buf[table_len++] = 0;
+
+    if (table_len > BLOCK_SIZE) {
+        fprintf(stderr, "TODO: dir table larger than BLOCK_SIZE");
+        exit(1);
+    }
+
+    /* inode#0 is for the dir table */
+    treedisk->write(treedisk, 0, 0, (void*)buf);
+
+    treedisk->read(treedisk, 0, 0, (void*)buf);
+    fprintf(stderr, "[INFO] Write dir table:\n");
+    fprintf(stderr, "%s", buf);
+
+}
+
+
+int getsize(block_if this_bs, unsigned int ino){
+    return FS_DISK_SIZE / BLOCK_SIZE;
+}
+
+int setsize(block_if this_bs, unsigned int ino, block_no newsize) {
+    fprintf(stderr, "disk_setsize not implemented");
+    exit(1);
+}
+
+int ramread(block_if this_bs, unsigned int ino, block_no offset, block_t *block) {
+    memcpy(block, fs + offset * BLOCK_SIZE, BLOCK_SIZE);
+    return 0;
+}
+
+int ramwrite(block_if this_bs, unsigned int ino, block_no offset, block_t *block) {
+    memcpy(fs + offset * BLOCK_SIZE, block, BLOCK_SIZE);
+    return 0;
+}
+
+block_if ramdisk_init() {
+    block_store_t *ramdisk = malloc(sizeof(*ramdisk));
+
+    ramdisk->read = ramread;
+    ramdisk->write = ramwrite;
+    ramdisk->getsize = getsize;
+    ramdisk->setsize = setsize;
+
+    return ramdisk;
+}
+

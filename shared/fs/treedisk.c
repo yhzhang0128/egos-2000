@@ -29,8 +29,13 @@
 #include "fs.h"
 #include "treedisk.h"
 
+#ifdef MKFS
+#include <stdio.h>
+#define HIGHLIGHT printf
+#else
 #include "egos.h"
 #include "print.h"
+#endif
 
 /* Temporary information about the file system and a particular inode.
  * Convenient for all operations. See "treedisk.h" for field details.
@@ -54,7 +59,12 @@ static unsigned int log_rpb;		// log2(REFS_PER_BLOCK)
 static block_t null_block;			// a block filled with null bytes
 
 static void panic(const char *s){
+#ifdef MKFS
+    fprintf(stderr, "%s", s);
+    exit(1);
+#else 
     FATAL(s);
+#endif
 }
 
 /* Stupid ANSI C compiler leaves shifting by #bits in unsigned int or more
@@ -339,6 +349,9 @@ static int treedisk_write(block_store_t *this_bs, unsigned int ino, block_no off
 
 /* Open a virtual block store on the specified inode of the block store below.
  */
+block_store_t this_bs_static;
+static struct treedisk_state ts_static;
+
 block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino){
 	/* Figure out the log of the number of references per block.
 	 */
@@ -350,14 +363,16 @@ block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino){
 
 	/* Create the block store state structure.
 	 */
-	struct treedisk_state *ts = malloc(sizeof(struct treedisk_state));
+	//struct treedisk_state *ts = malloc(sizeof(struct treedisk_state));
+        struct treedisk_state *ts = &ts_static;
         memset(ts, 0, sizeof(struct treedisk_state));
 	ts->below = below;
 	ts->below_ino = below_ino;
 
 	/* Return a block interface to this inode.
 	 */
-	block_store_t *this_bs = malloc(sizeof(block_store_t));
+	//block_store_t *this_bs = malloc(sizeof(block_store_t));
+        block_store_t *this_bs = &this_bs_static;
         memset(this_bs, 0, sizeof(block_store_t));
 	this_bs->state = ts;
 	this_bs->getsize = treedisk_getsize;
@@ -442,7 +457,7 @@ int treedisk_create(block_store_t *below, unsigned int below_ino, unsigned int n
 				return -1;
 			}
 		}
-		HIGHLIGHT("treedisk: Created a new filesystem with %lu inodes\n", ninodes);
+		HIGHLIGHT("treedisk: Created a new filesystem with %d inodes\n", ninodes);
 	}
 	else {
 		HIGHLIGHT("treedisk: Attempted to create a new filesystem, but one already exists with %lu inodes",
