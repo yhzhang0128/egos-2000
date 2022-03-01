@@ -10,6 +10,7 @@
 #include <string.h>
 #include "mem.h"
 #include "syscall.h"
+#include "servers.h"
 
 static struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
 
@@ -41,7 +42,11 @@ int sys_recv(int* sender, char* buf, int size) {
 }
 
 void sys_exit(int status) {
-	sc->type = SYS_EXIT;
-	sc->payload.exit.status = status;
-	sys_invoke();
+    struct proc_request req;
+    req.type = PROC_KILLED;
+    sys_send(GPID_PROCESS, (void*)&req, sizeof(struct proc_request));
+    
+    sc->type = SYS_EXIT;
+    sc->payload.exit.status = status;
+    sys_invoke();
 }

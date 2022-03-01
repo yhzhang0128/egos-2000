@@ -118,7 +118,8 @@ static void proc_syscall() {
         proc_send(sc);
         break;
     case SYS_EXIT:
-        FATAL("proc_syscall: exit not implemented");
+        proc_set[proc_curr_idx].status = PROC_ZOMBIE;
+        HIGHLIGHT("proc_syscall: exit not implemented %d", curr_pid);
     }
 }
 

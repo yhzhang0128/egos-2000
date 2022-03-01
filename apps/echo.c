@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: echo
+ * Description: a simple echo
  */
 
 
@@ -12,20 +12,15 @@
 
 
 int main(int argc, char** argv) {
-    char buf[100];
-
-    INFO("echo got work dir: %s", grass->work_dir);
-    INFO("echo got work dir name: %s", grass->work_dir_name);
-    INFO("echo got %d args", argc);
-    for (int i = 0; i < argc; i++)
-        printf("%s\r\n", (char*)argv + i * CMD_ARG_LEN);
-
-
-    int cnt = 0;
-    while (1) {
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++)
+            printf("%s ", (char*)argv + i * CMD_ARG_LEN);
+    } else {
+        char buf[100];
         tty_read(buf, 100);
-        SUCCESS("echo got: %s", buf);
-        
-        sys_exit(cnt++);
+        printf("%s", buf);        
     }
+
+    printf("\r\n");
+    return 0;
 }

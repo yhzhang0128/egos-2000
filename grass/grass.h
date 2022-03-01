@@ -26,7 +26,8 @@ enum {
     PROC_RUNNING,
     PROC_RUNNABLE,
     PROC_WAIT_TO_SEND,
-    PROC_WAIT_TO_RECV
+    PROC_WAIT_TO_RECV,
+    PROC_ZOMBIE
 };
 
 struct process{

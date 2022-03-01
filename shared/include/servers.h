@@ -52,7 +52,6 @@ struct proc_request {
           PROC_SPAWN,
           PROC_KILLED
     } type;
-    int pid;
     int argc;
     char argv[CMD_NARGS][CMD_ARG_LEN];
 };
@@ -62,4 +61,5 @@ struct proc_reply {
           CMD_OK,
           CMD_ERROR
     } type;
+    int pid;
 };

@@ -56,9 +56,13 @@ int main(struct pcb_intf* _pcb) {
                 reply->type = CMD_ERROR;
                 sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
             }
+        } else if (req->type == PROC_KILLED) {
+            struct proc_reply *reply = (void*)buf;
+            reply->pid = sender;
+            reply->type = CMD_OK;
+            sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
         } else {
-            // process killed
-            FATAL("TODO: sys_proc: process killed");
+            FATAL("sys_proc: receive unexpected message");
         }
 
     }
