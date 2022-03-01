@@ -230,9 +230,9 @@ static int treedisk_write(block_store_t *this_bs, unsigned int ino, block_no off
 
 	/* Get info from underlying file system.
 	 */
-	struct treedisk_snapshot *snapshot = malloc(sizeof(*snapshot));
+        struct treedisk_snapshot snapshot_buffer;
+	struct treedisk_snapshot *snapshot = &snapshot_buffer;
 	if (treedisk_get_snapshot(snapshot, ts, ino) < 0) {
-		free(snapshot);
 		return -1;
 	}
 
@@ -334,7 +334,6 @@ static int treedisk_write(block_store_t *this_bs, unsigned int ino, block_no off
 	if ((*ts->below->write)(ts->below, ts->below_ino, b, block) < 0) {
 		panic("treedisk_write: data block");
 	}
-	free(snapshot);
 	return 0;
 }
 
