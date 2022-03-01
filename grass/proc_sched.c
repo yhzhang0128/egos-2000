@@ -23,7 +23,7 @@ struct process proc_set[MAX_NPROCESS];
 #define curr_pid  PID(proc_curr_idx)
 
 void intr_entry(int id) {
-    int mepc;
+    unsigned int mepc;
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
     if (mepc < APPS_ENTRY) {
         /* IO may be busy; do not interrupt */
