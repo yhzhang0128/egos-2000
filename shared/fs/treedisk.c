@@ -27,7 +27,7 @@
 //#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "block_store.h"
+#include "fs.h"
 #include "treedisk.h"
 
 #include "egos.h"

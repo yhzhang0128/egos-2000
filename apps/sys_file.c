@@ -8,7 +8,7 @@
  */
 
 #include "app.h"
-#include "block_store.h"
+#include "fs.h"
 #include <string.h>
 
 int main() {
