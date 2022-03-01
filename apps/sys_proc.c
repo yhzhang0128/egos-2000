@@ -34,33 +34,13 @@ int main(struct pcb_intf* _pcb) {
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     if (sender != GPID_FILE)
         FATAL("sys_proc expects message from GPID_FILE");
-    INFO("sys_proc receives message: %s", buf);
+    INFO("sys_proc receives: %s", buf);
 
-
-    struct file_request req;
-    req.type = FILE_READ;
-    req.ino = 0;
-    req.offset = 0;
-    sys_send(GPID_FILE, (void*)&req, sizeof(struct file_request));
+    sys_dir_init();
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    if (sender != GPID_FILE)
-        FATAL("sys_proc expects message from GPID_FILE");
-    HIGHLIGHT("GPID_PROCESS Get dir table:");
-
-    struct file_reply *reply = (void*)buf;
-    for (int i = 0; i < BLOCK_SIZE; i++) {
-        char ch = reply->block.bytes[i];
-        switch (ch) {
-        case 0:
-            i = BLOCK_SIZE;
-            break;
-        case '\n':
-            printf("\r\n");
-            break;
-        default:
-            printf("%c", ch);
-        }
-    }
+    if (sender != GPID_DIR)
+        FATAL("sys_proc expects message from GPID_DIR");
+    INFO("sys_proc receives: %s", buf);    
     
     while (1) {
     }
@@ -78,4 +58,18 @@ void sys_file_init() {
     INFO("Load kernel process #%d: sys_file", file_pid);
     elf_load(file_pid, sys_file_read, earth);
     pcb.proc_set_ready(file_pid);
+}
+
+static int sys_dir_read(int block_no, char* dst) {
+    return earth->disk_read(SYS_DIR_EXEC_START + block_no, 1, dst);
+}
+
+void sys_dir_init() {
+    int dir_pid = pcb.proc_alloc();
+    if (dir_pid != GPID_DIR)
+        FATAL("Process ID mismatch: %d != %d", dir_pid, GPID_DIR);
+
+    INFO("Load kernel process #%d: sys_dir", dir_pid);
+    elf_load(dir_pid, sys_dir_read, earth);
+    pcb.proc_set_ready(dir_pid);
 }

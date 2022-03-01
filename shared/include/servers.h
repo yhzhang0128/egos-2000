@@ -27,3 +27,20 @@ struct file_reply {
     block_t block;
 };
 
+#define DIR_ROOT_INO      1
+#define DIR_NAME_SIZE     32
+struct dir_request {
+    enum {
+          DIR_UNUSED,
+          DIR_LOOKUP,
+          DIR_INSERT,
+          DIR_REMOVE
+    } type;
+    int ino;
+    char name[DIR_NAME_SIZE];
+};
+
+struct dir_reply {
+    enum dir_status { DIR_OK, DIR_ERROR } status;
+    int ino;
+};

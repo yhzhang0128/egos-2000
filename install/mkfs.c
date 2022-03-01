@@ -22,29 +22,32 @@
 #include "fs.h"
 #include "treedisk.h"
 
+#define NKERNEL_PROC 4
 char* kernel_processes[] = {
                             "bin/release/grass.elf",
                             "bin/release/sys_proc.elf",
-                            "bin/release/sys_file.elf"
-                            //"bin/release/sys_dir.elf",
+                            "bin/release/sys_file.elf",
+                            "bin/release/sys_dir.elf",
                             //"bin/release/sys_shell.elf"
 };
 
-char* names[] = {
-                 "/                    1  dir\n",
-                 "/home                2  dir\n",
-                 "/home/yunhao         3  dir\n",
-                 "/home/rvr            4  dir\n",
-                 "/home/yunhao/README  5  file\n"
-                 
+#define NINODE 6
+char* dir_names[] = {
+                     "\n",
+                     "/          1  \n",
+                     "home       2  \n",
+                     "yunhao     3  \n",
+                     "rvr        4  \n",
+                     "\n"
 };
 
 char* contents[] = {
-                 ".         1 ..        1 home      2 \n",
-                 ".         2 ..        1 yunhao    3 rvr       x4 \n",
-                 ".         3 ..        2 README    5 ",
-                 ".         4 ..        2 ",
-                 "This is the README file of egos-riscv!"
+                    "",
+                    ".         1 ..        1 home      2 \n",
+                    ".         2 ..        1 yunhao    3 rvr       x4 \n",
+                    ".         3 ..        2 README    5 ",
+                    ".         4 ..        2 ",
+                    "This is the README file of egos-riscv!"
 };
 
 char fs[FS_DISK_SIZE];
@@ -61,7 +64,7 @@ int main() {
     write(1, exec, PAGING_DEV_SIZE);
 
     /* grass kernel processes */
-    int n = sizeof(kernel_processes) / sizeof(char*);
+    int n = NKERNEL_PROC;
     if (n > GRASS_NEXEC) {
         fprintf(stderr, "[ERROR] >%d kernel processes\n", GRASS_NEXEC);
         return -1;
@@ -119,14 +122,7 @@ void mkfs() {
     }
     block_if treedisk = treedisk_init(ramdisk, 0);
 
-    int n = sizeof(names) / sizeof(char*);
-    int tmp = sizeof(contents) / sizeof(char*);
-
-    if (n != tmp) {
-        fprintf(stderr, "Check length of names and contents\n");
-        exit(1);
-    }
-
+    int n = NINODE;
     char buf[BLOCK_SIZE * 10];
     int table_len = 0;
     for (int i = 0; i < n; i++) {
