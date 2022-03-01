@@ -17,22 +17,21 @@ void dirtable_dump();
 int main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
-    block_if disk = disk_init();    
+    block_if disk = fs_disk_init();    
     if (treedisk_create(disk, 0, NINODES) < 0)
         FATAL("proc_file: can't create treedisk file system");
     treedisk = treedisk_init(disk, 0);
     dirtable_dump();
 
-    static int cnt = 0;
-    char buf[30];
-    char* msg = "Hi from GPID_FILE!";
+    char buf[SYSCALL_MSG_LEN];
+    char* msg = "Finish GPID_FILE initialization";
+    memcpy(buf, msg, 32);
+    sys_send(GPID_PROCESS, buf, 32);
+
     while (1) {
-        if (cnt++ % 50000 == 0) {
-            memcpy(buf, msg, 30);
-            sys_send(GPID_PROCESS, buf, 30);
-            sys_recv(buf, 30);
-            HIGHLIGHT("In sys_file: received %s", buf);
-        }
+        sys_recv(buf, SYSCALL_MSG_LEN);
+        struct file_request *req = (void*)buf;
+        INFO("GPID_FILE get request type=%d ino=%d offset=%d", req->type, req->ino, req->offset);
     }
     return 0;
 }
@@ -41,7 +40,7 @@ int main() {
 void dirtable_dump() {
     char buf[BLOCK_SIZE];
     treedisk->read(treedisk, 0, 0, (void*)buf);
-    HIGHLIGHT("Get dir table:");
+    INFO("Get dir table:");
 
     for (int i = 0; i < BLOCK_SIZE; i++) {
         switch (buf[i]) {

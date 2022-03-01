@@ -22,7 +22,7 @@ static int disk_write(block_if this_bs, unsigned int ino, block_no offset, block
 
 static block_store_t disk;
 
-block_if disk_init() {
+block_if fs_disk_init() {
     disk.read = disk_read;
     disk.write = disk_write;
     disk.getsize = disk_getsize;

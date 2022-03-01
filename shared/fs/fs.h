@@ -64,7 +64,7 @@ typedef block_store_t *block_if;    // block store interface
  * available block store types.
  */
 
-block_if disk_init();
+block_if fs_disk_init();
 
 block_if treedisk_init(block_if below, unsigned int below_ino);
 int treedisk_create(block_if below, unsigned int below_ino, unsigned int ninodes);

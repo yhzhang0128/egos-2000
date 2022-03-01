@@ -28,17 +28,18 @@ int main(struct pcb_intf* _pcb) {
     memcpy(&pcb, _pcb, sizeof(struct pcb_intf));
 
     sys_file_init();
+    char buf[SYSCALL_MSG_LEN];
+    sys_recv(buf, SYSCALL_MSG_LEN);
+    INFO("sys_proc receives message: %s", buf);
+    
 
-    static int cnt = 0;
-    char buf[30];
-    char* msg = "Hi from GPID_PROCESS!";
+    struct file_request req;
+    req.type = FILE_READ;
+    req.ino = 0;
+    req.offset = 0;
+    sys_send(GPID_FILE, (void*)&req, sizeof(struct file_request));
+
     while (1) {
-        if (cnt++ % 50000 == 0) {
-            sys_recv(buf, 30);
-            INFO("In sys_proc: received %s", buf);
-            memcpy(buf, msg, 30);
-            sys_send(GPID_FILE, buf, 30);
-        }
     }
 }
 
