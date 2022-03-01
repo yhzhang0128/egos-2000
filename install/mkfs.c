@@ -24,6 +24,26 @@ char* kernel_processes[] = {
                             //"bin/release/sys_dir.elf",
                             //"bin/release/sys_shell.elf"
 };
+
+char* names[] = {
+                 "/                      1",
+                 "/home                  2",
+                 "/home/yunhao           3",
+                 "/home/rvr              4",
+                 "/home/lorenzo          5",
+                 "/home/yunhao/README    6"
+                 
+};
+
+char* contents[] = {
+                 "home    002 ",
+                 "yunhao  003 rvr     004 lorenzo 005 ",
+                 "README  006 ",
+                 "",
+                 "",
+                 "This is the README file of egos-riscv!"
+};
+
 char buf[1024 * 1024];
 
 int main() {
