@@ -51,7 +51,7 @@ void sys_file_init() {
     if (file_pid != GPID_FILE)
         FATAL("Process ID mismatch: %d != %d", file_pid, GPID_FILE);
 
-    INFO("Load kernel process #%d: file server", file_pid);
+    INFO("Load kernel process #%d: sys_file", file_pid);
     elf_load(file_pid, sys_file_read, earth);
     pcb.proc_set_ready(file_pid);
 }
