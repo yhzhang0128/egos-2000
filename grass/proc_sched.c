@@ -31,7 +31,7 @@ void intr_entry(int id) {
         return;
     }
 
-    /* switch to the grass kernel */
+    /* switch to the grass kernel (ctx_entry) */
     switch(id) {
     case INTR_ID_TMR:
         kernel_entry = proc_yield;
@@ -51,7 +51,7 @@ void intr_entry(int id) {
 void ctx_entry() {
     /* kernel_entry is either proc_yield() or proc_syscall() */
     kernel_entry();
-    /* switch back to the user application */
+    /* switch back to the user application (intr_entry) */
     void* tmp;
     int mepc = (int)proc_set[proc_curr_idx].mepc;
     __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
