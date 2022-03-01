@@ -8,7 +8,7 @@
  */
 
 #include <stdio.h>
-#include "sdutil.h"
+#include "sd_utils.h"
 
 char send_data_byte(struct metal_spi *spi, char byte) {
     long rxdata, control_base = SPI_BASE_ADDR;

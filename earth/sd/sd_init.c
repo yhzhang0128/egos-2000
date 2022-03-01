@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include "sd.h"
-#include "sdutil.h"
+#include "sd_utils.h"
 
 static int sd_spi_reset(struct metal_spi*);
 static int sd_spi_configure(struct metal_spi*);
