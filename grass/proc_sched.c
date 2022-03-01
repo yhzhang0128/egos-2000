@@ -22,15 +22,6 @@ int proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
 #define curr_pid  PID(proc_curr_idx)
 
-void ctx_entry() {
-    kernel_entry();
-    /* switch back to user application */
-    void* tmp;
-    int mepc = (int)proc_set[proc_curr_idx].mepc;
-    __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
-    ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
-}
-
 void intr_entry(int id) {
     int mepc;
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
@@ -55,6 +46,16 @@ void intr_entry(int id) {
     default:
         FATAL("Got unknown interrupt #%d", id);
     }
+}
+
+void ctx_entry() {
+    /* kernel_entry is either proc_yield() or proc_syscall() */
+    kernel_entry();
+    /* switch back to the user application */
+    void* tmp;
+    int mepc = (int)proc_set[proc_curr_idx].mepc;
+    __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
+    ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
 }
 
 static void proc_yield() {
@@ -83,9 +84,9 @@ static void proc_yield() {
 
     if (curr_status == PROC_RUNNING)
         proc_set_runnable(curr_pid);
+    proc_curr_idx = proc_next_idx;
     proc_set_running(next_pid);
     earth->mmu_switch(next_pid);
-    proc_curr_idx = proc_next_idx;
 
     timer_reset();
     if (next_status == PROC_READY) {
@@ -102,6 +103,7 @@ static void proc_syscall() {
     /* software interrupt for system call */
     struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
     int type = sc->type;
+    sc->retval = 0;
     sc->type = SYS_UNUSED;
     *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
 
@@ -118,7 +120,6 @@ static void proc_syscall() {
 }
 
 static void proc_send(struct syscall *sc) {
-    sc->retval = 0;
     sc->payload.msg.sender = curr_pid;
     int receiver = sc->payload.msg.receiver;
 
@@ -153,7 +154,6 @@ static void proc_send(struct syscall *sc) {
 }
 
 static void proc_recv(struct syscall *sc) {
-    sc->retval = 0;
     sc->payload.msg.sender = 0;
     sc->payload.msg.receiver = curr_pid;
 
