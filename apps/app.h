@@ -7,4 +7,6 @@
 #include "servers.h"
 
 struct earth *earth = (void*)EARTH_STRUCT;
+struct grass *grass = (void*)GRASS_STRUCT;
+
 #define tty_read earth->tty_read

@@ -28,3 +28,9 @@ struct earth {
     /* helper functions for logging */
     struct dev_log log;
 };
+
+struct grass {
+    int work_dir_ino;
+    char work_dir[32 * 16];
+    char work_dir_name[32];
+};

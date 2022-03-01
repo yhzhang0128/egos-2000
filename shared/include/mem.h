@@ -6,8 +6,9 @@
 
 #define DTIM_END            0x80010000
 #define FRAME_CACHE_START   0x80004000  // 112KB  frame cache
-#define EARTH_STRUCT        0x80003f80  // 128B   earth interface
+#define EARTH_STRUCT        0x80003f80  //        earth interface
 #define GRASS_STACK_TOP     0x80003f80  // ~8KB   kernel stack top
+#define GRASS_STRUCT        0x80002000  //        grass interface
 #define APPS_STACK_TOP      0x80002000  // ~6KB   app stack top
 #define GRASS_SYSCALL_ARG   0x80000400  // ~1KB   syscall args
 #define APPS_MAIN_ARG       0x80000000  // ~1KB   main() args

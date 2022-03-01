@@ -16,6 +16,7 @@
 #include "log.h"
 #include "disk.h"
 #include "print.h"
+#include "servers.h"
 
 static void load_grass(elf_reader reader,
                        struct earth* earth,
@@ -24,10 +25,16 @@ static void load_grass(elf_reader reader,
 static void load_app(int pid,
                      elf_reader reader,
                      struct earth* earth,
+                     int argc, void** argv, 
                      struct elf32_program_header* pheader);
 
 
 void elf_load(int pid, elf_reader reader, struct earth* earth) {
+    elf_load_with_args(pid, reader, 0, NULL, earth);
+}
+
+void elf_load_with_args(int pid, elf_reader reader,
+                        int argc, void** argv, struct earth* earth) {
     char buf[BLOCK_SIZE];
     reader(0, buf);
     struct elf32_header *header = (void*) buf;
@@ -41,7 +48,7 @@ void elf_load(int pid, elf_reader reader, struct earth* earth) {
 
     switch (pheader.p_vaddr) {
     case APPS_ENTRY:
-        load_app(pid, reader, earth, &pheader);
+        load_app(pid, reader, earth, argc, argv, &pheader);
         break;
     case GRASS_ENTRY:
         load_grass(reader, earth, &pheader);
@@ -74,6 +81,7 @@ static void load_grass(elf_reader reader,
 static void load_app(int pid,
                      elf_reader reader,
                      struct earth* earth,
+                     int argc, void** argv,
                      struct elf32_program_header* pheader) {
     INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
@@ -107,6 +115,12 @@ static void load_app(int pid,
     /* allocate two pages for the app stack */
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+
+    /* base is at virtual address APPS_MAIN_ARG */
+    int* argc_addr = (int*)base;
+    *argc_addr = argc;
+    if (argc)
+        memcpy(argc_addr + 1, argv, CMD_NARGS * CMD_ARG_LEN);
 
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);

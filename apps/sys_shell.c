@@ -21,14 +21,15 @@ void parse_request(char* buf, struct proc_request* req);
 int main() {
     SUCCESS("Enter kernel process GPID_SHELL");
 
-    // get the inode of /home/yunhao
     int home = get_inode(0, "home");
     int yunhao = get_inode(home, "yunhao");
-    char work_dir_name[DIR_NAME_SIZE], work_dir[256];
+
+    grass->work_dir_ino = yunhao;
+    char *work_dir = grass->work_dir;
+    char *work_dir_name = grass->work_dir_name;
     strcpy(work_dir, "/home/yunhao");
     strcpy(work_dir_name, "yunhao");
     INFO("sys_shell: /home/yunhao has ino=%d", yunhao);
-
     
     /* Wait for shell commands */
     HIGHLIGHT("Welcome to egos-riscv!");

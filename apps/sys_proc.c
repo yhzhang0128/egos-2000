@@ -23,6 +23,8 @@ struct pcb_intf {
 void sys_file_init();
 void sys_dir_init();
 void sys_shell_init();
+static int proc_spawn(struct proc_request *req);
+
 
 int main(struct pcb_intf* _pcb) {
     SUCCESS("Enter kernel process GPID_PROCESS");    
@@ -49,18 +51,51 @@ int main(struct pcb_intf* _pcb) {
 
         struct proc_request *req = (void*)buf;
         if (sender == GPID_SHELL) {
-            INFO("sys_proc: got shell request with %d args", req->argc);
-            for (int i = 0; i < req->argc; i++)
-                INFO("%s", req->argv[i]);
-
-            struct proc_reply *reply = (void*)buf;
-            reply->type = CMD_OK;
-            sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
+            if (proc_spawn(req) != 0) {
+                struct proc_reply *reply = (void*)buf;
+                reply->type = CMD_ERROR;
+                sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
+            } else {
+                struct proc_reply *reply = (void*)buf;
+                reply->type = CMD_OK;
+                sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));                
+            }
         } else {
             // process killed
+            FATAL("TODO: sys_proc: process killed");
         }
 
     }
+}
+
+static int get_inode(int ino, char* name);
+static int proc_spawn(struct proc_request *req) {
+    int bin = get_inode(0, "bin");
+    int exec = get_inode(bin, req->argv[0]);
+
+    if (exec == -1) {
+        return -1;
+    } else {
+        INFO("TODO: spawn the process");
+        return 0;
+    }
+}
+
+static int get_inode(int ino, char* name) {
+    int sender;
+    struct dir_request req;
+    char buf[SYSCALL_MSG_LEN];
+
+    req.type = DIR_LOOKUP;
+    req.ino = ino;
+    strcpy(req.name, name);
+    sys_send(GPID_DIR, (void*)&req, sizeof(struct dir_request));
+    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    if (sender != GPID_DIR)
+        FATAL("sys_shell expects message from GPID_DIR");
+
+    struct dir_reply *reply = (void*)buf;
+    return reply->ino;
 }
 
 static int sys_file_read(int block_no, char* dst) {
