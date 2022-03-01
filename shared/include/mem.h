@@ -9,7 +9,8 @@
 #define EARTH_STRUCT        0x80003f80  // 128B   earth interface
 #define GRASS_STACK_TOP     0x80003f80  // ~8KB   kernel stack top
 #define APPS_STACK_TOP      0x80002000  // ~6KB   app stack top
-#define GRASS_SYSCALL_ARG   0x80000000  // ~2KB   syscall args
+#define GRASS_SYSCALL_ARG   0x80000400  // ~1KB   syscall args
+#define APPS_MAIN_ARG       0x80000000  // ~1KB   main() args
 #define DTIM_START          0x80000000
 
 #define ITIM_END            0x08008000
