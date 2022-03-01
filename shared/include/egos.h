@@ -1,7 +1,5 @@
 #pragma once
 
-#define KERNEL_STACK_TOP      0x08007f80 //0x08008000 - 128
-
 struct dev_log {
     int (*log_info)(const char *format, ...);
     int (*log_highlight)(const char *format, ...);
@@ -30,12 +28,3 @@ struct earth {
     /* helper functions for logging */
     struct dev_log log;
 };
-
-enum grass_servers {
-    GPID_UNUSED,
-    GPID_PROCESS,
-    GPID_FILE,
-    GPID_DIR,
-    GPID_SHELL,
-    GPID_USER_START
-}; 

@@ -6,6 +6,7 @@
 #include "elf.h"
 #include "disk.h"
 #include "print.h"
+#include "server.h"
 #include "syscall.h"
 
 struct earth *earth;

@@ -3,6 +3,7 @@
 #include "mem.h"
 #include "egos.h"
 #include "print.h"
+#include "server.h"
 #include "syscall.h"
 
 struct earth *earth = (void*)EARTH_STRUCT;
