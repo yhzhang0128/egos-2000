@@ -447,7 +447,7 @@ int treedisk_create(block_store_t *below, unsigned int below_ino, unsigned int n
 		HIGHLIGHT("treedisk: Created a new filesystem with %lu inodes\n", ninodes);
 	}
 	else {
-		HIGHLIGHT("treedisk: Attempted to create a new filesystem, but one already exists with %lu inodes\n",
+		HIGHLIGHT("treedisk: Attempted to create a new filesystem, but one already exists with %lu inodes",
 			superblock.superblock.n_inodeblocks * INODES_PER_BLOCK);
 		//assert(superblock.superblock.n_inodeblocks >= n_inodeblocks);
 	}
