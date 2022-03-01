@@ -31,22 +31,22 @@ char* kernel_processes[] = {
                             "bin/release/sys_shell.elf"
 };
 
-#define NINODE 5
+#define NINODE 7
 
 /* inode mappings:
-#0: /
-#1: /home
-#2: /home/yunhao
-#3: /home/rvr
-#4: /home/yunhao/README
- */
+#0: /              #1: /home               #2: /home/yunhao
+#3: /home/rvr      #4: /home/yunhao/README #5: /bin
+#6: /bin/echo      #7: /bin/ls             #8: /bin/cat
+*/
 
 char* contents[] = {
-                    ".   0 ..   0 home   1 \n",
-                    ".   1 ..   0 yunhao   2 rvr   3 \n",
+                    ".   0 ..   0 home   1 bin   5 ",
+                    ".   1 ..   0 yunhao   2 rvr   3 ",
                     ".   2 ..   1 README   4 ",
                     ".   3 ..   1 ",
-                    "This is the README file of egos-riscv!"
+                    "This is the README file of egos-riscv!",
+                    ".   5 ..   0 echo   6 ",
+                    "/bin/release/echo.elf"
 };
 
 char fs[FS_DISK_SIZE];
@@ -80,7 +80,7 @@ int main() {
         assert(st.st_size > 0);
 
         if (st.st_size > exec_size) {
-            fprintf(stderr, "[ERROR] file larger than 128KB\n");
+            fprintf(stderr, "[ERROR] file larger than %d\n", exec_size);
             return -1;
         }
 
@@ -112,7 +112,7 @@ int main() {
 block_if ramdisk_init();
 
 void mkfs() {
-    fprintf(stderr, "[INFO] Making the file system with treedisk\n");
+    fprintf(stderr, "[INFO] Create treedisk with %d inodes\n", NINODES);
 
     block_if ramdisk = ramdisk_init();    
     if (treedisk_create(ramdisk, 0, NINODES) < 0) {
@@ -123,8 +123,26 @@ void mkfs() {
 
     char buf[BLOCK_SIZE];
     for (int ino = 0; ino < NINODE; ino++) {
-        strncpy(buf, contents[ino], BLOCK_SIZE);
-        treedisk->write(treedisk, ino, 0, (void*)buf);
+        if (contents[ino][0] != '/') {
+            fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
+            strncpy(buf, contents[ino], BLOCK_SIZE);
+            treedisk->write(treedisk, ino, 0, (void*)buf);
+        } else {
+            struct stat st;
+            char* file_name = &contents[ino][1];
+            stat(file_name, &st);
+            
+            freopen(file_name, "r", stdin);
+            int nread = 0;
+            char file[GRASS_EXEC_SIZE / GRASS_NEXEC];
+            while (nread < st.st_size)
+                nread += read(0, file + nread, st.st_size - nread);
+            
+            fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, nread);
+            for (int b = 0; b * BLOCK_SIZE < st.st_size; b++) {
+                treedisk->write(treedisk, ino, b, (void*)(file + b * BLOCK_SIZE));
+            }
+        }
     }
     fprintf(stderr, "[INFO] Write %d inodes\n", NINODE);
 }
