@@ -46,6 +46,20 @@ int main(struct pcb_intf* _pcb) {
     
     while (1) {
         sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+
+        struct proc_request *req = (void*)buf;
+        if (sender == GPID_SHELL) {
+            INFO("sys_proc: got shell request with %d args", req->argc);
+            for (int i = 0; i < req->argc; i++)
+                INFO("%s", req->argv[i]);
+
+            struct proc_reply *reply = (void*)buf;
+            reply->type = CMD_OK;
+            sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
+        } else {
+            // process killed
+        }
+
     }
 }
 

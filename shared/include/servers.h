@@ -12,10 +12,10 @@ enum grass_servers {
 };
 
 struct file_request {
-    enum file_op {
-                  FILE_UNUSED,
-                  FILE_READ,
-                  FILE_WRITE,
+    enum {
+          FILE_UNUSED,
+          FILE_READ,
+          FILE_WRITE,
     } type;
     unsigned int ino;      // inode number
     unsigned int offset;   // offset
@@ -27,8 +27,8 @@ struct file_reply {
     block_t block;
 };
 
-#define DIR_ROOT_INO      1
-#define DIR_NAME_SIZE     32
+#define DIR_ROOT_INO    1
+#define DIR_NAME_SIZE   32
 struct dir_request {
     enum {
           DIR_UNUSED,
@@ -43,4 +43,23 @@ struct dir_request {
 struct dir_reply {
     enum dir_status { DIR_OK, DIR_ERROR } status;
     int ino;
+};
+
+#define CMD_NARGS       16
+#define CMD_ARG_LEN     32
+struct proc_request {
+    enum {
+          PROC_SPAWN,
+          PROC_KILLED
+    } type;
+    int pid;
+    int argc;
+    char argv[CMD_NARGS][CMD_ARG_LEN];
+};
+
+struct proc_reply {
+    enum {
+          CMD_OK,
+          CMD_ERROR
+    } type;
 };

@@ -16,6 +16,7 @@
 #define KNRM  "\x1B[1;0m"
 
 int get_inode(int ino, char* name);
+void parse_request(char* buf, struct proc_request* req);
 
 int main() {
     SUCCESS("Enter kernel process GPID_SHELL");
@@ -35,11 +36,20 @@ int main() {
     while (1) {
         printf("%s➜ %s%s%s ", KGRN, KCYN, work_dir_name, KNRM);
         tty_read(buf, 100);
+        if (strlen(buf) == 0) continue;
 
         if (strcmp(buf, "pwd") == 0) {
             printf("%s\r\n", work_dir);
         } else {
-            INFO("sys_shell: command not supported");
+            int sender;
+            struct proc_request req;
+            struct proc_reply reply;
+            parse_request(buf, &req);
+            sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+            sys_recv(&sender, (void*)&reply, sizeof(reply));
+
+            if (reply.type != CMD_OK)
+                INFO("sys_shell: command causes an error");
         }
     }
     return 0;
@@ -60,4 +70,20 @@ int get_inode(int ino, char* name) {
 
     struct dir_reply *reply = (void*)buf;
     return reply->ino;
+}
+
+void parse_request(char* buf, struct proc_request* req) {
+    int len = strlen(buf);
+    int idx = 0, nargs = 0;
+
+    memset(req->argv, 0, CMD_NARGS * CMD_ARG_LEN);
+    for (int i = 0; i < len; i++) {
+        if (buf[i] != ' ') {
+            req->argv[nargs][idx++] = buf[i];
+        } else if (idx != 0) {
+            nargs++;
+            idx = 0;
+        }
+    }
+    req->argc = ++nargs;
 }
