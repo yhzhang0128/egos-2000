@@ -17,6 +17,10 @@
 #include <assert.h>
 #include <sys/stat.h>
 
+#include "disk.h"
+#include "fs.h"
+#include "treedisk.h"
+
 char* kernel_processes[] = {
                             "bin/release/grass.elf",
                             "bin/release/sys_proc.elf",
@@ -42,30 +46,35 @@ char* contents[] = {
                  "This is the README file of egos-riscv!"
 };
 
-char buf[1024 * 1024];
+char fs[FS_DISK_SIZE];
+char exec[GRASS_EXEC_SIZE];
+char paging[PAGING_DEV_SIZE];
 
 int main() {
     freopen("disk.img", "w", stdout);
 
     /* paging area */
-    memset(buf, 0, 1024 * 1024);
-    write(1, buf, 1024 * 1024);
+    memset(paging, 0, PAGING_DEV_SIZE);
+    write(1, exec, PAGING_DEV_SIZE);
 
     /* grass kernel processes */
     int n = sizeof(kernel_processes) / sizeof(char*);
-    if (n > 8) {
-        fprintf(stderr, "[ERROR] more than 8 kernel processes\n");
+    if (n > GRASS_NEXEC) {
+        fprintf(stderr, "[ERROR] >%d kernel processes\n", GRASS_NEXEC);
         return -1;
     }
-    
+
+    int exec_size = GRASS_EXEC_SIZE / GRASS_NEXEC;
     fprintf(stderr, "[INFO] Loading %d kernel processes\n", n);
     for (int i = 0; i < n; i++) {
+        memset(exec, 0, GRASS_EXEC_SIZE);
+        
         struct stat st;
         stat(kernel_processes[i], &st);
         fprintf(stderr, "[INFO] Loading %s: %ld bytes\n", kernel_processes[i], (long)st.st_size);
         assert(st.st_size > 0);
 
-        if (st.st_size > 128 * 1024) {
+        if (st.st_size > exec_size) {
             fprintf(stderr, "[ERROR] file larger than 128KB\n");
             return -1;
         }
@@ -73,19 +82,19 @@ int main() {
         freopen(kernel_processes[i], "r", stdin);
         int nread = 0;
         while (nread < st.st_size)
-            nread += read(0, buf + nread, 128 * 1024 - nread);
+            nread += read(0, exec + nread, exec_size - nread);
 
-        write(1, buf, st.st_size);
-        write(1, buf, 128 * 1024 - st.st_size);
+        write(1, exec, st.st_size);
+        write(1, exec, exec_size - st.st_size);
     }
 
+    memset(exec, 0, GRASS_EXEC_SIZE);
     for (int i = 0; i < 8 - n; i++)
-        write(1, buf, 128 * 1024);
+        write(1, exec, exec_size);
         
     /* file system */
-    memset(buf, 0, 1024 * 1024);
-    write(1, buf, 1024 * 1024);
-    write(1, buf, 1024 * 1024);
+    memset(fs, 0, FS_DISK_SIZE);
+    write(1, fs, FS_DISK_SIZE);
     
     fclose(stdout);
     return 0;
