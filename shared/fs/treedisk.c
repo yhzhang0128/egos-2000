@@ -24,7 +24,6 @@
  * The layout of the file system is described in the file "treedisk.h".
  */
 
-//#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "fs.h"

@@ -14,9 +14,6 @@
  * 'init' function that returns a block_store_t *.  The block_store_t * is
  * a pointer to a structure that contains the following seven methods:
  *
- *      int getninodes(block_store_t *this_bs)
- *          returns the number of inodes of the block store
- *
  *      int getsize(block_store_t *this_bs, unsigned int ino)
  *          returns the size of the block store at the given inode number
  *			(inode numbers start at 0)
@@ -32,14 +29,6 @@
  *      int write(block_store_t *this_bs, unsigned int ino, block_no offset, block_t *block)
  *          write *block to the block at the given inode number and offset
  *          returns 0
- *
- *      int sync(block_store_t *this_bs, unsigned int ino)
- *          sync data in the block at the given inode number for write-back caches
- *          sync all data in the block for write-back caches if ino is (unsigned int) -1
- *          returns 0
- *
- *      void release(block_store_t *this_bs)
- *          clean up the block store interface
  *
  * All these return -1 upon error (typically after printing the
  * reason for the error).
@@ -74,6 +63,9 @@ typedef block_store_t *block_if;			// block store interface
  * 'block_store_t *' type.  Here are the 'init' functions of various
  * available block store types.
  */
+
+block_if disk_init();
+
 block_if treedisk_init(block_if below, unsigned int below_ino);
 int treedisk_create(block_if below, unsigned int below_ino, unsigned int ninodes);
 
