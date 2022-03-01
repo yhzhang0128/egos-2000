@@ -30,11 +30,11 @@ static void load_app(int pid,
 
 
 void elf_load(int pid, elf_reader reader, struct earth* earth) {
-    elf_load_with_args(pid, reader, 0, NULL, earth);
+    elf_load_with_arg(pid, reader, 0, NULL, earth);
 }
 
-void elf_load_with_args(int pid, elf_reader reader,
-                        int argc, void** argv, struct earth* earth) {
+void elf_load_with_arg(int pid, elf_reader reader,
+                       int argc, void** argv, struct earth* earth) {
     char buf[BLOCK_SIZE];
     reader(0, buf);
     struct elf32_header *header = (void*) buf;

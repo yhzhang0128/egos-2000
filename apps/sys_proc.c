@@ -55,10 +55,6 @@ int main(struct pcb_intf* _pcb) {
                 struct proc_reply *reply = (void*)buf;
                 reply->type = CMD_ERROR;
                 sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
-            } else {
-                struct proc_reply *reply = (void*)buf;
-                reply->type = CMD_OK;
-                sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));                
             }
         } else {
             // process killed
@@ -68,6 +64,32 @@ int main(struct pcb_intf* _pcb) {
     }
 }
 
+
+static int app_ino;
+static int app_read(int block_no, char* dst) {
+    int sender;
+    struct file_request req;
+    char buf[SYSCALL_MSG_LEN];
+    req.type = FILE_READ;
+    req.ino = app_ino;
+    req.offset = block_no;
+    sys_send(GPID_FILE, (void*)&req, sizeof(struct file_request));
+    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    if (sender != GPID_FILE)
+        FATAL("app_read expects message from GPID_FILE");
+
+    struct file_reply *reply = (void*)buf;
+    memcpy(dst, reply->block.bytes, BLOCK_SIZE);
+    return 0;
+}
+
+void app_init(struct proc_request *req) {
+    int app_pid = pcb.proc_alloc();
+    elf_load_with_arg(app_pid, app_read, req->argc, (void**)req->argv, earth);
+    pcb.proc_set_ready(app_pid);
+}
+
+
 static int get_inode(int ino, char* name);
 static int proc_spawn(struct proc_request *req) {
     int bin = get_inode(0, "bin");
@@ -76,7 +98,9 @@ static int proc_spawn(struct proc_request *req) {
     if (exec == -1) {
         return -1;
     } else {
-        INFO("TODO: spawn the process");
+        INFO("sys_proc: spawn the process");
+        app_ino = exec;
+        app_init(req);
         return 0;
     }
 }
