@@ -42,20 +42,10 @@ int main(struct pcb_intf* _pcb) {
         FATAL("sys_proc expects message from GPID_DIR");
     INFO("sys_proc receives: %s", buf);
 
-    struct dir_request req;
-    req.type = DIR_LOOKUP;
-    req.ino = 0;
-    req.name[0] = 'h';
-    req.name[1] = 'o';
-    req.name[2] = 'm';
-    req.name[3] = 'e';
-    req.name[4] = 0;
-    sys_send(GPID_DIR, (void*)&req, sizeof(struct dir_request));
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    struct dir_reply *reply = (void*)buf;
-    HIGHLIGHT("sys_proc: ino=%d for home", reply->ino);    
+    sys_shell_init();
     
     while (1) {
+        sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     }
 }
 
@@ -85,4 +75,18 @@ void sys_dir_init() {
     INFO("Load kernel process #%d: sys_dir", dir_pid);
     elf_load(dir_pid, sys_dir_read, earth);
     pcb.proc_set_ready(dir_pid);
+}
+
+static int sys_shell_read(int block_no, char* dst) {
+    return earth->disk_read(SYS_SHELL_EXEC_START + block_no, 1, dst);
+}
+
+void sys_shell_init() {
+    int shell_pid = pcb.proc_alloc();
+    if (shell_pid != GPID_SHELL)
+        FATAL("Process ID mismatch: %d != %d", shell_pid, GPID_SHELL);
+
+    INFO("Load kernel process #%d: sys_shell", shell_pid);
+    elf_load(shell_pid, sys_shell_read, earth);
+    pcb.proc_set_ready(shell_pid);
 }

@@ -22,13 +22,13 @@
 #include "fs.h"
 #include "treedisk.h"
 
-#define NKERNEL_PROC 4
+#define NKERNEL_PROC 5
 char* kernel_processes[] = {
                             "bin/release/grass.elf",
                             "bin/release/sys_proc.elf",
                             "bin/release/sys_file.elf",
                             "bin/release/sys_dir.elf",
-                            //"bin/release/sys_shell.elf"
+                            "bin/release/sys_shell.elf"
 };
 
 #define NINODE 5
