@@ -21,24 +21,47 @@ struct pcb_intf {
 } pcb;
 
 void sys_file_init();
-
+void sys_dir_init();
+void sys_shell_init();
 
 int main(struct pcb_intf* _pcb) {
     SUCCESS("Enter kernel process GPID_PROCESS");    
     memcpy(&pcb, _pcb, sizeof(struct pcb_intf));
 
-    sys_file_init();
+    int sender;
     char buf[SYSCALL_MSG_LEN];
-    sys_recv(buf, SYSCALL_MSG_LEN);
+    sys_file_init();
+    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    if (sender != GPID_FILE)
+        FATAL("sys_proc expects message from GPID_FILE");
     INFO("sys_proc receives message: %s", buf);
-    
+
 
     struct file_request req;
     req.type = FILE_READ;
     req.ino = 0;
     req.offset = 0;
     sys_send(GPID_FILE, (void*)&req, sizeof(struct file_request));
+    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    if (sender != GPID_FILE)
+        FATAL("sys_proc expects message from GPID_FILE");
+    HIGHLIGHT("GPID_PROCESS Get dir table:");
 
+    struct file_reply *reply = (void*)buf;
+    for (int i = 0; i < BLOCK_SIZE; i++) {
+        char ch = reply->block.bytes[i];
+        switch (ch) {
+        case 0:
+            i = BLOCK_SIZE;
+            break;
+        case '\n':
+            printf("\r\n");
+            break;
+        default:
+            printf("%c", ch);
+        }
+    }
+    
     while (1) {
     }
 }

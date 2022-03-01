@@ -29,13 +29,14 @@ int sys_send(int receiver, char* msg, int size) {
     return sc->retval;    
 }
 
-int sys_recv(char* buf, int size) {
+int sys_recv(int* sender, char* buf, int size) {
     if (size > SYSCALL_MSG_LEN)
         return -1;
 
     sc->type = SYS_RECV;
     sys_invoke();
     memcpy(buf, sc->payload.msg.msg, size);
+    *sender = sc->payload.msg.sender;
     return sc->retval;
 }
 

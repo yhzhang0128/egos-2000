@@ -11,47 +11,44 @@
 #include "fs.h"
 #include <string.h>
 
-block_if treedisk;
-void dirtable_dump();
+block_if fs;
 
 int main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
+    /* Initialize the file system */
     block_if disk = fs_disk_init();    
     if (treedisk_create(disk, 0, NINODES) < 0)
         FATAL("proc_file: can't create treedisk file system");
-    treedisk = treedisk_init(disk, 0);
-    dirtable_dump();
+    fs = treedisk_init(disk, 0);
 
+    /* Send notification to GPID_PROCESS */
+    int sender;
     char buf[SYSCALL_MSG_LEN];
     char* msg = "Finish GPID_FILE initialization";
     memcpy(buf, msg, 32);
     sys_send(GPID_PROCESS, buf, 32);
 
+    /* Wait for file requests */
     while (1) {
-        sys_recv(buf, SYSCALL_MSG_LEN);
+        sys_recv(&sender, buf, SYSCALL_MSG_LEN);
         struct file_request *req = (void*)buf;
-        INFO("GPID_FILE get request type=%d ino=%d offset=%d", req->type, req->ino, req->offset);
-    }
-    return 0;
-}
+        struct file_reply *reply = (void*)buf;
 
-
-void dirtable_dump() {
-    char buf[BLOCK_SIZE];
-    treedisk->read(treedisk, 0, 0, (void*)buf);
-    INFO("Get dir table:");
-
-    for (int i = 0; i < BLOCK_SIZE; i++) {
-        switch (buf[i]) {
-        case 0:
-            i = BLOCK_SIZE;
+        int r, type = req->type;
+        unsigned int ino = req->ino, offset = req->offset;
+        switch (type) {
+        case FILE_READ:
+            r = fs->read(fs, ino, offset, (void*)&reply->block);
+            reply->status = r == 0 ? FILE_OK : FILE_ERROR;
+            sys_send(sender, (void*)reply, sizeof(struct file_reply));
             break;
-        case '\n':
-            printf("\r\n");
+        case FILE_WRITE:
+            FATAL("TODO: FILE_WRITE to be implemented in GPID_FILE");
             break;
         default:
-            printf("%c", buf[i]);
+            FATAL("GPID_FILE get unknown request %d", type);
         }
     }
+    return 0;
 }

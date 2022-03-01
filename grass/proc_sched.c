@@ -144,7 +144,9 @@ static void proc_send(struct syscall *sc) {
         memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
         earth->mmu_switch(receiver);
 
+        sc->payload.msg.sender = curr_pid;
         memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
+
         earth->mmu_switch(curr_pid);
 
         proc_set_runnable(receiver);
@@ -174,6 +176,7 @@ static void proc_recv(struct syscall *sc) {
         struct sys_msg tmp;
         earth->mmu_switch(sender);
         memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
+        sc->payload.msg.receiver = curr_pid;
 
         earth->mmu_switch(curr_pid);
         memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
