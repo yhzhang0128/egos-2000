@@ -16,7 +16,7 @@ struct earth *earth;
 void timer_init();
 long long timer_reset();
 
-#define MAX_NPROCESS       64
+#define MAX_NPROCESS       16
 #define PID(x)    proc_set[x].pid
 
 enum {
