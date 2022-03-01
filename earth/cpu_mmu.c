@@ -4,13 +4,9 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: abstractions of the CPU memory management unit (MMU);
- * there are 256 physical frames at the start of the SD card and 20 of
- * them are cached in the memory (more precisely, in the CPU L1 cache);
- * the first 12 pages in memory are used as the virtual memory address
- * space for a process; there are totally 20 + 12 = 32 pages used by
- * kernel/user processes; other pages are used by earth and grass;
- * find more information in the documents
+ * Description: abstractions of the memory management unit (MMU);
+ * there are 256 physical frames at the start of the SD card and 28 of
+ * them are cached in the memory (more precisely, in the DTIM cache)
  */
 
 #include "egos.h"
