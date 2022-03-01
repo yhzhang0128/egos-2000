@@ -31,22 +31,21 @@ char* kernel_processes[] = {
                             //"bin/release/sys_shell.elf"
 };
 
-#define NINODE 6
-char* dir_names[] = {
-                     "\n",
-                     "/          1  \n",
-                     "home       2  \n",
-                     "yunhao     3  \n",
-                     "rvr        4  \n",
-                     "\n"
-};
+#define NINODE 5
+
+/* inode mappings:
+#0: /
+#1: /home
+#2: /home/yunhao
+#3: /home/rvr
+#4: /home/yunhao/README
+ */
 
 char* contents[] = {
-                    "",
-                    ".         1 ..        1 home      2 \n",
-                    ".         2 ..        1 yunhao    3 rvr       x4 \n",
-                    ".         3 ..        2 README    5 ",
-                    ".         4 ..        2 ",
+                    ".   0 ..   0 home   1 \n",
+                    ".   1 ..   0 yunhao   2 rvr   3 \n",
+                    ".   2 ..   1 README   4 ",
+                    ".   3 ..   1 ",
                     "This is the README file of egos-riscv!"
 };
 
@@ -122,31 +121,9 @@ void mkfs() {
     }
     block_if treedisk = treedisk_init(ramdisk, 0);
 
-    int n = NINODE;
-    char buf[BLOCK_SIZE * 10];
-    int table_len = 0;
-    for (int i = 0; i < n; i++) {
-        int len = sprintf(buf + table_len, "%s", dir_names[i]);
-        table_len += len;
-    }
-    buf[table_len++] = 0;
-
-    if (table_len > BLOCK_SIZE) {
-        fprintf(stderr, "TODO: dir table larger than BLOCK_SIZE");
-        exit(1);
-    }
-
-    /* inode#0 is for the dir table */
-    treedisk->write(treedisk, 0, 0, (void*)buf);
-
-    treedisk->read(treedisk, 0, 0, (void*)buf);
-    fprintf(stderr, "[INFO] Write dir table:\n");
-    fprintf(stderr, "%s", buf);
-
-    /* inode#1...#NINODE-1 */
-    for (int ino = 1; ino < NINODE; ino++) {
-        memset(buf, 0, BLOCK_SIZE);
-        strcpy(buf, contents[ino]);
+    char buf[BLOCK_SIZE];
+    for (int ino = 0; ino < NINODE; ino++) {
+        strncpy(buf, contents[ino], BLOCK_SIZE);
         treedisk->write(treedisk, ino, 0, (void*)buf);
     }
     fprintf(stderr, "[INFO] Write %d inodes\n", NINODE);

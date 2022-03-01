@@ -40,7 +40,20 @@ int main(struct pcb_intf* _pcb) {
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     if (sender != GPID_DIR)
         FATAL("sys_proc expects message from GPID_DIR");
-    INFO("sys_proc receives: %s", buf);    
+    INFO("sys_proc receives: %s", buf);
+
+    struct dir_request req;
+    req.type = DIR_LOOKUP;
+    req.ino = 0;
+    req.name[0] = 'h';
+    req.name[1] = 'o';
+    req.name[2] = 'm';
+    req.name[3] = 'e';
+    req.name[4] = 0;
+    sys_send(GPID_DIR, (void*)&req, sizeof(struct dir_request));
+    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    struct dir_reply *reply = (void*)buf;
+    HIGHLIGHT("sys_proc: ino=%d for home", reply->ino);    
     
     while (1) {
     }
