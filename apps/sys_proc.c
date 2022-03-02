@@ -57,6 +57,8 @@ int main(struct pcb_intf* _pcb) {
                 sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
             }
         } else if (req->type == PROC_KILLED) {
+            pcb.proc_free(sender);
+            
             struct proc_reply *reply = (void*)buf;
             reply->pid = sender;
             reply->type = CMD_OK;
@@ -102,7 +104,6 @@ static int proc_spawn(struct proc_request *req) {
     if (exec == -1) {
         return -1;
     } else {
-        INFO("sys_proc: spawn the process");
         app_ino = exec;
         app_init(req);
         return 0;

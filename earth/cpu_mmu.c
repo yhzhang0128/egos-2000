@@ -51,6 +51,26 @@ int mmu_alloc(int* frame_no, int* addr) {
     return -1;
 }
 
+int mmu_free(int pid) {
+    for (int i = 0; i < NFRAMES; i++) {
+        if (trans_table.frame[i].pid == pid &&
+            INUSE(trans_table.frame[i])) {
+            /* remove the mapping */
+            trans_table.frame[i].pid = 0;
+            trans_table.frame[i].page_no = 0;
+            trans_table.frame[i].flag = 0;
+
+            /* invalidate the cache */
+            for (int j = 0; j < CACHED_NFRAMES; j++) {
+                if (cache_frame_no[j] == i) {
+                    cache_frame_no[j] = -1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 int mmu_map(int pid, int page_no, int frame_no, int flag) {
     if (flag != F_ALL)
         FATAL("Memory protection not implemented in earth");

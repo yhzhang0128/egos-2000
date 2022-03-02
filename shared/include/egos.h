@@ -21,9 +21,10 @@ struct earth {
     int (*intr_register)(void (*handler)(int));
     int (*excp_register)(void (*handler)(int));
 
+    int (*mmu_free)(int pid);
     int (*mmu_alloc)(int* frame_no, int* addr);
-    int (*mmu_map)(int pid, int page_no, int frame_no, int flag);
     int (*mmu_switch)(int pid);
+    int (*mmu_map)(int pid, int page_no, int frame_no, int flag);
 
     /* helper functions for logging */
     struct dev_log log;

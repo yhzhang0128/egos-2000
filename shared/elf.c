@@ -83,8 +83,11 @@ static void load_app(int pid,
                      struct earth* earth,
                      int argc, void** argv,
                      struct elf32_program_header* pheader) {
-    INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
-    INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
+
+    if (pid < GPID_USER_START) {
+        INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
+        INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
+    }
 
     if (pheader->p_filesz > APPS_SIZE ||
         pheader->p_offset % BLOCK_SIZE != 0) {

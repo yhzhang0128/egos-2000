@@ -117,9 +117,8 @@ static void proc_syscall() {
     case SYS_SEND:
         proc_send(sc);
         break;
-    case SYS_EXIT:
-        proc_set[proc_curr_idx].status = PROC_ZOMBIE;
-        HIGHLIGHT("proc_syscall: exit not implemented %d", curr_pid);
+    default:
+        FATAL("proc_sched: got unknown syscall type %d", type);
     }
 }
 

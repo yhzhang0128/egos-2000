@@ -45,8 +45,5 @@ void sys_exit(int status) {
     struct proc_request req;
     req.type = PROC_KILLED;
     sys_send(GPID_PROCESS, (void*)&req, sizeof(struct proc_request));
-    
-    sc->type = SYS_EXIT;
-    sc->payload.exit.status = status;
-    sys_invoke();
+    while(1);
 }

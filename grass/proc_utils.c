@@ -40,10 +40,6 @@ int proc_alloc() {
     return -1;
 }
 
-void proc_free(int pid) {
-    FATAL("proc_free not implemented");
-}
-
 static void proc_set_status(int pid, int status) {
     for (int i = 0; i < MAX_NPROCESS; i++) {
         if (proc_set[i].pid == pid) {
@@ -51,6 +47,11 @@ static void proc_set_status(int pid, int status) {
             return;
         }
     }
+}
+
+void proc_free(int pid) {
+    earth->mmu_free(pid);
+    proc_set_status(pid, PROC_UNUSED);
 }
 
 void proc_set_ready(int pid) {

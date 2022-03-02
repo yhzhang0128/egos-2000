@@ -5,7 +5,6 @@
 
 enum syscall_type {
 	SYS_UNUSED,
-	SYS_EXIT,
 	SYS_RECV,
 	SYS_SEND,
 	SYS_NCALLS

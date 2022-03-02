@@ -61,6 +61,7 @@ int earth_init() {
     /* Initialize CPU memory management unit */
     if (mmu_init())
         FATAL("Failed at initializing the CPU interrupts");
+    earth.mmu_free = mmu_free;
     earth.mmu_alloc = mmu_alloc;
     earth.mmu_map = mmu_map;
     earth.mmu_switch = mmu_switch;
