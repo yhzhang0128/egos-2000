@@ -56,6 +56,7 @@ int dir_lookup(int ino, char* name) {
     int sender;
     struct file_request req;
     char buf[SYSCALL_MSG_LEN];
+
     req.type = FILE_READ;
     req.ino = ino;
     req.offset = 0;
