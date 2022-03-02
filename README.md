@@ -1,5 +1,7 @@
 # A minimal operating system for a real RISC-V board
 
+Within **2.7k** lines of code, our teaching OS implements SD card and TTY driver, interrupt handling, address translation, process creation and scheduling, system calls, file system, shell and 4 shell commands.
+
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
 The earth and grass operating system (EGOS) is our teaching OS at Cornell. It has three layers: 
@@ -12,27 +14,27 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
     * inter-process communication
 * the application layer on top of the operating system provides
     * file system
-    * shell and common shell commands
+    * shell and shell commands
 
 EGOS is minimal and very suitable for teaching an undergraduate operating system course.
 
 ```shell
-> cloc .
-      41 text files.
-      33 unique files.                              
-      16 files ignored.
+> cloc egos-riscv
+      52 text files.
+      48 unique files.                              
+       8 files ignored.
 
-github.com/AlDanial/cloc v 1.92  T=0.03 s (1089.7 files/s, 70829.1 lines/s)
+github.com/AlDanial/cloc v 1.92  T=0.03 s (1675.5 files/s, 135576.0 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               16            275            186            966
-C/C++ Header                    11             76             17            276
+C                               27            512            395           2021
+C/C++ Header                    15             99            110            406
 Markdown                         2             35              0            145
-Assembly                         3             10             21             70
+Assembly                         3              3             21             69
 make                             1             12              0             56
 -------------------------------------------------------------------------------
-SUM:                            33            408            224           1513
+SUM:                            48            661            526           2697
 -------------------------------------------------------------------------------
 ```
 
