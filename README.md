@@ -53,7 +53,7 @@ SUM:                            48            662            526           2698
 
 ## Tutorial and documentation
 
-For compiling and running egos-riscv, you can read [USAGES.md](USAGES.md). 
+For compiling and running egos-riscv, please read [USAGES.md](USAGES.md). 
 The [documentation](../../../documentation) further introduces the teaching plans, architecture and development history of egos-riscv.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
