@@ -51,7 +51,7 @@ SUM:                            48            662            526           2698
 * [optional] a tool to program a disk image file to the microSD card 
     * e.g., [balena Etcher](https://www.balena.io/etcher/) for all platforms
 
-## Tutorial and documentation
+## Usage and documentation
 
 For compiling and running egos-riscv, please read [USAGES.md](USAGES.md). 
 The [documentation](../../../documentation) further introduces the teaching plans, architecture and development history of egos-riscv.
