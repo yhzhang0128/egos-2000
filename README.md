@@ -24,17 +24,17 @@ EGOS is minimal and very suitable for teaching an undergraduate operating system
       48 unique files.                              
        8 files ignored.
 
-github.com/AlDanial/cloc v 1.92  T=0.03 s (1675.5 files/s, 135576.0 lines/s)
+github.com/AlDanial/cloc v 1.92  T=0.03 s (1619.1 files/s, 131083.6 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 C                               27            512            395           2021
 C/C++ Header                    15             99            110            406
-Markdown                         2             35              0            145
+Markdown                         2             36              0            146
 Assembly                         3              3             21             69
 make                             1             12              0             56
 -------------------------------------------------------------------------------
-SUM:                            48            661            526           2697
+SUM:                            48            662            526           2698
 -------------------------------------------------------------------------------
 ```
 
