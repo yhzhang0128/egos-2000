@@ -49,7 +49,7 @@ SUM:                            48            661            526           2697
 * a software to connect with ttyUSB
     * e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows
 * [optional] a tool to program a disk image file to the microSD card 
-    * e.g., [balena Etcher](https://www.balena.io/etcher/)
+    * e.g., [balena Etcher](https://www.balena.io/etcher/) for all platforms
 
 ## Tutorial and documentation
 
