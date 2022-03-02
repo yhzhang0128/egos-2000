@@ -31,7 +31,7 @@ char* kernel_processes[] = {
                             "bin/release/sys_shell.elf"
 };
 
-#define NINODE 8
+#define NINODE 9
 
 /* inode mappings:
 #0: /              #1: /home               #2: /home/yunhao
@@ -45,9 +45,10 @@ char* contents[] = {
                     ".   2 ..   1 README   4 ",
                     ".   3 ..   1 ",
                     "This is the README file of egos-riscv!",
-                    ".   5 ..   0 echo   6 ls   7 ",
+                    ".   5 ..   0 echo   6 ls   7 cat   8 ",
                     "/bin/release/echo.elf",
                     "/bin/release/ls.elf",
+                    "/bin/release/cat.elf",
 };
 /*NOTICE: in a dir, *4* bytes following the name gives the inode number*/
 
