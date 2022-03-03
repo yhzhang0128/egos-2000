@@ -13,7 +13,7 @@ apps: apps/*.c
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
 	  echo "Compile" $${FILE} "=>" $(RELEASE_DIR)/$${APP}.elf;\
-	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP}.elf;\
+	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP}.elf || exit 1 ;\
 	  echo "Compile" $${FILE} "=>" $(DEBUG_DIR)/$${APP}.lst;\
 	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP}.elf > $(DEBUG_DIR)/$${APP}.lst;\
 	done
