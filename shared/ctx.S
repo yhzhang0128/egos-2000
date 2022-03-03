@@ -26,7 +26,7 @@ ctx_start:
 	sw ra,52(sp)      /* save return address */
 	sw sp,0(a0)       /* save the current stack pointer */
 	mv sp,a1          /* switch the stack */
-	jal ctx_entry     /* call ctx_entry() */
+	call ctx_entry     /* call ctx_entry() */
 ctx_switch:
 	addi sp,sp,-64
 	sw s0,4(sp)      /* save callee-saved registers */
