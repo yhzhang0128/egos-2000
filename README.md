@@ -1,6 +1,6 @@
 # A minimal operating system for a real RISC-V board
 
-Within **2.7k** lines of code, our teaching OS implements SD card driver, serial TTY driver, interrupt handling, address translation, process creation and scheduling, system calls, file system, shell and 4 shell commands.
+With only **2.7k** lines of code, our teaching OS implements SD card driver, serial TTY driver, interrupt handling, address translation, process creation and scheduling, system calls, file system, shell and 4 shell commands.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
@@ -21,20 +21,20 @@ EGOS is minimal and very suitable for teaching an undergraduate operating system
 ```shell
 > cloc egos-riscv
       52 text files.
-      48 unique files.                              
-       8 files ignored.
+      52 unique files.                              
+       5 files ignored.
 
-github.com/AlDanial/cloc v 1.92  T=0.03 s (1619.1 files/s, 131083.6 lines/s)
+github.com/AlDanial/cloc v 1.82  T=0.03 s (1647.3 files/s, 133433.6 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               27            512            395           2021
-C/C++ Header                    15             99            110            406
+C                               27            515            393           2024
+C/C++ Header                    15             97            112            404
 Markdown                         2             36              0            146
 Assembly                         3              3             21             69
 make                             1             12              0             56
 -------------------------------------------------------------------------------
-SUM:                            48            662            526           2698
+SUM:                            48            663            526           2699
 -------------------------------------------------------------------------------
 ```
 
