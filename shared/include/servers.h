@@ -11,6 +11,25 @@ enum grass_servers {
     GPID_USER_START
 };
 
+#define CMD_NARGS       16
+#define CMD_ARG_LEN     32
+struct proc_request {
+    enum {
+          PROC_SPAWN,
+          PROC_KILLED
+    } type;
+    int argc;
+    char argv[CMD_NARGS][CMD_ARG_LEN];
+};
+
+struct proc_reply {
+    enum {
+          CMD_OK,
+          CMD_ERROR
+    } type;
+    int pid;
+};
+
 struct file_request {
     enum {
           FILE_UNUSED,
@@ -42,23 +61,4 @@ struct dir_request {
 struct dir_reply {
     enum dir_status { DIR_OK, DIR_ERROR } status;
     int ino;
-};
-
-#define CMD_NARGS       16
-#define CMD_ARG_LEN     32
-struct proc_request {
-    enum {
-          PROC_SPAWN,
-          PROC_KILLED
-    } type;
-    int argc;
-    char argv[CMD_NARGS][CMD_ARG_LEN];
-};
-
-struct proc_reply {
-    enum {
-          CMD_OK,
-          CMD_ERROR
-    } type;
-    int pid;
 };
