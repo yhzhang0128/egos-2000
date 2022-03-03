@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: a simple ls
+ * Description: a simple cat
  */
 
 

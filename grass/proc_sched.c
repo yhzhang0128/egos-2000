@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: process switching, communication and termination
+ * Description: process scheduling and communication
  * system calls are basically inter-process communication
  */
 

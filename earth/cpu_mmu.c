@@ -24,6 +24,9 @@ struct translation_table_t {
     } frame[NFRAMES];
 } trans_table;
 
+#define INUSE(x) (x.flag & F_INUSE)
+#define USE(x)   x.flag |= F_INUSE
+
 int curr_vm_pid;
 int cache_frame_no[CACHED_NFRAMES];
 struct frame_t* cache = (void*)FRAME_CACHE_START;

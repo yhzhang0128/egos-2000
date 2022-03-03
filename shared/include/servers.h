@@ -27,7 +27,6 @@ struct file_reply {
     block_t block;
 };
 
-#define DIR_ROOT_INO    1
 #define DIR_NAME_SIZE   32
 struct dir_request {
     enum {

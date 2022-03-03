@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: the earth kernel system calls
+ * Description: the grass kernel system calls
  */
 
 #include <string.h>

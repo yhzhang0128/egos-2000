@@ -8,7 +8,7 @@ static int disk_getsize(block_if this_bs, unsigned int ino){
 }
 
 static int disk_setsize(block_if this_bs, unsigned int ino, block_no newsize) {
-    FATAL("disk_setsize not implemented");
+    FATAL("Cannot set the size of the physical disk");
     return -1;
 }
 
