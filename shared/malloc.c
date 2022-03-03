@@ -4,10 +4,11 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: provide the _sbrk function to glibc malloc()
+ * Description: naive malloc and free; a better one is left to students
  */
 
 
+#include "mem.h"
 #include <stddef.h>
 
 /* heap region is defined in the memory layout scripts */
@@ -16,12 +17,14 @@ extern char __heap_end;
 
 static char* brk = &__heap_start;
 
-char* _sbrk(ptrdiff_t incr) {
+void* my_alloc(unsigned int size) {
     char* old = brk;
 
-    if (brk + incr >= &__heap_end)
-        return (void*) -1;
+    if (brk + size >= &__heap_end)
+        return NULL;
 
-    brk += incr;
-    return old;
+    brk += size;
+    return old;    
 }
+
+void my_free(void* ptr) {}

@@ -29,3 +29,11 @@
 #define F_WRITE             0x4
 #define F_EXEC              0x8
 #define F_ALL               0xf
+
+#undef malloc
+#undef free
+#define malloc my_alloc
+#define free   my_free
+
+void* my_alloc(unsigned int size);
+void my_free(void* ptr);
