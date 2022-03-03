@@ -10,10 +10,6 @@ enum syscall_type {
 	SYS_NCALLS
 };
 
-struct sys_exit {
-    int status;
-};
-
 struct sys_msg {
     int sender;
     int receiver;
@@ -23,7 +19,6 @@ struct sys_msg {
 struct syscall {
 	enum syscall_type type;
 	union {
-            struct sys_exit exit;
             struct sys_msg msg;
 	} payload;
     int retval;
