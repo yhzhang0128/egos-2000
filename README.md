@@ -16,7 +16,7 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
     * file system
     * shell and shell commands
 
-EGOS is minimal and very suitable for teaching an undergraduate operating system course.
+This RISC-V version of EGOS is minimal and very suitable for teaching an operating system course.
 
 ```shell
 > cloc egos-riscv
