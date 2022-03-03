@@ -8,7 +8,7 @@
  */
 
 #include "app.h"
-#include "fs.h"
+#include "file.h"
 #include <string.h>
 
 block_if fs;

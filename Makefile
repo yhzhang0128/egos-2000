@@ -21,7 +21,7 @@ apps: apps/*.c
 .PHONY: install
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(BUILD_DIR)/mkfs.c shared/fs/treedisk.c -DMKFS $(INCLUDE) -o $(BUILD_DIR)/mkfs
+	$(CC) $(BUILD_DIR)/mkfs.c shared/file/treedisk.c -DMKFS $(INCLUDE) -o $(BUILD_DIR)/mkfs
 	cd $(BUILD_DIR); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
@@ -41,7 +41,7 @@ EARTH_LAYOUT = -Tearth/layout.lds
 GRASS_SRCS = grass/enter.S grass/*.c shared/*.c shared/*.S
 GRASS_LAYOUT = -Tgrass/layout.lds
 
-APPS_SRCS = apps/enter.S shared/*.c shared/fs/*.c
+APPS_SRCS = apps/enter.S shared/*.c shared/file/*.c
 APPS_LAYOUT = -Tapps/layout.lds
 
 RISCV_CC = riscv64-unknown-elf-gcc
@@ -52,7 +52,7 @@ BUILD_DIR = install
 DEBUG_DIR = $(BUILD_DIR)/bin/debug
 RELEASE_DIR = $(BUILD_DIR)/bin/release
 
-INCLUDE = -Ishared/include -Ishared/fs
+INCLUDE = -Ishared/include -Ishared/file
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 

@@ -8,7 +8,6 @@
  */
 
 #include "app.h"
-#include "fs.h"
 #include <string.h>
 
 #define tty_read earth->tty_read

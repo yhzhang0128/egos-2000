@@ -8,7 +8,6 @@
  */
 
 #include "app.h"
-#include "fs.h"
 #include <string.h>
 
 int dir_lookup(int ino, char* name);

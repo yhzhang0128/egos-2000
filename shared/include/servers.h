@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fs.h"
+#include "file.h"
 
 enum grass_servers {
     GPID_UNUSED,

@@ -19,7 +19,7 @@
 #include <sys/stat.h>
 
 #include "disk.h"
-#include "fs.h"
+#include "file.h"
 #include "treedisk.h"
 
 #define NKERNEL_PROC 5

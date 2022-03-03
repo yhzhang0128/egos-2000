@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "fs.h"
+#include "file.h"
 #include "treedisk.h"
 
 #ifdef MKFS
