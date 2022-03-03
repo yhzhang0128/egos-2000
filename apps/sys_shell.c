@@ -11,6 +11,8 @@
 #include "fs.h"
 #include <string.h>
 
+#define tty_read earth->tty_read
+
 #define KGRN  "\x1B[1;32m"
 #define KCYN  "\x1B[1;36m"
 #define KNRM  "\x1B[1;0m"

@@ -10,6 +10,7 @@
 
 #include "app.h"
 
+#define tty_read earth->tty_read
 
 int main(int argc, char** argv) {
     if (argc > 1) {
