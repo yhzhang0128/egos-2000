@@ -6,13 +6,13 @@ With only **2.7k** lines of code, our teaching OS implements SD card driver, ser
 
 The earth and grass operating system (EGOS) is our teaching OS at Cornell. It has three layers: 
 
-* the **earth layer** provides *hardware-specific* abstractions
+* The **earth layer** provides *hardware-specific* abstractions.
     * tty and disk device interfaces
     * cpu interrupt and memory management interfaces
-* the **grass layer** provides *hardware-independent* abstractions
+* The **grass layer** provides *hardware-independent* abstractions.
     * processes and system calls
     * inter-process communication
-* the **application layer** on top of the operating system provides
+* The **application layer** provides
     * file system
     * shell and shell commands
 
