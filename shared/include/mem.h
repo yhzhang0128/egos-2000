@@ -30,10 +30,10 @@
 #define F_EXEC              0x8
 #define F_ALL               0xf
 
-#undef malloc
-#undef free
+#undef  malloc
 #define malloc my_alloc
-#define free   my_free
-
 void* my_alloc(unsigned int size);
+
+#undef  free
+#define free   my_free
 void my_free(void* ptr);
