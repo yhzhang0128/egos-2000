@@ -4,7 +4,7 @@ ENTRY(_enter)
 
 MEMORY
 {
-    ram (arw!xi) : ORIGIN = 0x08003000, LENGTH = 0x4000
+    ram (arw!xi) : ORIGIN = 0x08003000, LENGTH = 0x2000
 }
 
 PHDRS
@@ -15,7 +15,6 @@ PHDRS
 SECTIONS
 {
     __heap_size = 0x800;
-    __stack_size = 0x1800;
 
     .text : ALIGN(8) {
         *(.text .text.*)
@@ -48,10 +47,5 @@ SECTIONS
           PROVIDE( __heap_start = . );
           . = __heap_size;
           PROVIDE( __heap_end = . );
-    } >ram :ram
-
-
-    .stack (NOLOAD) : ALIGN(16) {
-        . += __stack_size;
     } >ram :ram
 }
