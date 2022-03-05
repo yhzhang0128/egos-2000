@@ -10,14 +10,16 @@
 
 
 #include "earth.h"
+#include "bus_uart.h"
 
 #define ENTER  0x0d
 #define CTRL_C 0x03
 
-int metal_tty_getc(int *c);
+static struct metal_uart* uart;
+
 int tty_read(char* buf, int len) {
     for (int c, i = 0; i < len - 1; i++) {
-        for (c = -1; c == -1; metal_tty_getc(&c));
+        for (c = -1; c == -1; metal_uart_getc(uart, &c));
         buf[i] = (char)c;
 
         switch (c) {
@@ -50,34 +52,7 @@ int tty_write(const char *format, ...)
     return r;
 }
 
-
-/* definitions for controlling UART in tty, copied from metal/uart.h */
-struct metal_uart;
-struct metal_uart_vtable {
-    void (*init)(struct metal_uart *uart, int baud_rate);
-    int (*putc)(struct metal_uart *uart, int c);
-    int (*txready)(struct metal_uart *uart);
-    int (*getc)(struct metal_uart *uart, int *c);
-    int (*get_baud_rate)(struct metal_uart *uart);
-    int (*set_baud_rate)(struct metal_uart *uart, int baud_rate);
-};
-
-struct metal_uart {
-    const struct metal_uart_vtable *vtable;
-};
-
-struct metal_uart *metal_uart_get_device(unsigned int device_num);
-__inline__ void metal_uart_init(struct metal_uart *uart, int baud_rate) {
-    uart->vtable->init(uart, baud_rate);
-}
-
-__inline__ int metal_uart_getc(struct metal_uart *uart, int *c) {
-    return uart->vtable->getc(uart, c);
-}
-
-
 int tty_init() {
-    struct metal_uart* uart;
     uart = metal_uart_get_device(0);
     metal_uart_init(uart, 115200);
     for (int i = 0; i < 2000000; i++);
