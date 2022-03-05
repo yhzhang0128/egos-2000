@@ -1,6 +1,6 @@
 # A minimal operating system for a real RISC-V board
 
-With only **2.7K** lines of code, our teaching OS implements SD card driver, serial TTY driver, interrupt handling, address translation, process creation and scheduling, system calls, file system, shell and 4 shell commands.
+With only **2.7K** lines of code, our teaching OS implements SD card driver, tty driver, interrupt handling, address translation, process creation and scheduling, system calls, file system, shell and 4 shell commands.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
