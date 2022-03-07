@@ -19,8 +19,8 @@ static void proc_syscall();
 static void (*kernel_entry)();
 
 int proc_curr_idx;
-struct process proc_set[MAX_NPROCESS];
-#define curr_pid  PID(proc_curr_idx)
+struct  process   proc_set[MAX_NPROCESS];
+#define curr_pid  proc_set[proc_curr_idx].pid
 
 void intr_entry(int id) {
     unsigned int mepc;
@@ -78,7 +78,7 @@ static void proc_yield() {
         return;
     }
 
-    int next_pid = PID(proc_next_idx);
+    int next_pid = proc_set[proc_next_idx].pid;
     int next_status = proc_set[proc_next_idx].status;
     int curr_status = proc_set[proc_curr_idx].status;
 

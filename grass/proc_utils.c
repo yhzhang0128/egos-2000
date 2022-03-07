@@ -21,9 +21,9 @@ void proc_init() {
     memset(proc_set, 0, sizeof(struct process) * MAX_NPROCESS);
 
     /* the first process is now running */
-    proc_alloc();
+    int pid = proc_alloc();
     proc_curr_idx = 0;
-    proc_set_running(PID(proc_curr_idx));
+    proc_set_running(pid);
 }
 
 int proc_alloc() {
