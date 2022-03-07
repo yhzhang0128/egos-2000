@@ -1,5 +1,4 @@
-#ifndef _EGOS_BLOCK_STORE_H
-#define _EGOS_BLOCK_STORE_H
+#pragma once
 /*
  * (C) 2017, Cornell University
  * All rights reserved.
@@ -68,5 +67,3 @@ block_if fs_disk_init();
 
 block_if treedisk_init(block_if below, unsigned int below_ino);
 int treedisk_create(block_if below, unsigned int below_ino, unsigned int ninodes);
-
-#endif
