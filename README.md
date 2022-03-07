@@ -17,6 +17,7 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
 This RISC-V version of EGOS is minimal in order to give students the **complete** picture of a working operating system.
 
 ```shell
+> cloc egos-riscv
       53 text files.
       53 unique files.                              
        5 files ignored.
