@@ -44,7 +44,6 @@ struct pcb_intf {
     void (*proc_set_ready)(int);
 };
 
-void proc_init();
 int  proc_alloc();
 void proc_free(int);
 void proc_set_ready (int);

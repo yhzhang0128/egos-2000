@@ -13,6 +13,8 @@
 
 struct pcb_intf pcb;
 struct earth *earth = (void*)EARTH_STRUCT;
+
+void proc_init();
 static void sys_proc_init();
 
 int main() {
