@@ -22,8 +22,10 @@ void proc_init() {
 
     /* the first process is now running */
     int pid = proc_alloc();
-    proc_curr_idx = 0;
     proc_set_running(pid);
+
+    if (pid != GPID_PROCESS)
+        FATAL("Process ID mismatch: %d != %d", pid, GPID_PROCESS);
 }
 
 int proc_alloc() {

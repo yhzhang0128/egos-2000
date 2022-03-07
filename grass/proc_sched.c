@@ -52,10 +52,9 @@ void ctx_entry() {
     /* kernel_entry is either proc_yield() or proc_syscall() */
     kernel_entry();
     /* switch back to the user application (intr_entry) */
-    void* tmp;
-    int mepc = (int)proc_set[proc_curr_idx].mepc;
+    int tmp, mepc = (int)proc_set[proc_curr_idx].mepc;
     __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
-    ctx_switch(&tmp, proc_set[proc_curr_idx].sp);
+    ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
 }
 
 static void proc_yield() {
@@ -103,8 +102,8 @@ static void proc_send(struct syscall *sc);
 static void proc_recv(struct syscall *sc);
 
 static void proc_syscall() {
-    /* software interrupt for system call */
     struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
+
     int type = sc->type;
     sc->retval = 0;
     sc->type = SYS_UNUSED;
@@ -118,7 +117,7 @@ static void proc_syscall() {
         proc_send(sc);
         break;
     default:
-        FATAL("proc_sched: got unknown syscall type %d", type);
+        FATAL("proc_sched: got unknown syscall type=%d", type);
     }
 }
 
