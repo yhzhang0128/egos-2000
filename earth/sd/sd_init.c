@@ -23,8 +23,6 @@ int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
 
 int sdinit() {
     long baud_rate = 100000;
-    long clock_rate = 65000000;
-
     struct metal_spi *spi = metal_spi_get_device(0);
     metal_spi_set_baud_rate(spi, baud_rate);
     printf("[INFO] Set SPI clock frequency to %ldHz\r\n", baud_rate);
@@ -39,7 +37,8 @@ int sdinit() {
         return -1;        
     }
 
-    baud_rate = clock_rate / 4;
+    long cpu_clock_rate = 65000000;
+    baud_rate = cpu_clock_rate / 4;
     metal_spi_set_baud_rate(spi, baud_rate);
     printf("[INFO] Set SPI clock frequency to %ldHz\r\n", baud_rate);
 
