@@ -76,7 +76,7 @@ int mmu_free(int pid) {
 
 int mmu_map(int pid, int page_no, int frame_no, int flag) {
     if (flag != F_ALL)
-        FATAL("Memory protection not implemented in earth");
+        FATAL("Memory protection not implemented");
     
     if (!INUSE(trans_table.frame[frame_no])) {
         INFO("Frame %d has not been allocated", frame_no);
@@ -155,12 +155,15 @@ static int cache_read(int frame_no) {
 
     if (free_no != -1) {
         cache_frame_no[free_no] = frame_no;
-        int group = PAGE_SIZE / BLOCK_SIZE;
-        disk_read(free_no * group, group, (char*)(cache + free_no));
+
+        if (INUSE(trans_table.frame[frame_no])) {
+            int group = PAGE_SIZE / BLOCK_SIZE;
+            disk_read(free_no * group, group, (char*)(cache + free_no));
+        }
 
         return (int)(cache + free_no);
     } else {
-        FATAL("Cache is full in cache_read(), cpu_mmu.c");
+        FATAL("Frame cache is full but eviction is not implemented");
     }
 }
 
@@ -173,5 +176,5 @@ static int cache_write(int frame_no, struct frame_t* src) {
         }
     }
 
-    FATAL("Cache is full in cache_write(), cpu_mmu.c");
+    FATAL("Frame cache is full but eviction is not implemented");
 }
