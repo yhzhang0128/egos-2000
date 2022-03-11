@@ -78,7 +78,8 @@ int dir_lookup(int ino, char* name) {
                 match = 0;
                 break;
             }
-        if (match) {
+
+        if (match && reply->block.bytes[i + name_len] == ' ') {
             int ino = 0, base = i + name_len;
             for (int k = 0; k < 4; k++) {
                 char ch = reply->block.bytes[base + k];
