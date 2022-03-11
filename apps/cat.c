@@ -32,13 +32,16 @@ int main(int argc, char** argv) {
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
 
     struct dir_reply *reply1 = (void*)buf;
-    int file_ino = reply1->ino;
+    if (reply1->status != DIR_OK) {
+        INFO("file %s not found", file_name);
+        sys_exit(1);
+    }
 
     /* Read the file */
     struct file_request req2;
 
     req2.type = FILE_READ;
-    req2.ino = file_ino;
+    req2.ino = reply1->ino;
     req2.offset = 0;
     sys_send(GPID_FILE, (void*)&req2, sizeof(struct file_request));
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
