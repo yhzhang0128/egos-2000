@@ -180,6 +180,7 @@ static int sd_spi_reset(struct metal_spi *spi) {
     return 0;
 }
 
+/* Code below is copied from the metal library */
 static int sd_spi_configure(struct metal_spi *spi) {
     struct metal_spi_config spi_config;
     struct metal_spi_config *config = &spi_config;
