@@ -157,8 +157,8 @@ static int cache_read(int frame_no) {
         cache_frame_no[free_no] = frame_no;
 
         if (INUSE(trans_table.frame[frame_no])) {
-            int group = PAGE_SIZE / BLOCK_SIZE;
-            disk_read(free_no * group, group, (char*)(cache + free_no));
+            int nblocks = PAGE_SIZE / BLOCK_SIZE;
+            disk_read(free_no * nblocks, nblocks, (char*)(cache + free_no));
         }
 
         return (int)(cache + free_no);
