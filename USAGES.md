@@ -1,7 +1,6 @@
 # Compile and Run EGOS on Arty
 
-You can use Linux, Mac or Windows to compile egos-riscv.
-But Vivado is needed to program the bootROM image to the Arty board and Vivado only supports Linux and Windows.
+You can use Linux, Mac or Windows.
 
 ## Step1: Setup compiler and compile egos-riscv
 
@@ -30,7 +29,7 @@ mkdir -p build/debug build/release
 ......
 ```
 
-This will create two directories `debug` and `release` in `build`. 
+
 `release` holds the ELF format binary executables and `debug` holds the human readable assembly files.
 
 ## Step2: Create the disk and bootROM images
@@ -44,7 +43,7 @@ This will create two directories `debug` and `release` in `build`.
 ......
 ```
 
-This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in `utils`.
+This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `utils` directory.
 You can use tools like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD.
 
 ## Step3: Program the Arty FPGA board
@@ -78,7 +77,7 @@ If you choose the wrong one, step8 will tell you.
 ### MacOS
 
 Install [Homebrew](https://brew.sh/).
-Then install `openocd` using Homebrew: Type `brew install openocd` in your terminal. 
+Then install `openocd` using Homebrew by typing `brew install openocd` in your terminal. 
 
 Prepare a text file `7series.txt` with the following content. 
 Replace the `$(EGOS_RISCV_DIR)` with your own egos-riscv path.
@@ -113,9 +112,8 @@ jtagspi_program $(EGOS_RISCV_DIR)/utils/bootROM.bin 0
 exit
 ```
 
-In your terminal, type `openocd -f 7series.txt` and wait for about 3 minutes for the process to finish.
+In your terminal, type `openocd -f 7series.txt` and wait for about 3 minutes for the program to finish.
 Then refer to step11-13 in the Windows/Linux instructions above.
-
 This method is borrowed from [this wiki](https://github.com/byu-cpe/BYU-Computing-Tutorials/wiki/Program-7-Series-FPGA-from-a-Mac-or-Linux-Without-Xilinx?_ga=2.208554260.708413845.1647041461-635131311.1640671103).
 
 ## Modify and recompile the processor
