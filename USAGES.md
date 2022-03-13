@@ -16,9 +16,10 @@ Setup your working directory and name it as `$ARTY`.
 Download the SiFive [riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to the working directory.
 
 ```shell
-> cd $ARTY/egos-riscv
+> cd $ARTY
 > tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
 > export PATH=$PATH:$ARTY/riscv64-unknown...../bin
+> cd $ARTY/egos-riscv
 > make
 mkdir -p build/debug build/release
 -------- Compile the Apps Layer --------
