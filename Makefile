@@ -26,7 +26,7 @@ install:
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(UTILS_DIR)/earth.bin
 	$(CC) $(UTILS_DIR)/mkrom.c -o $(UTILS_DIR)/mkrom
-	cd $(UTILS_DIR); ./mkrom ; rm mkfs mkrom earth.bin
+	cd $(UTILS_DIR); ./mkrom ; rm earth.bin
 
 clean:
 	rm -rf build
