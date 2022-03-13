@@ -1,6 +1,6 @@
 # Compile and Run EGOS on Arty
 
-You can use Windows, Linux or MacOS.
+You can use Windows, Linux or MacOS. For Windows users, use WSL (Windows Subsystem for Linux) for step1 and step2.
 
 ## Step1: Setup compiler and compile egos-riscv
 
