@@ -15,6 +15,7 @@ struct metal_spi {
 };
 
 struct metal_spi *metal_spi_get_device(unsigned int device_num);
+
 __inline__ int metal_spi_set_baud_rate(struct metal_spi *spi, int baud_rate) {
     return spi->vtable->set_baud_rate(spi, baud_rate);
 }

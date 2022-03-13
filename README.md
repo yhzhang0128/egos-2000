@@ -19,19 +19,19 @@ This RISC-V version of EGOS is minimal in order to give students the **complete*
 ```shell
 > cloc egos-riscv --exclude-ext=md
       53 text files.
-      47 unique files.                              
-      10 files ignored.
+      53 unique files.                              
+       7 files ignored.
 
-github.com/AlDanial/cloc v 1.92  T=0.03 s (1673.1 files/s, 131247.8 lines/s)
+github.com/AlDanial/cloc v 1.82  T=0.03 s (1767.1 files/s, 135987.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               27            511            388           1996
-C/C++ Header                    16            101            112            421
+C                               27            508            387           1957
+C/C++ Header                    16             99            102            406
 Assembly                         3              3             21             69
 make                             1             12              0             53
 -------------------------------------------------------------------------------
-SUM:                            47            627            521           2539
+SUM:                            47            622            510           2485
 -------------------------------------------------------------------------------
 ```
 
