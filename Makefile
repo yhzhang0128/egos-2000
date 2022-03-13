@@ -21,18 +21,18 @@ apps: apps/*.c
 .PHONY: install
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(TOOL_DIR)/mkfs.c shared/file/treedisk.c -DMKFS $(INCLUDE) -o $(TOOL_DIR)/mkfs
-	cd $(TOOL_DIR); ./mkfs
+	$(CC) $(UTILS_DIR)/mkfs.c shared/file/treedisk.c -DMKFS $(INCLUDE) -o $(UTILS_DIR)/mkfs
+	cd $(UTILS_DIR); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(TOOL_DIR)/earth.bin
-	$(CC) $(TOOL_DIR)/mkrom.c -o $(TOOL_DIR)/mkrom
-	cd $(TOOL_DIR); ./mkrom ; rm mkfs mkrom earth.bin
+	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(UTILS_DIR)/earth.bin
+	$(CC) $(UTILS_DIR)/mkrom.c -o $(UTILS_DIR)/mkrom
+	cd $(UTILS_DIR); ./mkrom ; rm mkfs mkrom earth.bin
 
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
-	rm -rf $(TOOL_DIR)/mkfs $(TOOL_DIR)/mkrom
-	rm -rf $(TOOL_DIR)/disk.img $(TOOL_DIR)/bootROM.mcs $(TOOL_DIR)/bootROM.bin
-	rm -rf $(TOOL_DIR)/earth.bin $(TOOL_DIR)/*.log
+	rm -rf $(UTILS_DIR)/mkfs $(UTILS_DIR)/mkrom
+	rm -rf $(UTILS_DIR)/disk.img $(UTILS_DIR)/bootROM.mcs $(UTILS_DIR)/bootROM.bin
+	rm -rf $(UTILS_DIR)/earth.bin $(UTILS_DIR)/*.log
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
@@ -47,8 +47,8 @@ RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
-TOOL_DIR = tools
-BUILD_DIR = $(TOOL_DIR)/build
+UTILS_DIR = utils
+BUILD_DIR = $(UTILS_DIR)/build
 DEBUG_DIR = $(BUILD_DIR)/debug
 RELEASE_DIR = $(BUILD_DIR)/release
 
