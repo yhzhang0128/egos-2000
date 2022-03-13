@@ -21,7 +21,7 @@ Download the SiFive [riscv-gcc compiler](https://github.com/sifive/freedom-tools
 > tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
 > export PATH=$PATH:$ARTY/riscv64-unknown...../bin
 > make
-mkdir -p install/bin/debug install/bin/release
+mkdir -p install/build/debug install/build/release
 -------- Compile the Apps Layer --------
 ......
 -------- Compile the Grass Layer --------

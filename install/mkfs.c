@@ -46,9 +46,9 @@ char* contents[] = {
                     ".   3 ..   1 ",
                     "This is the README file of egos-riscv!",
                     ".   5 ..   0 echo   6 ls   7 cat   8 ",
-                    "/bin/release/echo.elf",
-                    "/bin/release/ls.elf",
-                    "/bin/release/cat.elf",
+                    "/build/release/echo.elf",
+                    "/build/release/ls.elf",
+                    "/build/release/cat.elf",
 };
 /*NOTICE: in a dir, *4* bytes following the name gives the inode number*/
 
