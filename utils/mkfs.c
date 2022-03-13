@@ -107,7 +107,7 @@ int main() {
     write(1, fs, FS_DISK_SIZE);
     fclose(stdout);
 
-    fprintf(stderr, "[INFO] Finish making the disk image %d %d %d\n", PAGING_DEV_SIZE, GRASS_EXEC_SIZE, FS_DISK_SIZE);
+    fprintf(stderr, "[INFO] Finish making the disk image\n");
     return 0;
 }
 
