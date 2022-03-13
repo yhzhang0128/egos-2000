@@ -33,7 +33,7 @@ int main() {
     INFO("sys_shell: /home/yunhao has ino=%d", yunhao);
     
     /* Wait for shell commands */
-    HIGHLIGHT("Welcome to egos-riscv!");
+    HIGHLIGHT("Welcome to egos-riscv compiled by Mac!");
     char buf[128];
     while (1) {
         printf("%s➜ %s%s%s ", KGRN, KCYN, work_dir_name, KNRM);

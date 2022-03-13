@@ -22,7 +22,9 @@
 char disk_file[]  = "disk.img";
 char earth_file[] = "earth.bin";
 char fe310_file[] = "bin/fe310_cpu.bit";
-char output_file[]= "bootROM.mcs";
+
+char output_bit[] = "bootROM.bit";
+char output_mcs[] = "bootROM.mcs";
 
 char mem_fe310[4 * 1024 * 1024];
 char mem_earth[4 * 1024 * 1024];
@@ -31,6 +33,7 @@ char mem_disk [6 * 1024 * 1024];
 void load_fe310();
 void load_earth();
 void load_disk();
+void write_bitstream();
 void write_intel_mcs();
 void write_section(char* mem, int base, int size);
 
@@ -40,13 +43,35 @@ int main() {
     load_fe310();
     load_earth();
     load_disk();
+    write_bitstream();
     write_intel_mcs();
     
     return 0;
 }
 
+void write_bitstream() {
+    freopen(output_bit, "a", stdout);
+    int length = (4 + 4 + 6) * 1024 * 1024;
+    putw(length, stdout);
+
+    for (int i = 0; i < 4 * 1024 * 1024; i++)
+        putchar(mem_fe310[i]);
+    fprintf(stderr, "[INFO] FE310 written\n");
+
+    for (int i = 0; i < 4 * 1024 * 1024; i++)
+        putchar(mem_earth[i]);
+    fprintf(stderr, "[INFO] Earth written\n");
+
+    for (int i = 0; i < 6 * 1024 * 1024; i++)
+        putchar(mem_disk[i]);
+    fprintf(stderr, "[INFO] Disk image written\n");
+
+    fclose(stdout);
+    fprintf(stderr, "[INFO] Finish making the bootROM bitstream\n");
+}
+
 void write_intel_mcs() {
-    freopen(output_file, "w", stdout);
+    freopen(output_mcs, "w", stdout);
 
     write_section(mem_fe310, 0x00, fe310_size);
     fprintf(stderr, "[INFO] FE310 written\n");
@@ -62,7 +87,7 @@ void write_intel_mcs() {
     printf(":00000001FF\n");
     
     fclose(stdout);
-    fprintf(stderr, "[INFO] Finish making the bootROM image\n");
+    fprintf(stderr, "[INFO] Finish making the bootROM mcs image\n");
 }
 
 void write_section(char* mem, int base, int size) {

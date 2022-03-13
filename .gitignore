@@ -9,5 +9,6 @@ mkrom
 *.bin
 *.log
 *.mcs
+*.bit
 *.img
 *.prm
