@@ -119,4 +119,5 @@ exit
 Download file `bscan_spi_xc7a35t.bit` from [here](https://github.com/quartiq/bscan_spi_bitstreams/blob/master/bscan_spi_xc7a35t.bit) and put it in the same directory as `7series.txt`.
 In your terminal, type `openocd -f 7series.txt` and wait for about 3 minutes until the program finishes.
 Then refer to step9-13 in the Windows/Linux instructions above.
+
 This method is borrowed from [this wiki](https://github.com/byu-cpe/BYU-Computing-Tutorials/wiki/Program-7-Series-FPGA-from-a-Mac-or-Linux-Without-Xilinx?_ga=2.208554260.708413845.1647041461-635131311.1640671103).
