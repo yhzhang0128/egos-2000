@@ -21,7 +21,7 @@ Download the SiFive [riscv-gcc compiler](https://github.com/sifive/freedom-tools
 > tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
 > export PATH=$PATH:$ARTY/riscv64-unknown...../bin
 > make
-mkdir -p install/build/debug install/build/release
+mkdir -p build/debug build/release
 -------- Compile the Apps Layer --------
 ......
 -------- Compile the Grass Layer --------
@@ -30,7 +30,7 @@ mkdir -p install/build/debug install/build/release
 ......
 ```
 
-This will create two directories `debug` and `release` in `install/bin`. 
+This will create two directories `debug` and `release` in `build`. 
 `release` holds the ELF format binary executables and `debug` holds the human readable assembly files.
 
 ## Step2: Create the disk and bootROM images
@@ -44,11 +44,12 @@ This will create two directories `debug` and `release` in `install/bin`.
 ......
 ```
 
-This will create `disk.img` and `bootROM.mcs` in `install`.
+This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in `utils`.
 You can use tools like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD.
 
 ## Step3: Program the Arty FPGA board
 
+### Windows and Linux
 Install Vivado Lab Edition which can be downloaded [here](https://drive.google.com/file/d/1VS6_mxb6yrAxdDtlXkHdB-8jg9CScacw/view?usp=sharing) or [here](https://www.xilinx.com/support/download.html). You may need to register a Xilinx account, but the software is free.
 
 1. Connect the Arty FPGA board to your computer with the USB cable
@@ -74,50 +75,51 @@ In step4, if the Arty board is not detected, try to reinstall the USB cable driv
 In step6, old versions of Arty may use "mt25ql128-spi-x1_x2_x4" as memory device. 
 If you choose the wrong one, step8 will tell you.
 
-## Appendix: Modify and recompile the processor
+### MacOS
+
+Install [Homebrew](https://brew.sh/).
+Then install `openocd` using Homebrew: Type `brew install openocd` in your terminal. 
+
+Prepare a text file `7series.txt` with the following content. 
+Replace the `$(EGOS_RISCV_DIR)` with your own egos-riscv path.
+
+```
+# File: 7series.txt
+interface ftdi
+ftdi_device_desc "Digilent USB Device"
+ftdi_vid_pid 0x0403 0x6010
+
+# channel 1 does not have any functionality
+ftdi_channel 0
+
+# just TCK TDI TDO TMS, no reset
+ftdi_layout_init 0x0088 0x008b
+reset_config none
+adapter_khz 10000
+
+source [find cpld/xilinx-xc7.cfg]
+source [find cpld/jtagspi.cfg]
+
+init
+
+puts [irscan xc7.tap 0x09]
+puts [drscan xc7.tap 32 0]  
+
+puts "Programming FPGA..."
+
+jtagspi_init 0 bscan_spi_xc7a35t.bit
+jtagspi_program $(EGOS_RISCV_DIR)/utils/bootROM.bin 0 
+
+exit
+```
+
+In your terminal, type `openocd -f 7series.txt` and wait for about 3 minutes for the process to finish.
+Then refer to step11-13 in the Windows/Linux instructions above.
+
+This method is borrowed from [this wiki](https://github.com/byu-cpe/BYU-Computing-Tutorials/wiki/Program-7-Series-FPGA-from-a-Mac-or-Linux-Without-Xilinx?_ga=2.208554260.708413845.1647041461-635131311.1640671103).
+
+## Modify and recompile the processor
 
 In rare cases, you may want to modify the FE310 RISC-V processor.
 For example, we have modified the processor to increase the cache size from 32KB to 160KB, increase the clock frequency from 32MHz to 65MHz and connect its SPI bus controller to the microSD card.
-
-We prepared a docker image encapsulating the toolchain environment.
-
-```shell
-# This image takes ~45GB of disk space.
-> docker pull yhzhang0128/arty-toolchain:latest
-> docker run -it \
-	--mount type=bind,source=$ARTY,target=/root/host \
-	yhzhang0128/arty-toolchain:latest
-# enter the shell of docker container
-# $ARTY on the host machine is mapped to /root/host in the docker container
-
-root@579c433a6161:/# cd /root/fe310-cpu
-# do your modifications in this directory
-
-# compile the processor
-# could take 15-20 minutes
-root@579c433a6161:/# ./4411.sh
-......
-......
-===================================
-Configuration Memory information
-===================================
-File Format        MCS
-Interface          SPIX4
-Size               16M
-Start Address      0x00000000
-End Address        0x00FFFFFF
-
-Addr1         Addr2         Date                    File(s)
-0x00000000    0x0021728B    Jan 26 02:14:02 2022    /root/fe310-cpu/builds/e300artydevkit/obj/E300ArtyDevKitFPGAChip.bit
-0x00400000    0x00415047    Jan 27 16:45:46 2022    /root/fe310-cpu/earth.bin
-0x00800000    0x009FFFFF    Jan 26 01:52:57 2022    /root/fe310-cpu/disk.img
-0 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
-write_cfgmem completed successfully
-INFO: [Common 17-206] Exiting Vivado at Thu Jan 27 16:45:59 2022...
-
-
-# copy the processor binary from docker container
-# to the egos-riscv repository in the host machine
-root@579c433a6161:/# cp ./builds/e300artydevkit/obj/E300ArtyDevKitFPGAChip.bit \
-                        /root/host/egos-riscv/install/arty_board/fe310_cpu.bit
-```
+Contact [Yunhao Zhang](https://dolobyte.net/) if you wish to do so.
