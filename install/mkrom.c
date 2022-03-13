@@ -21,7 +21,7 @@
 
 char disk_file[]  = "disk.img";
 char earth_file[] = "earth.bin";
-char fe310_file[] = "bin/fe310_cpu.bin";
+char fe310_file[] = "build/fe310_cpu.bin";
 
 char output_bin[] = "bootROM.bin";
 char output_mcs[] = "bootROM.mcs";

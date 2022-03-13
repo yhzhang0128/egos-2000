@@ -24,11 +24,11 @@
 
 #define NKERNEL_PROC 5
 char* kernel_processes[] = {
-                            "bin/release/grass.elf",
-                            "bin/release/sys_proc.elf",
-                            "bin/release/sys_file.elf",
-                            "bin/release/sys_dir.elf",
-                            "bin/release/sys_shell.elf"
+                            "build/release/grass.elf",
+                            "build/release/sys_proc.elf",
+                            "build/release/sys_file.elf",
+                            "build/release/sys_dir.elf",
+                            "build/release/sys_shell.elf"
 };
 
 #define NINODE 9

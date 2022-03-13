@@ -48,14 +48,14 @@ OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
 BUILD_DIR = install
-DEBUG_DIR = $(BUILD_DIR)/bin/debug
-RELEASE_DIR = $(BUILD_DIR)/bin/release
+DEBUG_DIR = $(BUILD_DIR)/build/debug
+RELEASE_DIR = $(BUILD_DIR)/build/release
 
 INCLUDE = -Ishared/include -Ishared/file
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-ARTY_FLAGS = -L$(BUILD_DIR)/bin
+ARTY_FLAGS = -L$(BUILD_DIR)/build
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
