@@ -30,7 +30,7 @@ mkdir -p build/debug build/release
 ```
 
 
-`release` holds the ELF format binary executables and `debug` holds the human readable assembly files.
+`build/release` holds the ELF format binary executables and `build/debug` holds the human readable assembly files.
 
 ## Step2: Create the disk and bootROM images
 
