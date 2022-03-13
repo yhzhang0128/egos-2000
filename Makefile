@@ -3,7 +3,7 @@ all: apps
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
-	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) -L$(BUILD_DIR) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -Iearth/bus -o $(RELEASE_DIR)/earth.elf
+	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) -L$(UTILS_DIR)/prebuild $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -Iearth/bus -o $(RELEASE_DIR)/earth.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
 
 .PHONY: apps
@@ -29,10 +29,9 @@ install:
 	cd $(UTILS_DIR); ./mkrom ; rm mkfs mkrom earth.bin
 
 clean:
-	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
+	rm -rf build
 	rm -rf $(UTILS_DIR)/mkfs $(UTILS_DIR)/mkrom
-	rm -rf $(UTILS_DIR)/disk.img $(UTILS_DIR)/bootROM.mcs $(UTILS_DIR)/bootROM.bin
-	rm -rf $(UTILS_DIR)/earth.bin $(UTILS_DIR)/*.log
+	rm -rf $(UTILS_DIR)/disk.img $(UTILS_DIR)/bootROM.bin $(UTILS_DIR)/bootROM.mcs
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
@@ -48,9 +47,8 @@ OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
 UTILS_DIR = utils
-BUILD_DIR = $(UTILS_DIR)/build
-DEBUG_DIR = $(BUILD_DIR)/debug
-RELEASE_DIR = $(BUILD_DIR)/release
+DEBUG_DIR = build/debug
+RELEASE_DIR = build/release
 
 INCLUDE = -Ishared/include -Ishared/file
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow

@@ -24,11 +24,11 @@
 
 #define NKERNEL_PROC 5
 char* kernel_processes[] = {
-                            "build/release/grass.elf",
-                            "build/release/sys_proc.elf",
-                            "build/release/sys_file.elf",
-                            "build/release/sys_dir.elf",
-                            "build/release/sys_shell.elf"
+                            "../build/release/grass.elf",
+                            "../build/release/sys_proc.elf",
+                            "../build/release/sys_file.elf",
+                            "../build/release/sys_dir.elf",
+                            "../build/release/sys_shell.elf"
 };
 
 #define NINODE 9
@@ -46,9 +46,9 @@ char* contents[] = {
                     ".   3 ..   1 ",
                     "This is the README file of egos-riscv!",
                     ".   5 ..   0 echo   6 ls   7 cat   8 ",
-                    "/build/release/echo.elf",
-                    "/build/release/ls.elf",
-                    "/build/release/cat.elf",
+                    "#../build/release/echo.elf",
+                    "#../build/release/ls.elf",
+                    "#../build/release/cat.elf",
 };
 /*NOTICE: in a dir, *4* bytes following the name gives the inode number*/
 
@@ -59,6 +59,9 @@ char paging[PAGING_DEV_SIZE];
 void mkfs();
 
 int main() {
+    memset(fs, 0, FS_DISK_SIZE);
+    mkfs();
+
     freopen("disk.img", "w", stdout);
 
     /* paging area */
@@ -101,13 +104,10 @@ int main() {
         write(1, exec, exec_size);
         
     /* file system */
-    memset(fs, 0, FS_DISK_SIZE);
-    mkfs();
     write(1, fs, FS_DISK_SIZE);
-    
     fclose(stdout);
 
-    fprintf(stderr, "[INFO] Finish making the disk image\n");
+    fprintf(stderr, "[INFO] Finish making the disk image %d %d %d\n", PAGING_DEV_SIZE, GRASS_EXEC_SIZE, FS_DISK_SIZE);
     return 0;
 }
 
@@ -115,8 +115,6 @@ int main() {
 block_if ramdisk_init();
 
 void mkfs() {
-    fprintf(stderr, "[INFO] Create treedisk with %d inodes\n", NINODES);
-
     block_if ramdisk = ramdisk_init();    
     if (treedisk_create(ramdisk, 0, NINODES) < 0) {
         fprintf(stderr, "proc_file: can't create treedisk file system");
@@ -126,7 +124,7 @@ void mkfs() {
 
     char buf[BLOCK_SIZE];
     for (int ino = 0; ino < NINODE; ino++) {
-        if (contents[ino][0] != '/') {
+        if (contents[ino][0] != '#') {
             fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
             strncpy(buf, contents[ino], BLOCK_SIZE);
             treedisk->write(treedisk, ino, 0, (void*)buf);
