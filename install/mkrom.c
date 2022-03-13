@@ -10,7 +10,7 @@
  *     the next 4MB is reserved for the earth layer binary
  *     the next 6MB is reserved for the disk image
  *     the last 2MB is currently unused
- * the output file is in Intel MCS-86 object format
+ * the output file is in binary and Intel MCS-86 format
  */
 
 #include <stdio.h>
@@ -21,7 +21,7 @@
 
 char disk_file[]  = "disk.img";
 char earth_file[] = "earth.bin";
-char fe310_file[] = "bin/fe310_cpu.bit";
+char fe310_file[] = "bin/fe310_cpu.bin";
 
 char output_bin[] = "bootROM.bin";
 char output_mcs[] = "bootROM.mcs";
@@ -125,46 +125,14 @@ void load_earth() {
 }
 
 void load_fe310() {
-    /* load the fe310 binary file */
     struct stat st;
     stat(fe310_file, &st);
-    int len = (int)st.st_size;
-    //printf("[INFO] FE310 binary file has %d bytes\n", len);
-
-    /* load header */
-    freopen(fe310_file, "r", stdin);
-    int first, second;
-    first = getchar();
-    second = getchar();
-    int length = (first << 8) + second;
-    for (int i = 0, tmp; i < length; i++)
-        tmp = getchar();
-
-    /* load key length */
-    first = getchar();
-    second = getchar();
-    int key_len = (first << 8) + second;
-    assert(key_len == 1);
-
-    while (1) {
-        int key = getchar();
-        first = getchar();
-        second = getchar();
-        if ((char)key == 'e')
-            break;
-        
-        length = (first << 8) + second;
-        for (int i = 0, tmp; i < length; i++)
-            tmp = getchar();
-    }
-
-    int third, fourth;
-    third = getchar();
-    fourth = getchar();
-    fe310_size = (first << 24) + (second << 16) + (third << 8) + fourth;
+    fe310_size = (int)st.st_size;
     printf("[INFO] FE310 binary has 0x%.6x bytes\n", fe310_size);
 
-    for (int i = 0; i < fe310_size; i++)
-        mem_fe310[i] = getchar();
+    freopen(fe310_file, "r", stdin);
+    int nread = 0;
+    while (nread < fe310_size)
+        nread += read(0, mem_fe310 + nread, fe310_size - nread);
     fclose(stdin);
 }
