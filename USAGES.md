@@ -39,8 +39,11 @@ mkdir -p build/debug build/release
 > make install
 -------- Create the Disk Image --------
 ......
+[INFO] Finish making the disk image
 -------- Create the BootROM Image --------
 ......
+[INFO] Finish making the bootROM binary
+[INFO] Finish making the bootROM mcs image
 ```
 
 This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `utils` directory.
@@ -112,12 +115,7 @@ jtagspi_program $(EGOS_RISCV_DIR)/utils/bootROM.bin 0
 exit
 ```
 
-In your terminal, type `openocd -f 7series.txt` and wait for about 3 minutes for the program to finish.
-Then refer to step11-13 in the Windows/Linux instructions above.
+Download file `bscan_spi_xc7a35t.bit` from [here](https://github.com/quartiq/bscan_spi_bitstreams/blob/master/bscan_spi_xc7a35t.bit) and put it in the same directory as `7series.txt`.
+In your terminal, type `openocd -f 7series.txt` and wait for about 3 minutes until the program finishes.
+Then refer to step9-13 in the Windows/Linux instructions above.
 This method is borrowed from [this wiki](https://github.com/byu-cpe/BYU-Computing-Tutorials/wiki/Program-7-Series-FPGA-from-a-Mac-or-Linux-Without-Xilinx?_ga=2.208554260.708413845.1647041461-635131311.1640671103).
-
-## Modify and recompile the processor
-
-In rare cases, you may want to modify the FE310 RISC-V processor.
-For example, we have modified the processor to increase the cache size from 32KB to 160KB, increase the clock frequency from 32MHz to 65MHz and connect its SPI bus controller to the microSD card.
-Contact [Yunhao Zhang](https://dolobyte.net/) if you wish to do so.
