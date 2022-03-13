@@ -33,7 +33,7 @@ char mem_disk [6 * 1024 * 1024];
 void load_fe310();
 void load_earth();
 void load_disk();
-void write_bitstream();
+void write_binary();
 void write_intel_mcs();
 void write_section(char* mem, int base, int size);
 
@@ -43,45 +43,36 @@ int main() {
     load_fe310();
     load_earth();
     load_disk();
-    write_bitstream();
+    write_binary();
     write_intel_mcs();
     
     return 0;
 }
 
-void write_bitstream() {
+void write_binary() {
     freopen(output_bin, "w", stdout);
 
     for (int i = 0; i < 4 * 1024 * 1024; i++)
         putchar(mem_fe310[i]);
-    fprintf(stderr, "[INFO] FE310 written\n");
-
     for (int i = 0; i < 4 * 1024 * 1024; i++)
         putchar(mem_earth[i]);
-    fprintf(stderr, "[INFO] Earth written\n");
-
     for (int i = 0; i < 6 * 1024 * 1024; i++)
         putchar(mem_disk[i]);
-    fprintf(stderr, "[INFO] Disk image written\n");
 
     fclose(stdout);
-    fprintf(stderr, "[INFO] Finish making the bootROM bitstream\n");
+    fprintf(stderr, "[INFO] Finish making the bootROM binary\n");
 }
 
 void write_intel_mcs() {
     freopen(output_mcs, "w", stdout);
 
     write_section(mem_fe310, 0x00, fe310_size);
-    fprintf(stderr, "[INFO] FE310 written\n");
-
     write_section(mem_earth, 0x40, earth_size);
-    fprintf(stderr, "[INFO] Earth written\n");
 
     int paging_size = 1024 * 1024;
     write_section(mem_disk + paging_size,
                   0x80 + 0x10,
                   disk_size - paging_size);
-    fprintf(stderr, "[INFO] Disk image written\n");
     printf(":00000001FF\n");
     
     fclose(stdout);
