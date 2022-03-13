@@ -1,6 +1,6 @@
 # A minimal operating system for a real RISC-V board
 
-With only **2.7K** lines of code, our teaching OS implements SD card driver, tty driver, interrupt handling, address translation, process scheduling and communication, system calls, file system, shell and 4 shell commands.
+With only **2.5K** lines of code, our teaching OS implements SD card driver, tty driver, interrupt handling, address translation, process scheduling and communication, system calls, file system, shell and 4 shell commands.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
@@ -17,22 +17,21 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
 This RISC-V version of EGOS is minimal in order to give students the **complete** picture of an operating system.
 
 ```shell
-> cloc egos-riscv
+> cloc egos-riscv --exclude-ext=md
       53 text files.
-      53 unique files.                              
-       5 files ignored.
+      47 unique files.                              
+      10 files ignored.
 
-github.com/AlDanial/cloc v 1.82  T=0.03 s (1742.3 files/s, 137644.7 lines/s)
+github.com/AlDanial/cloc v 1.92  T=0.03 s (1673.1 files/s, 131247.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 C                               27            511            388           1996
 C/C++ Header                    16            101            112            421
-Markdown                         2             36              0            144
 Assembly                         3              3             21             69
 make                             1             12              0             53
 -------------------------------------------------------------------------------
-SUM:                            49            663            521           2683
+SUM:                            47            627            521           2539
 -------------------------------------------------------------------------------
 ```
 
