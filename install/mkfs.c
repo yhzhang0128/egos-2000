@@ -73,7 +73,7 @@ int main() {
     }
 
     int exec_size = GRASS_EXEC_SIZE / GRASS_NEXEC;
-    fprintf(stderr, "[INFO] Loading %d kernel processes\n", n);
+    fprintf(stderr, "[INFO] Loading %d kernel binary files\n", n);
     for (int i = 0; i < n; i++) {
         memset(exec, 0, GRASS_EXEC_SIZE);
         
@@ -107,7 +107,7 @@ int main() {
     
     fclose(stdout);
 
-    fprintf(stderr, "[INFO] Finish making the disk image (size=%d)\n", FS_DISK_SIZE + GRASS_EXEC_SIZE + PAGING_DEV_SIZE);
+    fprintf(stderr, "[INFO] Finish making the disk image\n");
     return 0;
 }
 
