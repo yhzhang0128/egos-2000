@@ -1,6 +1,9 @@
+/* 
+ * Definitions for controlling SPI in FE310
+ * copied from the Freedom Metal library: https://github.com/sifive/freedom-metal
+ */
 #pragma once
 
-/* definitions for controlling SPI in FE310, copied from metal/spi.h */
 struct metal_spi_config;
 struct metal_spi_vtable {
     void (*init)(struct metal_spi *spi, int baud_rate);

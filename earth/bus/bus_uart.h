@@ -1,6 +1,9 @@
+/* 
+ * Definitions for controlling UART in FE310
+ * copied from the Freedom Metal library: https://github.com/sifive/freedom-metal
+ */
 #pragma once
 
-/* definitions for controlling UART in FE310, copied from metal/uart.h */
 struct metal_uart;
 struct metal_uart_vtable {
     void (*init)(struct metal_uart *uart, int baud_rate);
