@@ -1,6 +1,24 @@
 #pragma once
 
 /* definitions for controlling SPI in FE310, copied from metal/spi.h */
+struct metal_spi_config;
+struct metal_spi_vtable {
+    void (*init)(struct metal_spi *spi, int baud_rate);
+    int (*transfer)(struct metal_spi *spi, struct metal_spi_config *config,
+                    size_t len, char *tx_buf, char *rx_buf);
+    int (*get_baud_rate)(struct metal_spi *spi);
+    int (*set_baud_rate)(struct metal_spi *spi, int baud_rate);
+};
+
+struct metal_spi {
+    const struct metal_spi_vtable *vtable;
+};
+
+struct metal_spi *metal_spi_get_device(unsigned int device_num);
+__inline__ int metal_spi_set_baud_rate(struct metal_spi *spi, int baud_rate) {
+    return spi->vtable->set_baud_rate(spi, baud_rate);
+}
+
 #define SPI_BASE_ADDR 0x10024000
 
 #define METAL_SPI_SCKDIV_MASK 0xFFF
@@ -49,49 +67,3 @@
     (__METAL_ACCESS_ONCE((unsigned char*)METAL_SPI_REG(offset)))
 #define METAL_SPI_REGW(offset)                                                 \
     (__METAL_ACCESS_ONCE((unsigned int*)METAL_SPI_REG(offset)))
-
-
-struct metal_spi_config {
-    /*! @brief The protocol for the SPI transfer */
-    enum { METAL_SPI_SINGLE, METAL_SPI_DUAL, METAL_SPI_QUAD } protocol;
-
-    /*! @brief The polarity of the SPI transfer, equivalent to CPOL */
-    unsigned int polarity : 1;
-    /*! @brief The phase of the SPI transfer, equivalent to CPHA */
-    unsigned int phase : 1;
-    /*! @brief The endianness of the SPI transfer */
-    unsigned int little_endian : 1;
-    /*! @brief The active state of the chip select line */
-    unsigned int cs_active_high : 1;
-    /*! @brief The chip select ID to activate for the SPI transfer */
-    unsigned int csid;
-    /*! @brief The spi command frame number (cycles = num * frame_len) */
-    unsigned int cmd_num;
-    /*! @brief The spi address frame number */
-    unsigned int addr_num;
-    /*! @brief The spi dummy frame number */
-    unsigned int dummy_num;
-    /*! @brief The Dual/Quad spi mode selection.*/
-    enum {
-        MULTI_WIRE_ALL,
-        MULTI_WIRE_DATA_ONLY,
-        MULTI_WIRE_ADDR_DATA
-    } multi_wire;
-};
-
-struct metal_spi_vtable {
-    void (*init)(struct metal_spi *spi, int baud_rate);
-    int (*transfer)(struct metal_spi *spi, struct metal_spi_config *config,
-                    size_t len, char *tx_buf, char *rx_buf);
-    int (*get_baud_rate)(struct metal_spi *spi);
-    int (*set_baud_rate)(struct metal_spi *spi, int baud_rate);
-};
-
-struct metal_spi {
-    const struct metal_spi_vtable *vtable;
-};
-
-struct metal_spi *metal_spi_get_device(unsigned int device_num);
-__inline__ int metal_spi_set_baud_rate(struct metal_spi *spi, int baud_rate) {
-    return spi->vtable->set_baud_rate(spi, baud_rate);
-}

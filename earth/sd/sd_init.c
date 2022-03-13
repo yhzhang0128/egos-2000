@@ -18,7 +18,6 @@ static void sd_print_type();
 static int sd_check_type(struct metal_spi*);
 static int sd_check_capacity(struct metal_spi*);
 
-
 int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
 
 int sdinit() {
@@ -72,22 +71,6 @@ int sdinit() {
     sd_print_type();
 
     return 0;
-}
-
-static void sd_print_type() {
-    switch (SD_CARD_TYPE) {
-    case SD_CARD_TYPE_SD1:
-        printf("[INFO] SD card is standard capacity V1 SD card\r\n");
-        break;
-    case SD_CARD_TYPE_SD2:
-        printf("[INFO] SD card is standard capacity V2 SD card\r\n");
-        break;
-    case SD_CARD_TYPE_SDHC:
-        printf("[INFO] SD card is high capacity SDHC card\r\n");
-        break;
-    default:
-        printf("[INFO] Unknown SD card type\r\n");
-    }
 }
 
 static int sd_check_type(struct metal_spi *spi) {
@@ -144,6 +127,17 @@ static int sd_check_capacity(struct metal_spi *spi) {
     return 0;
 }
 
+static void sd_print_type() {
+    switch (SD_CARD_TYPE) {
+    case SD_CARD_TYPE_SDHC:
+        printf("[INFO] SD card is high capacity SDHC card\r\n");
+        break;
+    default:
+        printf("[FATAL] Unknown SD card type\r\n");
+        while(1);
+    }
+}
+
 static int sd_spi_reset(struct metal_spi *spi) {
     printf("[INFO] Set CS and MOSI to 1 and toggle clock.\r\n");
     long control_base = SPI_BASE_ADDR;
@@ -164,7 +158,7 @@ static int sd_spi_reset(struct metal_spi *spi) {
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 1;
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) |= METAL_SPI_CSMODE_HOLD;
-    for (i = 0; i < 2000000; i++);
+    for (i = 0; i < 200000; i++);
     
     printf("[INFO] Set CS to 0 and send cmd0 through MOSI.\r\n");
     char cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
@@ -180,66 +174,29 @@ static int sd_spi_reset(struct metal_spi *spi) {
     return 0;
 }
 
-/* Code below is copied from the metal library */
 static int sd_spi_configure(struct metal_spi *spi) {
-    struct metal_spi_config spi_config;
-    struct metal_spi_config *config = &spi_config;
-    spi_config.protocol = METAL_SPI_SINGLE;
-    spi_config.polarity = 0;
-    spi_config.phase = 0;
-    spi_config.little_endian = 0;
-    spi_config.cs_active_high = 1;
-    spi_config.csid = 0;
-    spi_config.cmd_num = spi_config.addr_num = spi_config.dummy_num = 0;
-    spi_config.multi_wire = MULTI_WIRE_ALL;
-
     long control_base = SPI_BASE_ADDR;
 
-    /* Set protocol */
+    /* Set protocol as METAL_SPI_SINGLE */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
-    switch (config->protocol) {
-    case METAL_SPI_SINGLE:
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
-        break;
-    default:
-        /* Unsupported value */
-        return -1;
-    }
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
 
-    /* Set Polarity */
-    if (config->polarity) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |=
-            (1 << METAL_SPI_SCKMODE_POL_SHIFT);
-    } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &=
-            ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
-    }
+    /* Set polarity as 0 */
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &=
+        ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
 
-    /* Set Phase */
-    if (config->phase) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |=
-            (1 << METAL_SPI_SCKMODE_PHA_SHIFT);
-    } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &=
-            ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
-    }
+    /* Set phase as 0*/
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &=
+        ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
 
-    /* Set Endianness */
-    if (config->little_endian) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_ENDIAN_LSB;
-    } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_ENDIAN_LSB);
-    }
+    /* Set endianness as 0 */
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_ENDIAN_LSB);
 
     /* Always populate receive FIFO */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_DISABLE_RX);
 
-    /* Set CS Active */
-    if (config->cs_active_high) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 0;
-    } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 1;
-    }
+    /* Set CS active-high as 0 */
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 0;
 
     /* Set frame length */
     if ((METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) & METAL_SPI_FRAME_LEN_MASK) !=
@@ -250,11 +207,11 @@ static int sd_spi_configure(struct metal_spi *spi) {
     }
 
     /* Set CS line */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = config->csid;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = 0;
 
-    /* Toggle off memory-mapped SPI flash mode, toggle on programmable IO mode */
+    /* Toggle off memory-mapped SPI flash mode
+     * toggle on programmable IO mode */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FCTRL) = METAL_SPI_CONTROL_IO;
 
     return 0;
 }
-
