@@ -47,7 +47,7 @@ RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
-BUILD_DIR = install
+BUILD_DIR = tool
 DEBUG_DIR = $(BUILD_DIR)/build/debug
 RELEASE_DIR = $(BUILD_DIR)/build/release
 
