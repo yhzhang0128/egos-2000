@@ -25,7 +25,6 @@ install:
 	cd $(BUILD_DIR); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
-	cp $(BUILD_DIR)/bin/bitheader $(BUILD_DIR)/bootROM.bit
 	$(CC) $(BUILD_DIR)/mkrom.c -o $(BUILD_DIR)/mkrom
 	cd $(BUILD_DIR); ./mkrom
 	rm $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom $(BUILD_DIR)/earth.bin 
@@ -33,7 +32,7 @@ install:
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
 	rm -rf $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom
-	rm -rf $(BUILD_DIR)/disk.img $(BUILD_DIR)/bootROM.mcs $(BUILD_DIR)/bootROM.bit
+	rm -rf $(BUILD_DIR)/disk.img $(BUILD_DIR)/bootROM.mcs $(BUILD_DIR)/bootROM.bin
 	rm -rf $(BUILD_DIR)/earth.bin $(BUILD_DIR)/*.log
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c

@@ -23,7 +23,7 @@ char disk_file[]  = "disk.img";
 char earth_file[] = "earth.bin";
 char fe310_file[] = "bin/fe310_cpu.bit";
 
-char output_bit[] = "bootROM.bit";
+char output_bin[] = "bootROM.bin";
 char output_mcs[] = "bootROM.mcs";
 
 char mem_fe310[4 * 1024 * 1024];
@@ -50,9 +50,7 @@ int main() {
 }
 
 void write_bitstream() {
-    freopen(output_bit, "a", stdout);
-    int length = (4 + 4 + 6) * 1024 * 1024;
-    putw(length, stdout);
+    freopen(output_bin, "w", stdout);
 
     for (int i = 0; i < 4 * 1024 * 1024; i++)
         putchar(mem_fe310[i]);
