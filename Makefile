@@ -3,7 +3,7 @@ all: apps
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
-	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(ARTY_FLAGS) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -Iearth/bus -o $(RELEASE_DIR)/earth.elf
+	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) -L$(BUILD_DIR) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -Iearth/bus -o $(RELEASE_DIR)/earth.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
 
 .PHONY: apps
@@ -21,18 +21,18 @@ apps: apps/*.c
 .PHONY: install
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(BUILD_DIR)/mkfs.c shared/file/treedisk.c -DMKFS $(INCLUDE) -o $(BUILD_DIR)/mkfs
-	cd $(BUILD_DIR); ./mkfs
+	$(CC) $(TOOL_DIR)/mkfs.c shared/file/treedisk.c -DMKFS $(INCLUDE) -o $(TOOL_DIR)/mkfs
+	cd $(TOOL_DIR); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(BUILD_DIR)/earth.bin
-	$(CC) $(BUILD_DIR)/mkrom.c -o $(BUILD_DIR)/mkrom
-	cd $(BUILD_DIR); ./mkrom ; rm mkfs mkrom earth.bin
+	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(TOOL_DIR)/earth.bin
+	$(CC) $(TOOL_DIR)/mkrom.c -o $(TOOL_DIR)/mkrom
+	cd $(TOOL_DIR); ./mkrom ; rm mkfs mkrom earth.bin
 
 clean:
 	rm -rf $(DEBUG_DIR) $(RELEASE_DIR)
-	rm -rf $(BUILD_DIR)/mkfs $(BUILD_DIR)/mkrom
-	rm -rf $(BUILD_DIR)/disk.img $(BUILD_DIR)/bootROM.mcs $(BUILD_DIR)/bootROM.bin
-	rm -rf $(BUILD_DIR)/earth.bin $(BUILD_DIR)/*.log
+	rm -rf $(TOOL_DIR)/mkfs $(TOOL_DIR)/mkrom
+	rm -rf $(TOOL_DIR)/disk.img $(TOOL_DIR)/bootROM.mcs $(TOOL_DIR)/bootROM.bin
+	rm -rf $(TOOL_DIR)/earth.bin $(TOOL_DIR)/*.log
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
@@ -47,15 +47,15 @@ RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
-BUILD_DIR = tool
-DEBUG_DIR = $(BUILD_DIR)/build/debug
-RELEASE_DIR = $(BUILD_DIR)/build/release
+TOOL_DIR = tools
+BUILD_DIR = $(TOOL_DIR)/build
+DEBUG_DIR = $(BUILD_DIR)/debug
+RELEASE_DIR = $(BUILD_DIR)/release
 
 INCLUDE = -Ishared/include -Ishared/file
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-ARTY_FLAGS = -L$(BUILD_DIR)/build
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 DEFAULT_LDLIBS = -lc -lgcc
