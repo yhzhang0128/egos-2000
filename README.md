@@ -14,7 +14,7 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
     * inter-process communication
 * The **application layer** provides file system, shell and shell commands.
 
-This RISC-V version of EGOS is minimal in order to give students the **complete** picture of a working operating system.
+This RISC-V version of EGOS is minimal in order to give students the **complete** picture of an operating system.
 
 ```shell
 > cloc egos-riscv
