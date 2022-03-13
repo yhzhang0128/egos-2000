@@ -1,6 +1,6 @@
 # Compile and Run EGOS on Arty
 
-You can use Linux, Mac or Windows.
+You can use Windows, Linux or MacOS.
 
 ## Step1: Setup compiler and compile egos-riscv
 
