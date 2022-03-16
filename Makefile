@@ -34,13 +34,13 @@ clean:
 	rm -rf $(UTILS_DIR)/disk.img $(UTILS_DIR)/bootROM.bin $(UTILS_DIR)/bootROM.mcs
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
-EARTH_LAYOUT = -Tearth/mem_layout.lds
+EARTH_LAYOUT = -Tearth/layout.lds
 
 GRASS_SRCS = grass/enter.S grass/*.c shared/*.c shared/*.S
-GRASS_LAYOUT = -Tgrass/mem_layout.lds
+GRASS_LAYOUT = -Tgrass/layout.lds
 
 APPS_SRCS = apps/enter.S shared/*.c shared/file/*.c
-APPS_LAYOUT = -Tapps/mem_layout.lds
+APPS_LAYOUT = -Tapps/layout.lds
 
 RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
