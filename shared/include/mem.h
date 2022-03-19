@@ -7,7 +7,6 @@
 /* memory layout */
 #define DTIM_END            0x80010000
 #define FRAME_CACHE_START   0x80004000  // 112KB  frame cache
-#define EARTH_SIZE          0x00000080
 #define EARTH_STRUCT        0x80003f80  //        earth interface
 #define GRASS_STACK_TOP     0x80003f80  // ~8KB   kernel stack
 #define GRASS_STRUCT        0x80002000  //        grass interface
