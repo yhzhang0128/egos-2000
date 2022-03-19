@@ -15,7 +15,7 @@
 #define KGRN  "\x1B[1;32m"
 #define KYEL  "\x1B[1;33m"
 
-int INFO(const char *format, ...)
+int log_info(const char *format, ...)
 {
     printf("[INFO] ");
     
@@ -27,7 +27,7 @@ int INFO(const char *format, ...)
     printf("\r\n");
 }
 
-int HIGHLIGHT(const char *format, ...)
+int log_highlight(const char *format, ...)
 {
     printf("%s[HIGHLIGHT] ", KYEL);
     
@@ -39,7 +39,7 @@ int HIGHLIGHT(const char *format, ...)
     printf("%s\r\n", KNRM);
 }
 
-int SUCCESS(const char *format, ...)
+int log_success(const char *format, ...)
 {
     printf("%s[SUCCESS] ", KGRN);
     
@@ -51,7 +51,7 @@ int SUCCESS(const char *format, ...)
     printf("%s\r\n", KNRM);
 }
 
-int FATAL(const char *format, ...)
+int log_fatal(const char *format, ...)
 {
     printf("%s[FATAL] ", KRED);
     

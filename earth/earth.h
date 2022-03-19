@@ -31,7 +31,12 @@ int mmu_map(int pid, int page_no, int frame_no, int flag);
 int mmu_switch(int pid);
 int mmu_free(int pid);
 
-int INFO(const char *format, ...);
-int HIGHLIGHT(const char *format, ...);
-int SUCCESS(const char *format, ...);
-int FATAL(const char *format, ...);
+int log_info(const char *format, ...);
+int log_highlight(const char *format, ...);
+int log_success(const char *format, ...);
+int log_fatal(const char *format, ...);
+
+#define INFO       log_info
+#define HIGHLIGHT  log_highlight
+#define SUCCESS    log_success
+#define FATAL      log_fatal
