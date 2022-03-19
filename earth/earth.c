@@ -14,7 +14,7 @@
 
 int earth_init();
 void grass_load();
-static struct earth earth;
+struct earth earth;
 
 int main() {
     INFO("-----------------------------------");
@@ -81,7 +81,7 @@ static int grass_read(int block_no, char* dst) {
 }
 
 void grass_load() {
-    elf_load(0, grass_read, &earth);
+    elf_load(0, grass_read);
 
     /* call the grass kernel entry and never return */
     void (*grass_entry)() = (void*)GRASS_ENTRY;

@@ -41,7 +41,7 @@ static int read_sys_proc(int block_no, char* dst) {
 
 static void sys_proc_init() {
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
-    elf_load(GPID_PROCESS, read_sys_proc, earth);
+    elf_load(GPID_PROCESS, read_sys_proc);
 
     pcb.proc_alloc = proc_alloc;
     pcb.proc_free = proc_free;

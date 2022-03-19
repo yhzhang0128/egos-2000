@@ -33,5 +33,5 @@ struct elf32_program_header {
 
 struct earth;
 typedef int (*elf_reader)(int block_no, char* dst);
-void elf_load(int pid, elf_reader reader, struct earth* earth);
-void elf_load_with_arg(int pid, elf_reader reader, int argc, void** argv, struct earth* earth);
+void elf_load(int pid, elf_reader reader);
+void elf_load_with_arg(int pid, elf_reader reader, int argc, void** argv);

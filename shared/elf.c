@@ -18,22 +18,20 @@
 #include "servers.h"
 
 static void load_grass(elf_reader reader,
-                       struct earth* earth,
                        struct elf32_program_header* pheader);
 
 static void load_app(int pid,
                      elf_reader reader,
-                     struct earth* earth,
                      int argc, void** argv, 
                      struct elf32_program_header* pheader);
 
 
-void elf_load(int pid, elf_reader reader, struct earth* earth) {
-    elf_load_with_arg(pid, reader, 0, NULL, earth);
+void elf_load(int pid, elf_reader reader) {
+    elf_load_with_arg(pid, reader, 0, NULL);
 }
 
 void elf_load_with_arg(int pid, elf_reader reader,
-                       int argc, void** argv, struct earth* earth) {
+                       int argc, void** argv) {
     char buf[BLOCK_SIZE];
     reader(0, buf);
     struct elf32_header *header = (void*) buf;
@@ -47,10 +45,10 @@ void elf_load_with_arg(int pid, elf_reader reader,
 
     switch (pheader.p_vaddr) {
     case APPS_ENTRY:
-        load_app(pid, reader, earth, argc, argv, &pheader);
+        load_app(pid, reader, argc, argv, &pheader);
         break;
     case GRASS_ENTRY:
-        load_grass(reader, earth, &pheader);
+        load_grass(reader, &pheader);
         break;
     default:
         FATAL("ELF gives invalid p_vaddr: 0x%.8x", pheader.p_vaddr);
@@ -58,7 +56,6 @@ void elf_load_with_arg(int pid, elf_reader reader,
 }
 
 static void load_grass(elf_reader reader,
-                       struct earth* earth,
                        struct elf32_program_header* pheader) {
     INFO("Grass kernel file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("Grass kernel memory size: 0x%.8x bytes", pheader->p_memsz);
@@ -79,7 +76,6 @@ static void load_grass(elf_reader reader,
 
 static void load_app(int pid,
                      elf_reader reader,
-                     struct earth* earth,
                      int argc, void** argv,
                      struct elf32_program_header* pheader) {
 
