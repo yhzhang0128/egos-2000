@@ -7,7 +7,6 @@
 #include "mem.h"
 #include "elf.h"
 #include "disk.h"
-#include "servers.h"
 
 int tty_init();
 int tty_read(char* buf, int len);
