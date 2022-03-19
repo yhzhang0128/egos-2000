@@ -6,7 +6,6 @@
 
 #include "mem.h"
 #include "elf.h"
-#include "log.h"
 #include "disk.h"
 #include "servers.h"
 
@@ -31,3 +30,8 @@ int mmu_alloc(int* frame_no, int* addr);
 int mmu_map(int pid, int page_no, int frame_no, int flag);
 int mmu_switch(int pid);
 int mmu_free(int pid);
+
+int INFO(const char *format, ...);
+int HIGHLIGHT(const char *format, ...);
+int SUCCESS(const char *format, ...);
+int FATAL(const char *format, ...);

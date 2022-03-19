@@ -13,7 +13,6 @@
 #include "egos.h"
 #include "mem.h"
 #include "elf.h"
-#include "log.h"
 #include "disk.h"
 #include "print.h"
 #include "servers.h"
