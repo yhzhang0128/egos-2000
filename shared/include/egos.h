@@ -1,20 +1,6 @@
 #pragma once
 
-struct dev_log {
-    int (*log_info)(const char *format, ...);
-    int (*log_highlight)(const char *format, ...);
-    int (*log_success)(const char *format, ...);
-    int (*log_fatal)(const char *format, ...);
-};
-
 struct earth {
-    /* TTY and disk device driver interface */
-    int (*tty_read)(char* buf, int len);
-    int (*tty_write)(const char *format, ...);
-
-    int (*disk_read)(int block_no, int nblocks, char* dst);
-    int (*disk_write)(int block_no, int nblocks, char* src);
-
     /* CPU interface */
     int (*intr_enable)();
     int (*intr_disable)();
@@ -26,8 +12,17 @@ struct earth {
     int (*mmu_map)(int pid, int page_no, int frame_no, int flag);
     int (*mmu_switch)(int pid);
 
-    /* helper functions for logging */
-    struct dev_log log;
+    /* Disk and tty device driver interface */
+    int (*disk_read)(int block_no, int nblocks, char* dst);
+    int (*disk_write)(int block_no, int nblocks, char* src);
+
+    int (*tty_read)(char* buf, int len);
+    int (*tty_write)(const char *format, ...);
+
+    int (*log_info)(const char *format, ...);
+    int (*log_fatal)(const char *format, ...);
+    int (*log_success)(const char *format, ...);
+    int (*log_highlight)(const char *format, ...);
 };
 
 struct grass {

@@ -3,7 +3,7 @@
 extern struct earth *earth;
 #define printf    earth->tty_write
 
-#define INFO      earth->log.log_info
-#define HIGHLIGHT earth->log.log_highlight
-#define SUCCESS   earth->log.log_success
-#define FATAL     earth->log.log_fatal
+#define INFO      earth->log_info
+#define FATAL     earth->log_fatal
+#define SUCCESS   earth->log_success
+#define HIGHLIGHT earth->log_highlight
