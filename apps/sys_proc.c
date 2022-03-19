@@ -91,7 +91,7 @@ static int app_read(int block_no, char* dst) {
 
 void app_init(struct proc_request *req) {
     int app_pid = pcb.proc_alloc();
-    elf_load_with_arg(app_pid, app_read, req->argc, (void**)req->argv);
+    elf_load(app_pid, app_read, req->argc, (void**)req->argv);
     pcb.proc_set_ready(app_pid);
 }
 
@@ -137,7 +137,7 @@ void sys_file_init() {
         FATAL("Process ID mismatch: %d != %d", file_pid, GPID_FILE);
 
     INFO("Load kernel process #%d: sys_file", file_pid);
-    elf_load(file_pid, sys_file_read);
+    elf_load(file_pid, sys_file_read, 0, NULL);
     pcb.proc_set_ready(file_pid);
 }
 
@@ -151,7 +151,7 @@ void sys_dir_init() {
         FATAL("Process ID mismatch: %d != %d", dir_pid, GPID_DIR);
 
     INFO("Load kernel process #%d: sys_dir", dir_pid);
-    elf_load(dir_pid, sys_dir_read);
+    elf_load(dir_pid, sys_dir_read, 0, NULL);
     pcb.proc_set_ready(dir_pid);
 }
 
@@ -165,6 +165,6 @@ void sys_shell_init() {
         FATAL("Process ID mismatch: %d != %d", shell_pid, GPID_SHELL);
 
     INFO("Load kernel process #%d: sys_shell", shell_pid);
-    elf_load(shell_pid, sys_shell_read);
+    elf_load(shell_pid, sys_shell_read, 0, NULL);
     pcb.proc_set_ready(shell_pid);
 }

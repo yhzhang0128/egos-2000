@@ -25,13 +25,8 @@ static void load_app(int pid,
                      int argc, void** argv, 
                      struct elf32_program_header* pheader);
 
-
-void elf_load(int pid, elf_reader reader) {
-    elf_load_with_arg(pid, reader, 0, NULL);
-}
-
-void elf_load_with_arg(int pid, elf_reader reader,
-                       int argc, void** argv) {
+void elf_load(int pid, elf_reader reader,
+              int argc, void** argv) {
     char buf[BLOCK_SIZE];
     reader(0, buf);
     struct elf32_header *header = (void*) buf;

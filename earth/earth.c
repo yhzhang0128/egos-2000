@@ -81,7 +81,7 @@ static int grass_read(int block_no, char* dst) {
 }
 
 void grass_load() {
-    elf_load(0, grass_read);
+    elf_load(0, grass_read, 0, NULL);
 
     /* call the grass kernel entry and never return */
     void (*grass_entry)() = (void*)GRASS_ENTRY;
