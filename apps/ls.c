@@ -13,7 +13,7 @@
 
 int main(int argc, char** argv) {
     if (argc > 1) {
-        INFO("oops, ls with args not implemented");
+        INFO("ls with args not implemented");
         sys_exit(0);
     }
 

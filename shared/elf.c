@@ -121,9 +121,14 @@ static void load_app(int pid,
 
     /* base is at virtual address APPS_MAIN_ARG */
     int* argc_addr = (int*)base;
+    int* argv_addr = argc_addr + 1;
+    int* args_addr = argv_addr + CMD_NARGS;
+
     *argc_addr = argc;
-    if (argc)
-        memcpy(argc_addr + 1, argv, CMD_NARGS * CMD_ARG_LEN);
+    for (int i = 0; i < argc; i++)
+        argv_addr[i] = (int)((char*)args_addr + i * CMD_ARG_LEN);
+    if (argv)
+        memcpy(args_addr, argv, argc * CMD_ARG_LEN);
 
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);

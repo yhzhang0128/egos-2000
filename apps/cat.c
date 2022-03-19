@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
     }
 
     int dir_ino = grass->work_dir_ino;
-    char* file_name = (char*)argv + CMD_ARG_LEN;
+    char* file_name = argv[1];
 
     /* Get the inode number of the file */
     int sender;

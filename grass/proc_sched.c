@@ -89,9 +89,12 @@ static void proc_yield() {
 
     timer_reset();
     if (next_status == PROC_READY) {
+        /* prepare argc */
         __asm__ volatile("mv t0, %0" ::"r"(APPS_MAIN_ARG));
         __asm__ volatile("lw a0, 0(t0)");
+        /* prepare argv */
         __asm__ volatile("mv a1, %0" ::"r"(APPS_MAIN_ARG + 4));
+        /* enter application code */
         __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
         __asm__ volatile("mret");
     }
