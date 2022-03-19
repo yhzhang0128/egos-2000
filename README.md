@@ -17,7 +17,8 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
 This RISC-V version of EGOS is minimal in order to give students the **complete** picture of an operating system.
 
 ```shell
-> cloc egos-riscv --exclude-ext=md  # Count lines of code excluding Markdown documents
+> cloc egos-riscv --exclude-ext=md  
+# Count lines of code excluding Markdown documents
       52 text files.
       52 unique files.                              
        7 files ignored.
