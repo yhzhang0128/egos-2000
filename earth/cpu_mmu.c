@@ -42,11 +42,11 @@ int mmu_init() {
     return 0;
 }
 
-int mmu_alloc(int* frame_no, int* addr) {
+int mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++) {
         if (!INUSE(trans_table.frame[i])) {
             *frame_no = i;
-            *addr = cache_read(i);
+            *cached_addr = cache_read(i);
             USE(trans_table.frame[i]);
             return 0;
         }
