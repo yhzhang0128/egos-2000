@@ -42,6 +42,8 @@ int main() {
 
         if (strcmp(buf, "pwd") == 0) {
             printf("%s\r\n", work_dir);
+        } else if (strncmp(buf, "cd", 2) == 0) {
+            printf("sys_shell: `cd` not implemented; left to students\r\n");
         } else {
             int sender;
             struct proc_request req;
