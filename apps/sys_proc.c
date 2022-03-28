@@ -65,7 +65,7 @@ int main(struct pcb_intf* _pcb) {
         } else if (req->type == PROC_KILLALL){
             pcb.proc_free(-1);
         } else {
-            FATAL("sys_proc: receive unexpected message");
+            FATAL("sys_proc: unexpected message type %d", req->type);
         }
 
     }
