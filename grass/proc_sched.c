@@ -29,6 +29,13 @@ void intr_entry(int id) {
         return;
     }
 
+    if (curr_pid >= GPID_USER_START && earth->tty_intr()) {
+        /* User process killed by ctrl-C */
+        __asm__ volatile("mv a0, %0" ::"r"(0));
+        __asm__ volatile("csrw mepc, %0" ::"r"(0x8005006));
+        return;
+    }
+
     /* switch to the grass kernel (ctx_entry) */
     switch(id) {
     case INTR_ID_TMR:

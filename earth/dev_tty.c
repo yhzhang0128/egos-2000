@@ -17,7 +17,21 @@
 
 static struct metal_uart* uart;
 
+static int is_intr, is_reading;
+int tty_intr() {
+    if (is_reading)
+        return is_intr ? !(is_intr = 0) : 0;
+
+    int c = -1;
+    metal_uart_getc(uart, &c);
+    if (c != -1 && (char)c == CTRL_C)
+        return 1;
+    else
+        return 0;
+}
+
 int tty_read(char* buf, int len) {
+    is_reading = 1;
     for (int c, i = 0; i < len - 1; i++) {
         for (c = -1; c == -1; metal_uart_getc(uart, &c));
         buf[i] = (char)c;
@@ -26,11 +40,12 @@ int tty_read(char* buf, int len) {
         case ENTER:
             printf("\r\n");
             buf[i] = 0;
-            return 0;
+            goto finish;
         case CTRL_C:
             printf("\r\n");
             buf[0] = 0;
-            return 0;
+            is_intr = 1;
+            goto finish;
         }
 
         printf("%c", c);
@@ -38,6 +53,9 @@ int tty_read(char* buf, int len) {
     }
 
     buf[len - 1] = 0;
+
+ finish:
+    is_reading = 0;
     return 0;
 }
 

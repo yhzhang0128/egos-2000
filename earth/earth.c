@@ -33,6 +33,7 @@ int earth_init() {
     /* Initialize TTY */
     if (tty_init())
         FATAL("Failed at initializing the tty device");
+    earth->tty_intr = tty_intr;
     earth->tty_read = tty_read;
     earth->tty_write = tty_write;
     SUCCESS("Finished initializing the tty device");

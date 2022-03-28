@@ -9,6 +9,7 @@
 #include "disk.h"
 
 int tty_init();
+int tty_intr();
 int tty_read(char* buf, int len);
 int tty_write(const char *format, ...);
 
