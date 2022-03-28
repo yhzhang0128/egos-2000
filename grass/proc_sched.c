@@ -23,7 +23,7 @@ struct  process   proc_set[MAX_NPROCESS];
 #define curr_pid  proc_set[proc_curr_idx].pid
 
 void intr_entry(int id) {
-    if (curr_pid < GPID_USER_START && id == INTR_ID_TMR) {
+    if (curr_pid < GPID_SHELL && id == INTR_ID_TMR) {
         /* IO may be busy; do not interrupt */
         timer_reset();
         return;
