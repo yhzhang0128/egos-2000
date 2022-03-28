@@ -56,10 +56,12 @@ int main(struct pcb_intf* _pcb) {
             sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
         } else if (req->type == PROC_EXIT) {
             pcb.proc_free(sender);
-            if (shell_waiting)
+            if (shell_waiting && app_pid == sender) {
                 sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
-            else
+            } else {
                 INFO("background process %d terminated", sender);
+            }
+                
         } else if (req->type == PROC_KILLALL){
             pcb.proc_free(-1);
         } else {
