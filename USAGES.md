@@ -47,7 +47,7 @@ mkdir -p build/debug build/release
 [INFO] Finish making the bootROM mcs image
 ```
 
-This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `utils` directory.
+This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `tools` directory.
 You can use tools like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD.
 
 ## Step3: Program the Arty FPGA board
@@ -111,7 +111,7 @@ puts [drscan xc7.tap 32 0]
 puts "Programming FPGA..."
 
 jtagspi_init 0 bscan_spi_xc7a35t.bit
-jtagspi_program $(EGOS_RISCV_DIR)/utils/bootROM.bin 0 
+jtagspi_program $(EGOS_RISCV_DIR)/tools/bootROM.bin 0 
 
 exit
 ```
