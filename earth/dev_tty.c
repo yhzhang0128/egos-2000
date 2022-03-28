@@ -17,10 +17,10 @@
 
 static struct metal_uart* uart;
 
-static int is_intr, is_reading;
+static int is_reading;
 int tty_intr() {
     if (is_reading)
-        return is_intr ? !(is_intr = 0) : 0;
+        return 0;
 
     int c = -1;
     metal_uart_getc(uart, &c);
@@ -44,7 +44,6 @@ int tty_read(char* buf, int len) {
         case CTRL_C:
             printf("\r\n");
             buf[0] = 0;
-            is_intr = 1;
             goto finish;
         }
 
