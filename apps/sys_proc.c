@@ -111,7 +111,10 @@ static int app_spawn(struct proc_request *req) {
         return -1;
     } else {
         app_pid = pcb.proc_alloc();
-        elf_load(app_pid, app_read, req->argc, (void**)req->argv);
+        if (req->argv[req->argc - 1][0] != '&') 
+            elf_load(app_pid, app_read, req->argc, (void**)req->argv);
+        else
+            elf_load(app_pid, app_read, req->argc - 1, (void**)req->argv);
         pcb.proc_set_ready(app_pid);
         return 0;
     }
