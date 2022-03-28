@@ -49,7 +49,7 @@ int main(struct pcb_intf* _pcb) {
         sys_recv(&sender, buf, SYSCALL_MSG_LEN);
 
         struct proc_request *req = (void*)buf;
-        if (sender == GPID_SHELL) {
+        if (req->type == PROC_SPAWN) {
             if (proc_spawn(req) != 0) {
                 struct proc_reply *reply = (void*)buf;
                 reply->type = CMD_ERROR;
@@ -62,6 +62,8 @@ int main(struct pcb_intf* _pcb) {
             reply->pid = sender;
             reply->type = CMD_OK;
             sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
+        } else if (req->type == PROC_KILLALL){
+            pcb.proc_free(-1);
         } else {
             FATAL("sys_proc: receive unexpected message");
         }

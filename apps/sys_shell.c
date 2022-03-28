@@ -35,6 +35,9 @@ int main() {
     /* Wait for shell commands */
     HIGHLIGHT("Welcome to egos-riscv!");
     char buf[128];
+    int sender;
+    struct proc_request req;
+    struct proc_reply reply;
     while (1) {
         printf("%s➜ %s%s%s ", KGRN, KCYN, work_dir_name, KNRM);
         tty_read(buf, 100);
@@ -42,22 +45,20 @@ int main() {
 
         if (strcmp(buf, "pwd") == 0) {
             printf("%s\r\n", work_dir);
-        } else if (strncmp(buf, "cd", 2) == 0) {
-            printf("sys_shell: `cd` not implemented; left to students\r\n");
+        } else if (strcmp(buf, "killall") == 0) {
+            req.type = PROC_KILLALL;
+            sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
         } else {
-            int sender;
-            struct proc_request req;
-            struct proc_reply reply;
+            req.type = PROC_SPAWN;
             parse_request(buf, &req);
             sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
 
-            if (req.argv[req.argc - 1][0] == '&') {
-                INFO("sys_shell: background shell command is not fully implemented and may trigger crashes");
-            } else {
-                /* Wait for the forground process */
+            if (req.argv[req.argc - 1][0] != '&') {
                 sys_recv(&sender, (void*)&reply, sizeof(reply));
                 if (reply.type != CMD_OK)
                     INFO("sys_shell: command causes an error");
+            } else {
+                INFO("sys_shell: background command is not fully implemented and may trigger crashes");
             }
         }
     }

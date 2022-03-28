@@ -52,8 +52,18 @@ static void proc_set_status(int pid, int status) {
 }
 
 void proc_free(int pid) {
-    earth->mmu_free(pid);
-    proc_set_status(pid, PROC_UNUSED);
+    if (pid != -1) {
+        earth->mmu_free(pid);
+        proc_set_status(pid, PROC_UNUSED);
+    } else {
+        for (int i = 0; i < MAX_NPROCESS; i++) {
+            if (proc_set[i].pid >= GPID_USER_START &&
+                proc_set[i].status != PROC_UNUSED) {
+                earth->mmu_free(proc_set[i].pid);
+                proc_set[i].status = PROC_UNUSED;
+            }
+        }        
+    }
 }
 
 void proc_set_ready(int pid) {
