@@ -31,14 +31,14 @@ void proc_init() {
 int proc_alloc() {
     static int proc_nprocs = 0;
     for (int i = 0; i < MAX_NPROCESS; i++) {
-        if (proc_set[i].pid == 0) {
+        if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid = ++proc_nprocs;
-            proc_set[i].status = PROC_UNUSED;
+            proc_set[i].status = PROC_LOADING;
             return proc_nprocs;
         }
     }
 
-    FATAL("Reach the limit of %d processes", MAX_NPROCESS);
+    FATAL("Reach the limit of %d concurrent processes", MAX_NPROCESS);
     return -1;
 }
 
