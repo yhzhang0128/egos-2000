@@ -19,49 +19,46 @@ struct pcb_intf {
     void (*proc_set_ready)(int);
 } pcb;
 
-void sys_file_init();
-void sys_dir_init();
-void sys_shell_init();
-static int proc_spawn(struct proc_request *req);
-
+static int app_ino, app_pid;
+static void sys_spawn(int, int);
+static int app_spawn(struct proc_request *req);
 
 int main(struct pcb_intf* _pcb) {
     SUCCESS("Enter kernel process GPID_PROCESS");    
     memcpy(&pcb, _pcb, sizeof(struct pcb_intf));
 
-    int sender;
+    int sender, shell_waiting;
     char buf[SYSCALL_MSG_LEN];
-    sys_file_init();
+    sys_spawn(GPID_FILE, SYS_FILE_EXEC_START);
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     if (sender != GPID_FILE)
         FATAL("sys_proc expects message from GPID_FILE");
     INFO("sys_proc receives: %s", buf);
 
-    sys_dir_init();
+    sys_spawn(GPID_DIR, SYS_DIR_EXEC_START);
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     if (sender != GPID_DIR)
         FATAL("sys_proc expects message from GPID_DIR");
     INFO("sys_proc receives: %s", buf);
 
-    sys_shell_init();
+    sys_spawn(GPID_SHELL, SYS_SHELL_EXEC_START);
     
     while (1) {
         sys_recv(&sender, buf, SYSCALL_MSG_LEN);
 
         struct proc_request *req = (void*)buf;
+        struct proc_reply *reply = (void*)buf;
         if (req->type == PROC_SPAWN) {
-            if (proc_spawn(req) != 0) {
-                struct proc_reply *reply = (void*)buf;
-                reply->type = CMD_ERROR;
-                sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
-            }
+            reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
+            sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
+            shell_waiting = (req->argv[req->argc - 1][0] != '&');
+
+            if (!shell_waiting)
+                INFO("process %d running in the background", app_pid);
         } else if (req->type == PROC_EXIT) {
             pcb.proc_free(sender);
-            
-            struct proc_reply *reply = (void*)buf;
-            reply->pid = sender;
-            reply->type = CMD_OK;
-            sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
+            if (shell_waiting)
+                sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
         } else if (req->type == PROC_KILLALL){
             pcb.proc_free(-1);
         } else {
@@ -71,8 +68,6 @@ int main(struct pcb_intf* _pcb) {
     }
 }
 
-
-static int app_ino;
 static int app_read(int block_no, char* dst) {
     int sender;
     struct file_request req;
@@ -88,27 +83,6 @@ static int app_read(int block_no, char* dst) {
     struct file_reply *reply = (void*)buf;
     memcpy(dst, reply->block.bytes, BLOCK_SIZE);
     return 0;
-}
-
-void app_init(struct proc_request *req) {
-    int app_pid = pcb.proc_alloc();
-    elf_load(app_pid, app_read, req->argc, (void**)req->argv);
-    pcb.proc_set_ready(app_pid);
-}
-
-
-static int get_inode(int ino, char* name);
-static int proc_spawn(struct proc_request *req) {
-    int bin = get_inode(0, "bin");
-    int exec = get_inode(bin, req->argv[0]);
-
-    if (exec == -1) {
-        return -1;
-    } else {
-        app_ino = exec;
-        app_init(req);
-        return 0;
-    }
 }
 
 static int get_inode(int ino, char* name) {
@@ -128,44 +102,33 @@ static int get_inode(int ino, char* name) {
     return reply->ino;
 }
 
-static int sys_file_read(int block_no, char* dst) {
-    return earth->disk_read(SYS_FILE_EXEC_START + block_no, 1, dst);
+static int app_spawn(struct proc_request *req) {
+    int bin_ino = get_inode(0, "bin");
+    app_ino = get_inode(bin_ino, req->argv[0]);
+
+    if (app_ino < 0) {
+        return -1;
+    } else {
+        app_pid = pcb.proc_alloc();
+        elf_load(app_pid, app_read, req->argc, (void**)req->argv);
+        pcb.proc_set_ready(app_pid);
+        return 0;
+    }
 }
 
-void sys_file_init() {
-    int file_pid = pcb.proc_alloc();
-    if (file_pid != GPID_FILE)
-        FATAL("Process ID mismatch: %d != %d", file_pid, GPID_FILE);
-
-    INFO("Load kernel process #%d: sys_file", file_pid);
-    elf_load(file_pid, sys_file_read, 0, NULL);
-    pcb.proc_set_ready(file_pid);
+static int SYS_PROC_BASE;
+static int sys_proc_read(int block_no, char* dst) {
+    return earth->disk_read(SYS_PROC_BASE + block_no, 1, dst);
 }
 
-static int sys_dir_read(int block_no, char* dst) {
-    return earth->disk_read(SYS_DIR_EXEC_START + block_no, 1, dst);
-}
+char* kernel_procs[] = {"", "sys_proc", "sys_file", "sys_dir", "sys_shell"};
+static void sys_spawn(int pid, int base) {
+    int _pid = pcb.proc_alloc();
+    if (_pid != pid)
+        FATAL("Process ID mismatch: %d != %d", pid, _pid);
 
-void sys_dir_init() {
-    int dir_pid = pcb.proc_alloc();
-    if (dir_pid != GPID_DIR)
-        FATAL("Process ID mismatch: %d != %d", dir_pid, GPID_DIR);
-
-    INFO("Load kernel process #%d: sys_dir", dir_pid);
-    elf_load(dir_pid, sys_dir_read, 0, NULL);
-    pcb.proc_set_ready(dir_pid);
-}
-
-static int sys_shell_read(int block_no, char* dst) {
-    return earth->disk_read(SYS_SHELL_EXEC_START + block_no, 1, dst);
-}
-
-void sys_shell_init() {
-    int shell_pid = pcb.proc_alloc();
-    if (shell_pid != GPID_SHELL)
-        FATAL("Process ID mismatch: %d != %d", shell_pid, GPID_SHELL);
-
-    INFO("Load kernel process #%d: sys_shell", shell_pid);
-    elf_load(shell_pid, sys_shell_read, 0, NULL);
-    pcb.proc_set_ready(shell_pid);
+    INFO("Load kernel process #%d: %s", pid, kernel_procs[pid]);
+    SYS_PROC_BASE = base;
+    elf_load(pid, sys_proc_read, 0, NULL);
+    pcb.proc_set_ready(pid);
 }

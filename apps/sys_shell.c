@@ -52,14 +52,13 @@ int main() {
             req.type = PROC_SPAWN;
             parse_request(buf, &req);
             sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+            sys_recv(&sender, (void*)&reply, sizeof(reply));
 
-            if (req.argv[req.argc - 1][0] != '&') {
-                sys_recv(&sender, (void*)&reply, sizeof(reply));
-                if (reply.type != CMD_OK)
-                    INFO("sys_shell: command causes an error");
-            } else {
-                INFO("sys_shell: background command is not fully implemented and may trigger crashes");
-            }
+            if (reply.type != CMD_OK)
+                INFO("sys_shell: command causes an error");
+            else if (req.argv[req.argc - 1][0] != '&')
+                /* Wait for foreground process */
+                sys_recv(&sender, (void*)&reply, sizeof(reply));            
         }
     }
     return 0;
