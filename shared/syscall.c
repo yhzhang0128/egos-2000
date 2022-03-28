@@ -43,7 +43,7 @@ int sys_recv(int* sender, char* buf, int size) {
 
 void sys_exit(int status) {
     struct proc_request req;
-    req.type = PROC_KILLED;
+    req.type = PROC_EXIT;
     sys_send(GPID_PROCESS, (void*)&req, sizeof(struct proc_request));
     while(1);
 }

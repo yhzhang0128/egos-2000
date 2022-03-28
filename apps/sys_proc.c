@@ -55,7 +55,7 @@ int main(struct pcb_intf* _pcb) {
                 reply->type = CMD_ERROR;
                 sys_send(GPID_SHELL, (void*)reply, sizeof(struct proc_reply));
             }
-        } else if (req->type == PROC_KILLED) {
+        } else if (req->type == PROC_EXIT) {
             pcb.proc_free(sender);
             
             struct proc_reply *reply = (void*)buf;
