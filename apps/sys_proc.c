@@ -50,11 +50,10 @@ int main(struct pcb_intf* _pcb) {
         struct proc_reply *reply = (void*)buf;
         if (req->type == PROC_SPAWN) {
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
-            sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
-
             if (!shell_waiting)
                 INFO("process %d running in the background", app_pid);
+            sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
         } else if (req->type == PROC_EXIT) {
             pcb.proc_free(sender);
             if (shell_waiting)
