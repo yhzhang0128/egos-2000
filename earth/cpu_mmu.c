@@ -11,6 +11,7 @@
 
 #include "egos.h"
 #include "earth.h"
+#include <stdlib.h>
 
 struct frame_t {
     char byte[PAGE_SIZE];
@@ -139,6 +140,17 @@ int mmu_switch(int pid) {
     return 0;
 }
 
+static int cache_evict() {
+    int free_no = rand() % CACHED_NFRAMES;
+    int frame_no = cache_frame_no[free_no];
+
+    if (INUSE(trans_table.frame[frame_no])) {
+        int nblocks = PAGE_SIZE / BLOCK_SIZE;
+        disk_write(frame_no * nblocks, nblocks, (char*)(cache + free_no));
+    }
+    return free_no;
+}
+
 static int cache_read(int frame_no) {
     for (int i = 0; i < CACHED_NFRAMES; i++) {
         if (cache_frame_no[i] == frame_no)
@@ -153,22 +165,19 @@ static int cache_read(int frame_no) {
         }
     }
 
-    if (free_no != -1) {
-        cache_frame_no[free_no] = frame_no;
+    if (free_no == -1)
+        free_no = cache_evict();
+    cache_frame_no[free_no] = frame_no;
 
-        if (INUSE(trans_table.frame[frame_no])) {
-            int nblocks = PAGE_SIZE / BLOCK_SIZE;
-            disk_read(free_no * nblocks, nblocks, (char*)(cache + free_no));
-        }
-
-        return (int)(cache + free_no);
-    } else {
-        FATAL("Frame cache is full but eviction is not implemented");
+    if (INUSE(trans_table.frame[frame_no])) {
+        int nblocks = PAGE_SIZE / BLOCK_SIZE;
+        disk_read(frame_no * nblocks, nblocks, (char*)(cache + free_no));
     }
+
+    return (int)(cache + free_no);
 }
 
 static int cache_write(int frame_no, struct frame_t* src) {
-    int found_no = -1;
     for (int i = 0; i < CACHED_NFRAMES; i++) {
         if (cache_frame_no[i] == frame_no) {
             memcpy(cache + i, src, PAGE_SIZE);
@@ -176,5 +185,9 @@ static int cache_write(int frame_no, struct frame_t* src) {
         }
     }
 
-    FATAL("Frame cache is full but eviction is not implemented");
+    int free_no = cache_evict();
+    cache_frame_no[free_no] = frame_no;
+    memcpy(cache + free_no, src, PAGE_SIZE);
+
+    return 0;
 }

@@ -18,6 +18,6 @@ int main(int argc, char** argv) {
     volatile int i, cnt = 0;
     while (1) {
         for (i = 0; i < 5000000; i++);
-        INFO("clock %s: tick %d", argv[1], ++cnt);
+        printf("clock %s: tick %d\r\n", argv[1], ++cnt);
     }
 }
