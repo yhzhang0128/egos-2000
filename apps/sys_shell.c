@@ -51,7 +51,9 @@ int main() {
             parse_request(buf, &req);
             sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
 
-            if (req.argv[req.argc - 1][0] != '&') {
+            if (req.argv[req.argc - 1][0] == '&') {
+                INFO("sys_shell: background shell command is not fully implemented and may trigger crashes");
+            } else {
                 /* Wait for the forground process */
                 sys_recv(&sender, (void*)&reply, sizeof(reply));
                 if (reply.type != CMD_OK)

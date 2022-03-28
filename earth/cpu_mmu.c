@@ -65,11 +65,9 @@ int mmu_free(int pid) {
             trans_table.frame[i].flag = 0;
 
             /* invalidate the cache */
-            for (int j = 0; j < CACHED_NFRAMES; j++) {
-                if (cache_frame_no[j] == i) {
+            for (int j = 0; j < CACHED_NFRAMES; j++)
+                if (cache_frame_no[j] == i)
                     cache_frame_no[j] = -1;
-                }
-            }
         }
     }
     return 0;
@@ -152,17 +150,12 @@ static int cache_evict() {
 }
 
 static int cache_read(int frame_no) {
+    int free_no = -1;
     for (int i = 0; i < CACHED_NFRAMES; i++) {
         if (cache_frame_no[i] == frame_no)
             return (int)(cache + i);
-    }
-
-    int free_no = -1;
-    for (int i = 0; i < CACHED_NFRAMES; i++) {
-        if (cache_frame_no[i] == -1 && free_no == -1) {
+        if (cache_frame_no[i] == -1 && free_no == -1)
             free_no = i;
-            break;
-        }
     }
 
     if (free_no == -1)
