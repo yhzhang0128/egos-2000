@@ -21,17 +21,17 @@ apps: apps/*.c
 .PHONY: install
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(UTILS_DIR)/mkfs.c shared/file/treedisk.c -DMKFS $(INCLUDE) -o $(UTILS_DIR)/mkfs
-	cd $(UTILS_DIR); ./mkfs
+	$(CC) $(TOOLS_DIR)/mkfs.c shared/file/treedisk.c -DMKFS $(INCLUDE) -o $(TOOLS_DIR)/mkfs
+	cd $(TOOLS_DIR); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(UTILS_DIR)/earth.bin
-	$(CC) $(UTILS_DIR)/mkrom.c -o $(UTILS_DIR)/mkrom
-	cd $(UTILS_DIR); ./mkrom ; rm earth.bin
+	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(TOOLS_DIR)/earth.bin
+	$(CC) $(TOOLS_DIR)/mkrom.c -o $(TOOLS_DIR)/mkrom
+	cd $(TOOLS_DIR); ./mkrom ; rm earth.bin
 
 clean:
 	rm -rf build
-	rm -rf $(UTILS_DIR)/mkfs $(UTILS_DIR)/mkrom
-	rm -rf $(UTILS_DIR)/disk.img $(UTILS_DIR)/bootROM.bin $(UTILS_DIR)/bootROM.mcs
+	rm -rf $(TOOLS_DIR)/mkfs $(TOOLS_DIR)/mkrom
+	rm -rf $(TOOLS_DIR)/disk.img $(TOOLS_DIR)/bootROM.bin $(TOOLS_DIR)/bootROM.mcs
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
@@ -46,7 +46,7 @@ RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
-UTILS_DIR = utils
+TOOLS_DIR = tools
 DEBUG_DIR = build/debug
 RELEASE_DIR = build/release
 
