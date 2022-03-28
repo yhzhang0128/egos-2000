@@ -7,14 +7,13 @@
  * Description: a simple cat
  */
 
-
 #include "app.h"
 #include <string.h>
 
 int main(int argc, char** argv) {
     if (argc == 1) {
         INFO("please provide an argument");
-        sys_exit(0);
+        return 0;
     }
 
     int dir_ino = grass->work_dir_ino;
@@ -34,7 +33,7 @@ int main(int argc, char** argv) {
     struct dir_reply *reply1 = (void*)buf;
     if (reply1->status != DIR_OK) {
         INFO("file %s not found", file_name);
-        sys_exit(1);
+        return 1;
     }
 
     /* Read the file */

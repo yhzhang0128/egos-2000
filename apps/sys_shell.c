@@ -50,10 +50,13 @@ int main() {
             struct proc_reply reply;
             parse_request(buf, &req);
             sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
-            sys_recv(&sender, (void*)&reply, sizeof(reply));
 
-            if (reply.type != CMD_OK)
-                INFO("sys_shell: command causes an error");
+            if (req.argv[req.argc - 1][0] != '&') {
+                /* Wait for the forground process */
+                sys_recv(&sender, (void*)&reply, sizeof(reply));
+                if (reply.type != CMD_OK)
+                    INFO("sys_shell: command causes an error");
+            }
         }
     }
     return 0;

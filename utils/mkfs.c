@@ -31,12 +31,13 @@ char* kernel_processes[] = {
                             "../build/release/sys_shell.elf"
 };
 
-#define NINODE 9
+#define NINODE 10
 
 /* inode mappings:
 #0: /              #1: /home               #2: /home/yunhao
 #3: /home/rvr      #4: /home/yunhao/README #5: /bin
 #6: /bin/echo      #7: /bin/ls             #8: /bin/cat
+#9: /bin/clock
 */
 
 char* contents[] = {
@@ -45,10 +46,11 @@ char* contents[] = {
                     ".   2 ..   1 README   4 ",
                     ".   3 ..   1 ",
                     "With only 2.5K lines of code, egos-riscv implements SD card driver, tty driver, interrupt handling, address translation, process scheduling and communication, system calls, file system, shell and 4 shell commands.",
-                    ".   5 ..   0 echo   6 ls   7 cat   8 ",
+                    ".   5 ..   0 echo   6 ls   7 cat   8 clock   9 ",
                     "#../build/release/echo.elf",
                     "#../build/release/ls.elf",
                     "#../build/release/cat.elf",
+                    "#../build/release/clock.elf",
 };
 /*NOTICE: in a dir, *4* bytes following the name gives the inode number*/
 

@@ -7,7 +7,6 @@
  * Description: a simple ls
  */
 
-
 #include "app.h"
 #include <string.h>
 

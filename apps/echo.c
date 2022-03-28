@@ -7,7 +7,6 @@
  * Description: a simple echo
  */
 
-
 #include "app.h"
 
 #define tty_read earth->tty_read

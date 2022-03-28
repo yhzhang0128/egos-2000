@@ -7,7 +7,6 @@
  * Description: spawn and kill processes
  */
 
-
 #include "elf.h"
 #include "app.h"
 #include "disk.h"
