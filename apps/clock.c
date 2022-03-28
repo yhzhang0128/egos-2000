@@ -14,6 +14,6 @@ int main(int argc, char** argv) {
     while (1) {
         for (i = 0; i < 5000000; i++);
         printf("\r\n");
-        printf("clock: tick#%d\r\n", argv[1], ++cnt);
+        printf("clock: tick#%d\r\n", ++cnt);
     }
 }
