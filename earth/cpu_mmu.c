@@ -13,42 +13,37 @@
 #include "earth.h"
 #include <stdlib.h>
 
-struct frame_t {
-    char byte[PAGE_SIZE];
-};
-
 struct translation_table_t {
     struct {
         int pid;
         int page_no;
         int flag;
     } frame[NFRAMES];
-} trans_table;
+} translate_table;
 
 #define INUSE(x) (x.flag & F_INUSE)
-#define USE(x)   x.flag |= F_INUSE
 
 int curr_vm_pid;
-int cache_frame_no[CACHED_NFRAMES];
-struct frame_t* cache = (void*)FRAME_CACHE_START;
+int lookup_table[CACHED_NFRAMES];
+char *cache = (void*)FRAME_CACHE_START;
 
 static int cache_read(int frame_no);
-static int cache_write(int frame_no, struct frame_t* src);
+static int cache_write(int frame_no, char* src);
 
 int mmu_init() {
     curr_vm_pid = -1;
-    memset(cache_frame_no, 0xff, sizeof(cache_frame_no));
-    memset(&trans_table, 0, sizeof(struct translation_table_t));
+    memset(lookup_table, 0xff, sizeof(lookup_table));
+    memset(&translate_table, 0, sizeof(translate_table));
 
     return 0;
 }
 
 int mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++) {
-        if (!INUSE(trans_table.frame[i])) {
+        if (!INUSE(translate_table.frame[i])) {
             *frame_no = i;
             *cached_addr = cache_read(i);
-            USE(trans_table.frame[i]);
+            translate_table.frame[i].flag |= F_INUSE;
             return 0;
         }
     }
@@ -57,17 +52,17 @@ int mmu_alloc(int* frame_no, int* cached_addr) {
 
 int mmu_free(int pid) {
     for (int i = 0; i < NFRAMES; i++) {
-        if (trans_table.frame[i].pid == pid &&
-            INUSE(trans_table.frame[i])) {
+        if (translate_table.frame[i].pid == pid &&
+            INUSE(translate_table.frame[i])) {
             /* remove the mapping */
-            trans_table.frame[i].pid = 0;
-            trans_table.frame[i].page_no = 0;
-            trans_table.frame[i].flag = 0;
+            translate_table.frame[i].pid = 0;
+            translate_table.frame[i].page_no = 0;
+            translate_table.frame[i].flag = 0;
 
             /* invalidate the cache */
             for (int j = 0; j < CACHED_NFRAMES; j++)
-                if (cache_frame_no[j] == i)
-                    cache_frame_no[j] = -1;
+                if (lookup_table[j] == i)
+                    lookup_table[j] = -1;
         }
     }
     return 0;
@@ -77,14 +72,14 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
     if (flag != F_ALL)
         FATAL("Memory protection not implemented");
     
-    if (!INUSE(trans_table.frame[frame_no])) {
+    if (!INUSE(translate_table.frame[frame_no])) {
         INFO("Frame %d has not been allocated", frame_no);
         return -1;
     }
 
-    trans_table.frame[frame_no].pid = pid;
-    trans_table.frame[frame_no].page_no = page_no;
-    trans_table.frame[frame_no].flag = flag;
+    translate_table.frame[frame_no].pid = pid;
+    translate_table.frame[frame_no].page_no = page_no;
+    translate_table.frame[frame_no].flag = flag;
     return 0;
 }
 
@@ -98,11 +93,11 @@ int mmu_switch(int pid) {
 
     /* unmap curr_vm_pid from virtual address space */
     for (int i = 0; i < NFRAMES; i++) {
-        if (INUSE(trans_table.frame[i])
-            && trans_table.frame[i].pid == curr_vm_pid) {
+        if (INUSE(translate_table.frame[i])
+            && translate_table.frame[i].pid == curr_vm_pid) {
 
             char* addr;
-            int page_no = trans_table.frame[i].page_no;
+            int page_no = translate_table.frame[i].page_no;
             if (page_no < code_npages) {
                 addr = code_base + page_no * PAGE_SIZE;
                 cache_write(i, (void*)(addr));
@@ -117,11 +112,11 @@ int mmu_switch(int pid) {
  map_only:
     /* map pid to virtual address space */
     for (int i = 0; i < NFRAMES; i++) {
-        if (INUSE(trans_table.frame[i])
-            && trans_table.frame[i].pid == pid) {
+        if (INUSE(translate_table.frame[i])
+            && translate_table.frame[i].pid == pid) {
 
             char *dst_addr, *src_addr = (char*)cache_read(i);
-            int page_no = trans_table.frame[i].page_no;
+            int page_no = translate_table.frame[i].page_no;
             if (page_no < code_npages) {
                 dst_addr = code_base + page_no * PAGE_SIZE;
                 memcpy(dst_addr, src_addr, PAGE_SIZE);
@@ -139,48 +134,48 @@ int mmu_switch(int pid) {
 }
 
 static int cache_evict() {
-    int free_no = rand() % CACHED_NFRAMES;
-    int frame_no = cache_frame_no[free_no];
+    int free_idx = rand() % CACHED_NFRAMES;
+    int frame_no = lookup_table[free_idx];
 
-    if (INUSE(trans_table.frame[frame_no])) {
+    if (INUSE(translate_table.frame[frame_no])) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        disk_write(frame_no * nblocks, nblocks, (char*)(cache + free_no));
+        disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
     }
-    return free_no;
+    return free_idx;
 }
 
 static int cache_read(int frame_no) {
-    int free_no = -1;
+    int free_idx = -1;
     for (int i = 0; i < CACHED_NFRAMES; i++) {
-        if (cache_frame_no[i] == frame_no)
-            return (int)(cache + i);
-        if (cache_frame_no[i] == -1 && free_no == -1)
-            free_no = i;
+        if (lookup_table[i] == frame_no)
+            return (int)(cache + PAGE_SIZE * i);
+        if (lookup_table[i] == -1 && free_idx == -1)
+            free_idx = i;
     }
 
-    if (free_no == -1)
-        free_no = cache_evict();
-    cache_frame_no[free_no] = frame_no;
+    if (free_idx == -1)
+        free_idx = cache_evict();
+    lookup_table[free_idx] = frame_no;
 
-    if (INUSE(trans_table.frame[frame_no])) {
+    if (INUSE(translate_table.frame[frame_no])) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        disk_read(frame_no * nblocks, nblocks, (char*)(cache + free_no));
+        disk_read(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
     }
 
-    return (int)(cache + free_no);
+    return (int)(cache + PAGE_SIZE * free_idx);
 }
 
-static int cache_write(int frame_no, struct frame_t* src) {
+static int cache_write(int frame_no, char* src) {
     for (int i = 0; i < CACHED_NFRAMES; i++) {
-        if (cache_frame_no[i] == frame_no) {
-            memcpy(cache + i, src, PAGE_SIZE);
+        if (lookup_table[i] == frame_no) {
+            memcpy(cache + PAGE_SIZE * i, src, PAGE_SIZE);
             return 0;
         }
     }
 
-    int free_no = cache_evict();
-    cache_frame_no[free_no] = frame_no;
-    memcpy(cache + free_no, src, PAGE_SIZE);
+    int free_idx = cache_evict();
+    lookup_table[free_idx] = frame_no;
+    memcpy(cache + PAGE_SIZE * free_idx, src, PAGE_SIZE);
 
     return 0;
 }
