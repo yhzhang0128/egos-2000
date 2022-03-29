@@ -88,9 +88,6 @@ int mmu_switch(int pid) {
     char* stack_base = (void*) DTIM_START;
     int code_npages  = APPS_SIZE / PAGE_SIZE;
 
-    if (curr_vm_pid == -1)
-        goto map_only;
-
     /* unmap curr_vm_pid from virtual address space */
     for (int i = 0; i < NFRAMES; i++) {
         if (FRAME_INUSE(i)
@@ -109,7 +106,6 @@ int mmu_switch(int pid) {
         }
     }
 
- map_only:
     /* map pid to virtual address space */
     for (int i = 0; i < NFRAMES; i++) {
         if (FRAME_INUSE(i)
