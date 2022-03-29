@@ -84,23 +84,6 @@ static int app_read(int block_no, char* dst) {
     return 0;
 }
 
-static int get_inode(int ino, char* name) {
-    int sender;
-    struct dir_request req;
-    char buf[SYSCALL_MSG_LEN];
-
-    req.type = DIR_LOOKUP;
-    req.ino = ino;
-    strcpy(req.name, name);
-    sys_send(GPID_DIR, (void*)&req, sizeof(struct dir_request));
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    if (sender != GPID_DIR)
-        FATAL("sys_shell expects message from GPID_DIR");
-
-    struct dir_reply *reply = (void*)buf;
-    return reply->ino;
-}
-
 static int app_spawn(struct proc_request *req) {
     int bin_ino = get_inode(0, "bin");
     app_ino = get_inode(bin_ino, req->argv[0]);

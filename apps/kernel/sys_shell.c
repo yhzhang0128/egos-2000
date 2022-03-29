@@ -16,7 +16,6 @@
 #define CYAN  "\x1B[1;36m"
 #define NORM  "\x1B[1;0m"
 
-int get_inode(int ino, char* name);
 void parse_request(char* buf, struct proc_request* req);
 
 int main() {
@@ -64,23 +63,6 @@ int main() {
         }
     }
     return 0;
-}
-
-int get_inode(int ino, char* name) {
-    int sender;
-    struct dir_request req;
-    char buf[SYSCALL_MSG_LEN];
-
-    req.type = DIR_LOOKUP;
-    req.ino = ino;
-    strcpy(req.name, name);
-    sys_send(GPID_DIR, (void*)&req, sizeof(struct dir_request));
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    if (sender != GPID_DIR)
-        FATAL("sys_shell expects message from GPID_DIR");
-
-    struct dir_reply *reply = (void*)buf;
-    return reply->ino;
 }
 
 void parse_request(char* buf, struct proc_request* req) {
