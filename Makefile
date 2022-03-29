@@ -38,13 +38,13 @@ OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*/*.c
-EARTH_LAYOUT = -Tearth/layout.lds
+EARTH_LAYOUT = -Tearth/earth.lds
 
 GRASS_SRCS = grass/*.S grass/*.c shared/*/*.c
-GRASS_LAYOUT = -Tgrass/layout.lds
+GRASS_LAYOUT = -Tgrass/grass.lds
 
 APPS_SRCS = apps/app.S shared/*/*.c
-APPS_LAYOUT = -Tapps/layout.lds
+APPS_LAYOUT = -Tapps/app.lds
 
 TOOLS_DIR = tools
 DEBUG_DIR = build/debug
