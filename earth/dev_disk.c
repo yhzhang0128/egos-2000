@@ -21,11 +21,9 @@ static int type;
 
 int disk_read(int block_no, int nblocks, char* dst) {
     if (type == SD_CARD) {
-        int r = sdread(block_no, nblocks, dst);
-        return r;
+        return sdread(block_no, nblocks, dst);
     } else {
-        char* src = (void*)FLASH_ROM_START;
-        src += block_no * BLOCK_SIZE;
+        char* src = (char*)FLASH_ROM_START + block_no * BLOCK_SIZE;
         memcpy(dst, src, nblocks * BLOCK_SIZE);
         return 0;
     }
@@ -33,8 +31,7 @@ int disk_read(int block_no, int nblocks, char* dst) {
 
 int disk_write(int block_no, int nblocks, char* src) {
     if (type == SD_CARD) {
-        int r = sdwrite(block_no, nblocks, src);
-        return r;
+        return sdwrite(block_no, nblocks, src);
     } else {
         FATAL("on-board flash ROM cannot be written");
     }    
