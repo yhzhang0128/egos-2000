@@ -2,10 +2,10 @@
 
 #include <stdlib.h>
 
-#include "mem.h"
 #include "elf.h"
 #include "disk.h"
 #include "print.h"
+#include "memory.h"
 #include "syscall.h"
 #include "servers.h"
 

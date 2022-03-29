@@ -11,10 +11,10 @@
 #include <string.h>
 
 #include "egos.h"
-#include "mem.h"
 #include "elf.h"
 #include "disk.h"
 #include "print.h"
+#include "memory.h"
 #include "servers.h"
 
 static void load_grass(elf_reader reader,

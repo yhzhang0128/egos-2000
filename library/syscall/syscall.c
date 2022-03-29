@@ -8,7 +8,7 @@
  */
 
 #include <string.h>
-#include "mem.h"
+#include "memory.h"
 #include "syscall.h"
 #include "servers.h"
 

@@ -8,7 +8,7 @@
  */
 
 
-#include "mem.h"
+#include "memory.h"
 #include <stddef.h>
 
 /* heap region is defined in the memory layout scripts */

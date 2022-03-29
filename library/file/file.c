@@ -32,9 +32,9 @@
 #include <stdio.h>
 #define HIGHLIGHT printf
 #else
-#include "mem.h"
 #include "egos.h"
 #include "print.h"
+#include "memory.h"
 #endif
 
 /* Temporary information about the file system and a particular inode.

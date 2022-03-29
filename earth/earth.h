@@ -4,9 +4,9 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "mem.h"
 #include "elf.h"
 #include "disk.h"
+#include "memory.h"
 
 typedef void (*handler_t)(int);
 int intr_init();
