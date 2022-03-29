@@ -10,10 +10,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define KNRM  "\x1B[1;0m"
-#define KRED  "\x1B[1;31m"
-#define KGRN  "\x1B[1;32m"
-#define KYEL  "\x1B[1;33m"
+#define COLOR_RESET  "\x1B[1;0m"
 
 int log_info(const char *format, ...)
 {
@@ -29,38 +26,38 @@ int log_info(const char *format, ...)
 
 int log_highlight(const char *format, ...)
 {
-    printf("%s[HIGHLIGHT] ", KYEL);
-    
+    printf("%s[HIGHLIGHT] ", "\x1B[1;33m");  // yellow
+
     va_list args;
     va_start(args, format);
     vprintf(format, args);
     va_end(args);
 
-    printf("%s\r\n", KNRM);
+    printf("%s\r\n", COLOR_RESET);
 }
 
 int log_success(const char *format, ...)
 {
-    printf("%s[SUCCESS] ", KGRN);
-    
+    printf("%s[SUCCESS] ", "\x1B[1;32m");  // green
+
     va_list args;
     va_start(args, format);
     vprintf(format, args);
     va_end(args);
 
-    printf("%s\r\n", KNRM);
+    printf("%s\r\n", COLOR_RESET);
 }
 
 int log_fatal(const char *format, ...)
 {
-    printf("%s[FATAL] ", KRED);
+    printf("%s[FATAL] ", "\x1B[1;31m"); // red
     
     va_list args;
     va_start(args, format);
     vprintf(format, args);
     va_end(args);
 
-    printf("%s\r\n", KNRM);
+    printf("%s\r\n", COLOR_RESET);
 
     while(1);
 }
