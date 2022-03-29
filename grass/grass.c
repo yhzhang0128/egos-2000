@@ -15,14 +15,15 @@ struct pcb_intf pcb;
 struct earth *earth = (void*)EARTH_STRUCT;
 
 void proc_init();
-static void sys_proc_init();
+void timer_init();
+static void sys_proc_spawn();
 
 int main() {
     SUCCESS("Enter the grass layer");
 
     proc_init();
     timer_init();
-    sys_proc_init();
+    sys_proc_spawn();
 
     /* Enter the first kernel process sys_proc */
     void (*sys_proc_entry)(void*) = (void*)APPS_ENTRY;
@@ -39,7 +40,7 @@ static int read_sys_proc(int block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
 
-static void sys_proc_init() {
+static void sys_proc_spawn() {
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
     elf_load(GPID_PROCESS, read_sys_proc, 0, NULL);
 

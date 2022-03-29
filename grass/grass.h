@@ -13,11 +13,16 @@ struct earth *earth;
 
 #define INTR_ID_TMR        7
 #define INTR_ID_SOFT       3
-
-void timer_init();
 long long timer_reset();
 
 #define MAX_NPROCESS       16
+
+struct process{
+    int pid;
+    int status;
+    void *sp, *mepc;
+    int receiver_pid; // used when status is PROC_WAIT_TO_SEND
+};
 
 enum {
     PROC_UNUSED,
@@ -29,14 +34,7 @@ enum {
     PROC_WAIT_TO_RECV
 };
 
-struct process{
-    int pid;
-    int status;
-    void *sp, *mepc;
-    int receiver_pid; // used when status is PROC_WAIT_TO_SEND
-};
-
-/* interface for kernel process sys_proc */
+/* interface of the process control block (pcb) */
 struct pcb_intf {
     int (*proc_alloc)();
     void (*proc_free)(int);
