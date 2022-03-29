@@ -33,6 +33,10 @@ clean:
 	rm -rf $(TOOLS_DIR)/mkfs $(TOOLS_DIR)/mkrom
 	rm -rf $(TOOLS_DIR)/disk.img $(TOOLS_DIR)/bootROM.bin $(TOOLS_DIR)/bootROM.mcs
 
+RISCV_CC = riscv64-unknown-elf-gcc
+OBJDUMP = riscv64-unknown-elf-objdump
+OBJCOPY = riscv64-unknown-elf-objcopy
+
 EARTH_SRCS = earth/*.c earth/sd/*.c shared/*/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
 
@@ -41,10 +45,6 @@ GRASS_LAYOUT = -Tgrass/layout.lds
 
 APPS_SRCS = apps/enter.S shared/*/*.c
 APPS_LAYOUT = -Tapps/layout.lds
-
-RISCV_CC = riscv64-unknown-elf-gcc
-OBJDUMP = riscv64-unknown-elf-objdump
-OBJCOPY = riscv64-unknown-elf-objcopy
 
 TOOLS_DIR = tools
 DEBUG_DIR = build/debug
