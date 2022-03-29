@@ -5,13 +5,13 @@
 #include "syscall.h"
 #include "servers.h"
 
-int get_inode(int ino, char* name) {
+int dir_lookup(int dir_ino, char* name) {
     int sender;
     struct dir_request req;
     char buf[SYSCALL_MSG_LEN];
 
     req.type = DIR_LOOKUP;
-    req.ino = ino;
+    req.ino = dir_ino;
     strcpy(req.name, name);
     sys_send(GPID_DIR, (void*)&req, sizeof(struct dir_request));
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);

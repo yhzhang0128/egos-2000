@@ -10,7 +10,7 @@
 #include "app.h"
 #include <string.h>
 
-int dir_lookup(int ino, char* name);
+int dir_do_lookup(int ino, char* name);
 
 int main() {
     SUCCESS("Enter kernel process GPID_DIR");
@@ -33,7 +33,7 @@ int main() {
         char* name = req->name;
         switch (type) {
         case DIR_LOOKUP:
-            reply->ino = dir_lookup(ino, name);
+            reply->ino = dir_do_lookup(ino, name);
             reply->status = reply->ino == -1? DIR_ERROR : DIR_OK;
             sys_send(sender, (void*)reply, sizeof(struct dir_reply));
             break;
@@ -50,7 +50,7 @@ int main() {
     return 0;
 }
 
-int dir_lookup(int ino, char* name) {
+int dir_do_lookup(int ino, char* name) {
     int len = strlen(name);
     int sender;
     struct file_request req;

@@ -85,8 +85,8 @@ static int app_read(int block_no, char* dst) {
 }
 
 static int app_spawn(struct proc_request *req) {
-    int bin_ino = get_inode(0, "bin");
-    app_ino = get_inode(bin_ino, req->argv[0]);
+    int bin_ino = dir_lookup(0, "bin");
+    app_ino = dir_lookup(bin_ino, req->argv[0]);
 
     if (app_ino < 0) {
         return -1;

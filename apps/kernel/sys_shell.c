@@ -21,8 +21,8 @@ void parse_request(char* buf, struct proc_request* req);
 int main() {
     SUCCESS("Enter kernel process GPID_SHELL");
 
-    int home = get_inode(0, "home");
-    int yunhao = get_inode(home, "yunhao");
+    int home = dir_lookup(0, "home");
+    int yunhao = dir_lookup(home, "yunhao");
 
     grass->work_dir_ino = yunhao;
     char *work_dir = grass->work_dir;
