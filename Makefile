@@ -21,7 +21,7 @@ apps: apps/kernel/*.c apps/user/*.c
 .PHONY: install
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(TOOLS_DIR)/mkfs.c shared/file/treedisk.c -DMKFS $(INCLUDE) -o $(TOOLS_DIR)/mkfs
+	$(CC) $(TOOLS_DIR)/mkfs.c library/file/treedisk.c -DMKFS $(INCLUDE) -o $(TOOLS_DIR)/mkfs
 	cd $(TOOLS_DIR); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(TOOLS_DIR)/earth.bin
@@ -37,20 +37,20 @@ RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
-EARTH_SRCS = earth/*.c earth/sd/*.c shared/*/*.c
+EARTH_SRCS = earth/*.c earth/sd/*.c library/*/*.c
 EARTH_LAYOUT = -Tearth/earth.lds
 
-GRASS_SRCS = grass/*.S grass/*.c shared/*/*.c
+GRASS_SRCS = grass/*.S grass/*.c library/*/*.c
 GRASS_LAYOUT = -Tgrass/grass.lds
 
-APPS_SRCS = apps/app.S shared/*/*.c
+APPS_SRCS = apps/app.S library/*/*.c
 APPS_LAYOUT = -Tapps/app.lds
 
 TOOLS_DIR = tools
 DEBUG_DIR = build/debug
 RELEASE_DIR = build/release
 
-INCLUDE = -Ishared -Ishared/mem -Ishared/file -Ishared/syscall -Ishared/utils
+INCLUDE = -Ilibrary -Ilibrary/mem -Ilibrary/file -Ilibrary/syscall -Ilibrary/utils
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
