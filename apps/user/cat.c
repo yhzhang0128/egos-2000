@@ -30,6 +30,8 @@ int main(int argc, char** argv) {
     req.offset = 0;
     sys_send(GPID_FILE, (void*)&req, sizeof(req));
 
+    int sender;
+    char buf[SYSCALL_MSG_LEN];
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     struct file_reply *reply = (void*)buf;
     char *result = reply->block.bytes;
