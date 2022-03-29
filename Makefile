@@ -7,13 +7,13 @@ all: apps
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
 
 .PHONY: apps
-apps: apps/*.c
+apps: apps/kernel/*.c apps/user/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
 	@echo "$(CYAN)-------- Compile the Apps Layer --------$(END)"
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
 	  echo "Compile" $${FILE} "=>" $(RELEASE_DIR)/$${APP}.elf;\
-	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE} $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/$${APP}.elf || exit 1 ;\
+	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE} $(DEFAULT_LDLIBS) $(INCLUDE) -Iapps -o $(RELEASE_DIR)/$${APP}.elf || exit 1 ;\
 	  echo "Compile" $${FILE} "=>" $(DEBUG_DIR)/$${APP}.lst;\
 	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP}.elf > $(DEBUG_DIR)/$${APP}.lst;\
 	done
