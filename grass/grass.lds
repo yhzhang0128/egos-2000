@@ -24,10 +24,6 @@ SECTIONS
         *(.rdata)
         *(.rodata .rodata.*)
         . = ALIGN(8);
-        *(.srodata.cst16)
-        *(.srodata.cst8)
-        *(.srodata.cst4)
-        *(.srodata.cst2)
         *(.srodata .srodata.*)
     } >ram :ram
 

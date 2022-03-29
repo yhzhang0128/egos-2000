@@ -44,7 +44,7 @@ char* contents[] = {
                     ".   1 ..   0 yunhao   2 rvr   3 ",
                     ".   2 ..   1 README   4 ",
                     ".   3 ..   1 ",
-                    "With only 2.4K lines of code, egos-riscv implements SD card driver, tty driver, interrupt handling, address translation, process scheduling and communication, system calls, file system, shell and 7 shell commands.",
+                    "With only 2.3K lines of code, egos-riscv implements SD card driver, tty driver, interrupt handling, address translation, process scheduling and communication, system calls, file system, shell and 7 shell commands.",
                     ".   5 ..   0 echo   6 ls   7 cat   8 clock   9 ",
                     "#../build/release/echo.elf",
                     "#../build/release/ls.elf",
