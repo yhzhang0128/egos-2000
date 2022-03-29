@@ -33,13 +33,13 @@ clean:
 	rm -rf $(TOOLS_DIR)/mkfs $(TOOLS_DIR)/mkrom
 	rm -rf $(TOOLS_DIR)/disk.img $(TOOLS_DIR)/bootROM.bin $(TOOLS_DIR)/bootROM.mcs
 
-EARTH_SRCS = earth/*.c earth/sd/*.c shared/*.c
+EARTH_SRCS = earth/*.c earth/sd/*.c shared/*/*.c
 EARTH_LAYOUT = -Tearth/layout.lds
 
-GRASS_SRCS = grass/enter.S grass/*.c shared/*.c shared/*.S
+GRASS_SRCS = grass/*.S grass/*.c shared/*/*.c
 GRASS_LAYOUT = -Tgrass/layout.lds
 
-APPS_SRCS = apps/enter.S shared/*.c shared/file/*.c
+APPS_SRCS = apps/enter.S shared/*/*.c
 APPS_LAYOUT = -Tapps/layout.lds
 
 RISCV_CC = riscv64-unknown-elf-gcc
@@ -50,13 +50,12 @@ TOOLS_DIR = tools
 DEBUG_DIR = build/debug
 RELEASE_DIR = build/release
 
-INCLUDE = -Ishared/include -Ishared/file
+INCLUDE = -Ishared -Ishared/memory -Ishared/file -Ishared/syscall -Ishared/tools
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
-LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
-
 DEFAULT_LDLIBS = -lc -lgcc
+LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 EARTH_LDLIBS = -Learth/bus -Wl,--start-group -lc -lgcc -lm -lmetal -lmetal-gloss -Wl,--end-group
 
 GREEN = \033[1;32m
