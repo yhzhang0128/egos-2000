@@ -48,7 +48,7 @@ int main(struct pcb_intf* _pcb) {
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
 
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
-            if (!shell_waiting)
+            if (!shell_waiting && app_pid > 0)
                 INFO("process %d running in the background", app_pid);
             sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
         } else if (req->type == PROC_EXIT) {
@@ -84,9 +84,10 @@ static int app_read(int block_no, char* dst) {
 static int app_spawn(struct proc_request *req) {
     int bin_ino = dir_lookup(0, "bin");
 
-    app_ino = dir_lookup(bin_ino, req->argv[0]);
-    app_pid = pcb.proc_alloc();
+    if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0)
+        return -1;
 
+    app_pid = pcb.proc_alloc();
     if (req->argv[req->argc - 1][0] != '&') 
         elf_load(app_pid, app_read, req->argc, (void**)req->argv);
     else

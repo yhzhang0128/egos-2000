@@ -19,5 +19,5 @@ int dir_lookup(int dir_ino, char* name) {
         FATAL("sys_shell expects message from GPID_DIR");
 
     struct dir_reply *reply = (void*)buf;
-    return reply->ino;
+    return reply->status == DIR_OK? reply->ino : -1;
 }

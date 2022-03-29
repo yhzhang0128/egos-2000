@@ -12,45 +12,30 @@
 
 int main(int argc, char** argv) {
     if (argc == 1) {
-        INFO("please provide an argument");
+        INFO("cat: please provide an argument");
         return 0;
     }
 
-    int dir_ino = grass->work_dir_ino;
-    char* file_name = argv[1];
-
     /* Get the inode number of the file */
-    int sender;
-    struct dir_request req1;
-    char buf[SYSCALL_MSG_LEN];
-
-    req1.type = DIR_LOOKUP;
-    req1.ino = dir_ino;
-    strcpy(req1.name, file_name);
-    sys_send(GPID_DIR, (void*)&req1, sizeof(struct dir_request));
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-
-    struct dir_reply *reply1 = (void*)buf;
-    if (reply1->status != DIR_OK) {
-        INFO("file %s not found", file_name);
+    int file_ino = dir_lookup(grass->work_dir_ino, argv[1]);
+    if (file_ino < 0) {
+        INFO("cat: file %s not found", argv[1]);
         return 1;
     }
 
-    /* Read the file */
-    struct file_request req2;
+    /* Read the first block of the file */
+    struct file_request req;
+    req.type = FILE_READ;
+    req.ino = file_ino;
+    req.offset = 0;
+    sys_send(GPID_FILE, (void*)&req, sizeof(req));
 
-    req2.type = FILE_READ;
-    req2.ino = reply1->ino;
-    req2.offset = 0;
-    sys_send(GPID_FILE, (void*)&req2, sizeof(struct file_request));
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-
-    struct file_reply *reply2 = (void*)buf;
-    char *result = reply2->block.bytes;
-    int len = strlen(result);
+    struct file_reply *reply = (void*)buf;
+    char *result = reply->block.bytes;
 
     printf("%s", result);
-    if (result[len - 1] != '\n')
+    if (result[strlen(result) - 1] != '\n')
         printf("\r\n");
 
     return 0;
