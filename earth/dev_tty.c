@@ -47,7 +47,7 @@ int tty_read(char* buf, int len) {
             printf("\b ");
         }
 
-        printf("%c", c);
+        if (i >= 0) printf("%c", c);
         fflush(stdout);
     }
 
