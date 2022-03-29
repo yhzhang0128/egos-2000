@@ -65,20 +65,7 @@ int main(struct pcb_intf* _pcb) {
 }
 
 static int app_read(int block_no, char* dst) {
-    int sender;
-    struct file_request req;
-    char buf[SYSCALL_MSG_LEN];
-    req.type = FILE_READ;
-    req.ino = app_ino;
-    req.offset = block_no;
-    sys_send(GPID_FILE, (void*)&req, sizeof(struct file_request));
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    if (sender != GPID_FILE)
-        FATAL("app_read expects message from GPID_FILE");
-
-    struct file_reply *reply = (void*)buf;
-    memcpy(dst, reply->block.bytes, BLOCK_SIZE);
-    return 0;
+    file_read(app_ino, block_no, dst);
 }
 
 static int app_spawn(struct proc_request *req) {

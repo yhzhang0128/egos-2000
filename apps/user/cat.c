@@ -24,17 +24,8 @@ int main(int argc, char** argv) {
     }
 
     /* Read the first block of the file */
-    struct file_request req;
-    req.type = FILE_READ;
-    req.ino = file_ino;
-    req.offset = 0;
-    sys_send(GPID_FILE, (void*)&req, sizeof(req));
-
-    int sender;
-    char buf[SYSCALL_MSG_LEN];
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    struct file_reply *reply = (void*)buf;
-    char *result = reply->block.bytes;
+    char result[BLOCK_SIZE];
+    file_read(file_ino, 0, result);
 
     printf("%s", result);
     if (result[strlen(result) - 1] != '\n')

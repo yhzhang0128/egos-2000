@@ -16,7 +16,7 @@ int dir_lookup(int dir_ino, char* name) {
     sys_send(GPID_DIR, (void*)&req, sizeof(struct dir_request));
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     if (sender != GPID_DIR)
-        FATAL("sys_shell expects message from GPID_DIR");
+        FATAL("dir_lookup expects message from GPID_DIR");
 
     struct dir_reply *reply = (void*)buf;
     return reply->status == DIR_OK? reply->ino : -1;
@@ -34,7 +34,8 @@ int file_read(int file_ino, int offset, char* block) {
 
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     if (sender != GPID_FILE)
-        FATAL("dir_do_lookup expects message from GPID_FILE");
+        FATAL("file_read expects message from GPID_FILE");
+
     struct file_reply *reply = (void*)buf;
     memcpy(block, reply->block.bytes, BLOCK_SIZE);
 }

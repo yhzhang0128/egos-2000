@@ -16,24 +16,10 @@ int main(int argc, char** argv) {
         sys_exit(0);
     }
 
-    int ino = grass->work_dir_ino;
-    char* work_dir = grass->work_dir;
-
-    int sender;
-    struct file_request req;
-    char buf[SYSCALL_MSG_LEN];
-
-    req.type = FILE_READ;
-    req.ino = ino;
-    req.offset = 0;
-    sys_send(GPID_FILE, (void*)&req, sizeof(struct file_request));
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-
-    struct file_reply *reply = (void*)buf;
-    char *result = reply->block.bytes;
-    int len = strlen(result);
-
-    for (int i = 1; i < len; i++)
+    char result[BLOCK_SIZE];
+    file_read(grass->work_dir_ino, 0, result);
+    
+    for (int i = 1; i < strlen(result); i++)
         if (result[i - 1] == ' ' &&
             result[i] >= '0' &&
             result[i] <= '9')
