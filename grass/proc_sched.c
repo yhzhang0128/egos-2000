@@ -89,20 +89,21 @@ static void proc_yield() {
         proc_set_runnable(curr_pid);
 
     proc_curr_idx = proc_next_idx;
-    proc_set_running(curr_pid);
     earth->mmu_switch(curr_pid);
     timer_reset();
 
     if (proc_set[proc_curr_idx].status == PROC_READY) {
-        /* prepare argc */
+        proc_set_running(curr_pid);
+        /* Prepare argc and argv */
         int argc = *((int*)APPS_MAIN_ARG);
         __asm__ volatile("mv a0, %0" ::"r"(argc));
-        /* prepare argv */
         __asm__ volatile("mv a1, %0" ::"r"(APPS_MAIN_ARG + 4));
-        /* enter application code */
+        /* Enter application code */
         __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
         __asm__ volatile("mret");
     }
+
+    proc_set_running(curr_pid);
 }
 
 

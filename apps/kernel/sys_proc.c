@@ -20,7 +20,7 @@ struct pcb_intf {
 } pcb;
 
 static int app_ino, app_pid;
-static void sys_spawn(int, int);
+static void sys_spawn(int base);
 static int app_spawn(struct proc_request *req);
 
 int main(struct pcb_intf* _pcb) {
@@ -29,15 +29,16 @@ int main(struct pcb_intf* _pcb) {
 
     int sender, shell_waiting;
     char buf[SYSCALL_MSG_LEN];
-    sys_spawn(GPID_FILE, SYS_FILE_EXEC_START);
+
+    sys_spawn(SYS_FILE_EXEC_START);
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
-    sys_spawn(GPID_DIR, SYS_DIR_EXEC_START);
+    sys_spawn(SYS_DIR_EXEC_START);
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
-    sys_spawn(GPID_SHELL, SYS_SHELL_EXEC_START);
+    sys_spawn(SYS_SHELL_EXEC_START);
     
     while (1) {
         sys_recv(&sender, buf, SYSCALL_MSG_LEN);
@@ -89,12 +90,12 @@ static int sys_proc_read(int block_no, char* dst) {
     return earth->disk_read(SYS_PROC_BASE + block_no, 1, dst);
 }
 
-static char* kernel_procs[] = {"", "sys_proc", "sys_file", "sys_dir", "sys_shell"};
-static void sys_spawn(int pid, int base) {
-    int _pid = pcb.proc_alloc();
+char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
+static void sys_spawn(int base) {
+    int pid = pcb.proc_alloc();
 
-    INFO("Load kernel process #%d: %s", _pid, kernel_procs[_pid]);
+    INFO("Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
     SYS_PROC_BASE = base;
     elf_load(pid, sys_proc_read, 0, NULL);
-    pcb.proc_set_ready(_pid);
+    pcb.proc_set_ready(pid);
 }
