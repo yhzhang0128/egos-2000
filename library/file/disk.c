@@ -9,7 +9,6 @@ static int disk_getsize(block_if this_bs, unsigned int ino){
 
 static int disk_setsize(block_if this_bs, unsigned int ino, block_no newsize) {
     FATAL("Cannot set the size of the physical disk");
-    return -1;
 }
 
 static int disk_read(block_if this_bs, unsigned int ino, block_no offset, block_t *block) {

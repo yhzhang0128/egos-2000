@@ -30,11 +30,10 @@ int disk_read(int block_no, int nblocks, char* dst) {
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
-    if (type == SD_CARD) {
+    if (type == SD_CARD)
         return sdwrite(block_no, nblocks, src);
-    } else {
-        FATAL("on-board flash ROM cannot be written");
-    }    
+    else
+        FATAL("on-board flash ROM cannot be written"); 
 }
 
 int disk_init() {

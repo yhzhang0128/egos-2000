@@ -23,29 +23,26 @@ int main() {
     fs = treedisk_init(disk, 0);
 
     /* Send notification to GPID_PROCESS */
-    int sender;
     char buf[SYSCALL_MSG_LEN];
-    char* msg = "Finish GPID_FILE initialization";
-    memcpy(buf, msg, 32);
+    strcpy(buf, "Finish GPID_FILE initialization");
     sys_send(GPID_PROCESS, buf, 32);
 
     /* Wait for file requests */
     while (1) {
-        sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+        int sender, r;
         struct file_request *req = (void*)buf;
         struct file_reply *reply = (void*)buf;
+        sys_recv(&sender, buf, SYSCALL_MSG_LEN);
 
-        int r, type = req->type;
-        unsigned int ino = req->ino, offset = req->offset;
-        switch (type) {
+        switch (req->type) {
         case FILE_READ:
-            r = fs->read(fs, ino, offset, (void*)&reply->block);
+            r = fs->read(fs, req->ino, req->offset, (void*)&reply->block);
             reply->status = r == 0 ? FILE_OK : FILE_ERROR;
             sys_send(sender, (void*)reply, sizeof(struct file_reply));
             break;
         case FILE_WRITE:
         default:
-            FATAL("Request type=%d not implemented in GPID_FILE", type);
+            FATAL("Request type=%d not implemented in GPID_FILE", req->type);
         }
     }
 }

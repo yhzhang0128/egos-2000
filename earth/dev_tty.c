@@ -15,8 +15,7 @@ static int c, is_reading;
 static struct metal_uart* uart;
 
 int tty_intr() {
-    if (is_reading)
-        return 0;
+    if (is_reading) return 0;
 
     metal_uart_getc(uart, &c);
     return c == 3;          // Ctrl + C
@@ -48,6 +47,15 @@ int tty_read(char* buf, int len) {
  finish:
     buf[len - 1] = is_reading = 0;    
     return 0;
+}
+
+int tty_write(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+    fflush(stdout);
 }
 
 int tty_init() {

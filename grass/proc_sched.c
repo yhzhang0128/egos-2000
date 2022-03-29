@@ -14,13 +14,17 @@
 #include "syscall.h"
 #include <string.h>
 
+#define INTR_ID_TMR        7
+#define INTR_ID_SOFT       3
+
 static void proc_yield();
 static void proc_syscall();
 static void (*kernel_entry)();
 
 int proc_curr_idx;
-struct  process   proc_set[MAX_NPROCESS];
-#define curr_pid  proc_set[proc_curr_idx].pid
+struct  process     proc_set[MAX_NPROCESS];
+#define curr_pid    proc_set[proc_curr_idx].pid
+#define curr_status proc_set[proc_curr_idx].status
 
 void intr_entry(int id) {
     if (curr_pid < GPID_SHELL && id == INTR_ID_TMR) {
@@ -31,7 +35,6 @@ void intr_entry(int id) {
 
     if (curr_pid >= GPID_USER_START && earth->tty_intr()) {
         /* User process killed by ctrl+c interrupt */
-        __asm__ volatile("mv a0, %0" ::"r"(0));
         __asm__ volatile("csrw mepc, %0" ::"r"(0x8005006));
         return;
     }
@@ -66,27 +69,23 @@ void ctx_entry() {
 }
 
 static void proc_yield() {
-    int proc_next_idx = -1;
+    int next_idx = -1;
     for (int i = 1; i <= MAX_NPROCESS; i++) {
-        int tmp_next = (proc_curr_idx + i) % MAX_NPROCESS;
-        if (proc_set[tmp_next].status == PROC_READY ||
-            proc_set[tmp_next].status == PROC_RUNNING ||
-            proc_set[tmp_next].status == PROC_RUNNABLE) {
-            proc_next_idx = tmp_next;
+        int s = proc_set[(proc_curr_idx + i) % MAX_NPROCESS].status;
+        if (s == PROC_READY || s == PROC_RUNNING || s == PROC_RUNNABLE) {
+            next_idx = (proc_curr_idx + i) % MAX_NPROCESS;
             break;
         }
     }
 
-    if (proc_next_idx == -1) FATAL("proc_yield: no more runnable process");
+    if (next_idx == -1) FATAL("proc_yield: no more runnable process");
+    if (curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
-    if (proc_set[proc_curr_idx].status == PROC_RUNNING)
-        proc_set_runnable(curr_pid);
-
-    proc_curr_idx = proc_next_idx;
+    proc_curr_idx = next_idx;
     earth->mmu_switch(curr_pid);
     timer_reset();
 
-    if (proc_set[proc_curr_idx].status == PROC_READY) {
+    if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
         /* Prepare argc and argv */
         int argc = *((int*)APPS_MAIN_ARG);
@@ -129,12 +128,11 @@ static void proc_send(struct syscall *sc) {
     int receiver = sc->payload.msg.receiver;
 
     int receiver_idx = -1;
-    for (int i = 0; i < MAX_NPROCESS; i++) {
+    for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == receiver) {
             receiver_idx = i;
             break;
         }
-    }
 
     if (receiver_idx == -1) {
         sc->retval = -1;
@@ -165,16 +163,15 @@ static void proc_recv(struct syscall *sc) {
     sc->payload.msg.receiver = curr_pid;
 
     int sender = -1;
-    for (int i = 0; i < MAX_NPROCESS; i++) {
+    for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_WAIT_TO_SEND &&
             proc_set[i].receiver_pid == curr_pid) {
             sender = proc_set[i].pid;
             break;
         }
-    }
 
     if (sender == -1) {
-        proc_set[proc_curr_idx].status = PROC_WAIT_TO_RECV;
+        curr_status = PROC_WAIT_TO_RECV;
     } else {
         sc->payload.msg.sender = sender;
 

@@ -10,11 +10,6 @@
 #include "servers.h"
 
 struct earth *earth;
-
-#define INTR_ID_TMR        7
-#define INTR_ID_SOFT       3
-long long timer_reset();
-
 #define MAX_NPROCESS       16
 
 struct process{
@@ -40,6 +35,8 @@ struct pcb_intf {
     void (*proc_free)(int);
     void (*proc_set_ready)(int);
 };
+
+long long timer_reset();
 
 int  proc_alloc();
 void proc_free(int);

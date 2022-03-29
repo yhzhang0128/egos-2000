@@ -39,21 +39,19 @@ int mmu_init() {
 }
 
 int mmu_alloc(int* frame_no, int* cached_addr) {
-    for (int i = 0; i < NFRAMES; i++) {
+    for (int i = 0; i < NFRAMES; i++)
         if (!FRAME_INUSE(i)) {
             *frame_no = i;
             *cached_addr = cache_read(i);
             translate_table.frame[i].flag |= F_INUSE;
             return 0;
         }
-    }
     return -1;
 }
 
 int mmu_free(int pid) {
-    for (int i = 0; i < NFRAMES; i++) {
-        if (translate_table.frame[i].pid == pid &&
-            FRAME_INUSE(i)) {
+    for (int i = 0; i < NFRAMES; i++)
+        if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
             /* remove the mapping */
             translate_table.frame[i].pid = 0;
             translate_table.frame[i].page_no = 0;
@@ -61,10 +59,8 @@ int mmu_free(int pid) {
 
             /* invalidate the cache */
             for (int j = 0; j < CACHED_NFRAMES; j++)
-                if (lookup_table[j] == i)
-                    lookup_table[j] = -1;
+                if (lookup_table[j] == i) lookup_table[j] = -1;
         }
-    }
     return 0;
 }
 
@@ -72,10 +68,8 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
     if (flag != F_ALL)
         FATAL("Memory protection not implemented");
     
-    if (!FRAME_INUSE(frame_no)) {
-        INFO("Frame %d has not been allocated", frame_no);
-        return -1;
-    }
+    if (!FRAME_INUSE(frame_no))
+        FATAL("Frame %d has not been allocated", frame_no);
 
     translate_table.frame[frame_no].pid = pid;
     translate_table.frame[frame_no].page_no = page_no;
@@ -145,12 +139,11 @@ static int cache_read(int frame_no) {
 }
 
 static int cache_write(int frame_no, char* src) {
-    for (int i = 0; i < CACHED_NFRAMES; i++) {
+    for (int i = 0; i < CACHED_NFRAMES; i++)
         if (lookup_table[i] == frame_no) {
             memcpy(cache + PAGE_SIZE * i, src, PAGE_SIZE);
             return 0;
         }
-    }
 
     int free_idx = cache_evict();
     lookup_table[free_idx] = frame_no;

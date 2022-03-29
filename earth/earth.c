@@ -34,7 +34,7 @@ int earth_init() {
     tty_init();
     earth->tty_intr = tty_intr;
     earth->tty_read = tty_read;
-    earth->tty_write = printf;
+    earth->tty_write = tty_write;
     SUCCESS("Finished initializing the tty device");
     
     /* Initialize disk */

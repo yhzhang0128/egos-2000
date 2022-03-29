@@ -36,13 +36,12 @@ static void trap_entry() {
         else
             FATAL("Got interrupt %d but handler not registered", id);
     } else {
+        int mepc;
+        __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
         if (excp_handler != NULL)
             excp_handler(id);
-        else {
-            int mepc;
-            __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
+        else
             FATAL("Got exception %d (mepc=%x) but handler not registered", id, mepc);
-        }
     }
 }
 

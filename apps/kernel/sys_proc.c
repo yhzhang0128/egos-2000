@@ -58,7 +58,7 @@ int main(struct pcb_intf* _pcb) {
             if (shell_waiting && app_pid == sender)
                 sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
             else
-                INFO("background process %d terminated", sender);                
+                INFO("background process %d terminated", sender);
         } else if (req->type == PROC_KILLALL){
             pcb.proc_free(-1);
         }
@@ -71,31 +71,27 @@ static int app_read(int block_no, char* dst) {
 
 static int app_spawn(struct proc_request *req) {
     int bin_ino = dir_lookup(0, "bin");
-
-    if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0)
-        return -1;
+    if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
 
     app_pid = pcb.proc_alloc();
-    if (req->argv[req->argc - 1][0] != '&') 
-        elf_load(app_pid, app_read, req->argc, (void**)req->argv);
-    else
-        elf_load(app_pid, app_read, req->argc - 1, (void**)req->argv);
+    int argc = req->argv[req->argc - 1][0] == '&'? req->argc - 1 : req->argc;
 
+    elf_load(app_pid, app_read, argc, (void**)req->argv);
     pcb.proc_set_ready(app_pid);
     return 0;
 }
 
-static int SYS_PROC_BASE;
+static int sys_proc_base;
 static int sys_proc_read(int block_no, char* dst) {
-    return earth->disk_read(SYS_PROC_BASE + block_no, 1, dst);
+    return earth->disk_read(sys_proc_base + block_no, 1, dst);
 }
 
 char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
 static void sys_spawn(int base) {
     int pid = pcb.proc_alloc();
-
     INFO("Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
-    SYS_PROC_BASE = base;
+
+    sys_proc_base = base;
     elf_load(pid, sys_proc_read, 0, NULL);
     pcb.proc_set_ready(pid);
 }

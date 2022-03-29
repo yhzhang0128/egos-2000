@@ -35,7 +35,7 @@ int main() {
 
         if (strcmp(buf, "pwd") == 0) {
             printf("%s\r\n", grass->work_dir);
-        } if (strcmp(buf, "clear") == 0) {
+        } else if (strcmp(buf, "clear") == 0) {
             printf("\e[1;1H\e[2J");
         } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
