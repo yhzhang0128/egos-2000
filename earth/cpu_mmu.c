@@ -129,14 +129,16 @@ int mmu_switch(int pid) {
     return 0;
 }
 
-static int cache_evict() {
+static int cache_evict(int frame_no) {
     int free_idx = rand() % CACHED_NFRAMES;
-    int frame_no = lookup_table[free_idx];
+    int old_frame_no = lookup_table[free_idx];
 
-    if (FRAME_INUSE(frame_no)) {
+    if (FRAME_INUSE(old_frame_no)) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
+        disk_write(old_frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
     }
+
+    lookup_table[free_idx] = frame_no;
     return free_idx;
 }
 
@@ -150,8 +152,7 @@ static int cache_read(int frame_no) {
     }
 
     if (free_idx == -1)
-        free_idx = cache_evict();
-    lookup_table[free_idx] = frame_no;
+        free_idx = cache_evict(frame_no);
 
     if (FRAME_INUSE(frame_no)) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
@@ -169,8 +170,7 @@ static int cache_write(int frame_no, char* src) {
         }
     }
 
-    int free_idx = cache_evict();
-    lookup_table[free_idx] = frame_no;
+    int free_idx = cache_evict(frame_no);
     memcpy(cache + PAGE_SIZE * free_idx, src, PAGE_SIZE);
 
     return 0;
