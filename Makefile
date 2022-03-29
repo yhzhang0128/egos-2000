@@ -50,7 +50,7 @@ TOOLS_DIR = tools
 DEBUG_DIR = build/debug
 RELEASE_DIR = build/release
 
-INCLUDE = -Ishared -Ishared/memory -Ishared/file -Ishared/syscall -Ishared/utils
+INCLUDE = -Ishared -Ishared/mem -Ishared/file -Ishared/syscall -Ishared/utils
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
