@@ -20,10 +20,10 @@ struct earth {
     int (*tty_read)(char* buf, int len);
     int (*tty_write)(const char *format, ...);
 
-    int (*log_info)(const char *format, ...);
-    int (*log_fatal)(const char *format, ...);
-    int (*log_success)(const char *format, ...);
-    int (*log_highlight)(const char *format, ...);
+    int (*tty_info)(const char *format, ...);
+    int (*tty_fatal)(const char *format, ...);
+    int (*tty_success)(const char *format, ...);
+    int (*tty_highlight)(const char *format, ...);
 };
 
 struct grass {

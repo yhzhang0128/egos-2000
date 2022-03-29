@@ -8,16 +8,6 @@
 #include "elf.h"
 #include "disk.h"
 
-int tty_init();
-int tty_intr();
-int tty_read(char* buf, int len);
-int tty_write(const char *format, ...);
-
-int disk_init();
-int disk_busy();
-int disk_read(int block_no, int nblocks, char* dst);
-int disk_write(int block_no, int nblocks, char* src);
-
 typedef void (*handler_t)(int);
 int intr_init();
 int intr_enable();
@@ -31,12 +21,22 @@ int mmu_map(int pid, int page_no, int frame_no, int flag);
 int mmu_switch(int pid);
 int mmu_free(int pid);
 
-int log_info(const char *format, ...);
-int log_highlight(const char *format, ...);
-int log_success(const char *format, ...);
-int log_fatal(const char *format, ...);
+int disk_init();
+int disk_busy();
+int disk_read(int block_no, int nblocks, char* dst);
+int disk_write(int block_no, int nblocks, char* src);
 
-#define INFO       log_info
-#define HIGHLIGHT  log_highlight
-#define SUCCESS    log_success
-#define FATAL      log_fatal
+int tty_init();
+int tty_intr();
+int tty_read(char* buf, int len);
+int tty_write(const char *format, ...);
+
+int tty_info(const char *format, ...);
+int tty_highlight(const char *format, ...);
+int tty_success(const char *format, ...);
+int tty_fatal(const char *format, ...);
+
+#define INFO       tty_info
+#define HIGHLIGHT  tty_highlight
+#define SUCCESS    tty_success
+#define FATAL      tty_fatal

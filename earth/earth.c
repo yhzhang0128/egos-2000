@@ -60,10 +60,10 @@ int earth_init() {
     SUCCESS("Finished initializing the CPU memory management unit");
 
     /* Initialize the logging functions */
-    earth->log_info = log_info;
-    earth->log_fatal = log_fatal;
-    earth->log_success = log_success;
-    earth->log_highlight = log_highlight;
+    earth->tty_info = tty_info;
+    earth->tty_fatal = tty_fatal;
+    earth->tty_success = tty_success;
+    earth->tty_highlight = tty_highlight;
 
     return 0;
 }
