@@ -43,7 +43,7 @@ EARTH_LAYOUT = -Tearth/layout.lds
 GRASS_SRCS = grass/*.S grass/*.c shared/*/*.c
 GRASS_LAYOUT = -Tgrass/layout.lds
 
-APPS_SRCS = apps/enter.S shared/*/*.c
+APPS_SRCS = apps/app.S shared/*/*.c
 APPS_LAYOUT = -Tapps/layout.lds
 
 TOOLS_DIR = tools
