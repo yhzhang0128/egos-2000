@@ -105,7 +105,7 @@ static void load_app(int pid,
         memset((char*)base, 0, PAGE_SIZE);
     }
 
-    /* allocate two pages for the app stack */
+    /* allocate two pages for the app arguments and stack */
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);
 
