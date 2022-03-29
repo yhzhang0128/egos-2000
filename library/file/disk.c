@@ -1,7 +1,7 @@
 #include "egos.h"
 #include "disk.h"
-#include "file.h"
 #include "print.h"
+#include "block_store.h"
 
 static int disk_getsize(block_if this_bs, unsigned int ino){
     return FS_DISK_SIZE / BLOCK_SIZE;

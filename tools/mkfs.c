@@ -20,7 +20,6 @@
 
 #include "disk.h"
 #include "file.h"
-#include "treedisk.h"
 
 #define NKERNEL_PROC 5
 char* kernel_processes[] = {

@@ -21,7 +21,7 @@ apps: apps/kernel/*.c apps/user/*.c
 .PHONY: install
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(TOOLS_DIR)/mkfs.c library/file/treedisk.c -DMKFS $(INCLUDE) -o $(TOOLS_DIR)/mkfs
+	$(CC) $(TOOLS_DIR)/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o $(TOOLS_DIR)/mkfs
 	cd $(TOOLS_DIR); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(TOOLS_DIR)/earth.bin

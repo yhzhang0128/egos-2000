@@ -21,13 +21,12 @@
  *		block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino)
  *			Opens a virtual block store within inode below_ino of the block store below.
  *
- * The layout of the file system is described in the file "treedisk.h".
+ * The layout of the file system is described in the file "file.h".
  */
 
 #include <stdlib.h>
 #include <string.h>
 #include "file.h"
-#include "treedisk.h"
 
 #ifdef MKFS
 #include <stdio.h>
@@ -39,7 +38,7 @@
 #endif
 
 /* Temporary information about the file system and a particular inode.
- * Convenient for all operations. See "treedisk.h" for field details.
+ * Convenient for all operations. See "file.h" for field details.
  */
 struct treedisk_snapshot {
 	union treedisk_block superblock; 
