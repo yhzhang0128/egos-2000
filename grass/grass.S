@@ -7,8 +7,15 @@
  * Description: context switch and context start
  */
 	.section .text
+    .global _enter
 	.global ctx_start
 	.global ctx_switch
+_enter:
+        li sp,0x80003f80
+        call main
+_spin:
+        j _spin
+
 ctx_start:
 	addi sp,sp,-64
 	sw s0,4(sp)       /* save callee-saved registers */
@@ -27,6 +34,7 @@ ctx_start:
 	sw sp,0(a0)       /* save the current stack pointer */
 	mv sp,a1          /* switch the stack */
 	call ctx_entry    /* call ctx_entry() */
+
 ctx_switch:
 	addi sp,sp,-64
 	sw s0,4(sp)       /* save callee-saved registers */
