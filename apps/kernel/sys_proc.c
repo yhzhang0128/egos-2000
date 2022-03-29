@@ -46,24 +46,21 @@ int main(struct pcb_intf* _pcb) {
         struct proc_reply *reply = (void*)buf;
         if (req->type == PROC_SPAWN) {
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
+
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
             if (!shell_waiting)
                 INFO("process %d running in the background", app_pid);
             sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
         } else if (req->type == PROC_EXIT) {
             pcb.proc_free(sender);
-            if (shell_waiting && app_pid == sender) {
+
+            if (shell_waiting && app_pid == sender)
                 sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
-            } else {
-                INFO("background process %d terminated", sender);
-            }
-                
+            else
+                INFO("background process %d terminated", sender);                
         } else if (req->type == PROC_KILLALL){
             pcb.proc_free(-1);
-        } else {
-            FATAL("sys_proc: unexpected message type %d", req->type);
         }
-
     }
 }
 
@@ -86,19 +83,17 @@ static int app_read(int block_no, char* dst) {
 
 static int app_spawn(struct proc_request *req) {
     int bin_ino = dir_lookup(0, "bin");
-    app_ino = dir_lookup(bin_ino, req->argv[0]);
 
-    if (app_ino < 0) {
-        return -1;
-    } else {
-        app_pid = pcb.proc_alloc();
-        if (req->argv[req->argc - 1][0] != '&') 
-            elf_load(app_pid, app_read, req->argc, (void**)req->argv);
-        else
-            elf_load(app_pid, app_read, req->argc - 1, (void**)req->argv);
-        pcb.proc_set_ready(app_pid);
-        return 0;
-    }
+    app_ino = dir_lookup(bin_ino, req->argv[0]);
+    app_pid = pcb.proc_alloc();
+
+    if (req->argv[req->argc - 1][0] != '&') 
+        elf_load(app_pid, app_read, req->argc, (void**)req->argv);
+    else
+        elf_load(app_pid, app_read, req->argc - 1, (void**)req->argv);
+
+    pcb.proc_set_ready(app_pid);
+    return 0;
 }
 
 static int SYS_PROC_BASE;
@@ -106,14 +101,12 @@ static int sys_proc_read(int block_no, char* dst) {
     return earth->disk_read(SYS_PROC_BASE + block_no, 1, dst);
 }
 
-char* kernel_procs[] = {"", "sys_proc", "sys_file", "sys_dir", "sys_shell"};
+static char* kernel_procs[] = {"", "sys_proc", "sys_file", "sys_dir", "sys_shell"};
 static void sys_spawn(int pid, int base) {
     int _pid = pcb.proc_alloc();
-    if (_pid != pid)
-        FATAL("Process ID mismatch: %d != %d", pid, _pid);
 
-    INFO("Load kernel process #%d: %s", pid, kernel_procs[pid]);
+    INFO("Load kernel process #%d: %s", _pid, kernel_procs[_pid]);
     SYS_PROC_BASE = base;
     elf_load(pid, sys_proc_read, 0, NULL);
-    pcb.proc_set_ready(pid);
+    pcb.proc_set_ready(_pid);
 }

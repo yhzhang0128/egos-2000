@@ -10,40 +10,31 @@
 #include "app.h"
 #include <string.h>
 
-#define tty_read earth->tty_read
-
-#define GREEN  "\x1B[1;32m"
-#define CYAN  "\x1B[1;36m"
-#define NORM  "\x1B[1;0m"
-
 void parse_request(char* buf, struct proc_request* req);
 
 int main() {
     SUCCESS("Enter kernel process GPID_SHELL");
 
-    int home = dir_lookup(0, "home");
-    int yunhao = dir_lookup(home, "yunhao");
+    strcpy(grass->work_dir, "/home/yunhao");
+    strcpy(grass->work_dir_name, "yunhao");
 
-    grass->work_dir_ino = yunhao;
-    char *work_dir = grass->work_dir;
-    char *work_dir_name = grass->work_dir_name;
-    strcpy(work_dir, "/home/yunhao");
-    strcpy(work_dir_name, "yunhao");
-    INFO("sys_shell: /home/yunhao has ino=%d", yunhao);
+    int home = dir_lookup(0, "home");
+    grass->work_dir_ino = dir_lookup(home, "yunhao");
+    INFO("sys_shell: /home/yunhao has ino=%d", grass->work_dir_ino);
     
     /* Wait for shell commands */
     HIGHLIGHT("Welcome to egos-riscv!");
     int sender;
-    char buf[128];
+    char buf[256];
     struct proc_request req;
     struct proc_reply reply;
     while (1) {
-        printf("%s➜ %s%s%s ", GREEN, CYAN, work_dir_name, NORM);
-        tty_read(buf, 100);
+        printf("%s➜ %s%s%s ", "\x1B[1;32m", "\x1B[1;36m", grass->work_dir_name, "\x1B[1;0m");
+        earth->tty_read(buf, 256);
         if (strlen(buf) == 0) continue;
 
         if (strcmp(buf, "pwd") == 0) {
-            printf("%s\r\n", work_dir);
+            printf("%s\r\n", grass->work_dir);
         } if (strcmp(buf, "clear") == 0) {
             printf("\e[1;1H\e[2J");
         } else if (strcmp(buf, "killall") == 0) {
@@ -62,7 +53,6 @@ int main() {
                 sys_recv(&sender, (void*)&reply, sizeof(reply));            
         }
     }
-    return 0;
 }
 
 void parse_request(char* buf, struct proc_request* req) {
@@ -78,5 +68,5 @@ void parse_request(char* buf, struct proc_request* req) {
             idx = 0;
         }
     }
-    req->argc = ++nargs;
+    req->argc = idx ? nargs + 1 : nargs;
 }

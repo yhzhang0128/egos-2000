@@ -44,11 +44,8 @@ int main() {
             sys_send(sender, (void*)reply, sizeof(struct file_reply));
             break;
         case FILE_WRITE:
-            FATAL("TODO: FILE_WRITE to be implemented in GPID_FILE");
-            break;
         default:
-            FATAL("GPID_FILE get unknown request %d", type);
+            FATAL("Request type=%d not implemented in GPID_FILE", type);
         }
     }
-    return 0;
 }
