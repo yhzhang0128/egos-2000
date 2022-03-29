@@ -1,6 +1,6 @@
 # A minimal operating system on a real RISC-V board
 
-With only **2.5K** lines of code, our teaching OS implements SD card driver, tty driver, interrupt handling, address translation, process scheduling and communication, system calls, file system, shell and 7 shell commands.
+With only **2.4K** lines of code, our teaching OS implements SD card driver, tty driver, interrupt handling, address translation, process scheduling and communication, system calls, file system, shell and 7 shell commands.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
@@ -19,20 +19,20 @@ This RISC-V version of EGOS is minimal in order to give students the **complete*
 ```shell
 # Count lines of code excluding Markdown documents
 > cloc egos-riscv --exclude-ext=md  
-      64 text files.
-      64 unique files.                              
-      18 files ignored.
+      53 text files.
+      53 unique files.
+       7 files ignored.
 
-github.com/AlDanial/cloc v 1.74  T=0.09 s (505.8 files/s, 39185.5 lines/s)
+github.com/AlDanial/cloc v 1.82  T=0.03 s (1787.2 files/s, 134268.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               28            499            403           1970
-C/C++ Header                    15             99            107            405
-Assembly                         3              3             21             69
-make                             1             12              0             53
+C                               29            488            401           1883
+C/C++ Header                    15             99            107            404
+Assembly                         2              4             14             67
+make                             1             11              0             53
 -------------------------------------------------------------------------------
-SUM:                            47            613            531           2497
+SUM:                            47            602            522           2407
 -------------------------------------------------------------------------------
 ```
 
