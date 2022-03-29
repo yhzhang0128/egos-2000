@@ -24,19 +24,19 @@ struct  process   proc_set[MAX_NPROCESS];
 
 void intr_entry(int id) {
     if (curr_pid < GPID_SHELL && id == INTR_ID_TMR) {
-        /* IO may be busy; do not interrupt */
+        /* IO may be busy in kernel processes */
         timer_reset();
         return;
     }
 
     if (curr_pid >= GPID_USER_START && earth->tty_intr()) {
-        /* User process killed by ctrl-C */
+        /* User process killed by ctrl+c interrupt */
         __asm__ volatile("mv a0, %0" ::"r"(0));
         __asm__ volatile("csrw mepc, %0" ::"r"(0x8005006));
         return;
     }
 
-    /* switch to the grass kernel (ctx_entry) */
+    /* switch to the grass kernel stack */
     switch(id) {
     case INTR_ID_TMR:
         kernel_entry = proc_yield;
@@ -85,18 +85,15 @@ static void proc_yield() {
         return;
     }
 
-    int next_pid = proc_set[proc_next_idx].pid;
-    int next_status = proc_set[proc_next_idx].status;
-    int curr_status = proc_set[proc_curr_idx].status;
-
-    if (curr_status == PROC_RUNNING)
+    if (proc_set[proc_curr_idx].status == PROC_RUNNING)
         proc_set_runnable(curr_pid);
-    proc_curr_idx = proc_next_idx;
-    proc_set_running(next_pid);
-    earth->mmu_switch(next_pid);
 
+    proc_curr_idx = proc_next_idx;
+    proc_set_running(curr_pid);
+    earth->mmu_switch(curr_pid);
     timer_reset();
-    if (next_status == PROC_READY) {
+
+    if (proc_set[proc_curr_idx].status == PROC_READY) {
         /* prepare argc */
         int argc = *((int*)APPS_MAIN_ARG);
         __asm__ volatile("mv a0, %0" ::"r"(argc));
