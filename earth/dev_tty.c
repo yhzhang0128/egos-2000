@@ -42,12 +42,12 @@ int tty_read(char* buf, int len) {
             printf("\r\n");
             goto finish;
         case DELETE:
-            c = '\b';
-            i = i ? i - 2 : -1;
-            printf("\b ");
+            c = 0;
+            i = i ? i - 2 : i - 1;
+            printf("\b \b");
         }
 
-        if (i >= 0) printf("%c", c);
+        if (c) printf("%c", c);
         fflush(stdout);
     }
 
