@@ -12,9 +12,9 @@
 
 #define tty_read earth->tty_read
 
-#define KGRN  "\x1B[1;32m"
-#define KCYN  "\x1B[1;36m"
-#define KNRM  "\x1B[1;0m"
+#define GREEN  "\x1B[1;32m"
+#define CYAN  "\x1B[1;36m"
+#define NORM  "\x1B[1;0m"
 
 int get_inode(int ino, char* name);
 void parse_request(char* buf, struct proc_request* req);
@@ -34,17 +34,19 @@ int main() {
     
     /* Wait for shell commands */
     HIGHLIGHT("Welcome to egos-riscv!");
-    char buf[128];
     int sender;
+    char buf[128];
     struct proc_request req;
     struct proc_reply reply;
     while (1) {
-        printf("%s➜ %s%s%s ", KGRN, KCYN, work_dir_name, KNRM);
+        printf("%s➜ %s%s%s ", GREEN, CYAN, work_dir_name, NORM);
         tty_read(buf, 100);
         if (strlen(buf) == 0) continue;
 
         if (strcmp(buf, "pwd") == 0) {
             printf("%s\r\n", work_dir);
+        } if (strcmp(buf, "clear") == 0) {
+            printf("\e[1;1H\e[2J");
         } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
             sys_send(GPID_PROCESS, (void*)&req, sizeof(req));

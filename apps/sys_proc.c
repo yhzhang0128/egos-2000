@@ -31,14 +31,10 @@ int main(struct pcb_intf* _pcb) {
     char buf[SYSCALL_MSG_LEN];
     sys_spawn(GPID_FILE, SYS_FILE_EXEC_START);
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    if (sender != GPID_FILE)
-        FATAL("sys_proc expects message from GPID_FILE");
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(GPID_DIR, SYS_DIR_EXEC_START);
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    if (sender != GPID_DIR)
-        FATAL("sys_proc expects message from GPID_DIR");
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(GPID_SHELL, SYS_SHELL_EXEC_START);
