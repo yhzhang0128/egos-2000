@@ -18,37 +18,34 @@ void intr_entry(int id);
 
 void proc_init() {
     earth->intr_register(intr_entry);
-    memset(proc_set, 0, sizeof(struct process) * MAX_NPROCESS);
+    memset(proc_set, 0, sizeof(proc_set));
 
     /* the first process is now running */
     int pid = proc_alloc();
     proc_set_running(pid);
 
     if (pid != GPID_PROCESS)
-        FATAL("Process ID mismatch: %d != %d", pid, GPID_PROCESS);
+        FATAL("Process ID mismatch: %d != %d in proc_init()", pid, GPID_PROCESS);
 }
 
 int proc_alloc() {
     static int proc_nprocs = 0;
-    for (int i = 0; i < MAX_NPROCESS; i++) {
+    for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid = ++proc_nprocs;
             proc_set[i].status = PROC_LOADING;
             return proc_nprocs;
         }
-    }
 
     FATAL("Reach the limit of %d concurrent processes", MAX_NPROCESS);
-    return -1;
 }
 
 static void proc_set_status(int pid, int status) {
-    for (int i = 0; i < MAX_NPROCESS; i++) {
+    for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == pid) {
             proc_set[i].status = status;
             return;
         }
-    }
 }
 
 void proc_free(int pid) {
@@ -56,13 +53,13 @@ void proc_free(int pid) {
         earth->mmu_free(pid);
         proc_set_status(pid, PROC_UNUSED);
     } else {
-        for (int i = 0; i < MAX_NPROCESS; i++) {
+        /* Free all user applications */
+        for (int i = 0; i < MAX_NPROCESS; i++)
             if (proc_set[i].pid >= GPID_USER_START
                 && proc_set[i].status != PROC_UNUSED) {
                 earth->mmu_free(proc_set[i].pid);
                 proc_set[i].status = PROC_UNUSED;
             }
-        }        
     }
 }
 
