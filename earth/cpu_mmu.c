@@ -21,7 +21,7 @@ struct translation_table_t {
     } frame[NFRAMES];
 } translate_table;
 
-#define INUSE(x) (x.flag & F_INUSE)
+#define FRAME_INUSE(x) (translate_table.frame[x].flag & F_INUSE)
 
 int curr_vm_pid;
 int lookup_table[CACHED_NFRAMES];
@@ -40,7 +40,7 @@ int mmu_init() {
 
 int mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++) {
-        if (!INUSE(translate_table.frame[i])) {
+        if (!FRAME_INUSE(i)) {
             *frame_no = i;
             *cached_addr = cache_read(i);
             translate_table.frame[i].flag |= F_INUSE;
@@ -53,7 +53,7 @@ int mmu_alloc(int* frame_no, int* cached_addr) {
 int mmu_free(int pid) {
     for (int i = 0; i < NFRAMES; i++) {
         if (translate_table.frame[i].pid == pid &&
-            INUSE(translate_table.frame[i])) {
+            FRAME_INUSE(i)) {
             /* remove the mapping */
             translate_table.frame[i].pid = 0;
             translate_table.frame[i].page_no = 0;
@@ -72,7 +72,7 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
     if (flag != F_ALL)
         FATAL("Memory protection not implemented");
     
-    if (!INUSE(translate_table.frame[frame_no])) {
+    if (!FRAME_INUSE(frame_no)) {
         INFO("Frame %d has not been allocated", frame_no);
         return -1;
     }
@@ -93,7 +93,7 @@ int mmu_switch(int pid) {
 
     /* unmap curr_vm_pid from virtual address space */
     for (int i = 0; i < NFRAMES; i++) {
-        if (INUSE(translate_table.frame[i])
+        if (FRAME_INUSE(i)
             && translate_table.frame[i].pid == curr_vm_pid) {
 
             char* addr;
@@ -112,7 +112,7 @@ int mmu_switch(int pid) {
  map_only:
     /* map pid to virtual address space */
     for (int i = 0; i < NFRAMES; i++) {
-        if (INUSE(translate_table.frame[i])
+        if (FRAME_INUSE(i)
             && translate_table.frame[i].pid == pid) {
 
             char *dst_addr, *src_addr = (char*)cache_read(i);
@@ -137,7 +137,7 @@ static int cache_evict() {
     int free_idx = rand() % CACHED_NFRAMES;
     int frame_no = lookup_table[free_idx];
 
-    if (INUSE(translate_table.frame[frame_no])) {
+    if (FRAME_INUSE(frame_no)) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
         disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
     }
@@ -157,7 +157,7 @@ static int cache_read(int frame_no) {
         free_idx = cache_evict();
     lookup_table[free_idx] = frame_no;
 
-    if (INUSE(translate_table.frame[frame_no])) {
+    if (FRAME_INUSE(frame_no)) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
         disk_read(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
     }
