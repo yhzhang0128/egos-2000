@@ -67,5 +67,3 @@ block_if fs_disk_init();
 
 block_if treedisk_init(block_if below, unsigned int below_ino);
 int treedisk_create(block_if below, unsigned int below_ino, unsigned int ninodes);
-
-int dir_lookup(int dir_ino, char* name);

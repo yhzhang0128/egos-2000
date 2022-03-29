@@ -46,34 +46,24 @@ int main() {
 }
 
 int dir_do_lookup(int ino, char* name) {
-    int sender;
-    struct file_request req;
-    char buf[SYSCALL_MSG_LEN];
+    char block[BLOCK_SIZE];
+    file_read(ino, 0, block);
 
-    req.type = FILE_READ;
-    req.ino = ino;
-    req.offset = 0;
-    sys_send(GPID_FILE, (void*)&req, sizeof(struct file_request));
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-    if (sender != GPID_FILE)
-        FATAL("dir_do_lookup expects message from GPID_FILE");
-
-    struct file_reply *reply = (void*)buf;
+    int dir_len = strlen(block);
     int name_len = strlen(name);
-    int dir_len = strlen(reply->block.bytes);
 
     for (int i = 0; i < dir_len - name_len; i++) {
         int match = 1;
         for (int j = 0; j < name_len; j++)
-            if (name[j] != reply->block.bytes[i + j]) {
+            if (name[j] != block[i + j]) {
                 match = 0;
                 break;
             }
 
-        if (match && reply->block.bytes[i + name_len] == ' ') {
+        if (match && block[i + name_len] == ' ') {
             int ino = 0, base = i + name_len;
             for (int k = 0; k < 4; k++) {
-                char ch = reply->block.bytes[base + k];
+                char ch = block[base + k];
                 if (ch != ' ')
                     ino = ino * 10 + ch - '0';
             }
