@@ -43,8 +43,8 @@ int tty_read(char* buf, int len) {
             goto finish;
         case DELETE:
             c = 0;
+            if (i) printf("\b \b");
             i = i ? i - 2 : i - 1;
-            printf("\b \b");
         }
 
         if (c) printf("%c", c);
