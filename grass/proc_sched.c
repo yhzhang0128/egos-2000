@@ -77,13 +77,7 @@ static void proc_yield() {
         }
     }
 
-    if (proc_next_idx == -1)
-        FATAL("proc_yield: no more runnable process");
-
-    if (proc_next_idx == proc_curr_idx) {
-        timer_reset();
-        return;
-    }
+    if (proc_next_idx == -1) FATAL("proc_yield: no more runnable process");
 
     if (proc_set[proc_curr_idx].status == PROC_RUNNING)
         proc_set_runnable(curr_pid);

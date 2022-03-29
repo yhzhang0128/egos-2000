@@ -86,6 +86,7 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
 int mmu_switch(int pid) {
     char *dst, *src;
     int code_top = APPS_SIZE / PAGE_SIZE;
+    if (pid == curr_vm_pid) return 0;
     
     /* unmap curr_vm_pid from virtual address space */
     for (int i = 0; i < NFRAMES; i++)
