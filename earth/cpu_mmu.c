@@ -84,46 +84,26 @@ int mmu_map(int pid, int page_no, int frame_no, int flag) {
 }
 
 int mmu_switch(int pid) {
-    char* code_base  = (void*) APPS_ENTRY;
-    char* stack_base = (void*) DTIM_START;
-    int code_npages  = APPS_SIZE / PAGE_SIZE;
-
+    char *dst, *src;
+    int code_top = APPS_SIZE / PAGE_SIZE;
+    
     /* unmap curr_vm_pid from virtual address space */
-    for (int i = 0; i < NFRAMES; i++) {
-        if (FRAME_INUSE(i)
-            && translate_table.frame[i].pid == curr_vm_pid) {
-
-            char* addr;
+    for (int i = 0; i < NFRAMES; i++)
+        if (FRAME_INUSE(i) && translate_table.frame[i].pid == curr_vm_pid) {
             int page_no = translate_table.frame[i].page_no;
-            if (page_no < code_npages) {
-                addr = code_base + page_no * PAGE_SIZE;
-                cache_write(i, (void*)(addr));
-            } else {
-                addr = stack_base + (page_no - code_npages) * PAGE_SIZE;
-                cache_write(i, (void*)(addr));
-            }
-            //INFO("Unmap(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", curr_vm_pid, i, page_no, addr, &cache[i]);
+            src = (char*) ((page_no < code_top)? APPS_ENTRY : DTIM_START);
+            cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
         }
-    }
 
     /* map pid to virtual address space */
-    for (int i = 0; i < NFRAMES; i++) {
-        if (FRAME_INUSE(i)
-            && translate_table.frame[i].pid == pid) {
-
-            char *dst_addr, *src_addr = (char*)cache_read(i);
+    for (int i = 0; i < NFRAMES; i++)
+        if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
+            src = (char*)cache_read(i);
             int page_no = translate_table.frame[i].page_no;
-            if (page_no < code_npages) {
-                dst_addr = code_base + page_no * PAGE_SIZE;
-                memcpy(dst_addr, src_addr, PAGE_SIZE);
-            }
-            else {
-                dst_addr = stack_base + (page_no - code_npages) * PAGE_SIZE;
-                memcpy(dst_addr, src_addr, PAGE_SIZE);
-            }
-            //INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst_addr, src_addr);
+            dst = (char*) ((page_no < code_top)? APPS_ENTRY : DTIM_START);
+            memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
+            //INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst, src);
         }
-    }
 
     curr_vm_pid = pid;
     return 0;
