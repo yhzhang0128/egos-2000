@@ -14,20 +14,18 @@
 
 #define ENTER  0x0d
 #define CTRL_C 0x03
-
-static struct metal_uart* uart;
+#define DELETE 0x7f
 
 static int is_reading;
+static struct metal_uart* uart;
+
 int tty_intr() {
     if (is_reading)
         return 0;
 
     int c = -1;
     metal_uart_getc(uart, &c);
-    if (c != -1 && (char)c == CTRL_C)
-        return 1;
-    else
-        return 0;
+    return c == CTRL_C;
 }
 
 int tty_read(char* buf, int len) {
@@ -37,23 +35,24 @@ int tty_read(char* buf, int len) {
         buf[i] = (char)c;
 
         switch (c) {
-        case ENTER:
-            printf("\r\n");
-            buf[i] = 0;
-            goto finish;
         case CTRL_C:
-            printf("\r\n");
             buf[0] = 0;
+        case ENTER:
+            buf[i] = 0;
+            printf("\r\n");
             goto finish;
+        case DELETE:
+            c = '\b';
+            i = i ? i - 2 : -1;
+            printf("\b ");
         }
 
         printf("%c", c);
         fflush(stdout);
     }
 
-    buf[len - 1] = 0;
-
  finish:
+    buf[len - 1] = 0;
     is_reading = 0;
     return 0;
 }
