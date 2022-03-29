@@ -31,23 +31,20 @@ int main() {
 
 int earth_init() {
     /* Initialize TTY */
-    if (tty_init())
-        FATAL("Failed at initializing the tty device");
+    tty_init();
     earth->tty_intr = tty_intr;
     earth->tty_read = tty_read;
     earth->tty_write = printf;
     SUCCESS("Finished initializing the tty device");
     
     /* Initialize disk */
-    if (disk_init())
-        FATAL("Failed at initializing the disk device");
+    disk_init();
     earth->disk_read = disk_read;
     earth->disk_write = disk_write;
     SUCCESS("Finished initializing the disk device");
 
     /* Initialize CPU interrupt */
-    if (intr_init())
-        FATAL("Failed at initializing the CPU interrupts");
+    intr_init();
     earth->intr_enable = intr_enable;
     earth->intr_disable = intr_disable;
     earth->intr_register = intr_register;
@@ -55,8 +52,7 @@ int earth_init() {
     SUCCESS("Finished initializing the CPU interrupts");
 
     /* Initialize CPU memory management unit */
-    if (mmu_init())
-        FATAL("Failed at initializing the CPU interrupts");
+    mmu_init();
     earth->mmu_free = mmu_free;
     earth->mmu_alloc = mmu_alloc;
     earth->mmu_map = mmu_map;
