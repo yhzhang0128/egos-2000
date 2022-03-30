@@ -1,6 +1,7 @@
 /* 
  * Definitions for controlling SPI in FE310
- * copied from the Freedom Metal library: https://github.com/sifive/freedom-metal
+ * copied from the Freedom Metal library: 
+ * https://github.com/sifive/freedom-metal
  */
 #pragma once
 

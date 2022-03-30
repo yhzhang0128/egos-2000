@@ -1,6 +1,7 @@
 /* 
  * Definitions for controlling UART in FE310
- * copied from the Freedom Metal library: https://github.com/sifive/freedom-metal
+ * copied from the Freedom Metal library: 
+ * https://github.com/sifive/freedom-metal
  */
 #pragma once
 
