@@ -27,6 +27,10 @@ struct earth {
 };
 
 struct grass {
+    int (*proc_alloc)();
+    void (*proc_free)(int);
+    void (*proc_set_ready)(int);
+
     int work_dir_ino;
     char work_dir[32 * 16];
     char work_dir_name[32];

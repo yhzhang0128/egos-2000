@@ -28,13 +28,6 @@ enum {
     PROC_WAIT_TO_RECV
 };
 
-/* interface of the process control block (pcb) */
-struct pcb_intf {
-    int (*proc_alloc)();
-    void (*proc_free)(int);
-    void (*proc_set_ready)(int);
-};
-
 long long timer_reset();
 
 int  proc_alloc();

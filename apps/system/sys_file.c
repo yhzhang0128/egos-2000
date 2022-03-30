@@ -11,8 +11,6 @@
 #include "file.h"
 #include <string.h>
 
-block_if fs;
-
 int main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
@@ -20,7 +18,7 @@ int main() {
     block_if disk = fs_disk_init();    
     if (treedisk_create(disk, 0, NINODES) < 0)
         FATAL("proc_file: can't create treedisk file system");
-    fs = treedisk_init(disk, 0);
+    block_if fs = treedisk_init(disk, 0);
 
     /* Send notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];

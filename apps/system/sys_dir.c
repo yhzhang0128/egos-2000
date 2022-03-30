@@ -10,7 +10,24 @@
 #include "app.h"
 #include <string.h>
 
-int dir_do_lookup(int ino, char* name);
+int dir_do_lookup(int dir_ino, char* name) {
+    char block[BLOCK_SIZE];
+    file_read(dir_ino, 0, block);
+
+    int dir_len = strlen(block);
+    int name_len = strlen(name);
+
+    for (int i = 0, ret = 0; i < dir_len - name_len; i++)
+        if (strncmp(name, block + i, name_len) == 0 &&
+            block[i + name_len] == ' ') {
+            for (int k = 0; k < 4; k++)
+                if (block[i + name_len + k] != ' ')
+                    ret = ret * 10 + block[i + name_len + k] - '0';
+            return ret;
+        }
+
+    return -1;
+}
 
 int main() {
     SUCCESS("Enter kernel process GPID_DIR");
@@ -39,24 +56,4 @@ int main() {
             FATAL("Request type=%d not implemented in GPID_DIR", req->type);
         }
     }
-}
-
-int dir_do_lookup(int dir_ino, char* name) {
-    char block[BLOCK_SIZE];
-    file_read(dir_ino, 0, block);
-
-    int dir_len = strlen(block);
-    int name_len = strlen(name);
-
-    for (int i = 0; i < dir_len - name_len; i++)
-        if (strncmp(name, block + i, name_len) == 0 &&
-            block[i + name_len] == ' ') {
-            int ino = 0, base = i + name_len;
-            for (int k = 0; k < 4; k++)
-                if (block[base + k] != ' ')
-                    ino = ino * 10 + block[base + k] - '0';
-            return ino;
-        }
-
-    return -1;
 }

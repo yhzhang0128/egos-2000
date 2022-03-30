@@ -11,8 +11,8 @@
 #include "egos.h"
 #include "grass.h"
 
-struct pcb_intf pcb;
 struct earth *earth = (void*)EARTH_STRUCT;
+struct grass *grass = (void*)GRASS_STRUCT;
 
 void proc_init();
 void timer_init();
@@ -26,11 +26,11 @@ int main() {
     sys_proc_spawn();
 
     /* Enter the first kernel process sys_proc */
-    void (*sys_proc_entry)(void*) = (void*)APPS_ENTRY;
+    void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     earth->mmu_switch(GPID_PROCESS);   /* setup virtual address space */
     timer_reset();                     /* start timer                 */
     earth->intr_enable();              /* enable interrupt            */
-    sys_proc_entry(&pcb);              /* enter sys_proc              */
+    sys_proc_entry();                  /* enter sys_proc              */
 
     FATAL("Should never return to the grass kernel main()");
 }
@@ -43,7 +43,7 @@ static void sys_proc_spawn() {
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
     elf_load(GPID_PROCESS, read_sys_proc, 0, NULL);
 
-    pcb.proc_alloc = proc_alloc;
-    pcb.proc_free = proc_free;
-    pcb.proc_set_ready = proc_set_ready;
+    grass->proc_alloc = proc_alloc;
+    grass->proc_free = proc_free;
+    grass->proc_set_ready = proc_set_ready;
 }
