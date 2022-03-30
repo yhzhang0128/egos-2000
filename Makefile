@@ -51,7 +51,7 @@ DEBUG_DIR = build/debug
 RELEASE_DIR = build/release
 
 INCLUDE = -Ilibrary
-INCLUDE += -Ilibrary/memory -Ilibrary/file -Ilibrary/syscall -Ilibrary/utils
+INCLUDE += -Ilibrary/memory -Ilibrary/file -Ilibrary/syscall -Ilibrary/elf
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
