@@ -46,13 +46,13 @@ int tty_read(char* buf, int len) {
         buf[i] = (char)c;
 
         switch (c) {
-        case 0x3:           /* Ctrl+C    */
+        case 0x3:   /* Ctrl+C    */
             buf[0] = 0;
-        case 0xd:           /* Enter     */
+        case 0xd:   /* Enter     */
             buf[i] = 0;
             printf("\r\n");
             goto finish;
-        case 0x7f:          /* Backspace */
+        case 0x7f:  /* Backspace */
             c = 0;
             if (i) printf("\b \b");
             i = i ? i - 2 : i - 1;
