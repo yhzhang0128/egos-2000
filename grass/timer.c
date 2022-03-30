@@ -12,26 +12,26 @@
 #include "egos.h"
 #include "grass.h"
 
-#define QUANTUM_NCYCLES                  5000
-#define RISCV_CLINT0_MTIME_BASE          0x200bff8
-#define RISCV_CLINT0_MTIMECMP_BASE       0x2004000
+#define QUANTUM_NCYCLES            5000
+#define CLINT0_MTIME_BASE          0x200bff8
+#define CLINT0_MTIMECMP_BASE       0x2004000
 #define ACCESS(x) (*(__typeof__(*(unsigned int*)x) volatile *)((unsigned int*)(x)))
 
 static long long mtime_get() {
     unsigned int time_lo, time_hi;
     /* Guard against rollover when reading */
     do {
-        time_hi = ACCESS(RISCV_CLINT0_MTIME_BASE + 4);
-        time_lo = ACCESS(RISCV_CLINT0_MTIME_BASE);
-    } while (ACCESS(RISCV_CLINT0_MTIME_BASE + 4) != time_hi);
+        time_hi = ACCESS(CLINT0_MTIME_BASE + 4);
+        time_lo = ACCESS(CLINT0_MTIME_BASE);
+    } while (ACCESS(CLINT0_MTIME_BASE + 4) != time_hi);
 
     return (((unsigned long long)time_hi) << 32) | time_lo;
 }
 
 static void mtimecmp_set(long long time) {
-    ACCESS(RISCV_CLINT0_MTIMECMP_BASE + 4) = 0xFFFFFFFF;
-    ACCESS(RISCV_CLINT0_MTIMECMP_BASE) = (unsigned int)time;
-    ACCESS(RISCV_CLINT0_MTIMECMP_BASE + 4) = (unsigned int)(time >> 32);
+    ACCESS(CLINT0_MTIMECMP_BASE + 4) = 0xFFFFFFFF;
+    ACCESS(CLINT0_MTIMECMP_BASE) = (unsigned int)time;
+    ACCESS(CLINT0_MTIMECMP_BASE + 4) = (unsigned int)(time >> 32);
 }
 
 void timer_init() {

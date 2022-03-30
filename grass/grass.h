@@ -8,7 +8,6 @@
 #include "syscall.h"
 #include "servers.h"
 
-struct earth *earth;
 #define MAX_NPROCESS       16
 
 struct process{

@@ -36,7 +36,7 @@ int main() {
         case FILE_READ:
             r = fs->read(fs, req->ino, req->offset, (void*)&reply->block);
             reply->status = r == 0 ? FILE_OK : FILE_ERROR;
-            sys_send(sender, (void*)reply, sizeof(struct file_reply));
+            sys_send(sender, (void*)reply, sizeof(*reply));
             break;
         case FILE_WRITE:
         default:

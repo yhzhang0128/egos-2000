@@ -126,8 +126,7 @@ static int cache_read(int frame_no) {
             free_idx = i;
     }
 
-    if (free_idx == -1)
-        free_idx = cache_evict();
+    if (free_idx == -1) free_idx = cache_evict();
     lookup_table[free_idx] = frame_no;
 
     if (FRAME_INUSE(frame_no)) {

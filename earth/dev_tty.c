@@ -85,11 +85,12 @@ int tty_info(const char *format, ...)
     printf("\r\n");
 }
 
-int tty_highlight(const char *format, ...)
+int tty_fatal(const char *format, ...)
 {
-    printf("%s[HIGHLIGHT] ", "\x1B[1;33m");
+    printf("%s[FATAL] ", "\x1B[1;31m");
     VPRINTF
     printf("%s\r\n", "\x1B[1;0m");
+    while(1);
 }
 
 int tty_success(const char *format, ...)
@@ -99,10 +100,9 @@ int tty_success(const char *format, ...)
     printf("%s\r\n", "\x1B[1;0m");
 }
 
-int tty_fatal(const char *format, ...)
+int tty_highlight(const char *format, ...)
 {
-    printf("%s[FATAL] ", "\x1B[1;31m");
+    printf("%s[HIGHLIGHT] ", "\x1B[1;33m");
     VPRINTF
     printf("%s\r\n", "\x1B[1;0m");
-    while(1);
 }

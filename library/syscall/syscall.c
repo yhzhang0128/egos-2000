@@ -7,10 +7,11 @@
  * Description: the grass kernel system calls
  */
 
-#include <string.h>
 #include "memory.h"
 #include "syscall.h"
 #include "servers.h"
+
+#include <string.h>
 
 static struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
 
@@ -42,6 +43,6 @@ int sys_recv(int* sender, char* buf, int size) {
 void sys_exit(int status) {
     struct proc_request req;
     req.type = PROC_EXIT;
-    sys_send(GPID_PROCESS, (void*)&req, sizeof(struct proc_request));
+    sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
     while(1);
 }

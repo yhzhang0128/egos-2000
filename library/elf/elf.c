@@ -30,9 +30,8 @@ void elf_load(int pid, elf_reader reader,
     reader(0, buf);
     struct elf32_header *header = (void*) buf;
     if (header->e_phnum != 1 ||
-        header->e_phoff + header->e_phentsize > BLOCK_SIZE) {
+        header->e_phoff + header->e_phentsize > BLOCK_SIZE)
         FATAL("Grass exec region of the disk seems to be corrupted");
-    }
     
     struct elf32_program_header pheader;
     memcpy(&pheader, buf + header->e_phoff, sizeof(pheader));
@@ -55,15 +54,13 @@ static void load_grass(elf_reader reader,
     INFO("Grass kernel memory size: 0x%.8x bytes", pheader->p_memsz);
 
     if (pheader->p_filesz > GRASS_SIZE ||
-        pheader->p_offset % BLOCK_SIZE != 0) {
+        pheader->p_offset % BLOCK_SIZE != 0)
         FATAL("Invalid grass binary file");
-    }
 
     char* entry = (char*)GRASS_ENTRY;
     int block_offset = pheader->p_offset / BLOCK_SIZE;
-    for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
+    for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE)
         reader(block_offset++, entry + off);
-    }
 
     memset(entry + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz);
 }
@@ -79,9 +76,8 @@ static void load_app(int pid,
     }
 
     if (pheader->p_filesz > APPS_SIZE ||
-        pheader->p_offset % BLOCK_SIZE != 0) {
+        pheader->p_offset % BLOCK_SIZE != 0)
         FATAL("Invalid app binary file");
-    }
 
     /* load the app code & data */
     int base, frame_no, page_no = 0;
@@ -114,10 +110,10 @@ static void load_app(int pid,
     int* args_addr = argv_addr + CMD_NARGS;
 
     *argc_addr = argc;
-    for (int i = 0; i < argc; i++)
-        argv_addr[i] = (int)((char*)args_addr + i * CMD_ARG_LEN);
     if (argv)
         memcpy(args_addr, argv, argc * CMD_ARG_LEN);
+    for (int i = 0; i < argc; i++)
+        argv_addr[i] = (int)((char*)args_addr + i * CMD_ARG_LEN);
 
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);

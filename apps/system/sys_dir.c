@@ -48,7 +48,7 @@ int main() {
         case DIR_LOOKUP:
             reply->ino = dir_do_lookup(req->ino, req->name);
             reply->status = reply->ino == -1? DIR_ERROR : DIR_OK;
-            sys_send(sender, (void*)reply, sizeof(struct dir_reply));
+            sys_send(sender, (void*)reply, sizeof(*reply));
             break;
         case DIR_INSERT:
         case DIR_REMOVE:

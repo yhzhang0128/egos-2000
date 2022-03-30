@@ -21,19 +21,18 @@ int main() {
 }
 
 void earth_init() {
-    /* Initialize the print functions */
-    earth->tty_info = tty_info;
-    earth->tty_fatal = tty_fatal;
-    earth->tty_success = tty_success;
-    earth->tty_highlight = tty_highlight;
-    INFO("-----------------------------------");
-    INFO("Start to initialize the earth layer");
-
     /* Initialize tty */
     tty_init();
     earth->tty_intr = tty_intr;
     earth->tty_read = tty_read;
     earth->tty_write = tty_write;
+    earth->tty_info = tty_info;
+    earth->tty_fatal = tty_fatal;
+    earth->tty_success = tty_success;
+    earth->tty_highlight = tty_highlight;
+
+    INFO("-----------------------------------");
+    INFO("Start to initialize the earth layer");
     SUCCESS("Finished initializing the tty device");
     
     /* Initialize disk */
