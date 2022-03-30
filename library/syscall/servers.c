@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include "egos.h"
-#include "print.h"
 #include "syscall.h"
 #include "servers.h"
 

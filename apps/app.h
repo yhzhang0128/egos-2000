@@ -1,7 +1,6 @@
 #pragma once
 
 #include "egos.h"
-#include "print.h"
 #include "memory.h"
 #include "syscall.h"
 #include "servers.h"

@@ -1,6 +1,5 @@
 #include "egos.h"
 #include "disk.h"
-#include "print.h"
 #include "block_store.h"
 
 static int disk_getsize(block_if this_bs, unsigned int ino){

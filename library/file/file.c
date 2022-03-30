@@ -28,12 +28,15 @@
 #include <string.h>
 #include "file.h"
 
+#ifdef EARTH
+#define printf HIGHLIGHT
+#endif
+
 #ifdef MKFS
 #include <stdio.h>
 #define HIGHLIGHT printf
 #else
 #include "egos.h"
-#include "print.h"
 #include "memory.h"
 #endif
 

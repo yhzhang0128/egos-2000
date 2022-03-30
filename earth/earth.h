@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include "egos.h"
 #include "elf.h"
 #include "disk.h"
 #include "memory.h"
@@ -35,8 +36,3 @@ int tty_info(const char *format, ...);
 int tty_highlight(const char *format, ...);
 int tty_success(const char *format, ...);
 int tty_fatal(const char *format, ...);
-
-#define INFO       tty_info
-#define HIGHLIGHT  tty_highlight
-#define SUCCESS    tty_success
-#define FATAL      tty_fatal

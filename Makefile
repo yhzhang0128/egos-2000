@@ -3,7 +3,7 @@ all: apps
 	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
-	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -Iearth/bus -o $(RELEASE_DIR)/earth.elf
+	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -Iearth/bus -DEARTH -o $(RELEASE_DIR)/earth.elf
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
 
 .PHONY: apps

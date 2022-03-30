@@ -31,3 +31,13 @@ struct grass {
     char work_dir[32 * 16];
     char work_dir_name[32];
 };
+
+extern struct earth *earth;
+
+#define INFO      earth->tty_info
+#define FATAL     earth->tty_fatal
+#define SUCCESS   earth->tty_success
+#define HIGHLIGHT earth->tty_highlight
+#ifndef EARTH
+#define printf    earth->tty_write
+#endif
