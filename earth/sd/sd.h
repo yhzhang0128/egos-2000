@@ -4,6 +4,8 @@
 
 /* SD card library interface */
 #define SD_BLOCK_SIZE 512
+#define uint32_t unsigned int
+
 enum {
       SD_CARD_TYPE_SD1,
       SD_CARD_TYPE_SD2,

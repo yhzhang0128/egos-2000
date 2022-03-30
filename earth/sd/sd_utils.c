@@ -7,7 +7,6 @@
  * Description: util functions for sending/receiving bytes to the SD card
  */
 
-#include <stdio.h>
 #include "sd.h"
 
 char send_data_byte(char byte) {

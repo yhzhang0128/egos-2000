@@ -7,8 +7,6 @@
  * Description: reset and initialize the SD card on Arty; this library works with SDHC, but may contain bugs for other types of SD cards
  */
 
-
-#include <stdio.h>
 #include "sd.h"
 
 static int sd_spi_reset();
@@ -88,7 +86,7 @@ static int sd_check_capacity() {
     INFO("SD card replies cmd58 with status 0x00");
 
     unsigned long payload;
-    for (uint8_t i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         reply = ((char*)&payload)[3 - i] = recv_data_byte();
 
         if (i == 0 && ((reply & 0XC0) == 0XC0))
