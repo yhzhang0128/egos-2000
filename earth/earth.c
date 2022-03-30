@@ -18,8 +18,6 @@ struct earth *earth = (void*)EARTH_STRUCT;
 int main() {
     earth_init();
     grass_load();
-
-    return 0;
 }
 
 void earth_init() {

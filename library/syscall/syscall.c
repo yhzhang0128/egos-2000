@@ -20,8 +20,7 @@ static void sys_invoke() {
 }
 
 int sys_send(int receiver, char* msg, int size) {
-    if (size > SYSCALL_MSG_LEN)
-        return -1;
+    if (size > SYSCALL_MSG_LEN) return -1;
 
     sc->type = SYS_SEND;
     sc->payload.msg.receiver = receiver;
@@ -31,8 +30,7 @@ int sys_send(int receiver, char* msg, int size) {
 }
 
 int sys_recv(int* sender, char* buf, int size) {
-    if (size > SYSCALL_MSG_LEN)
-        return -1;
+    if (size > SYSCALL_MSG_LEN) return -1;
 
     sc->type = SYS_RECV;
     sys_invoke();

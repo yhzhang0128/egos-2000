@@ -1,8 +1,17 @@
-#include <string.h>
+/*
+ * (C) 2022, Cornell University
+ * All rights reserved.
+ */
+
+/* Author: Yunhao Zhang
+ * Description: user friendly interfaces of kernel processes
+ */
 
 #include "egos.h"
 #include "syscall.h"
 #include "servers.h"
+
+#include <string.h>
 
 int dir_lookup(int dir_ino, char* name) {
     int sender;
@@ -13,6 +22,7 @@ int dir_lookup(int dir_ino, char* name) {
     req.ino = dir_ino;
     strcpy(req.name, name);
     sys_send(GPID_DIR, (void*)&req, sizeof(struct dir_request));
+
     sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     if (sender != GPID_DIR)
         FATAL("dir_lookup expects message from GPID_DIR");

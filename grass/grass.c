@@ -33,7 +33,6 @@ int main() {
     sys_proc_entry(&pcb);              /* enter sys_proc              */
 
     FATAL("Should never return to the grass kernel main()");
-    return 0;
 }
 
 static int read_sys_proc(int block_no, char* dst) {

@@ -31,6 +31,5 @@ struct elf32_program_header {
     uint32_t       p_align;
 };
 
-struct earth;
 typedef int (*elf_reader)(int block_no, char* dst);
 void elf_load(int pid, elf_reader reader, int argc, void** argv);
