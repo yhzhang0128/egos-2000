@@ -114,8 +114,7 @@ static void sd_print_type() {
 
 static int sd_spi_reset() {
     INFO("Set CS and MOSI to 1 and toggle clock.");
-    long control_base = SPI_BASE_ADDR;
-    INFO("UART base address is 0x%x.", control_base);
+
     /* Keep chip select line high */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) |= METAL_SPI_CSMODE_HOLD;
@@ -147,8 +146,6 @@ static int sd_spi_reset() {
 }
 
 static int sd_spi_configure() {
-    long control_base = SPI_BASE_ADDR;
-
     /* Set protocol as METAL_SPI_SINGLE */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
@@ -194,7 +191,6 @@ static void sd_spi_set_clock(long baud_rate) {
     if (div > METAL_SPI_SCKDIV_MASK)
         FATAL("SPI baud rate %lHz is too low", baud_rate);
 
-    long control_base = SPI_BASE_ADDR;
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) &= ~METAL_SPI_SCKDIV_MASK;
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) |= (div & METAL_SPI_SCKDIV_MASK);
 }

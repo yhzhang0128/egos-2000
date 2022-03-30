@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#define SPI_BASE_ADDR 0x10024000
+#define SPI_BASE_ADDR 0x10024000UL
 
 #define METAL_SPI_SCKDIV_MASK 0xFFF
 #define METAL_SPI_SCKMODE_PHA_SHIFT 0
@@ -48,7 +48,7 @@
 
 
 #define __METAL_ACCESS_ONCE(x) (*(__typeof__(*x) volatile *)(x))
-#define METAL_SPI_REG(offset) (((unsigned long)control_base + offset))
+#define METAL_SPI_REG(offset) (SPI_BASE_ADDR + offset)
 #define METAL_SPI_REGB(offset)                                                 \
     (__METAL_ACCESS_ONCE((unsigned char*)METAL_SPI_REG(offset)))
 #define METAL_SPI_REGW(offset)                                                 \

@@ -11,11 +11,10 @@
 #include "sd.h"
 
 char send_data_byte(char byte) {
-    long rxdata, control_base = SPI_BASE_ADDR;
-
     while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL);
     METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = byte;
 
+    long rxdata;
     while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
            METAL_SPI_RXDATA_EMPTY);    
     return (char)(rxdata & METAL_SPI_TXRXDATA_MASK);

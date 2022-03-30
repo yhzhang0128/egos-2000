@@ -13,8 +13,18 @@
 #include "bus_uart.h"
 
 static int c, is_reading;
-static void uart_getc(int*);
-static void uart_set_clock(long);
+
+static void uart_set_clock(long baud_rate) {
+    long cpu_clock_rate = 65000000;
+    UART_REGW(METAL_SIFIVE_UART0_DIV) = cpu_clock_rate / baud_rate - 1;
+    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= 1;
+    UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= 1;
+}
+
+static void uart_getc(int* c) {
+    uint32_t ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
+    *c = (ch & UART_RXEMPTY)? -1 : (ch & 0x0ff);
+}
 
 int tty_init() {
     uart_set_clock(115200);
@@ -58,22 +68,6 @@ int tty_read(char* buf, int len) {
  finish:
     buf[len - 1] = is_reading = 0;    
     return 0;
-}
-
-static void uart_set_clock(long baud_rate) {
-    long control_base = 0x10013000;
-    long cpu_clock_rate = 65000000;
-
-    UART_REGW(METAL_SIFIVE_UART0_DIV) = cpu_clock_rate / baud_rate - 1;
-    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= 1;
-    UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= 1;
-}
-
-static void uart_getc(int* c) {
-    long control_base = 0x10013000;
-    uint32_t ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
-
-    *c = (ch & UART_RXEMPTY)? -1 : (ch & 0x0ff);
 }
 
 #define VPRINTF   va_list args; \
