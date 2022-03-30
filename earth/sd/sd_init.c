@@ -14,7 +14,6 @@ static void sd_spi_configure();
 static void sd_spi_set_clock(long baud_rate);
 
 static int sd_check_type();
-static void sd_print_type();
 static void sd_check_capacity();
 
 int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
@@ -46,7 +45,10 @@ int sdinit() {
 
     if (SD_CARD_TYPE == SD_CARD_TYPE_SD2)
         sd_check_capacity();
-    sd_print_type();
+
+    if (SD_CARD_TYPE != SD_CARD_TYPE_SDHC)
+        FATAL("Only SDHC card is supported");
+    INFO("SD card is high capacity SDHC card");
 
     return 0;
 }
@@ -93,16 +95,6 @@ static void sd_check_capacity() {
     INFO("SD card replies cmd58 with payload 0x%.8x", payload);
 
     for (int i = 0; i < 100; i++) recv_data_byte();
-}
-
-static void sd_print_type() {
-    switch (SD_CARD_TYPE) {
-    case SD_CARD_TYPE_SDHC:
-        INFO("SD card is high capacity SDHC card");
-        break;
-    default:
-        FATAL("Unknown SD card type");
-    }
 }
 
 static void sd_spi_reset() {
