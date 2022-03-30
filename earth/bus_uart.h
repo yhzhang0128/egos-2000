@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#define UART_BASE_ADDR 0x10013000UL
+#define UART_BASE_ADDR            0x10013000UL
 
 #define UART_RXEMPTY              (1 << 31)
 #define METAL_SIFIVE_UART0_RXDATA 4UL
