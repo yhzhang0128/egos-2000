@@ -17,18 +17,16 @@ static int multi_read(uint32_t, uint32_t, char*);
 static int multi_write(uint32_t, uint32_t, char*);
 
 int sdread(uint32_t offset, uint32_t nblock, char* dst) {
-    for (int i = 0; i < nblock; i++) {
+    for (int i = 0; i < nblock; i++)
         if (single_read(offset + i, dst + SD_BLOCK_SIZE * i))
             return -1;
-    }
     return 0;
 }
 
 int sdwrite(uint32_t offset, uint32_t nblock, char* src) {
-    for (int i = 0; i < nblock; i++) {
+    for (int i = 0; i < nblock; i++)
         if (single_write(offset + i, src + SD_BLOCK_SIZE * i))
             return -1;
-    }
     return 0;
 }
 
@@ -45,17 +43,14 @@ static int single_read(uint32_t offset, char* dst) {
     char *arg = (void*)&offset;
     char reply, cmd17[] = {0x51, arg[3], arg[2], arg[1], arg[0], 0xFF};
 
-    if (reply = sd_exec_cmd(spi, cmd17)) {
-        printf("[ERROR] SD card replies cmd17 with status 0x%.2x\r\n", reply);
-        return -1;
-    }
+    if (reply = sd_exec_cmd(spi, cmd17))
+        FATAL("[ERROR] SD card replies cmd17 with status 0x%.2x", reply);
  
     /* wait for the data packet and ignore the 2-byte checksum */
     char token;
     while ((token = recv_data_byte(spi)) != 0xFE);
-    for (int i = 0; i < SD_BLOCK_SIZE; i++) {
+    for (int i = 0; i < SD_BLOCK_SIZE; i++)
         dst[i] = recv_data_byte(spi);
-    }
     recv_data_byte(spi);
     recv_data_byte(spi);
 
@@ -75,10 +70,8 @@ static int single_write(uint32_t offset, char* src) {
     /* send write request with cmd24 */
     char *arg = (void*)&offset;
     char reply, cmd24[] = {0x58, arg[3], arg[2], arg[1], arg[0], 0xFF};
-    if (reply = sd_exec_cmd(spi, cmd24)) {
-        printf("[ERROR] SD card replies cmd24 with status %.2x\r\n", reply);
-        return -1;
-    }
+    if (reply = sd_exec_cmd(spi, cmd24))
+        FATAL("SD card replies cmd24 with status %.2x", reply);
 
     /* send data packet: token + block + dummy 2-byte checksum */
     send_data_byte(spi, 0xFE);
@@ -89,10 +82,8 @@ static int single_write(uint32_t offset, char* src) {
 
     /* wait for SD card ack of data packet */
     while ((reply = recv_data_byte(spi)) == 0xFF);
-    if ((reply & 0x1F) != 0x05) {
-        printf("[ERROR] SD card replies write data packet with status 0x%.2x\r\n", reply);
-        return -1;
-    }
+    if ((reply & 0x1F) != 0x05)
+        FATAL("SD card replies write data packet with status 0x%.2x", reply);
     
     return 0;
 }

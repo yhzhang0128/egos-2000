@@ -28,10 +28,6 @@
 #include <string.h>
 #include "file.h"
 
-#ifdef EARTH
-#define printf HIGHLIGHT
-#endif
-
 #ifdef MKFS
 #include <stdio.h>
 #define HIGHLIGHT printf

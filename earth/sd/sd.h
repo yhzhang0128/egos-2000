@@ -22,3 +22,4 @@ char sd_exec_cmd(struct metal_spi *, char*);
 char sd_exec_acmd(struct metal_spi *, char*);
 
 #include "bus_spi.h"
+#include "egos.h"

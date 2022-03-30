@@ -37,10 +37,10 @@ RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
-EARTH_SRCS = earth/*.c earth/sd/*.c library/*/*.c
+EARTH_SRCS = earth/*.c earth/sd/*.c library/elf/*.c
 EARTH_LAYOUT = -Tearth/earth.lds
 
-GRASS_SRCS = grass/*.S grass/*.c library/*/*.c
+GRASS_SRCS = grass/*.S grass/*.c library/elf/*.c
 GRASS_LAYOUT = -Tgrass/grass.lds
 
 APPS_SRCS = apps/app.S library/*/*.c

@@ -33,10 +33,10 @@ char sd_exec_cmd(struct metal_spi *spi, char* cmd) {
     char reply;
     while (1) {
         if (i++ % 1000 == 0)
-            printf("    ... wait for the SD card to reply cmd%d\r\n", cmd[0] ^ 0x40);
+            INFO("    ... wait for the SD card to reply cmd%d", cmd[0] ^ 0x40);
+        if (i == 5000) FATAL("SD card not responding cmd%d", cmd[0] ^ 0x40);
 
-        if ((reply = recv_data_byte(spi)) != 0xFF)
-            break;
+        if ((reply = recv_data_byte(spi)) != 0xFF) break;
     }
 
     return reply;    
