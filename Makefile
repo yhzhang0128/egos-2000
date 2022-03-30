@@ -7,7 +7,7 @@ all: apps
 	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
 
 .PHONY: apps
-apps: apps/kernel/*.c apps/user/*.c
+apps: apps/system/*.c apps/user/*.c
 	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
 	@echo "$(CYAN)-------- Compile the Apps Layer --------$(END)"
 	for FILE in $^ ; do \
