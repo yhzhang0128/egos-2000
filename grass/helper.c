@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: process util functions
+ * Description: helper functions for managing processes
  */
 
 #include "egos.h"
