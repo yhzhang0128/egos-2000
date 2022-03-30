@@ -57,7 +57,7 @@ CFLAGS += -ffunction-sections -fdata-sections
 
 DEFAULT_LDLIBS = -lc -lgcc
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
-EARTH_LDLIBS = -Llibrary/metal -Wl,--start-group -lc -lgcc -lm -lmetal -lmetal-gloss -Wl,--end-group
+EARTH_LDLIBS = -Llibrary/sifive -Wl,--start-group -lc -lgcc -lm -lmetal -lmetal-gloss -Wl,--end-group
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
