@@ -45,24 +45,20 @@ static void trap_entry() {
     }
 }
 
-#define MSTATUS_MIE  0x00000008UL
-#define MIE_SW       0x008
-#define MIE_TMR      0x080
-
 int intr_enable() {
     int tmp;
     /* Enable global interrupt */
     __asm__ volatile("csrrs %0, mstatus, %1"
                      : "=r"(tmp)
-                     : "r"(MSTATUS_MIE));
+                     : "r"(0x00000008UL));
     /* Enable software interrupt */
     __asm__ volatile("csrrs %0, mie, %1"
                      : "=r"(tmp)
-                     : "r"(MIE_SW));
+                     : "r"(0x008));
     /* Enable timer interrupt */
     __asm__ volatile("csrrs %0, mie, %1"
                      : "=r"(tmp)
-                     : "r"(MIE_TMR));
+                     : "r"(0x080));
     return 0;
 }
 
@@ -71,15 +67,15 @@ int intr_disable() {
     /* Disable global interrupt */
     __asm__ volatile("csrrc %0, mstatus, %1"
                      : "=r"(tmp)
-                     : "r"(MSTATUS_MIE));
+                     : "r"(0x00000008UL));
     /* Disable software interrupt */
     __asm__ volatile("csrrc %0, mie, %1"
                      : "=r"(tmp)
-                     : "r"(MIE_SW));
+                     : "r"(0x008));
     /* Disable timer interrupt */
     __asm__ volatile("csrrc %0, mie, %1"
                      : "=r"(tmp)
-                     : "r"(MIE_TMR));
+                     : "r"(0x080));
     return 0;
 }
 

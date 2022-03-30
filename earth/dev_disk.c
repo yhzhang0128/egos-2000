@@ -33,7 +33,7 @@ int disk_write(int block_no, int nblocks, char* src) {
     if (type == SD_CARD)
         return sdwrite(block_no, nblocks, src);
     else
-        FATAL("on-board flash ROM cannot be written"); 
+        FATAL("Try to write the on-board flash ROM"); 
 }
 
 int disk_init() {

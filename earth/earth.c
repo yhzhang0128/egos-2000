@@ -15,9 +15,18 @@ void earth_init();
 void grass_load();
 struct earth *earth = (void*)EARTH_STRUCT;
 
+static int grass_read(int block_no, char* dst) {
+    return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
+}
+
 int main() {
     earth_init();
-    grass_load();
+
+    INFO("Start to load the grass layer");
+    elf_load(0, grass_read, 0, NULL);
+
+    void (*grass_entry)() = (void*)GRASS_ENTRY;
+    grass_entry();
 }
 
 void earth_init() {
@@ -26,6 +35,7 @@ void earth_init() {
     earth->tty_intr = tty_intr;
     earth->tty_read = tty_read;
     earth->tty_write = tty_write;
+
     earth->tty_info = tty_info;
     earth->tty_fatal = tty_fatal;
     earth->tty_success = tty_success;
@@ -56,17 +66,4 @@ void earth_init() {
     earth->mmu_map = mmu_map;
     earth->mmu_switch = mmu_switch;
     SUCCESS("Finished initializing the CPU memory management unit");
-}
-
-static int grass_read(int block_no, char* dst) {
-    return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
-}
-
-void grass_load() {
-    INFO("Start to load the grass layer");
-    elf_load(0, grass_read, 0, NULL);
-
-    /* call the grass kernel entry and never return */
-    void (*grass_entry)() = (void*)GRASS_ENTRY;
-    grass_entry();
 }
