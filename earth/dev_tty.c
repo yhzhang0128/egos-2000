@@ -15,7 +15,9 @@
 static int c, is_reading;
 static struct metal_uart* uart;
 
+static void uart_getc(int*);
 int tty_fatal(const char *format, ...);
+
 int tty_init() {
     uart = metal_uart_get_device(0);
     metal_uart_init(uart, 115200);
@@ -23,21 +25,21 @@ int tty_init() {
     if (!uart) tty_fatal("Unable to get uart handle");
 
     /* wait for the tty device to be ready */
-    for (int c = 0; c != -1; metal_uart_getc(uart, &c));
+    for (int c = 0; c != -1; uart_getc(&c));
     return 0;
 }
 
 int tty_intr() {
     if (is_reading) return 0;
 
-    metal_uart_getc(uart, &c);
+    uart_getc(&c);
     return c == 3;
 }
 
 int tty_read(char* buf, int len) {
     is_reading = 1;
     for (int i = 0; i < len - 1; i++) {
-        for (c = -1; c == -1; metal_uart_getc(uart, &c));
+        for (c = -1; c == -1; uart_getc(&c));
         buf[i] = (char)c;
 
         switch (c) {
@@ -60,6 +62,13 @@ int tty_read(char* buf, int len) {
  finish:
     buf[len - 1] = is_reading = 0;    
     return 0;
+}
+
+static void uart_getc(int* c) {
+    long control_base = 0x10013000;
+    uint32_t ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
+
+    *c = (ch & UART_RXEMPTY)? -1 : (ch & 0x0ff);
 }
 
 #define VPRINTF   va_list args; \
