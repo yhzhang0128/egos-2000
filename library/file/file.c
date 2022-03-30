@@ -30,7 +30,7 @@
 
 #ifdef MKFS
 #include <stdio.h>
-#define HIGHLIGHT printf
+#define INFO printf
 #else
 #include "egos.h"
 #include "memory.h"
@@ -452,10 +452,10 @@ int treedisk_create(block_store_t *below, unsigned int below_ino, unsigned int n
 				return -1;
 			}
 		}
-		HIGHLIGHT("treedisk: Created a new filesystem with %d inodes\n", ninodes);
+		INFO("treedisk: Created a new filesystem with %d inodes\n", ninodes);
 	}
 	else {
-		HIGHLIGHT("treedisk: Attempted to create a new filesystem, but one already exists with %lu inodes",
+		INFO("treedisk: Attempted to create a new filesystem, but one already exists with %lu inodes",
 			superblock.superblock.n_inodeblocks * INODES_PER_BLOCK);
 		//assert(superblock.superblock.n_inodeblocks >= n_inodeblocks);
 	}
