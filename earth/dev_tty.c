@@ -12,8 +12,6 @@
 #include <stdarg.h>
 #include "bus_uart.h"
 
-static int c, is_reading;
-
 static void uart_set_clock(long baud_rate) {
     long cpu_clock_rate = 65000000;
     UART_REGW(METAL_SIFIVE_UART0_DIV) = cpu_clock_rate / baud_rate - 1;
@@ -35,6 +33,7 @@ int tty_init() {
     return 0;
 }
 
+static int c, is_reading;
 int tty_intr() {
     if (is_reading) return 0;
 
@@ -109,4 +108,3 @@ int tty_fatal(const char *format, ...)
     printf("%s\r\n", "\x1B[1;0m");
     while(1);
 }
-

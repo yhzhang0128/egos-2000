@@ -46,7 +46,6 @@
 #define METAL_SIFIVE_SPI0_RXDATA  76UL
 #define METAL_SIFIVE_SPI0_SCKMODE 4UL
 
-
 #define __METAL_ACCESS_ONCE(x) (*(__typeof__(*x) volatile *)(x))
 #define METAL_SPI_REG(offset) (SPI_BASE_ADDR + offset)
 #define METAL_SPI_REGB(offset)                                                 \
