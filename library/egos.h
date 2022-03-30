@@ -38,6 +38,5 @@ extern struct earth *earth;
 #define FATAL     earth->tty_fatal
 #define SUCCESS   earth->tty_success
 #define HIGHLIGHT earth->tty_highlight
-#ifndef EARTH
+
 #define printf    earth->tty_write
-#endif

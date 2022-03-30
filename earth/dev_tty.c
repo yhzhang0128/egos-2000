@@ -8,6 +8,9 @@
  * have been implemented by the freedom-metal library for Arty
  */
 
+#include <stdio.h>
+#include <stdarg.h>
+
 #include "earth.h"
 #include "bus_uart.h"
 

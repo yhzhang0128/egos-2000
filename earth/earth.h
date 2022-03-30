@@ -1,13 +1,10 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
-
 #include "egos.h"
 #include "elf.h"
 #include "disk.h"
 #include "memory.h"
+#include <string.h>
 
 typedef void (*handler_t)(int);
 int intr_init();

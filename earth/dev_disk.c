@@ -38,8 +38,8 @@ int disk_write(int block_no, int nblocks, char* src) {
 
 int disk_init() {
     HIGHLIGHT("Choose a disk:");
-    printf("  Enter 0: use the microSD card\r\n");
-    printf("  Enter 1: use the on-board flash ROM @0x%.8x\r\n", FLASH_ROM_START);
+    HIGHLIGHT("Enter 0: use the microSD card\r\n");
+    HIGHLIGHT("Enter 1: use the on-board flash ROM @0x%.8x\r\n", FLASH_ROM_START);
 
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; tty_read(buf, 2));
