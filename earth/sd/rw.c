@@ -36,7 +36,6 @@ static int single_read(uint32_t offset, char* dst) {
         offset <<= 9;
 
     /* wait until SD card is not busy */
-    struct metal_spi *spi = metal_spi_get_device(0);
     while (recv_data_byte() != 0xFF);
     
     /* send read request with cmd17 */
@@ -64,7 +63,6 @@ static int single_write(uint32_t offset, char* src) {
         offset <<= 9;
 
     /* wait until SD card is not busy */
-    struct metal_spi *spi = metal_spi_get_device(0);
     while (recv_data_byte() != 0xFF);
 
     /* send write request with cmd24 */

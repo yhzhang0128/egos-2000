@@ -2,11 +2,6 @@
 
 /* SD card library interface */
 #define SD_BLOCK_SIZE 512
-
-int sdinit();
-int sdread(uint32_t offset, uint32_t nblock, char* dst);
-int sdwrite(uint32_t offset, uint32_t nblock, char* src);
-
 enum {
       SD_CARD_TYPE_SD1,
       SD_CARD_TYPE_SD2,
@@ -15,7 +10,10 @@ enum {
 };
 extern int SD_CARD_TYPE;
 
-struct metal_spi;
+int sdinit();
+int sdread(uint32_t offset, uint32_t nblock, char* dst);
+int sdwrite(uint32_t offset, uint32_t nblock, char* src);
+
 char sd_exec_cmd(char*);
 char sd_exec_acmd(char*);
 char recv_data_byte();

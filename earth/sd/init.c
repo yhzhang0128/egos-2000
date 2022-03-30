@@ -13,6 +13,7 @@
 
 static int sd_spi_reset();
 static int sd_spi_configure();
+static void sd_spi_set_clock(long baud_rate);
 
 static void sd_print_type();
 static int sd_check_type();
@@ -21,18 +22,13 @@ static int sd_check_capacity();
 int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
 
 int sdinit() {
-    long baud_rate = 100000;
-    struct metal_spi *spi = metal_spi_get_device(0);
-    metal_spi_set_baud_rate(spi, baud_rate);
-    INFO("Set SPI clock frequency to %ldHz", baud_rate);
-
+    sd_spi_set_clock(100000);
+    INFO("Set SPI clock frequency to 100000Hz");
     if (0 != sd_spi_configure()) FATAL("Fail to configure spi device");
     if (0 != sd_spi_reset()) FATAL("Fail to reset SD card with cmd0");
 
-    long cpu_clock_rate = 65000000;
-    baud_rate = cpu_clock_rate / 4;
-    metal_spi_set_baud_rate(spi, baud_rate);
-    INFO("Set SPI clock frequency to %ldHz", baud_rate);
+    sd_spi_set_clock(65000000 / 4);
+    INFO("Set SPI clock frequency to %ldHz", 65000000 / 4);
 
     INFO("Check SD card type and voltage with cmd8");
     if (0 != sd_check_type()) FATAL("Fail to check SD card type and voltage");
@@ -190,4 +186,15 @@ static int sd_spi_configure() {
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FCTRL) = METAL_SPI_CONTROL_IO;
 
     return 0;
+}
+
+static void sd_spi_set_clock(long baud_rate) {
+    long cpu_clock_rate = 65000000;
+    long div = (cpu_clock_rate / (2 * baud_rate)) - 1;
+    if (div > METAL_SPI_SCKDIV_MASK)
+        FATAL("SPI baud rate %lHz is too low", baud_rate);
+
+    long control_base = SPI_BASE_ADDR;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) &= ~METAL_SPI_SCKDIV_MASK;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) |= (div & METAL_SPI_SCKDIV_MASK);
 }
