@@ -13,18 +13,14 @@
 #include "bus_uart.h"
 
 static int c, is_reading;
-static struct metal_uart* uart;
-
 static void uart_getc(int*);
-int tty_fatal(const char *format, ...);
+static void uart_set_clock(long);
 
 int tty_init() {
-    uart = metal_uart_get_device(0);
-    metal_uart_init(uart, 115200);
-    for (int i = 0; i < 2000000; i++);
-    if (!uart) tty_fatal("Unable to get uart handle");
+    uart_set_clock(115200);
 
-    /* wait for the tty device to be ready */
+    /* Wait for the tty device to be ready */
+    for (int i = 0; i < 2000000; i++);
     for (int c = 0; c != -1; uart_getc(&c));
     return 0;
 }
@@ -62,6 +58,15 @@ int tty_read(char* buf, int len) {
  finish:
     buf[len - 1] = is_reading = 0;    
     return 0;
+}
+
+static void uart_set_clock(long baud_rate) {
+    long control_base = 0x10013000;
+    long cpu_clock_rate = 65000000;
+
+    UART_REGW(METAL_SIFIVE_UART0_DIV) = cpu_clock_rate / baud_rate - 1;
+    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= 1;
+    UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= 1;
 }
 
 static void uart_getc(int* c) {
