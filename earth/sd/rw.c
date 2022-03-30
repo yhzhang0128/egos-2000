@@ -37,22 +37,22 @@ static int single_read(uint32_t offset, char* dst) {
 
     /* wait until SD card is not busy */
     struct metal_spi *spi = metal_spi_get_device(0);
-    while (recv_data_byte(spi) != 0xFF);
+    while (recv_data_byte() != 0xFF);
     
     /* send read request with cmd17 */
     char *arg = (void*)&offset;
     char reply, cmd17[] = {0x51, arg[3], arg[2], arg[1], arg[0], 0xFF};
 
-    if (reply = sd_exec_cmd(spi, cmd17))
+    if (reply = sd_exec_cmd(cmd17))
         FATAL("[ERROR] SD card replies cmd17 with status 0x%.2x", reply);
  
     /* wait for the data packet and ignore the 2-byte checksum */
     char token;
-    while ((token = recv_data_byte(spi)) != 0xFE);
+    while ((token = recv_data_byte()) != 0xFE);
     for (int i = 0; i < SD_BLOCK_SIZE; i++)
-        dst[i] = recv_data_byte(spi);
-    recv_data_byte(spi);
-    recv_data_byte(spi);
+        dst[i] = recv_data_byte();
+    recv_data_byte();
+    recv_data_byte();
 
     return 0;
 }
@@ -65,23 +65,23 @@ static int single_write(uint32_t offset, char* src) {
 
     /* wait until SD card is not busy */
     struct metal_spi *spi = metal_spi_get_device(0);
-    while (recv_data_byte(spi) != 0xFF);
+    while (recv_data_byte() != 0xFF);
 
     /* send write request with cmd24 */
     char *arg = (void*)&offset;
     char reply, cmd24[] = {0x58, arg[3], arg[2], arg[1], arg[0], 0xFF};
-    if (reply = sd_exec_cmd(spi, cmd24))
+    if (reply = sd_exec_cmd(cmd24))
         FATAL("SD card replies cmd24 with status %.2x", reply);
 
     /* send data packet: token + block + dummy 2-byte checksum */
-    send_data_byte(spi, 0xFE);
+    send_data_byte(0xFE);
     for (int i = 0; i < SD_BLOCK_SIZE; i++)
-        send_data_byte(spi, src[i]);
-    send_data_byte(spi, 0xFF);
-    send_data_byte(spi, 0xFF);
+        send_data_byte(src[i]);
+    send_data_byte(0xFF);
+    send_data_byte(0xFF);
 
     /* wait for SD card ack of data packet */
-    while ((reply = recv_data_byte(spi)) == 0xFF);
+    while ((reply = recv_data_byte()) == 0xFF);
     if ((reply & 0x1F) != 0x05)
         FATAL("SD card replies write data packet with status 0x%.2x", reply);
     

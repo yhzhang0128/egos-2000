@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "sd.h"
 
-char send_data_byte(struct metal_spi *spi, char byte) {
+char send_data_byte(char byte) {
     long rxdata, control_base = SPI_BASE_ADDR;
 
     while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL);
@@ -21,32 +21,28 @@ char send_data_byte(struct metal_spi *spi, char byte) {
     return (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
 }
 
-inline char recv_data_byte(struct metal_spi *spi) {
-    return send_data_byte(spi, 0xFF);
+inline char recv_data_byte() {
+    return send_data_byte(0xFF);
 }
 
-char sd_exec_cmd(struct metal_spi *spi, char* cmd) {
-    int i;
-    for (i = 0; i < 6; i++)
-        send_data_byte(spi, cmd[i]);
+char sd_exec_cmd(char* cmd) {
+    for (int i = 0; i < 6; i++)
+        send_data_byte(cmd[i]);
 
-    char reply;
-    while (1) {
-        if (i++ % 1000 == 0)
+    for (int reply, i = 0; i < 5000; i++) {
+        if (i % 1000 == 0)
             INFO("    ... wait for the SD card to reply cmd%d", cmd[0] ^ 0x40);
-        if (i == 5000) FATAL("SD card not responding cmd%d", cmd[0] ^ 0x40);
-
-        if ((reply = recv_data_byte(spi)) != 0xFF) break;
+        if ((reply = recv_data_byte()) != 0xFF) return reply;
     }
 
-    return reply;    
+    FATAL("SD card not responding cmd%d", cmd[0] ^ 0x40);
 }
 
-char sd_exec_acmd(struct metal_spi *spi, char* cmd) {
+char sd_exec_acmd(char* cmd) {
     char cmd55[] = {0x77, 0x00, 0x00, 0x00, 0x00, 0xFF};
-    while (recv_data_byte(spi) != 0xFF);
-    sd_exec_cmd(spi, cmd55);
+    while (recv_data_byte() != 0xFF);
+    sd_exec_cmd(cmd55);
 
-    while (recv_data_byte(spi) != 0xFF);
-    return sd_exec_cmd(spi, cmd);
+    while (recv_data_byte() != 0xFF);
+    return sd_exec_cmd(cmd);
 }

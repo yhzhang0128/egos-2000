@@ -16,10 +16,10 @@ enum {
 extern int SD_CARD_TYPE;
 
 struct metal_spi;
-char recv_data_byte(struct metal_spi*);
-char send_data_byte(struct metal_spi*, char);
-char sd_exec_cmd(struct metal_spi *, char*);
-char sd_exec_acmd(struct metal_spi *, char*);
+char sd_exec_cmd(char*);
+char sd_exec_acmd(char*);
+char recv_data_byte();
+char send_data_byte(char);
 
 #include "bus_spi.h"
 #include "egos.h"

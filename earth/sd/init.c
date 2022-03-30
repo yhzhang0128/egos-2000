@@ -38,16 +38,16 @@ int sdinit() {
     if (0 != sd_check_type(spi)) FATAL("Fail to check SD card type and voltage");
 
     char acmd41[] = {0x69, (SD_CARD_TYPE == SD_CARD_TYPE_SD2)? 0x40 : 0x00, 0x00, 0x00, 0x00, 0xFF};
-    while (sd_exec_acmd(spi, acmd41));
+    while (sd_exec_acmd(acmd41));
     for (int i = 0; i < 100; i++)
-        recv_data_byte(spi);
+        recv_data_byte();
     INFO("SD card initialization completes");
 
     INFO("Set block size to 512 bytes with cmd16");
     char cmd16[] = {0x50, 0x00, 0x00, 0x02, 0x00, 0xFF};
-    char reply = sd_exec_cmd(spi, cmd16);
+    char reply = sd_exec_cmd(cmd16);
     for (int i = 0; i < 100; i++)
-        recv_data_byte(spi);
+        recv_data_byte();
     INFO("SD card replies cmd16 with status 0x%.2x", reply);
 
     if (SD_CARD_TYPE == SD_CARD_TYPE_SD2)
@@ -59,7 +59,7 @@ int sdinit() {
 
 static int sd_check_type(struct metal_spi *spi) {
     char cmd8[] = {0x48, 0x00, 0x00, 0x01, 0xAA, 0x87};
-    char reply = sd_exec_cmd(spi, cmd8);
+    char reply = sd_exec_cmd(cmd8);
 
     INFO("SD card replies cmd8 with status 0x%.2x", reply);
     if (reply & 0x04) {
@@ -69,7 +69,7 @@ static int sd_check_type(struct metal_spi *spi) {
         /* only need last byte of r7 response */
         unsigned long payload;
         for (int i = 0; i < 4; i++)
-            ((char*)&payload)[3 - i] = recv_data_byte(spi);
+            ((char*)&payload)[3 - i] = recv_data_byte();
         INFO("SD card replies cmd8 with payload 0x%.8x", payload);
 
         if ((payload & 0xFFF) != 0x1AA) return -1;
@@ -77,7 +77,7 @@ static int sd_check_type(struct metal_spi *spi) {
     }
 
     for (int i = 0; i < 10; i++)
-        recv_data_byte(spi);
+        recv_data_byte();
 
     return 0;
 }
@@ -85,15 +85,15 @@ static int sd_check_type(struct metal_spi *spi) {
 static int sd_check_capacity(struct metal_spi *spi) {
     INFO("Check SD card capacity with cmd58");
     for (int i = 0; i < 10; i++)
-        recv_data_byte(spi);
+        recv_data_byte();
 
     char reply, cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
-    if (sd_exec_cmd(spi, cmd58)) FATAL("cmd58 returns failure");
+    if (sd_exec_cmd(cmd58)) FATAL("cmd58 returns failure");
     INFO("SD card replies cmd58 with status 0x00");
 
     unsigned long payload;
     for (uint8_t i = 0; i < 4; i++) {
-        reply = ((char*)&payload)[3 - i] = recv_data_byte(spi);
+        reply = ((char*)&payload)[3 - i] = recv_data_byte();
 
         if (i == 0 && ((reply & 0XC0) == 0XC0))
             SD_CARD_TYPE = SD_CARD_TYPE_SDHC;
@@ -101,7 +101,7 @@ static int sd_check_capacity(struct metal_spi *spi) {
     INFO("SD card replies cmd58 with payload 0x%.8x", payload);
 
     for (int i = 0; i < 100; i++)
-        recv_data_byte(spi);
+        recv_data_byte();
 
     return 0;
 }
@@ -128,7 +128,7 @@ static int sd_spi_reset(struct metal_spi *spi) {
     for (i = 0; i < 100; i++) {
         if (i % 20 == 0) INFO("    ... completed %d%c", i / 10 * 10, '%');
 
-        send_data_byte(spi, 0xFF);
+        send_data_byte(0xFF);
     }
 
     /* Keep chip select line low */
@@ -139,14 +139,14 @@ static int sd_spi_reset(struct metal_spi *spi) {
     
     INFO("Set CS to 0 and send cmd0 through MOSI.");
     char cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
-    char reply = sd_exec_cmd(spi, cmd0);
+    char reply = sd_exec_cmd(cmd0);
 
     while (reply != 0x01)
-        reply = recv_data_byte(spi);
+        reply = recv_data_byte();
     INFO("SD card replies cmd0 with 0x01");
 
     for(i = 0; i < 10; i++)
-        recv_data_byte(spi);
+        recv_data_byte();
     return 0;
 }
 
