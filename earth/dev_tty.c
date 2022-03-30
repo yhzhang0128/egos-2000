@@ -31,7 +31,7 @@ int tty_intr() {
     if (is_reading) return 0;
 
     metal_uart_getc(uart, &c);
-    return c == 3;          // Ctrl + C
+    return c == 3;
 }
 
 int tty_read(char* buf, int len) {
@@ -41,13 +41,13 @@ int tty_read(char* buf, int len) {
         buf[i] = (char)c;
 
         switch (c) {
-        case 0x3:           // Ctrl + C
+        case 0x3:           /* Ctrl+C    */
             buf[0] = 0;
-        case 0xd:           // Enter
+        case 0xd:           /* Enter     */
             buf[i] = 0;
             printf("\r\n");
             goto finish;
-        case 0x7f:          // Backspace / Delete
+        case 0x7f:          /* Backspace */
             c = 0;
             if (i) printf("\b \b");
             i = i ? i - 2 : i - 1;
@@ -82,21 +82,21 @@ int tty_info(const char *format, ...)
 
 int tty_highlight(const char *format, ...)
 {
-    printf("%s[HIGHLIGHT] ", "\x1B[1;33m"); // yellow
+    printf("%s[HIGHLIGHT] ", "\x1B[1;33m");
     VPRINTF
     printf("%s\r\n", "\x1B[1;0m");
 }
 
 int tty_success(const char *format, ...)
 {
-    printf("%s[SUCCESS] ", "\x1B[1;32m");   // green
+    printf("%s[SUCCESS] ", "\x1B[1;32m");
     VPRINTF
     printf("%s\r\n", "\x1B[1;0m");
 }
 
 int tty_fatal(const char *format, ...)
 {
-    printf("%s[FATAL] ", "\x1B[1;31m");     // red
+    printf("%s[FATAL] ", "\x1B[1;31m");
     VPRINTF
     printf("%s\r\n", "\x1B[1;0m");
     while(1);

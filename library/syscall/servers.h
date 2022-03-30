@@ -36,8 +36,8 @@ struct file_request {
           FILE_READ,
           FILE_WRITE,
     } type;
-    unsigned int ino;      // inode number
-    unsigned int offset;   // offset
+    unsigned int ino;
+    unsigned int offset;
     block_t block;
 };
 

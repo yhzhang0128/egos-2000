@@ -15,13 +15,13 @@ struct process{
     int pid;
     int status;
     void *sp, *mepc;
-    int receiver_pid; // used when status is PROC_WAIT_TO_SEND
+    int receiver_pid; /* used when status is PROC_WAIT_TO_SEND */
 };
 
 enum {
     PROC_UNUSED,
-    PROC_LOADING,     // allocated but waiting to load elf binary
-    PROC_READY,       // finish loading but haven't started running
+    PROC_LOADING,     /* allocated but waiting to load elf binary   */
+    PROC_READY,       /* finish loading but haven't started running */
     PROC_RUNNING,
     PROC_RUNNABLE,
     PROC_WAIT_TO_SEND,

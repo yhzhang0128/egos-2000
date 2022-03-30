@@ -27,10 +27,10 @@ int main() {
 
     /* Enter the first kernel process sys_proc */
     void (*sys_proc_entry)(void*) = (void*)APPS_ENTRY;
-    earth->mmu_switch(GPID_PROCESS);   // setup virtual address space
-    timer_reset();                     // start timer
-    earth->intr_enable();              // enable interrupt
-    sys_proc_entry(&pcb);              // enter sys_proc
+    earth->mmu_switch(GPID_PROCESS);   /* setup virtual address space */
+    timer_reset();                     /* start timer                 */
+    earth->intr_enable();              /* enable interrupt            */
+    sys_proc_entry(&pcb);              /* enter sys_proc              */
 
     FATAL("Should never return to the grass kernel main()");
     return 0;

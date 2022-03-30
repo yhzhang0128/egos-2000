@@ -82,7 +82,7 @@ static int sd_check_type(struct metal_spi *spi) {
         /* Illegal command */
         SD_CARD_TYPE = SD_CARD_TYPE_SD1;
     } else {
-        // only need last byte of r7 response
+        /* only need last byte of r7 response */
         unsigned long payload;
         for (int i = 0; i < 4; i++)
             ((char*)&payload)[3 - i] = recv_data_byte(spi);

@@ -88,7 +88,7 @@ int mmu_switch(int pid) {
             int page_no = translate_table.frame[i].page_no;
             src = (char*) ((page_no < code_top)? APPS_ENTRY : DTIM_START);
             cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
-            //INFO("Unmap(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", curr_vm_pid, i, page_no, src + (page_no % code_top) * PAGE_SIZE, cache + i * PAGE_SIZE);
+            /* INFO("Unmap(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", curr_vm_pid, i, page_no, src + (page_no % code_top) * PAGE_SIZE, cache + i * PAGE_SIZE); */
         }
 
     /* map pid to virtual address space */
@@ -98,7 +98,7 @@ int mmu_switch(int pid) {
             int page_no = translate_table.frame[i].page_no;
             dst = (char*) ((page_no < code_top)? APPS_ENTRY : DTIM_START);
             memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
-            //INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst + (page_no % code_top) * PAGE_SIZE, src);
+            /* INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst + (page_no % code_top) * PAGE_SIZE, src); */
         }
 
     curr_vm_pid = pid;
