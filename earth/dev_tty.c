@@ -13,8 +13,7 @@
 #include "bus_uart.h"
 
 static void uart_set_clock(long baud_rate) {
-    long cpu_clock_rate = 65000000;
-    UART_REGW(METAL_SIFIVE_UART0_DIV) = cpu_clock_rate / baud_rate - 1;
+    UART_REGW(METAL_SIFIVE_UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
     UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= 1;
     UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= 1;
 }

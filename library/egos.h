@@ -1,5 +1,7 @@
 #pragma once
 
+#define CPU_CLOCK_RATE 65000000
+
 struct earth {
     /* CPU interface */
     int (*intr_enable)();
@@ -42,5 +44,4 @@ extern struct earth *earth;
 #define FATAL     earth->tty_fatal
 #define SUCCESS   earth->tty_success
 #define HIGHLIGHT earth->tty_highlight
-
 #define printf    earth->tty_write

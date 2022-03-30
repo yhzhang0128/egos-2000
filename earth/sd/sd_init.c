@@ -10,7 +10,7 @@
 #include "sd.h"
 
 static void sd_spi_reset();
-static void sd_spi_configure();
+static void sd_spi_config();
 static void sd_spi_set_clock(long baud_rate);
 
 static int sd_check_type();
@@ -21,27 +21,23 @@ int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
 int sdinit() {
     INFO("Set SPI clock frequency to 100000Hz");
     sd_spi_set_clock(100000);
-    sd_spi_configure();
+    sd_spi_config();
     sd_spi_reset();
 
-    INFO("Set SPI clock frequency to %ldHz", 65000000 / 4);
-    sd_spi_set_clock(65000000 / 4);
+    INFO("Set SPI clock frequency to %ldHz", CPU_CLOCK_RATE / 4);
+    sd_spi_set_clock(CPU_CLOCK_RATE / 4);
 
     INFO("Check SD card type and voltage with cmd8");
     if (0 != sd_check_type()) FATAL("Fail to check SD card type and voltage");
 
     char acmd41[] = {0x69, (SD_CARD_TYPE == SD_CARD_TYPE_SD2)? 0x40 : 0x00, 0x00, 0x00, 0x00, 0xFF};
     while (sd_exec_acmd(acmd41));
-    for (int i = 0; i < 100; i++)
-        recv_data_byte();
-    INFO("SD card initialization completes");
+    while (recv_data_byte() != 0xFF);
 
     INFO("Set block size to 512 bytes with cmd16");
     char cmd16[] = {0x50, 0x00, 0x00, 0x02, 0x00, 0xFF};
     char reply = sd_exec_cmd(cmd16);
-    for (int i = 0; i < 100; i++)
-        recv_data_byte();
-    INFO("SD card replies cmd16 with status 0x%.2x", reply);
+    while (recv_data_byte() != 0xFF);
 
     if (SD_CARD_TYPE == SD_CARD_TYPE_SD2)
         sd_check_capacity();
@@ -72,14 +68,13 @@ static int sd_check_type() {
         SD_CARD_TYPE = SD_CARD_TYPE_SD2;
     }
 
-    for (int i = 0; i < 10; i++) recv_data_byte();
+    while (recv_data_byte() != 0xFF);
     return 0;
 }
 
 static void sd_check_capacity() {
     INFO("Check SD card capacity with cmd58");
-    for (int i = 0; i < 10; i++)
-        recv_data_byte();
+    while (recv_data_byte() != 0xFF);
 
     char reply, cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
     if (sd_exec_cmd(cmd58)) FATAL("cmd58 returns failure");
@@ -94,7 +89,7 @@ static void sd_check_capacity() {
     }
     INFO("SD card replies cmd58 with payload 0x%.8x", payload);
 
-    for (int i = 0; i < 100; i++) recv_data_byte();
+    while (recv_data_byte() != 0xFF);
 }
 
 static void sd_spi_reset() {
@@ -121,14 +116,13 @@ static void sd_spi_reset() {
     char cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
     char reply = sd_exec_cmd(cmd0);
 
-    while (reply != 0x01)
-        reply = recv_data_byte();
+    while (reply != 0x01) reply = recv_data_byte();
     INFO("SD card replies cmd0 with 0x01");
 
-    for(i = 0; i < 10; i++) recv_data_byte();
+    while (recv_data_byte() != 0xFF);
 }
 
-static void sd_spi_configure() {
+static void sd_spi_config() {
     /* Set protocol as METAL_SPI_SINGLE */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
@@ -167,8 +161,7 @@ static void sd_spi_configure() {
 }
 
 static void sd_spi_set_clock(long baud_rate) {
-    long cpu_clock_rate = 65000000;
-    long div = (cpu_clock_rate / (2 * baud_rate)) - 1;
+    long div = (CPU_CLOCK_RATE / (2 * baud_rate)) - 1;
     if (div > METAL_SPI_SCKDIV_MASK)
         FATAL("SPI baud rate %lHz is too low", baud_rate);
 
