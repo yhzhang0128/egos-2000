@@ -11,12 +11,12 @@
 #include <stdio.h>
 #include "sd.h"
 
-static int sd_spi_reset(struct metal_spi*);
-static int sd_spi_configure(struct metal_spi*);
+static int sd_spi_reset();
+static int sd_spi_configure();
 
 static void sd_print_type();
-static int sd_check_type(struct metal_spi*);
-static int sd_check_capacity(struct metal_spi*);
+static int sd_check_type();
+static int sd_check_capacity();
 
 int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
 
@@ -26,8 +26,8 @@ int sdinit() {
     metal_spi_set_baud_rate(spi, baud_rate);
     INFO("Set SPI clock frequency to %ldHz", baud_rate);
 
-    if (0 != sd_spi_configure(spi)) FATAL("Fail to configure spi device");
-    if (0 != sd_spi_reset(spi)) FATAL("Fail to reset SD card with cmd0");
+    if (0 != sd_spi_configure()) FATAL("Fail to configure spi device");
+    if (0 != sd_spi_reset()) FATAL("Fail to reset SD card with cmd0");
 
     long cpu_clock_rate = 65000000;
     baud_rate = cpu_clock_rate / 4;
@@ -35,7 +35,7 @@ int sdinit() {
     INFO("Set SPI clock frequency to %ldHz", baud_rate);
 
     INFO("Check SD card type and voltage with cmd8");
-    if (0 != sd_check_type(spi)) FATAL("Fail to check SD card type and voltage");
+    if (0 != sd_check_type()) FATAL("Fail to check SD card type and voltage");
 
     char acmd41[] = {0x69, (SD_CARD_TYPE == SD_CARD_TYPE_SD2)? 0x40 : 0x00, 0x00, 0x00, 0x00, 0xFF};
     while (sd_exec_acmd(acmd41));
@@ -51,13 +51,13 @@ int sdinit() {
     INFO("SD card replies cmd16 with status 0x%.2x", reply);
 
     if (SD_CARD_TYPE == SD_CARD_TYPE_SD2)
-        sd_check_capacity(spi);
+        sd_check_capacity();
     sd_print_type();
 
     return 0;
 }
 
-static int sd_check_type(struct metal_spi *spi) {
+static int sd_check_type() {
     char cmd8[] = {0x48, 0x00, 0x00, 0x01, 0xAA, 0x87};
     char reply = sd_exec_cmd(cmd8);
 
@@ -82,7 +82,7 @@ static int sd_check_type(struct metal_spi *spi) {
     return 0;
 }
 
-static int sd_check_capacity(struct metal_spi *spi) {
+static int sd_check_capacity() {
     INFO("Check SD card capacity with cmd58");
     for (int i = 0; i < 10; i++)
         recv_data_byte();
@@ -116,7 +116,7 @@ static void sd_print_type() {
     }
 }
 
-static int sd_spi_reset(struct metal_spi *spi) {
+static int sd_spi_reset() {
     INFO("Set CS and MOSI to 1 and toggle clock.");
     long control_base = SPI_BASE_ADDR;
     INFO("UART base address is 0x%x.", control_base);
@@ -150,7 +150,7 @@ static int sd_spi_reset(struct metal_spi *spi) {
     return 0;
 }
 
-static int sd_spi_configure(struct metal_spi *spi) {
+static int sd_spi_configure() {
     long control_base = SPI_BASE_ADDR;
 
     /* Set protocol as METAL_SPI_SINGLE */

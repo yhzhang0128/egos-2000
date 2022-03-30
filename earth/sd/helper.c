@@ -29,11 +29,9 @@ char sd_exec_cmd(char* cmd) {
     for (int i = 0; i < 6; i++)
         send_data_byte(cmd[i]);
 
-    for (int reply, i = 0; i < 5000; i++) {
-        if (i % 1000 == 0)
-            INFO("    ... wait for the SD card to reply cmd%d", cmd[0] ^ 0x40);
-        if ((reply = recv_data_byte()) != 0xFF) return reply;
-    }
+    for (int reply, i = 0; i < 5000; i++)
+        if ((reply = recv_data_byte()) != 0xFF)
+            return reply;
 
     FATAL("SD card not responding cmd%d", cmd[0] ^ 0x40);
 }
