@@ -19,9 +19,9 @@ static void uart_set_clock(long baud_rate) {
     UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= 1;
 }
 
-static void uart_getc(int* c) {
+static int uart_getc(int* c) {
     uint32_t ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
-    *c = (ch & UART_RXEMPTY)? -1 : (ch & 0x0ff);
+    return *c = (ch & UART_RXEMPTY)? -1 : (ch & 0x0ff);
 }
 
 int tty_init() {
@@ -33,17 +33,15 @@ int tty_init() {
     return 0;
 }
 
-static int c, is_reading;
+static int is_reading;
 int tty_intr() {
-    if (is_reading) return 0;
-
-    uart_getc(&c);
-    return c == 3;
+    int c;
+    return (is_reading)? 0 : (uart_getc(&c) == 3);
 }
 
 int tty_read(char* buf, int len) {
     is_reading = 1;
-    for (int i = 0; i < len - 1; i++) {
+    for (int c, i = 0; i < len - 1; i++) {
         for (c = -1; c == -1; uart_getc(&c));
         buf[i] = (char)c;
 
