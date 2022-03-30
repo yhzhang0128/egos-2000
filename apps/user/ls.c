@@ -13,7 +13,7 @@
 int main(int argc, char** argv) {
     if (argc > 1) {
         INFO("ls with args not implemented");
-        sys_exit(0);
+        return -1;
     }
 
     char result[BLOCK_SIZE];
@@ -21,8 +21,7 @@ int main(int argc, char** argv) {
     
     for (int i = 1; i < strlen(result); i++)
         if (result[i - 1] == ' ' &&
-            result[i] >= '0' &&
-            result[i] <= '9')
+            result[i] >= '0' && result[i] <= '9')
             result[i] = ' ';
 
     printf("%s\r\n", result);

@@ -10,7 +10,19 @@
 #include "app.h"
 #include <string.h>
 
-void parse_request(char* buf, struct proc_request* req);
+void parse_request(char* buf, struct proc_request* req) {
+    int idx = 0, nargs = 0;
+    memset(req->argv, 0, CMD_NARGS * CMD_ARG_LEN);
+
+    for (int i = 0; i < strlen(buf); i++)
+        if (buf[i] != ' ') {
+            req->argv[nargs][idx++] = buf[i];
+        } else if (idx != 0) {
+            nargs++;
+            idx = 0;
+        }
+    req->argc = idx ? nargs + 1 : nargs;
+}
 
 int main() {
     SUCCESS("Enter kernel process GPID_SHELL");
@@ -21,9 +33,9 @@ int main() {
     int home = dir_lookup(0, "home");
     grass->work_dir_ino = dir_lookup(home, "yunhao");
     INFO("sys_shell: /home/yunhao has ino=%d", grass->work_dir_ino);
+    HIGHLIGHT("Welcome to egos-riscv!");
     
     /* Wait for shell commands */
-    HIGHLIGHT("Welcome to egos-riscv!");
     int sender;
     char buf[256];
     struct proc_request req;
@@ -53,20 +65,4 @@ int main() {
                 sys_recv(&sender, (void*)&reply, sizeof(reply));            
         }
     }
-}
-
-void parse_request(char* buf, struct proc_request* req) {
-    int len = strlen(buf);
-    int idx = 0, nargs = 0;
-
-    memset(req->argv, 0, CMD_NARGS * CMD_ARG_LEN);
-    for (int i = 0; i < len; i++) {
-        if (buf[i] != ' ') {
-            req->argv[nargs][idx++] = buf[i];
-        } else if (idx != 0) {
-            nargs++;
-            idx = 0;
-        }
-    }
-    req->argc = idx ? nargs + 1 : nargs;
 }

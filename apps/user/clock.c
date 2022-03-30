@@ -17,4 +17,6 @@ int main(int argc, char** argv) {
         for (j = 0; j < 5000000; j++);
         printf("clock: tick#%d / #%d\r\n", i + 1, cnt);
     }
+
+    return 0;
 }

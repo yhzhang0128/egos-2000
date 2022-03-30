@@ -15,5 +15,4 @@
 int main() {
     memset((void*)FRAME_CACHE_START, 0, DTIM_END - FRAME_CACHE_START);
     SUCCESS("Crash2 succeeds in corrupting the memory of other processes");
-    return 0;
 }

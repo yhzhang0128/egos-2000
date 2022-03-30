@@ -11,5 +11,4 @@
 
 int main() {
     *(int*)(0x1000) = 1;
-    return 0;
 }

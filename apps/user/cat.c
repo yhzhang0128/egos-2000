@@ -20,16 +20,15 @@ int main(int argc, char** argv) {
     int file_ino = dir_lookup(grass->work_dir_ino, argv[1]);
     if (file_ino < 0) {
         INFO("cat: file %s not found", argv[1]);
-        return 1;
+        return -1;
     }
 
-    /* Read the first block of the file */
+    /* Read and print the first block of the file */
     char result[BLOCK_SIZE];
     file_read(file_ino, 0, result);
 
     printf("%s", result);
-    if (result[strlen(result) - 1] != '\n')
-        printf("\r\n");
+    if (result[strlen(result) - 1] != '\n') printf("\r\n");
 
     return 0;
 }

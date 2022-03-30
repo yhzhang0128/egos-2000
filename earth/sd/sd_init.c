@@ -9,24 +9,24 @@
 
 #include "sd.h"
 
-static int sd_spi_reset();
-static int sd_spi_configure();
+static void sd_spi_reset();
+static void sd_spi_configure();
 static void sd_spi_set_clock(long baud_rate);
 
-static void sd_print_type();
 static int sd_check_type();
-static int sd_check_capacity();
+static void sd_print_type();
+static void sd_check_capacity();
 
 int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
 
 int sdinit() {
-    sd_spi_set_clock(100000);
     INFO("Set SPI clock frequency to 100000Hz");
-    if (0 != sd_spi_configure()) FATAL("Fail to configure spi device");
-    if (0 != sd_spi_reset()) FATAL("Fail to reset SD card with cmd0");
+    sd_spi_set_clock(100000);
+    sd_spi_configure();
+    sd_spi_reset();
 
-    sd_spi_set_clock(65000000 / 4);
     INFO("Set SPI clock frequency to %ldHz", 65000000 / 4);
+    sd_spi_set_clock(65000000 / 4);
 
     INFO("Check SD card type and voltage with cmd8");
     if (0 != sd_check_type()) FATAL("Fail to check SD card type and voltage");
@@ -70,13 +70,11 @@ static int sd_check_type() {
         SD_CARD_TYPE = SD_CARD_TYPE_SD2;
     }
 
-    for (int i = 0; i < 10; i++)
-        recv_data_byte();
-
+    for (int i = 0; i < 10; i++) recv_data_byte();
     return 0;
 }
 
-static int sd_check_capacity() {
+static void sd_check_capacity() {
     INFO("Check SD card capacity with cmd58");
     for (int i = 0; i < 10; i++)
         recv_data_byte();
@@ -94,10 +92,7 @@ static int sd_check_capacity() {
     }
     INFO("SD card replies cmd58 with payload 0x%.8x", payload);
 
-    for (int i = 0; i < 100; i++)
-        recv_data_byte();
-
-    return 0;
+    for (int i = 0; i < 100; i++) recv_data_byte();
 }
 
 static void sd_print_type() {
@@ -110,7 +105,7 @@ static void sd_print_type() {
     }
 }
 
-static int sd_spi_reset() {
+static void sd_spi_reset() {
     INFO("Set CS and MOSI to 1 and toggle clock.");
 
     /* Keep chip select line high */
@@ -138,12 +133,10 @@ static int sd_spi_reset() {
         reply = recv_data_byte();
     INFO("SD card replies cmd0 with 0x01");
 
-    for(i = 0; i < 10; i++)
-        recv_data_byte();
-    return 0;
+    for(i = 0; i < 10; i++) recv_data_byte();
 }
 
-static int sd_spi_configure() {
+static void sd_spi_configure() {
     /* Set protocol as METAL_SPI_SINGLE */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
@@ -179,8 +172,6 @@ static int sd_spi_configure() {
     /* Toggle off memory-mapped SPI flash mode
      * toggle on programmable IO mode */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FCTRL) = METAL_SPI_CONTROL_IO;
-
-    return 0;
 }
 
 static void sd_spi_set_clock(long baud_rate) {
