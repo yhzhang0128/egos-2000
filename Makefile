@@ -38,7 +38,7 @@ OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
 EARTH_SRCS = earth/*.c earth/sd/*.c library/elf/*.c
-EARTH_LAYOUT = -Tearth/earth.lds
+EARTH_LAYOUT = -Tlibrary/sifive/metal.lds
 
 GRASS_SRCS = grass/*.S grass/*.c library/elf/*.c
 GRASS_LAYOUT = -Tgrass/grass.lds
