@@ -10,20 +10,17 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-
-#include "earth.h"
 #include "bus_uart.h"
 
 static int c, is_reading;
 static struct metal_uart* uart;
 
+int tty_fatal(const char *format, ...);
 int tty_init() {
     uart = metal_uart_get_device(0);
     metal_uart_init(uart, 115200);
     for (int i = 0; i < 2000000; i++);
-    
-    if (!uart)
-        FATAL("Unable to get uart handle");
+    if (!uart) tty_fatal("Unable to get uart handle");
 
     /* wait for the tty device to be ready */
     for (int c = 0; c != -1; metal_uart_getc(uart, &c));
