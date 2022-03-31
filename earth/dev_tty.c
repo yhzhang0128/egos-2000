@@ -13,7 +13,7 @@
 #include "bus_uart.c"
 
 void tty_init() {
-    uart_set_clock(115200);
+    uart_init(115200);
 
     /* Wait for the tty device to be ready */
     for (int i = 0; i < 2000000; i++);
