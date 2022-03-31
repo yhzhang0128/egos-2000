@@ -43,6 +43,7 @@ int sdinit() {
         sd_check_capacity();
 
     if (SD_CARD_TYPE != SD_CARD_TYPE_SDHC)
+        /* SDXC may also work but I didn't try */
         FATAL("Only SDHC card is supported");
     INFO("SD card is high capacity SDHC card");
 
