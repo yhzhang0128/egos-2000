@@ -17,22 +17,22 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
 This RISC-V version of EGOS is minimal in order to give students a complete picture.
 
 ```shell
-# Count lines of code excluding README.md and USAGES.md (LOC = 2117)
+# Count lines of code excluding README.md and USAGES.md (LOC = 2099)
 > cloc egos-riscv --exclude-ext=md  
       52 text files.
       52 unique files.
        7 files ignored.
 
-github.com/AlDanial/cloc v 1.74  T=0.07 s (639.0 files/s, 44604.7 lines/s)
+github.com/AlDanial/cloc v 1.82  T=0.03 s (1799.3 files/s, 124657.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               30            443            422           1630
-C/C++ Header                    13             92            111            364
+C                               30            448            414           1614
+C/C++ Header                    13             90            107            364
 Assembly                         2              4             14             67
 make                             1             11              0             54
 -------------------------------------------------------------------------------
-SUM:                            46            550            547           2115
+SUM:                            46            553            535           2099
 -------------------------------------------------------------------------------
 ```
 
