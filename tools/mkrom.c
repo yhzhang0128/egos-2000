@@ -19,38 +19,27 @@
 #include <assert.h>
 #include <sys/stat.h>
 
-char disk_file[]  = "disk.img";
-char earth_file[] = "earth.bin";
-char fe310_file[] = "fe310_cpu.bin";
-
-char output_bin[] = "bootROM.bin";
-char output_mcs[] = "bootROM.mcs";
-
 char mem_fe310[4 * 1024 * 1024];
 char mem_earth[4 * 1024 * 1024];
 char mem_disk [6 * 1024 * 1024];
-
-void load_fe310();
-void load_earth();
-void load_disk();
-void write_binary();
-void write_intel_mcs();
-void write_section(char* mem, int base, int size);
-
 int fe310_size, earth_size, disk_size;
 
+void write_binary();
+void write_intel_mcs();
+int load_file(char* file_name, char* print_name, char* dst);
+
 int main() {
-    load_fe310();
-    load_earth();
-    load_disk();
+    fe310_size = load_file("fe310_cpu.bin", "FE310 binary", mem_fe310);
+    earth_size = load_file("earth.bin", "Earth binary", mem_earth);
+    disk_size = load_file("disk.img", "Disk  image ", mem_disk);
+
     write_binary();
     write_intel_mcs();
-    
     return 0;
 }
 
 void write_binary() {
-    freopen(output_bin, "w", stdout);
+    freopen("bootROM.bin", "w", stdout);
 
     for (int i = 0; i < 4 * 1024 * 1024; i++)
         putchar(mem_fe310[i]);
@@ -63,23 +52,24 @@ void write_binary() {
     fprintf(stderr, "[INFO] Finish making the bootROM binary\n");
 }
 
+void write_mcs_section(char* mem, int base, int size);
 void write_intel_mcs() {
-    freopen(output_mcs, "w", stdout);
+    freopen("bootROM.mcs", "w", stdout);
 
-    write_section(mem_fe310, 0x00, fe310_size);
-    write_section(mem_earth, 0x40, earth_size);
+    write_mcs_section(mem_fe310, 0x00, fe310_size);
+    write_mcs_section(mem_earth, 0x40, earth_size);
 
     int paging_size = 1024 * 1024;
-    write_section(mem_disk + paging_size,
-                  0x80 + 0x10,
-                  disk_size - paging_size);
+    write_mcs_section(mem_disk + paging_size,
+                      0x80 + 0x10,
+                      disk_size - paging_size);
     printf(":00000001FF\n");
     
     fclose(stdout);
     fprintf(stderr, "[INFO] Finish making the bootROM mcs image\n");
 }
 
-void write_section(char* mem, int base, int size) {
+void write_mcs_section(char* mem, int base, int size) {
     /* using a dummy checksum */
     char chk;
 
@@ -97,42 +87,15 @@ void write_section(char* mem, int base, int size) {
     }    
 }
 
-void load_disk() {
+int load_file(char* file_name, char* print_name, char* dst) {
     struct stat st;
-    stat(disk_file, &st);
-    disk_size = (int)st.st_size;
-    printf("[INFO] Disk  image  has 0x%.6x bytes\n", disk_size);
-    assert(disk_size <= 6 * 1024 * 1024);
+    stat(file_name, &st);
+    printf("[INFO] %s has 0x%.6x bytes\n", print_name, (int)st.st_size);
 
-    freopen(disk_file, "r", stdin);
-    int nread = 0;
-    while (nread < disk_size)
-        nread += read(0, mem_disk + nread, disk_size - nread);
+    freopen(file_name, "r", stdin);
+    for (int nread = 0; nread < st.st_size; )
+        nread += read(0, dst + nread, st.st_size - nread);
     fclose(stdin);
-}
 
-void load_earth() {
-    struct stat st;
-    stat(earth_file, &st);
-    earth_size = (int)st.st_size;
-    printf("[INFO] Earth binary has 0x%.6x bytes\n", earth_size);
-
-    freopen(earth_file, "r", stdin);
-    int nread = 0;
-    while (nread < earth_size)
-        nread += read(0, mem_earth + nread, earth_size - nread);
-    fclose(stdin);
-}
-
-void load_fe310() {
-    struct stat st;
-    stat(fe310_file, &st);
-    fe310_size = (int)st.st_size;
-    printf("[INFO] FE310 binary has 0x%.6x bytes\n", fe310_size);
-
-    freopen(fe310_file, "r", stdin);
-    int nread = 0;
-    while (nread < fe310_size)
-        nread += read(0, mem_fe310 + nread, fe310_size - nread);
-    fclose(stdin);
+    return st.st_size;
 }
