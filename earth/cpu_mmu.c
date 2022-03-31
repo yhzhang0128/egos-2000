@@ -13,6 +13,7 @@
 #include "earth.h"
 #include <stdlib.h>
 
+/* definitions for translation table */
 struct translation_table_t {
     struct {
         int pid;
@@ -24,6 +25,7 @@ struct translation_table_t {
 #define F_INUSE        0x1
 #define FRAME_INUSE(x) (translate_table.frame[x].flag & F_INUSE)
 
+/* definitions for frame cache */
 int curr_vm_pid;
 int lookup_table[CACHED_NFRAMES];
 char *cache = (void*)FRAME_CACHE_START;
@@ -45,7 +47,7 @@ int mmu_alloc(int* frame_no, int* cached_addr) {
             translate_table.frame[i].flag |= F_INUSE;
             return 0;
         }
-    return -1;
+    FATAL("mmu_alloc: no more available frames");
 }
 
 int mmu_free(int pid) {
@@ -64,8 +66,7 @@ int mmu_free(int pid) {
 }
 
 int mmu_map(int pid, int page_no, int frame_no) {
-    if (!FRAME_INUSE(frame_no))
-        FATAL("Frame %d has not been allocated", frame_no);
+    if (!FRAME_INUSE(frame_no)) FATAL("mmu_map: bad frame_no");
 
     translate_table.frame[frame_no].pid = pid;
     translate_table.frame[frame_no].page_no = page_no;
@@ -101,15 +102,15 @@ int mmu_switch(int pid) {
 }
 
 static int cache_evict() {
-    int free_idx = rand() % CACHED_NFRAMES;
-    int frame_no = lookup_table[free_idx];
+    int idx = rand() % CACHED_NFRAMES;
+    int frame_no = lookup_table[idx];
 
     if (FRAME_INUSE(frame_no)) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
+        disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * idx);
     }
 
-    return free_idx;
+    return idx;
 }
 
 static int cache_read(int frame_no) {

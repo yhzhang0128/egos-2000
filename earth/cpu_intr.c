@@ -20,22 +20,18 @@ void intr_init() {
     __asm__ volatile("csrw mtvec, %0" ::"r"(trap_entry));
 }
 
-#define MCAUSE_INTR_MASK  0x80000000UL
-#define MCAUSE_IDMASK     0x000003FFUL
-
 static void trap_entry() {
-    int mcause;
+    int mcause, mepc;
     __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
+    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
 
-    int id = mcause & MCAUSE_IDMASK;
-    if (mcause & MCAUSE_INTR_MASK) {
+    int id = mcause & 0x80000000UL;
+    if (mcause & 0x000003FFUL) {
         if (intr_handler != NULL)
             intr_handler(id);
         else
             FATAL("Got interrupt %d but handler not registered", id);
     } else {
-        int mepc;
-        __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
         if (excp_handler != NULL)
             excp_handler(id);
         else

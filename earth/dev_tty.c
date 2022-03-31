@@ -32,9 +32,9 @@ int tty_read(char* buf, int len) {
         buf[i] = (char)c;
 
         switch (c) {
-        case 0x3:   /* Ctrl+C    */
+        case 0x03:  /* Ctrl+C    */
             buf[0] = 0;
-        case 0xd:   /* Enter     */
+        case 0x0d:  /* Enter     */
             buf[i] = is_reading = 0;
             printf("\r\n");
             return i;

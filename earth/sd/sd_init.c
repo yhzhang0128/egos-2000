@@ -18,8 +18,7 @@ static void sd_check_capacity();
 
 int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
 
-int sdinit() {
-    INFO("Set SPI clock frequency to 100000Hz");
+void sdinit() {
     sd_spi_set_clock(100000);
     sd_spi_config();
     sd_spi_reset();
@@ -28,7 +27,7 @@ int sdinit() {
     sd_spi_set_clock(CPU_CLOCK_RATE / 4);
 
     INFO("Check SD card type and voltage with cmd8");
-    if (0 != sd_check_type()) FATAL("Fail to check SD card type and voltage");
+    if (0 != sd_check_type()) FATAL("Fail to check SD card type");
 
     char acmd41[] = {0x69, (SD_CARD_TYPE == SD_CARD_TYPE_SD2)? 0x40 : 0x00, 0x00, 0x00, 0x00, 0xFF};
     while (sd_exec_acmd(acmd41));
@@ -46,8 +45,6 @@ int sdinit() {
         /* SDXC may also work but I didn't try */
         FATAL("Only SDHC card is supported");
     INFO("SD card is high capacity SDHC card");
-
-    return 0;
 }
 
 static int sd_check_type() {

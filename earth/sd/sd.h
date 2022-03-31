@@ -13,7 +13,7 @@ enum {
 };
 extern int SD_CARD_TYPE;
 
-int sdinit();
+void sdinit();
 int sdread(int offset, int nblock, char* dst);
 int sdwrite(int offset, int nblock, char* src);
 
