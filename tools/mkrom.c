@@ -41,12 +41,9 @@ int main() {
 void write_binary() {
     freopen("bootROM.bin", "w", stdout);
 
-    for (int i = 0; i < 4 * 1024 * 1024; i++)
-        putchar(mem_fe310[i]);
-    for (int i = 0; i < 4 * 1024 * 1024; i++)
-        putchar(mem_earth[i]);
-    for (int i = 0; i < 6 * 1024 * 1024; i++)
-        putchar(mem_disk[i]);
+    write(1, mem_fe310, 4 * 1024 * 1024);
+    write(1, mem_earth, 4 * 1024 * 1024);
+    write(1, mem_disk,  6 * 1024 * 1024);
 
     fclose(stdout);
     fprintf(stderr, "[INFO] Finish making the bootROM binary\n");
@@ -71,18 +68,15 @@ void write_intel_mcs() {
 
 void write_mcs_section(char* mem, int base, int size) {
     /* using a dummy checksum */
-    char chk;
-
     int ngroups = (size >> 16) + 1;
     for (int i = 0; i < ngroups; i++) {
-        printf(":02000004%.4X%.2X\n", i + base, chk & 0xff);
+        printf(":02000004%.4X%.2X\n", i + base, 0xff);
         for (int j = 0; j < 0x10000; j += 16) {
             printf(":10%.4X00", j);
             for (int k = 0; k < 16; k++)
                 printf("%.2X", mem[i * 0x10000 + j + k] & 0xff);
-            printf("%.2X\n", chk & 0xff);
-            if (i * 0x10000 + j + 16 >= size)
-                return;
+            printf("%.2X\n", 0xff);
+            if (i * 0x10000 + j + 16 >= size) return;
         }
     }    
 }
