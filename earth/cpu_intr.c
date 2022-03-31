@@ -25,8 +25,8 @@ static void trap_entry() {
     __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
 
-    int id = mcause & 0x80000000UL;
-    if (mcause & 0x000003FFUL) {
+    int id = mcause & 0x3FF;
+    if (mcause & 0x80000000) {
         if (intr_handler != NULL)
             intr_handler(id);
         else

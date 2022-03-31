@@ -43,9 +43,9 @@ void disk_init() {
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; tty_read(buf, 2));
 
     if (buf[0] == '0') {
-        sdinit();
         type = SD_CARD;
         INFO("microSD card is chosen");
+        sdinit();
     } else {
         type = FLASH_ROM;
         INFO("on-board flash ROM is chosen");
