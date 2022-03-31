@@ -1,20 +1,20 @@
 # A minimal operating system on a real RISC-V board
 
-With only **2.1K** lines of code, our teaching OS implements SD card driver, tty driver, interrupt handling, address translation, process scheduling and communication, system calls, file system, shell and 7 shell commands.
+With only **2.1K** lines of code, our teaching OS implements microSD driver, tty driver, interrupt handling, address translation, process scheduling and messaging, system call, file system, shell and 7 shell commands.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
 The earth and grass operating system (EGOS) is our teaching OS at Cornell. It has three layers: 
 
-* The **earth layer** provides hardware-specific abstractions.
+* The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
     * cpu interrupt and memory management interfaces
-* The **grass layer** provides hardware-independent abstractions.
+* The **grass layer** implements hardware-independent abstractions.
     * processes and system calls
     * inter-process communication
 * The **application layer** provides file system, shell and shell commands.
 
-This RISC-V version of EGOS is minimal in order to give students the **complete** picture of an operating system.
+This RISC-V version of EGOS is minimal in order to give students a complete picture.
 
 ```shell
 # Count lines of code excluding README.md and USAGES.md (LOC = 2117)
