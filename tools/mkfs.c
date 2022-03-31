@@ -62,20 +62,17 @@ char paging[PAGING_DEV_SIZE];
 void mkfs();
 
 int main() {
-    memset(fs, 0, FS_DISK_SIZE);
     mkfs();
 
-    freopen("disk.img", "w", stdout);
-
     /* paging area */
-    memset(paging, 0, PAGING_DEV_SIZE);
+    freopen("disk.img", "w", stdout);
     write(1, exec, PAGING_DEV_SIZE);
 
     /* grass kernel processes */
     assert(NKERNEL_PROC <= GRASS_NEXEC);
-
     int exec_size = GRASS_EXEC_SIZE / GRASS_NEXEC;
     fprintf(stderr, "[INFO] Loading %d kernel binary files\n", NKERNEL_PROC);
+
     for (int i = 0; i < NKERNEL_PROC; i++) {
         struct stat st;
         stat(kernel_processes[i], &st);
