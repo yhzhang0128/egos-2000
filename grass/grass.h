@@ -14,6 +14,8 @@ struct process{
     void *sp, *mepc;
     int receiver_pid; /* used when status is PROC_WAIT_TO_SEND */
 };
+extern int proc_curr_idx;
+extern struct process proc_set[MAX_NPROCESS];
 
 enum {
     PROC_UNUSED,

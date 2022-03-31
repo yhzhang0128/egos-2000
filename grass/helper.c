@@ -13,15 +13,18 @@
 
 void intr_entry(int id);
 
-extern int proc_curr_idx;
-extern struct process proc_set[MAX_NPROCESS];
-
 void proc_init() {
     earth->intr_register(intr_entry);
     memset(proc_set, 0, sizeof(proc_set));
 
-    /* the first process is now running */
+    /* The first process is currently running */
     proc_set_running(proc_alloc());
+}
+
+static void proc_set_status(int pid, int status) {
+    for (int i = 0; i < MAX_NPROCESS; i++)
+        if (proc_set[i].pid == pid)
+            proc_set[i].status = status;
 }
 
 int proc_alloc() {
@@ -34,12 +37,6 @@ int proc_alloc() {
         }
 
     FATAL("Reach the limit of %d concurrent processes", MAX_NPROCESS);
-}
-
-static void proc_set_status(int pid, int status) {
-    for (int i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == pid)
-            proc_set[i].status = status;
 }
 
 void proc_free(int pid) {

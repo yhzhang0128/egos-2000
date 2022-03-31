@@ -7,9 +7,7 @@
  * Description: context switch and context start
  */
 	.section .text
-    .global _enter
-	.global ctx_start
-	.global ctx_switch
+        .global _enter, ctx_start, ctx_switch
 _enter:
         li sp,0x80003f80
         call main

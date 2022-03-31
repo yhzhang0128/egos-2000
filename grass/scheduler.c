@@ -55,14 +55,14 @@ void intr_entry(int id) {
 }
 
 void ctx_entry() {
-    int tmp, mepc;
+    int mepc, tmp;
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
     /* kernel_entry() is either proc_yield() or proc_syscall() */
     kernel_entry();
 
-    /* switch back to the user application stack */
+    /* Switch back to the user application stack */
     mepc = (int)proc_set[proc_curr_idx].mepc;
     __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
     ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
@@ -88,8 +88,7 @@ static void proc_yield() {
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
         /* Prepare argc and argv */
-        int argc = *((int*)APPS_MAIN_ARG);
-        __asm__ volatile("mv a0, %0" ::"r"(argc));
+        __asm__ volatile("mv a0, %0" ::"r"(*((int*)APPS_MAIN_ARG)));
         __asm__ volatile("mv a1, %0" ::"r"(APPS_MAIN_ARG + 4));
         /* Enter application code */
         __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
@@ -98,7 +97,6 @@ static void proc_yield() {
 
     proc_set_running(curr_pid);
 }
-
 
 static void proc_send(struct syscall *sc);
 static void proc_recv(struct syscall *sc);
@@ -141,16 +139,18 @@ static void proc_send(struct syscall *sc) {
         proc_set[proc_curr_idx].status = PROC_WAIT_TO_SEND;
         proc_set[proc_curr_idx].receiver_pid = receiver;
     } else {
+        /* Copy message from sender to kernel stack */
         struct sys_msg tmp;
         memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
-        earth->mmu_switch(receiver);
 
+        /* Copy message from kernel stack to receiver */
+        earth->mmu_switch(receiver);
         sc->payload.msg.sender = curr_pid;
         memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
-
-        earth->mmu_switch(curr_pid);
-
         proc_set_runnable(receiver);
+
+        /* Switch back to sender address space */
+        earth->mmu_switch(curr_pid);
     }
 
     proc_yield();
@@ -169,17 +169,17 @@ static void proc_recv(struct syscall *sc) {
     if (sender == -1) {
         curr_status = PROC_WAIT_TO_RECV;
     } else {
-        sc->payload.msg.sender = sender;
-
+        /* Copy message from sender to kernel stack */
         struct sys_msg tmp;
         earth->mmu_switch(sender);
         memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
         sc->payload.msg.receiver = curr_pid;
+        proc_set_runnable(sender);
 
+        /* Copy message from kernel stack to receiver */
         earth->mmu_switch(curr_pid);
         memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
-
-        proc_set_runnable(sender);
+        sc->payload.msg.sender = sender;
     }
 
     proc_yield();
