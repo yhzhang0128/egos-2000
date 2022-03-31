@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdlib.h>
-
 #include "elf.h"
 #include "disk.h"
 #include "memory.h"
@@ -27,8 +25,10 @@ enum {
     PROC_WAIT_TO_RECV
 };
 
-long long timer_reset();
+void timer_init();
+void timer_reset();
 
+void proc_init();
 int  proc_alloc();
 void proc_free(int);
 void proc_set_ready (int);

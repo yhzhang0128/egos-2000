@@ -19,7 +19,7 @@
 
 static long long mtime_get() {
     unsigned int time_lo, time_hi;
-    /* Guard against rollover when reading */
+    /* Guard against rollover when reading mtime */
     do {
         time_hi = ACCESS(CLINT0_MTIME_BASE + 4);
         time_lo = ACCESS(CLINT0_MTIME_BASE);
@@ -38,8 +38,6 @@ void timer_init() {
     mtimecmp_set(0);
 }
 
-long long timer_reset() {
-    long long mtime = mtime_get();
-    mtimecmp_set(mtime + QUANTUM_NCYCLES);
-    return mtime;
+void timer_reset() {
+    mtimecmp_set(mtime_get() + QUANTUM_NCYCLES);
 }

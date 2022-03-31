@@ -11,10 +11,10 @@
 #include "grass.h"
 #include <string.h>
 
+void intr_entry(int id);
+
 extern int proc_curr_idx;
 extern struct process proc_set[MAX_NPROCESS];
-
-void intr_entry(int id);
 
 void proc_init() {
     earth->intr_register(intr_entry);

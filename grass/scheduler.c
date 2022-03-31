@@ -62,7 +62,7 @@ void ctx_entry() {
     /* kernel_entry is either proc_yield() or proc_syscall() */
     kernel_entry();
 
-    /* switch back to the user application (intr_entry) */
+    /* switch back to the user application stack */
     mepc = (int)proc_set[proc_curr_idx].mepc;
     __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
     ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
@@ -78,7 +78,7 @@ static void proc_yield() {
         }
     }
 
-    if (next_idx == -1) FATAL("proc_yield: no more runnable process");
+    if (next_idx == -1) FATAL("proc_yield: no runnable process");
     if (curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
     proc_curr_idx = next_idx;
@@ -125,14 +125,12 @@ static void proc_syscall() {
 
 static void proc_send(struct syscall *sc) {
     sc->payload.msg.sender = curr_pid;
+    int receiver_idx = -1;
     int receiver = sc->payload.msg.receiver;
 
-    int receiver_idx = -1;
     for (int i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == receiver) {
+        if (proc_set[i].pid == receiver)
             receiver_idx = i;
-            break;
-        }
 
     if (receiver_idx == -1) {
         sc->retval = -1;
@@ -165,10 +163,8 @@ static void proc_recv(struct syscall *sc) {
     int sender = -1;
     for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_WAIT_TO_SEND &&
-            proc_set[i].receiver_pid == curr_pid) {
+            proc_set[i].receiver_pid == curr_pid)
             sender = proc_set[i].pid;
-            break;
-        }
 
     if (sender == -1) {
         curr_status = PROC_WAIT_TO_RECV;
