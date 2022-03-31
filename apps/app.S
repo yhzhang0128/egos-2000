@@ -12,5 +12,3 @@ _enter:
         li sp,0x80002000
         call main
         call sys_exit
-_spin:
-        j _spin

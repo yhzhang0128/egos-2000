@@ -13,8 +13,6 @@
 _enter:
         li sp,0x80003f80
         call main
-_spin:
-        j _spin
 
 ctx_start:
 	addi sp,sp,-64
