@@ -21,6 +21,7 @@ struct translation_table_t {
     } frame[NFRAMES];
 } translate_table;
 
+#define F_INUSE        0x1
 #define FRAME_INUSE(x) (translate_table.frame[x].flag & F_INUSE)
 
 int curr_vm_pid;
@@ -64,16 +65,12 @@ int mmu_free(int pid) {
     return 0;
 }
 
-int mmu_map(int pid, int page_no, int frame_no, int flag) {
-    if (flag != F_ALL)
-        FATAL("Memory protection not implemented");
-    
+int mmu_map(int pid, int page_no, int frame_no) {
     if (!FRAME_INUSE(frame_no))
         FATAL("Frame %d has not been allocated", frame_no);
 
     translate_table.frame[frame_no].pid = pid;
     translate_table.frame[frame_no].page_no = page_no;
-    translate_table.frame[frame_no].flag = flag;
     return 0;
 }
 

@@ -18,7 +18,7 @@ int intr_register(handler_t handler);
 int excp_register(handler_t handler);
 
 int mmu_alloc(int* frame_no, int* cached_addr);
-int mmu_map(int pid, int page_no, int frame_no, int flag);
+int mmu_map(int pid, int page_no, int frame_no);
 int mmu_switch(int pid);
 int mmu_free(int pid);
 

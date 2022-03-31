@@ -85,7 +85,7 @@ static void load_app(int pid,
     for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
         if (off % PAGE_SIZE == 0) {
             earth->mmu_alloc(&frame_no, &base);
-            earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+            earth->mmu_map(pid, page_no++, frame_no);
         }
         reader(block_offset++, ((char*)base) + (off % PAGE_SIZE));
     }
@@ -96,13 +96,13 @@ static void load_app(int pid,
 
     while (page_no < APPS_SIZE / PAGE_SIZE) {
         earth->mmu_alloc(&frame_no, &base);
-        earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+        earth->mmu_map(pid, page_no++, frame_no);
         memset((char*)base, 0, PAGE_SIZE);
     }
 
     /* allocate two pages for argc, argv and stack */
     earth->mmu_alloc(&frame_no, &base);
-    earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+    earth->mmu_map(pid, page_no++, frame_no);
 
     /* base is at virtual address APPS_MAIN_ARG */
     int* argc_addr = (int*)base;
@@ -116,7 +116,7 @@ static void load_app(int pid,
         argv_addr[i] = (int)((char*)args_addr + i * CMD_ARG_LEN);
 
     earth->mmu_alloc(&frame_no, &base);
-    earth->mmu_map(pid, page_no++, frame_no, F_ALL);
+    earth->mmu_map(pid, page_no++, frame_no);
 }
 
 

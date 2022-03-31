@@ -23,13 +23,6 @@
 #define ITIM_START          0x08000000  /* 12KB   earth data+stack     */
                                         /* earth code is in QSPI flash */
 
-/* F stands for memory frame */
-#define F_INUSE             0x1
-#define F_READ              0x2
-#define F_WRITE             0x4
-#define F_EXEC              0x8
-#define F_ALL               0xf
-
 #undef  malloc
 #define malloc my_alloc
 void* my_alloc(unsigned int size);
