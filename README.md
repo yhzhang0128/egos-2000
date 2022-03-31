@@ -1,6 +1,6 @@
 # A minimal operating system on a real RISC-V board
 
-With only **2.1K** lines of code, our teaching OS implements microSD driver, tty driver, interrupt handling, address translation, process scheduling and messaging, system call, file system, shell and 7 shell commands.
+With only **2K** lines of code, our teaching OS implements microSD driver, tty driver, interrupt handling, address translation, process scheduling and messaging, system call, file system, shell and 7 shell commands.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
@@ -23,16 +23,16 @@ This RISC-V version of EGOS is minimal in order to help students understand the 
       52 unique files.
        7 files ignored.
 
-github.com/AlDanial/cloc v 1.82  T=0.03 s (1810.5 files/s, 124842.4 lines/s)
+github.com/AlDanial/cloc v 1.82  T=0.02 s (1849.8 files/s, 123134.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               31            447            419           1614
-C/C++ Header                    12             87            102            353
-Assembly                         2              4             14             63
+C                               31            432            423           1560
+C/C++ Header                    12             77            103            323
+Assembly                         2              4             14             61
 make                             1             11              0             54
 -------------------------------------------------------------------------------
-SUM:                            46            549            535           2084
+SUM:                            46            524            540           1998
 -------------------------------------------------------------------------------
 ```
 
