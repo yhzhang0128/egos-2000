@@ -59,7 +59,7 @@ void ctx_entry() {
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
-    /* kernel_entry is either proc_yield() or proc_syscall() */
+    /* kernel_entry() is either proc_yield() or proc_syscall() */
     kernel_entry();
 
     /* switch back to the user application stack */

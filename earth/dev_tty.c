@@ -48,9 +48,9 @@ int tty_read(char* buf, int len) {
         case 0x3:   /* Ctrl+C    */
             buf[0] = 0;
         case 0xd:   /* Enter     */
-            buf[i] = 0;
+            buf[i] = is_reading = 0;
             printf("\r\n");
-            goto finish;
+            return i;
         case 0x7f:  /* Backspace */
             c = 0;
             if (i) printf("\b \b");
@@ -61,9 +61,8 @@ int tty_read(char* buf, int len) {
         fflush(stdout);
     }
 
- finish:
     buf[len - 1] = is_reading = 0;    
-    return 0;
+    return len - 1;
 }
 
 #define VPRINTF   va_list args; \

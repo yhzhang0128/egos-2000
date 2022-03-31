@@ -11,6 +11,7 @@ enum grass_servers {
     GPID_USER_START
 };
 
+/* GPID_PROCESS */
 #define CMD_NARGS       16
 #define CMD_ARG_LEN     32
 struct proc_request {
@@ -30,6 +31,7 @@ struct proc_reply {
     } type;
 };
 
+/* GPID_FILE */
 struct file_request {
     enum {
           FILE_UNUSED,
@@ -46,6 +48,8 @@ struct file_reply {
     block_t block;
 };
 
+
+/* GPID_DIR */
 #define DIR_NAME_SIZE   32
 struct dir_request {
     enum {

@@ -1,5 +1,6 @@
 #pragma once
 
+/* SiFive FE310 has a 65MHz clock */
 #define CPU_CLOCK_RATE 65000000
 
 struct earth {
@@ -34,7 +35,6 @@ struct grass {
     void (*proc_set_ready)(int);
 
     int work_dir_ino;
-    char work_dir[32 * 16];
     char work_dir_name[32];
 };
 

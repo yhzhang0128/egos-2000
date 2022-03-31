@@ -27,12 +27,12 @@ void parse_request(char* buf, struct proc_request* req) {
 int main() {
     SUCCESS("Enter kernel process GPID_SHELL");
 
-    strcpy(grass->work_dir, "/home/yunhao");
+    char work_dir[] = "/home/yunhao";
     strcpy(grass->work_dir_name, "yunhao");
 
     int home = dir_lookup(0, "home");
     grass->work_dir_ino = dir_lookup(home, "yunhao");
-    INFO("sys_shell: /home/yunhao has ino=%d", grass->work_dir_ino);
+    INFO("sys_shell: %s has ino=%d", work_dir, grass->work_dir_ino);
     HIGHLIGHT("Welcome to egos-riscv!");
     
     /* Wait for shell commands */
@@ -42,11 +42,10 @@ int main() {
     struct proc_reply reply;
     while (1) {
         printf("%s➜ %s%s%s ", "\x1B[1;32m", "\x1B[1;36m", grass->work_dir_name, "\x1B[1;0m");
-        earth->tty_read(buf, 256);
-        if (strlen(buf) == 0) continue;
+        if (earth->tty_read(buf, 256) == 0) continue;
 
         if (strcmp(buf, "pwd") == 0) {
-            printf("%s\r\n", grass->work_dir);
+            printf("%s\r\n", work_dir);
         } else if (strcmp(buf, "clear") == 0) {
             printf("\e[1;1H\e[2J");
         } else if (strcmp(buf, "killall") == 0) {

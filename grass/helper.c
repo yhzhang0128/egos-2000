@@ -21,8 +21,7 @@ void proc_init() {
     memset(proc_set, 0, sizeof(proc_set));
 
     /* the first process is now running */
-    int pid = proc_alloc();
-    proc_set_running(pid);
+    proc_set_running(proc_alloc());
 }
 
 int proc_alloc() {
@@ -39,10 +38,8 @@ int proc_alloc() {
 
 static void proc_set_status(int pid, int status) {
     for (int i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == pid) {
+        if (proc_set[i].pid == pid)
             proc_set[i].status = status;
-            return;
-        }
 }
 
 void proc_free(int pid) {
