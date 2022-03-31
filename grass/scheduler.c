@@ -40,7 +40,7 @@ void intr_entry(int id) {
     }
 
     /* switch to the grass kernel stack */
-    switch(id) {
+    switch (id) {
     case INTR_ID_TMR:
         kernel_entry = proc_yield;
         ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
