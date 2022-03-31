@@ -33,6 +33,10 @@ int main() {
     earth_size = load_file("earth.bin", "Earth binary", mem_earth);
     disk_size = load_file("disk.img", "Disk  image ", mem_disk);
 
+    assert(fe310_size <= 4 * 1024 * 1024);
+    assert(earth_size <= 4 * 1024 * 1024);
+    assert(disk_size  <= 6 * 1024 * 1024);
+
     write_binary();
     write_intel_mcs();
     return 0;

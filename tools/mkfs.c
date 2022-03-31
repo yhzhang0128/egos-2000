@@ -79,9 +79,9 @@ int main() {
     for (int i = 0; i < NKERNEL_PROC; i++) {
         struct stat st;
         stat(kernel_processes[i], &st);
-        fprintf(stderr, "[INFO] Loading %s: %ld bytes\n", kernel_processes[i], (long)st.st_size);
         assert(st.st_size > 0);
         assert(st.st_size <= exec_size);
+        fprintf(stderr, "[INFO] Loading %s: %ld bytes\n", kernel_processes[i], (long)st.st_size);
 
         freopen(kernel_processes[i], "r", stdin);
         memset(exec, 0, GRASS_EXEC_SIZE);
@@ -91,9 +91,7 @@ int main() {
         write(1, exec, st.st_size);
         write(1, exec, exec_size - st.st_size);
     }
-
-    for (int i = 0; i < GRASS_NEXEC - NKERNEL_PROC; i++)
-        write(1, exec, exec_size);
+    write(1, exec, (GRASS_NEXEC - NKERNEL_PROC) * exec_size);
         
     /* file system */
     write(1, fs, FS_DISK_SIZE);
@@ -102,7 +100,6 @@ int main() {
     fprintf(stderr, "[INFO] Finish making the disk image\n");
     return 0;
 }
-
 
 block_if ramdisk_init();
 
@@ -118,8 +115,8 @@ void mkfs() {
             strncpy(buf, contents[ino], BLOCK_SIZE);
             treedisk->write(treedisk, ino, 0, (void*)buf);
         } else {
-            struct stat st;
             char* file_name = &contents[ino][1];
+            struct stat st;
             stat(file_name, &st);
             
             freopen(file_name, "r", stdin);
