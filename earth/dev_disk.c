@@ -17,8 +17,6 @@ enum {
 };
 static int type;
 
-#define GPIO_BASE 0x10012000
-
 int disk_read(int block_no, int nblocks, char* dst) {
     if (type == SD_CARD) {
         return sdread(block_no, nblocks, dst);
