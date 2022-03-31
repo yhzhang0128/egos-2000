@@ -46,8 +46,7 @@ SUM:                            46            549            535           2088
 * [Vivado lab solutions](https://www.xilinx.com/support/download.html) or any edition with the hardware manager
 * a software to connect with ttyUSB
     * e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows
-* [optional] a tool to program a disk image file to the microSD card 
-    * e.g., [balena Etcher](https://www.balena.io/etcher/) for all platforms
+* [optional] a tool (e.g., [balena Etcher](https://www.balena.io/etcher/)) to program a disk image file to the microSD card 
 
 ## Usages and documentation
 
