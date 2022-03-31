@@ -72,38 +72,27 @@ int main() {
     write(1, exec, PAGING_DEV_SIZE);
 
     /* grass kernel processes */
-    int n = NKERNEL_PROC;
-    if (n > GRASS_NEXEC) {
-        fprintf(stderr, "[ERROR] >%d kernel processes\n", GRASS_NEXEC);
-        return -1;
-    }
+    assert(NKERNEL_PROC <= GRASS_NEXEC);
 
     int exec_size = GRASS_EXEC_SIZE / GRASS_NEXEC;
-    fprintf(stderr, "[INFO] Loading %d kernel binary files\n", n);
-    for (int i = 0; i < n; i++) {
-        memset(exec, 0, GRASS_EXEC_SIZE);
-        
+    fprintf(stderr, "[INFO] Loading %d kernel binary files\n", NKERNEL_PROC);
+    for (int i = 0; i < NKERNEL_PROC; i++) {
         struct stat st;
         stat(kernel_processes[i], &st);
         fprintf(stderr, "[INFO] Loading %s: %ld bytes\n", kernel_processes[i], (long)st.st_size);
         assert(st.st_size > 0);
-
-        if (st.st_size > exec_size) {
-            fprintf(stderr, "[ERROR] file larger than %d\n", exec_size);
-            return -1;
-        }
+        assert(st.st_size <= exec_size);
 
         freopen(kernel_processes[i], "r", stdin);
-        int nread = 0;
-        while (nread < st.st_size)
+        memset(exec, 0, GRASS_EXEC_SIZE);
+        for (int nread = 0; nread < st.st_size; )
             nread += read(0, exec + nread, exec_size - nread);
 
         write(1, exec, st.st_size);
         write(1, exec, exec_size - st.st_size);
     }
 
-    memset(exec, 0, GRASS_EXEC_SIZE);
-    for (int i = 0; i < 8 - n; i++)
+    for (int i = 0; i < GRASS_NEXEC - NKERNEL_PROC; i++)
         write(1, exec, exec_size);
         
     /* file system */
@@ -118,14 +107,11 @@ int main() {
 block_if ramdisk_init();
 
 void mkfs() {
-    block_if ramdisk = ramdisk_init();    
-    if (treedisk_create(ramdisk, 0, NINODES) < 0) {
-        fprintf(stderr, "proc_file: can't create treedisk file system");
-        exit(1);
-    }
+    block_if ramdisk = ramdisk_init();
+    assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
     block_if treedisk = treedisk_init(ramdisk, 0);
 
-    char buf[BLOCK_SIZE];
+    char buf[GRASS_EXEC_SIZE / GRASS_NEXEC];
     for (int ino = 0; ino < NINODE; ino++) {
         if (contents[ino][0] != '#') {
             fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
@@ -137,15 +123,12 @@ void mkfs() {
             stat(file_name, &st);
             
             freopen(file_name, "r", stdin);
-            int nread = 0;
-            char file[GRASS_EXEC_SIZE / GRASS_NEXEC];
-            while (nread < st.st_size)
-                nread += read(0, file + nread, st.st_size - nread);
+            for (int nread = 0; nread < st.st_size; )
+                nread += read(0, buf + nread, st.st_size - nread);
             
-            fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, nread);
-            for (int b = 0; b * BLOCK_SIZE < st.st_size; b++) {
-                treedisk->write(treedisk, ino, b, (void*)(file + b * BLOCK_SIZE));
-            }
+            fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, (int)st.st_size);
+            for (int b = 0; b * BLOCK_SIZE < st.st_size; b++)
+                treedisk->write(treedisk, ino, b, (void*)(buf + b * BLOCK_SIZE));
         }
     }
     fprintf(stderr, "[INFO] Write %d inodes\n", NINODE);
@@ -157,8 +140,7 @@ int getsize(block_if this_bs, unsigned int ino){
 }
 
 int setsize(block_if this_bs, unsigned int ino, block_no newsize) {
-    fprintf(stderr, "disk_setsize not implemented");
-    exit(1);
+    assert(0);
 }
 
 int ramread(block_if this_bs, unsigned int ino, block_no offset, block_t *block) {
