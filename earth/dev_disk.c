@@ -20,20 +20,13 @@ static int type;
 #define GPIO_BASE 0x10012000
 
 int disk_read(int block_no, int nblocks, char* dst) {
-    /* led0 red light on */
-    ACCESS_ONCE((unsigned int *)(GPIO_BASE + 4)) &= ~1;
-    ACCESS_ONCE((unsigned int *)(GPIO_BASE + 8)) |= 1;
-    ACCESS_ONCE((unsigned int *)(GPIO_BASE + 12)) |= 1;
-    
     if (type == SD_CARD) {
-        sdread(block_no, nblocks, dst);
+        return sdread(block_no, nblocks, dst);
     } else {
         char* src = (char*)0x20800000 + block_no * BLOCK_SIZE;
         memcpy(dst, src, nblocks * BLOCK_SIZE);
+        return 0;
     }
-
-    /* led0 red light off */
-    ACCESS_ONCE((unsigned int *)(GPIO_BASE + 12)) &= ~1;
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
