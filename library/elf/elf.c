@@ -28,23 +28,23 @@ void elf_load(int pid, elf_reader reader,
               int argc, void** argv) {
     char buf[BLOCK_SIZE];
     reader(0, buf);
+
     struct elf32_header *header = (void*) buf;
+    struct elf32_program_header *pheader = (void*)(buf + header->e_phoff);
+
     if (header->e_phnum != 1 ||
         header->e_phoff + header->e_phentsize > BLOCK_SIZE)
         FATAL("Grass exec region of the disk seems to be corrupted");
-    
-    struct elf32_program_header pheader;
-    memcpy(&pheader, buf + header->e_phoff, sizeof(pheader));
 
-    switch (pheader.p_vaddr) {
+    switch (pheader->p_vaddr) {
     case APPS_ENTRY:
-        load_app(pid, reader, argc, argv, &pheader);
+        load_app(pid, reader, argc, argv, pheader);
         break;
     case GRASS_ENTRY:
-        load_grass(reader, &pheader);
+        load_grass(reader, pheader);
         break;
     default:
-        FATAL("ELF gives invalid p_vaddr: 0x%.8x", pheader.p_vaddr);
+        FATAL("ELF gives invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
     }
 }
 
@@ -100,7 +100,7 @@ static void load_app(int pid,
         memset((char*)base, 0, PAGE_SIZE);
     }
 
-    /* allocate two pages for the app arguments and stack */
+    /* allocate two pages for argc, argv and stack */
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no, F_ALL);
 
