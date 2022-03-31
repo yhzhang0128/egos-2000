@@ -39,8 +39,8 @@
 /* Contents of the "superblock".  There is only one of these.
  */
 struct treedisk_superblock {
-	block_no n_inodeblocks;		// # blocks with inodes
-	block_no free_list;			// pointer to first block on free list
+    block_no n_inodeblocks;		/* # blocks with inodes */
+    block_no free_list;			/* pointer to first block on free list */
 };
 
 /* An inode describes a file (= virtual block store).  "nblocks" contains
@@ -50,14 +50,14 @@ struct treedisk_superblock {
  * not is maintained elsewhere.
  */
 struct treedisk_inode {
-	block_no root;				// block number of root node
-	block_no nblocks;			// total size of the file
+    block_no root;			/* block number of root node */
+    block_no nblocks;			/* total size of the file */
 };
 
 /* An inode block is filled with inodes.
  */
 struct treedisk_inodeblock {
-	struct treedisk_inode inodes[INODES_PER_BLOCK];
+    struct treedisk_inode inodes[INODES_PER_BLOCK];
 };
 
 /* A freelist block is filled with references to other blocks, the first
@@ -65,22 +65,22 @@ struct treedisk_inodeblock {
  * the freelist acts as a stack (freelist blocks are added FILO).
  */
 struct treedisk_freelistblock {
-	block_no refs[REFS_PER_BLOCK];
+    block_no refs[REFS_PER_BLOCK];
 };
 
 /* An indirect block is an internal node in the tree rooted at an inode.
  */
 struct treedisk_indirblock {
-	block_no refs[REFS_PER_BLOCK];
+    block_no refs[REFS_PER_BLOCK];
 };
 
 /* A convenient structure that's the union of all block types.  It should
  * have size BLOCK_SIZE, which may not be true for the elements.
  */
 union treedisk_block {
-	block_t datablock;
-	struct treedisk_superblock superblock;
-	struct treedisk_inodeblock inodeblock;
-	struct treedisk_freelistblock freelistblock;
-	struct treedisk_indirblock indirblock;
+    block_t datablock;
+    struct treedisk_superblock superblock;
+    struct treedisk_inodeblock inodeblock;
+    struct treedisk_freelistblock freelistblock;
+    struct treedisk_indirblock indirblock;
 };

@@ -49,13 +49,13 @@ struct treedisk_snapshot {
 /* The state of a virtual block store, which is identified by an inode number.
  */
 struct treedisk_state {
-    block_store_t *below;			// block store below
-    unsigned int below_ino;			// inode number to use for the block store below
-    unsigned int ninodes;			// number of inodes in the treedisk
+    block_store_t *below;			/* block store below */
+    unsigned int below_ino;			/* inode number to use for the block store below */
+    unsigned int ninodes;			/* number of inodes in the treedisk */
 };
 
-static unsigned int log_rpb;		// log2(REFS_PER_BLOCK)
-static block_t null_block;			// a block filled with null bytes
+static unsigned int log_rpb;                    /* log2(REFS_PER_BLOCK) */
+static block_t null_block;			/* a block filled with null bytes */
 
 static void panic(const char *s){
 #ifdef MKFS
@@ -334,7 +334,7 @@ static int treedisk_write(block_store_t *this_bs, unsigned int ino, block_no off
 block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino){
     /* Figure out the log of the number of references per block.
      */
-    if (log_rpb == 0) {		// first time only
+    if (log_rpb == 0) {		/* first time only */
         do {
             log_rpb++;
         } while (((REFS_PER_BLOCK - 1) >> log_rpb) != 0);

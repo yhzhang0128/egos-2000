@@ -42,7 +42,7 @@
 #include "disk.h"
 
 #define NINODES  128
-typedef unsigned int block_no;      // index of a block
+typedef unsigned int block_no;      /* index of a block */
 
 typedef struct block {
     char bytes[BLOCK_SIZE];
@@ -56,7 +56,7 @@ typedef struct block_store {
     int (*write)(struct block_store *this_bs, unsigned int ino, block_no offset, block_t *block);
 } block_store_t;
 
-typedef block_store_t *block_if;    // block store interface
+typedef block_store_t *block_if;    /* block store interface */
 
 block_if fs_disk_init();
 block_if treedisk_init(block_if below, unsigned int below_ino);
