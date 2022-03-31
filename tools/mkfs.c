@@ -5,10 +5,10 @@
 
 /* Author: Yunhao Zhang
  * Description: create the disk image file (disk.img)
- * the first 1MB is reserved as 256 physical frames for paging
+ * the first  1MB is reserved as 256 physical frames for paging
  * the second 1MB contains some ELF binary executables for booting
- * the last 4MB is managed by a file system
- * in total, disk.img should be 6MB
+ * the last   2MB is managed by a file system
+ * in total, disk.img should be 4MB
  */
 
 #include <stdio.h>

@@ -1,3 +1,8 @@
+/*
+ * (C) 2022, Cornell University
+ * All rights reserved.
+ */
+
 /* 
  * definitions for controlling UART0 in FE310
  * see chapter18 of the SiFive FE310-G002 Manual

@@ -4,8 +4,9 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: a simple tty device driver; getc and printf functions
- * have been implemented by the freedom-metal library for Arty
+ * Description: a simple tty device driver
+ * uart_getc is implemented in bus_uart.c
+ * printf is implemented in the Sifive Metal library
  */
 
 #include <stdio.h>

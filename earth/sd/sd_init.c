@@ -4,7 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: reset and initialize the SD card on Arty; this library works with SDHC, but may contain bugs for other types of SD cards
+ * Description: reset and initialize the microSD card; 
+ * This library has only been tested with SDHC cards.
  */
 
 #include "sd.h"

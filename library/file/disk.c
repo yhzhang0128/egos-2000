@@ -1,3 +1,12 @@
+/*
+ * (C) 2022, Cornell University
+ * All rights reserved.
+ */
+
+/* Author: Yunhao Zhang
+ * Description: block_store interface for the physical disk
+ */
+
 #include "egos.h"
 #include "disk.h"
 #include "block_store.h"

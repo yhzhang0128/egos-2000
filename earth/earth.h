@@ -29,6 +29,6 @@ int tty_read(char* buf, int len);
 int tty_write(const char *format, ...);
 
 int tty_info(const char *format, ...);
-int tty_highlight(const char *format, ...);
-int tty_success(const char *format, ...);
 int tty_fatal(const char *format, ...);
+int tty_success(const char *format, ...);
+int tty_highlight(const char *format, ...);

@@ -4,13 +4,13 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: create the bootROM image file (egos_bootROM.mcs)
- * the bootROM has 16MB
+ * Description: create the bootROM image files
+ * the ROM on the Arty board has 16MB
  *     the first 4MB is reserved for the FE310 processor
- *     the next 4MB is reserved for the earth layer binary
- *     the next 6MB is reserved for the disk image
- *     the last 2MB is currently unused
- * the output file is in binary and Intel MCS-86 format
+ *     the next  4MB is reserved for the earth layer binary
+ *     the next  4MB is reserved for the disk image
+ *     the last  4MB is currently unused
+ * the output is in binary (bootROM.bin) and Intel MCS-86 format (bootROM.mcs)
  */
 
 #include <stdio.h>

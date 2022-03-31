@@ -4,7 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: naive malloc() and free(); a better one is left to students
+ * Description: naive malloc() and free(); 
+ * A better one is left to students as an exercise
  */
 
 #include "egos.h"

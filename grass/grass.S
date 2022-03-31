@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: context switch and context start
+ * Description: _enter, context switch and context start
  */
 	.section .text
         .global _enter, ctx_start, ctx_switch
