@@ -10,13 +10,13 @@
 #include "sd.h"
 
 char send_data_byte(char byte) {
-    while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL);
+    while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & (1 << 31));
     METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = byte;
 
     long rxdata;
     while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
-           METAL_SPI_RXDATA_EMPTY);    
-    return (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
+           (1 << 31));
+    return (char)(rxdata & 0xFF);
 }
 
 inline char recv_data_byte() {
