@@ -12,7 +12,7 @@
 #include "earth.h"
 
 void earth_init();
-struct earth *earth = (void*)EARTH_STRUCT;
+struct earth *earth = (void*)GRASS_STACK_TOP;
 
 static int grass_read(int block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);

@@ -88,8 +88,8 @@ static void proc_yield() {
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
         /* Prepare argc and argv */
-        __asm__ volatile("mv a0, %0" ::"r"(*((int*)APPS_MAIN_ARG)));
-        __asm__ volatile("mv a1, %0" ::"r"(APPS_MAIN_ARG + 4));
+        __asm__ volatile("mv a0, %0" ::"r"(*((int*)APPS_ARG)));
+        __asm__ volatile("mv a1, %0" ::"r"(APPS_ARG + 4));
         /* Enter application code */
         __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
         __asm__ volatile("mret");
@@ -102,7 +102,7 @@ static void proc_send(struct syscall *sc);
 static void proc_recv(struct syscall *sc);
 
 static void proc_syscall() {
-    struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
+    struct syscall *sc = (struct syscall*)SYSCALL_ARG;
 
     int type = sc->type;
     sc->retval = 0;

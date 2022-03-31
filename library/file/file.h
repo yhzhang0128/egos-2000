@@ -33,8 +33,8 @@
 
 #include "block_store.h"
 
-#define INODES_PER_BLOCK	(BLOCK_SIZE / sizeof(struct treedisk_inode))
-#define REFS_PER_BLOCK		(BLOCK_SIZE / sizeof(block_no))
+#define INODES_PER_BLOCK  (BLOCK_SIZE / sizeof(struct treedisk_inode))
+#define REFS_PER_BLOCK    (BLOCK_SIZE / sizeof(block_no))
 
 /* Contents of the "superblock".  There is only one of these.
  */

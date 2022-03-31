@@ -14,7 +14,7 @@
 
 #include <string.h>
 
-static struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
+static struct syscall *sc = (struct syscall*)SYSCALL_ARG;
 
 static void sys_invoke() {
     /* The standard way of doing syscall is to use the `ecall`

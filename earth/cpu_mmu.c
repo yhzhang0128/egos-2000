@@ -82,7 +82,7 @@ int mmu_switch(int pid) {
     for (int i = 0; i < NFRAMES; i++)
         if (FRAME_INUSE(i) && translate_table.frame[i].pid == curr_vm_pid) {
             int page_no = translate_table.frame[i].page_no;
-            src = (char*) ((page_no < code_top)? APPS_ENTRY : DTIM_START);
+            src = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
             cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
             /* INFO("Unmap(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", curr_vm_pid, i, page_no, src + (page_no % code_top) * PAGE_SIZE, cache + i * PAGE_SIZE); */
         }
@@ -92,7 +92,7 @@ int mmu_switch(int pid) {
         if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
             src = (char*)cache_read(i);
             int page_no = translate_table.frame[i].page_no;
-            dst = (char*) ((page_no < code_top)? APPS_ENTRY : DTIM_START);
+            dst = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
             memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
             /* INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst + (page_no % code_top) * PAGE_SIZE, src); */
         }
