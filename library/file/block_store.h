@@ -45,7 +45,7 @@
 typedef unsigned int block_no;      // index of a block
 
 typedef struct block {
-	char bytes[BLOCK_SIZE];
+    char bytes[BLOCK_SIZE];
 } block_t;
 
 typedef struct block_store {
@@ -58,12 +58,6 @@ typedef struct block_store {
 
 typedef block_store_t *block_if;    // block store interface
 
-/* Each block store module has an 'init' function that returns a
- * 'block_store_t *' type.  Here are the 'init' functions of various
- * available block store types.
- */
-
 block_if fs_disk_init();
-
 block_if treedisk_init(block_if below, unsigned int below_ino);
 int treedisk_create(block_if below, unsigned int below_ino, unsigned int ninodes);

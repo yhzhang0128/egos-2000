@@ -30,15 +30,13 @@ char* kernel_processes[] = {
                             "../build/release/sys_shell.elf"
 };
 
-#define NINODE 12
-
 /* inode mappings:
 #0: /              #1: /home               #2: /home/yunhao
 #3: /home/rvr      #4: /home/yunhao/README #5: /bin
 #6: /bin/echo      #7: /bin/ls             #8: /bin/cat
 #9: /bin/clock
 */
-
+#define NINODE 12
 char* contents[] = {
                     ".   0 ..   0 home   1 bin   5 ",
                     ".   1 ..   0 yunhao   2 rvr   3 ",
@@ -60,6 +58,7 @@ char exec[GRASS_EXEC_SIZE];
 char paging[PAGING_DEV_SIZE];
 
 void mkfs();
+block_if ramdisk_init();
 
 int main() {
     mkfs();
@@ -98,7 +97,6 @@ int main() {
     return 0;
 }
 
-block_if ramdisk_init();
 
 void mkfs() {
     block_if ramdisk = ramdisk_init();

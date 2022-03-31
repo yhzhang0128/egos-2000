@@ -7,6 +7,7 @@
  * Description: the grass kernel system calls
  */
 
+#include "egos.h"
 #include "memory.h"
 #include "syscall.h"
 #include "servers.h"
@@ -16,6 +17,8 @@
 static struct syscall *sc = (struct syscall*)GRASS_SYSCALL_ARG;
 
 static void sys_invoke() {
+    /* The standard way of doing syscall is to use the `ecall`
+     * instruction; Here uses software interrupt for simplicity */
     *((int*)RISCV_CLINT0_MSIP_BASE) = 1;
     while (sc->type != SYS_UNUSED);
 }
@@ -44,5 +47,5 @@ void sys_exit(int status) {
     struct proc_request req;
     req.type = PROC_EXIT;
     sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
-    while(1);
+    FATAL("sys_exit: should never reach here");
 }
