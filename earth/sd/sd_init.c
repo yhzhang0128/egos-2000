@@ -97,8 +97,8 @@ static void sd_spi_reset() {
     INFO("Set CS and MOSI to 1 and toggle clock.");
 
     /* Keep chip select line high */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~3;
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) |= 2;
+    SPI_REGW(SPI1_CSMODE) &= ~3;
+    SPI_REGW(SPI1_CSMODE) |= 2;
 
     unsigned long i, rxdata;
     for (i = 0; i < 100; i++) {
@@ -108,9 +108,9 @@ static void sd_spi_reset() {
     }
 
     /* Keep chip select line low */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 1;
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~3;
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) |= 2;
+    SPI_REGW(SPI1_CSDEF) = 1;
+    SPI_REGW(SPI1_CSMODE) &= ~3;
+    SPI_REGW(SPI1_CSMODE) |= 2;
     for (i = 0; i < 200000; i++);
     
     INFO("Set CS to 0 and send cmd0 through MOSI.");
@@ -124,43 +124,42 @@ static void sd_spi_reset() {
 }
 
 static void sd_spi_config() {
-    /* Set protocol as METAL_SPI_SINGLE */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~3;
+    /* Set protocol as SPI_SINGLE */
+    SPI_REGW(SPI1_FMT) &= ~3;
 
     /* Set phase as 0*/
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &= ~1;
+    SPI_REGW(SPI1_SCKMODE) &= ~1;
 
     /* Set polarity as 0 */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &= ~2;
+    SPI_REGW(SPI1_SCKMODE) &= ~2;
 
     /* Set endianness as 0 */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~4;
+    SPI_REGW(SPI1_FMT) &= ~4;
 
     /* Always populate receive FIFO */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~8;
+    SPI_REGW(SPI1_FMT) &= ~8;
 
     /* Set CS active-high as 0 */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 0;
+    SPI_REGW(SPI1_CSDEF) = 0;
 
     /* Set frame length */
-    if ((METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) & 0xF0000) != 0x80000) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~0xF0000;
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= 0x80000;
+    if ((SPI_REGW(SPI1_FMT) & 0xF0000) != 0x80000) {
+        SPI_REGW(SPI1_FMT) &= ~0xF0000;
+        SPI_REGW(SPI1_FMT) |= 0x80000;
     }
 
     /* Set CS line */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = 0;
+    SPI_REGW(SPI1_CSID) = 0;
 
     /* Toggle off memory-mapped SPI flash mode;
      * toggle on programmable IO mode */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FCTRL) = 0;
+    SPI_REGW(SPI1_FCTRL) = 0;
 }
 
 static void sd_spi_set_clock(long baud_rate) {
     long div = (CPU_CLOCK_RATE / (2 * baud_rate)) - 1;
-    if (div > 0xFFF)
-        FATAL("SPI baud rate %lHz is too low", baud_rate);
+    if (div > 0xFFF) FATAL("SPI baud rate too low");
 
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) &= ~0xFFF;
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) |= (div & 0xFFF);
+    SPI_REGW(SPI1_SCKDIV) &= ~0xFFF;
+    SPI_REGW(SPI1_SCKDIV) |= (div & 0xFFF);
 }

@@ -23,26 +23,23 @@ char recv_data_byte();
 char send_data_byte(char);
 
 /* 
- * Definitions for controlling SPI in FE310
- * copied from the Freedom Metal library: 
- * https://github.com/sifive/freedom-metal
+ * definitions for controlling SPI1 in FE310
+ * see chapter19 of the SiFive FE310-G002 Manual
  */
 
-#define SPI_BASE_ADDR               0x10024000UL
+#define SPI1_BASE     0x10024000UL
 
-#define METAL_SIFIVE_SPI0_SCKDIV    0UL
-#define METAL_SIFIVE_SPI0_SCKMODE   4UL
-#define METAL_SIFIVE_SPI0_CSID      16UL
-#define METAL_SIFIVE_SPI0_CSDEF     20UL
-#define METAL_SIFIVE_SPI0_CSMODE    24UL
-#define METAL_SIFIVE_SPI0_FMT       64UL
-#define METAL_SIFIVE_SPI0_TXDATA    72UL
-#define METAL_SIFIVE_SPI0_RXDATA    76UL
-#define METAL_SIFIVE_SPI0_FCTRL     96UL
+#define SPI1_SCKDIV   0UL
+#define SPI1_SCKMODE  4UL
+#define SPI1_CSID     16UL
+#define SPI1_CSDEF    20UL
+#define SPI1_CSMODE   24UL
+#define SPI1_FMT      64UL
+#define SPI1_TXDATA   72UL
+#define SPI1_RXDATA   76UL
+#define SPI1_FCTRL    96UL
 
-#define __METAL_ACCESS_ONCE(x) (*(__typeof__(*x) volatile *)(x))
-#define METAL_SPI_REG(offset) (SPI_BASE_ADDR + offset)
-#define METAL_SPI_REGB(offset)                                                 \
-    (__METAL_ACCESS_ONCE((unsigned char*)METAL_SPI_REG(offset)))
-#define METAL_SPI_REGW(offset)                                                 \
-    (__METAL_ACCESS_ONCE((unsigned int*)METAL_SPI_REG(offset)))
+#define ACCESS_ONCE(x) (*(__typeof__(*x) volatile *)(x))
+#define SPI_REG(offset) (SPI1_BASE + offset)
+#define SPI_REGB(offset) (ACCESS_ONCE((unsigned char*)SPI_REG(offset)))
+#define SPI_REGW(offset) (ACCESS_ONCE((unsigned int*)SPI_REG(offset)))

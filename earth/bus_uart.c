@@ -1,7 +1,6 @@
 /* 
- * Definitions for controlling UART in FE310
- * copied from the Freedom Metal library: 
- * https://github.com/sifive/freedom-metal
+ * definitions for controlling UART0 in FE310
+ * see chapter18 of the SiFive FE310-G002 Manual
  */
 
 #define UART0_BASE    0x10013000UL
