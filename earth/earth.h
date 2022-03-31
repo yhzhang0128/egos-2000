@@ -13,7 +13,6 @@ void mmu_init();
 
 typedef void (*handler_t)(int);
 int intr_enable();
-int intr_disable();
 int intr_register(handler_t handler);
 int excp_register(handler_t handler);
 

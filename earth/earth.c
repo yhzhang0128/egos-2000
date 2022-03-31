@@ -52,7 +52,6 @@ void earth_init() {
     /* Initialize CPU interrupt */
     intr_init();
     earth->intr_enable = intr_enable;
-    earth->intr_disable = intr_disable;
     earth->intr_register = intr_register;
     earth->excp_register = excp_register;
     SUCCESS("Finished initializing the CPU interrupts");

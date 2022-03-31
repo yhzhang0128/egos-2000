@@ -53,23 +53,8 @@ int intr_enable() {
     __asm__ volatile("csrrs %0, mie, %1"
                      : "=r"(tmp)
                      : "r"(0x080));
-    return 0;
-}
 
-int intr_disable() {
-    int tmp;
-    /* Disable global interrupt */
-    __asm__ volatile("csrrc %0, mstatus, %1"
-                     : "=r"(tmp)
-                     : "r"(0x00000008UL));
-    /* Disable software interrupt */
-    __asm__ volatile("csrrc %0, mie, %1"
-                     : "=r"(tmp)
-                     : "r"(0x008));
-    /* Disable timer interrupt */
-    __asm__ volatile("csrrc %0, mie, %1"
-                     : "=r"(tmp)
-                     : "r"(0x080));
+    /* Note: intr_disable is similar by using csrrc instead of csrrs */
     return 0;
 }
 
