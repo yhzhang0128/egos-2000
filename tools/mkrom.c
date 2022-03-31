@@ -45,9 +45,9 @@ int main() {
 void write_binary() {
     freopen("bootROM.bin", "w", stdout);
 
-    write(1, mem_fe310, 4 * 1024 * 1024);
-    write(1, mem_earth, 4 * 1024 * 1024);
-    write(1, mem_disk,  6 * 1024 * 1024);
+    for (int i = 0; i < 4 * 1024 * 1024; i++) putchar(mem_fe310[i]);
+    for (int i = 0; i < 4 * 1024 * 1024; i++) putchar(mem_earth[i]);
+    for (int i = 0; i < 6 * 1024 * 1024; i++) putchar(mem_disk[i]);
 
     fclose(stdout);
     fprintf(stderr, "[INFO] Finish making the bootROM binary\n");
