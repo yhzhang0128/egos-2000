@@ -1,6 +1,6 @@
 # A minimal operating system on a real RISC-V board
 
-With only **2K** lines of code, **egos-2K** implements microSD driver, tty driver, interrupt handling, address translation, process scheduling and messaging, system call, file system, shell and 7 shell commands.
+With only **2K** lines of code, **egos-2K** implements microSD driver, tty driver, interrupt handling, address translation, process scheduling and messaging, system call, file system, shell, 7 user commands and `mkfs/mkrom` tools.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
