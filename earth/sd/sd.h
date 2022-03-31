@@ -2,9 +2,6 @@
 
 #include "egos.h"
 
-/* SD card library interface */
-#define SD_BLOCK_SIZE 512
-
 enum {
       SD_CARD_TYPE_SD1,
       SD_CARD_TYPE_SD2,

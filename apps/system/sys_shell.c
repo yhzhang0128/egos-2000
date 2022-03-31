@@ -36,14 +36,13 @@ int main() {
     HIGHLIGHT("Welcome to egos-riscv!");
     
     /* Wait for shell commands */
-    int sender;
-    char buf[256];
-    struct proc_request req;
-    struct proc_reply reply;
     while (1) {
         printf("%s➜ %s%s%s ", "\x1B[1;32m", "\x1B[1;36m", grass->work_dir_name, "\x1B[1;0m");
+        char buf[256];
         if (earth->tty_read(buf, 256) == 0) continue;
 
+        struct proc_request req;
+        struct proc_reply reply;
         if (strcmp(buf, "pwd") == 0) {
             printf("%s\r\n", work_dir);
         } else if (strcmp(buf, "clear") == 0) {
@@ -52,6 +51,7 @@ int main() {
             req.type = PROC_KILLALL;
             sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
         } else {
+            int sender;
             req.type = PROC_SPAWN;
             parse_request(buf, &req);
             sys_send(GPID_PROCESS, (void*)&req, sizeof(req));

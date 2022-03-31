@@ -98,11 +98,7 @@ static void sd_spi_reset() {
     SPI_REGW(SPI1_CSMODE) |= 2;
 
     unsigned long i, rxdata;
-    for (i = 0; i < 100; i++) {
-        if (i % 20 == 0) INFO("    ... completed %d%c", i / 10 * 10, '%');
-
-        send_data_byte(0xFF);
-    }
+    for (i = 0; i < 1000; i++) send_data_byte(0xFF);
 
     /* Keep chip select line low */
     SPI_REGW(SPI1_CSDEF) = 1;

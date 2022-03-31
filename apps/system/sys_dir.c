@@ -53,7 +53,7 @@ int main() {
         case DIR_INSERT:
         case DIR_REMOVE:
         default:
-            FATAL("Request type=%d not implemented in GPID_DIR", req->type);
+            FATAL("proc_dir: request%d not implemented", req->type);
         }
     }
 }

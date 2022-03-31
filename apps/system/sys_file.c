@@ -40,7 +40,7 @@ int main() {
             break;
         case FILE_WRITE:
         default:
-            FATAL("Request type=%d not implemented in GPID_FILE", req->type);
+            FATAL("proc_file: request%d not implemented", req->type);
         }
     }
 }
