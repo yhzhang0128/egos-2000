@@ -12,7 +12,6 @@
 #include "earth.h"
 
 void earth_init();
-void grass_load();
 struct earth *earth = (void*)EARTH_STRUCT;
 
 static int grass_read(int block_no, char* dst) {
@@ -24,7 +23,6 @@ int main() {
 
     INFO("Start to load the grass layer");
     elf_load(0, grass_read, 0, NULL);
-
     void (*grass_entry)() = (void*)GRASS_ENTRY;
     grass_entry();
 }

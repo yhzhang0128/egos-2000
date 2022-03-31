@@ -10,18 +10,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "bus_uart.h"
-
-static void uart_set_clock(long baud_rate) {
-    UART_REGW(METAL_SIFIVE_UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
-    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= 1;
-    UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= 1;
-}
-
-static int uart_getc(int* c) {
-    uint32_t ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
-    return *c = (ch & UART_RXEMPTY)? -1 : (ch & 0x0ff);
-}
+#include "bus_uart.c"
 
 int tty_init() {
     uart_set_clock(115200);
@@ -32,15 +21,14 @@ int tty_init() {
     return 0;
 }
 
-static int is_reading;
+static int c, is_reading;
 int tty_intr() {
-    int c;
     return (is_reading)? 0 : (uart_getc(&c) == 3);
 }
 
 int tty_read(char* buf, int len) {
     is_reading = 1;
-    for (int c, i = 0; i < len - 1; i++) {
+    for (int i = 0; i < len - 1; i++) {
         for (c = -1; c == -1; uart_getc(&c));
         buf[i] = (char)c;
 
