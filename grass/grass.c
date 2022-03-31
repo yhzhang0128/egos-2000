@@ -19,17 +19,13 @@ static int read_sys_proc(int block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
 
-static void sys_proc_load() {
-    INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
-    elf_load(GPID_PROCESS, read_sys_proc, 0, NULL);
-}
-
 int main() {
     SUCCESS("Enter the grass layer");
 
     proc_init();
     timer_init();
-    sys_proc_load();
+    INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
+    elf_load(GPID_PROCESS, read_sys_proc, 0, NULL);
 
     grass->proc_alloc = proc_alloc;
     grass->proc_free = proc_free;

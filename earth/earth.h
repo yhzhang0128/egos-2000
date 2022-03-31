@@ -6,10 +6,10 @@
 #include "memory.h"
 #include <string.h>
 
-int tty_init();
-int disk_init();
-int intr_init();
-int mmu_init();
+void tty_init();
+void disk_init();
+void intr_init();
+void mmu_init();
 
 typedef void (*handler_t)(int);
 int intr_enable();

@@ -12,13 +12,12 @@
 #include <stdarg.h>
 #include "bus_uart.c"
 
-int tty_init() {
+void tty_init() {
     uart_set_clock(115200);
 
     /* Wait for the tty device to be ready */
     for (int i = 0; i < 2000000; i++);
     for (int c = 0; c != -1; uart_getc(&c));
-    return 0;
 }
 
 static int c, is_reading;

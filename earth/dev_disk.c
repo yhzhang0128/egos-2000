@@ -36,7 +36,7 @@ int disk_write(int block_no, int nblocks, char* src) {
         FATAL("Try to write the on-board flash ROM"); 
 }
 
-int disk_init() {
+void disk_init() {
     HIGHLIGHT("Choose a disk:");
     printf("  Enter 0: use the microSD card\r\n");
     printf("  Enter 1: use the on-board flash ROM @0x%.8x\r\n", FLASH_ROM_START);
@@ -45,12 +45,11 @@ int disk_init() {
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; tty_read(buf, 2));
 
     if (buf[0] == '0') {
+        sdinit();
         type = SD_CARD;
         INFO("microSD card is chosen");
-        return sdinit();
     } else {
         type = FLASH_ROM;
         INFO("on-board flash ROM is chosen");
-        return 0;
     }
 }

@@ -14,12 +14,10 @@ static handler_t intr_handler;
 static handler_t excp_handler;
 static void trap_entry()  __attribute__((interrupt, aligned(128)));
 
-int intr_init() {
+void intr_init() {
     INFO("Use direct mode for CPU interrupt handling");
     INFO("Put the address of trap_entry() to CSR register mtvec");
     __asm__ volatile("csrw mtvec, %0" ::"r"(trap_entry));
-        
-    return 0;
 }
 
 #define MCAUSE_INTR_MASK  0x80000000UL

@@ -31,12 +31,10 @@ char *cache = (void*)FRAME_CACHE_START;
 static int cache_read(int frame_no);
 static int cache_write(int frame_no, char* src);
 
-int mmu_init() {
+void mmu_init() {
     curr_vm_pid = -1;
     memset(lookup_table, 0xff, sizeof(lookup_table));
     memset(&translate_table, 0, sizeof(translate_table));
-
-    return 0;
 }
 
 int mmu_alloc(int* frame_no, int* cached_addr) {
