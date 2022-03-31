@@ -47,5 +47,5 @@ void sys_exit(int status) {
     struct proc_request req;
     req.type = PROC_EXIT;
     sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
-    FATAL("sys_exit: should never reach here");
+    while(1);
 }
