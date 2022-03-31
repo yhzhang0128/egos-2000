@@ -74,12 +74,12 @@ void write_mcs_section(char* mem, int base, int size) {
     /* using a dummy checksum */
     int ngroups = (size >> 16) + 1;
     for (int i = 0; i < ngroups; i++) {
-        printf(":02000004%.4X%.2X\n", i + base, 0xff);
+        printf(":02000004%.4X%.2X\n", i + base, 0xFF);
         for (int j = 0; j < 0x10000; j += 16) {
             printf(":10%.4X00", j);
             for (int k = 0; k < 16; k++)
-                printf("%.2X", mem[i * 0x10000 + j + k] & 0xff);
-            printf("%.2X\n", 0xff);
+                printf("%.2X", mem[i * 0x10000 + j + k] & 0xFF);
+            printf("%.2X\n", 0xFF);
             if (i * 0x10000 + j + 16 >= size) return;
         }
     }    

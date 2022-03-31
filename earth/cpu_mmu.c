@@ -35,7 +35,7 @@ static int cache_write(int frame_no, char* src);
 
 void mmu_init() {
     curr_vm_pid = -1;
-    memset(lookup_table, 0xff, sizeof(lookup_table));
+    memset(lookup_table, 0xFF, sizeof(lookup_table));
     memset(&translate_table, 0, sizeof(translate_table));
 }
 

@@ -27,5 +27,5 @@ static void uart_init(long baud_rate) {
 
 static int uart_getc(int* c) {
     int ch = UART_REGW(UART0_RXDATA);
-    return *c = (ch & (1 << 31))? -1 : (ch & 0x0ff);
+    return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
 }
