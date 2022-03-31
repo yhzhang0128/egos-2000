@@ -18,6 +18,9 @@ enum {
 static int type;
 
 int disk_read(int block_no, int nblocks, char* dst) {
+    /* Flash the led0 blue light */
+    *(char*)(0x1001200C) |= 8;
+    
     if (type == SD_CARD) {
         return sdread(block_no, nblocks, dst);
     } else {
@@ -28,6 +31,9 @@ int disk_read(int block_no, int nblocks, char* dst) {
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
+    /* Flash the led0 red light */
+    *(char*)(0x1001200C) |= 1;
+
     if (type == SD_CARD)
         return sdwrite(block_no, nblocks, src);
     else
