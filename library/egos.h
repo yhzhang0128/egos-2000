@@ -1,8 +1,5 @@
 #pragma once
 
-/* SiFive FE310 has a 65MHz clock */
-#define CPU_CLOCK_RATE 65000000
-
 struct earth {
     /* CPU interface */
     int (*intr_enable)();

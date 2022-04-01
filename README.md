@@ -23,16 +23,16 @@ This RISC-V version of EGOS is minimal in order to help students understand the 
       52 unique files.
        7 files ignored.
 
-github.com/AlDanial/cloc v 1.82  T=0.03 s (1837.1 files/s, 122963.7 lines/s)
+github.com/AlDanial/cloc v 1.82  T=0.02 s (1842.8 files/s, 123267.6 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 C                               31            435            437           1560
-C/C++ Header                    12             77            103            323
+C/C++ Header                    12             76            102            322
 Assembly                         2              4             14             61
-make                             1             11              0             54
+make                             1             11              0             55
 -------------------------------------------------------------------------------
-SUM:                            46            527            554           1998
+SUM:                            46            526            553           1998
 -------------------------------------------------------------------------------
 ```
 

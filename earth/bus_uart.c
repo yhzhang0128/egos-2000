@@ -20,7 +20,7 @@
 #define UART_REGW(offset) (ACCESS_ONCE((unsigned int*)UART_REG(offset)))
 
 static void uart_init(long baud_rate) {
-    UART_REGW(UART0_DIV) = 65000000 / baud_rate - 1;
+    UART_REGW(UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
     UART_REGW(UART0_TXCTRL) |= 1;
     UART_REGW(UART0_RXCTRL) |= 1;
 }
