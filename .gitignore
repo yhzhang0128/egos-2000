@@ -1,14 +1,10 @@
-debug
-release
-
+build
 mkfs
 mkrom
 
 *.elf
 *.lst
 *.bin
-*.log
 *.mcs
-*.bit
 *.img
-*.prm
+
