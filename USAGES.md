@@ -73,7 +73,7 @@ Install Vivado Lab Edition which can be downloaded [here](https://drive.google.c
 12. For Mac users, use the same commands but check your `/dev` directory for the serial device name
 13. For Windows users, use software like `PuTTY` to connect with the serial port using baud rate 115200
 
-In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US).
+In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please contact Xilinx [here](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US).
 
 In step6, old versions of Arty may use "mt25ql128-spi-x1_x2_x4" as memory device. 
 If you choose the wrong one, step8 will tell you.
