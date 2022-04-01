@@ -44,8 +44,7 @@ SUM:                            46            527            554           1998
 ## Software requirements
 * SiFive [freedom riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
 * [Vivado lab solutions](https://www.xilinx.com/support/download.html) or any edition with the hardware manager
-* a software to connect with ttyUSB
-    * e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows
+* a software to connect with ttyUSB (e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows)
 * [optional] a tool (e.g., [balena Etcher](https://www.balena.io/etcher/)) to program a disk image file to the microSD card 
 
 ## Usages and documentation
