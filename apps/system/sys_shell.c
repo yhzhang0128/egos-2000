@@ -33,7 +33,7 @@ int main() {
     int home = dir_lookup(0, "home");
     grass->work_dir_ino = dir_lookup(home, "yunhao");
     INFO("sys_shell: %s has ino=%d", work_dir, grass->work_dir_ino);
-    HIGHLIGHT("Welcome to egos-riscv!");
+    CRITICAL("Welcome to egos-riscv!");
     
     /* Wait for shell commands */
     while (1) {

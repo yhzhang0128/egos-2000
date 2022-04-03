@@ -22,7 +22,7 @@ struct earth {
     int (*tty_info)(const char *format, ...);
     int (*tty_fatal)(const char *format, ...);
     int (*tty_success)(const char *format, ...);
-    int (*tty_highlight)(const char *format, ...);
+    int (*tty_critical)(const char *format, ...);
 };
 
 struct grass {
@@ -36,8 +36,8 @@ struct grass {
 
 extern struct earth *earth;
 
+#define printf    earth->tty_printf
 #define INFO      earth->tty_info
 #define FATAL     earth->tty_fatal
 #define SUCCESS   earth->tty_success
-#define HIGHLIGHT earth->tty_highlight
-#define printf    earth->tty_printf
+#define CRITICAL  earth->tty_critical

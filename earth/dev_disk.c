@@ -35,7 +35,7 @@ int disk_write(int block_no, int nblocks, char* src) {
 }
 
 void disk_init() {
-    HIGHLIGHT("Choose a disk:");
+    CRITICAL("Choose a disk:");
     printf("  Enter 0: use the microSD card\r\n");
     printf("  Enter 1: use the on-board flash ROM @0x20800000\r\n");
 

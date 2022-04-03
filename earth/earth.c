@@ -37,7 +37,7 @@ void earth_init() {
     earth->tty_info = tty_info;
     earth->tty_fatal = tty_fatal;
     earth->tty_success = tty_success;
-    earth->tty_highlight = tty_highlight;
+    earth->tty_critical = tty_critical;
 
     INFO("-----------------------------------");
     INFO("Start to initialize the earth layer");

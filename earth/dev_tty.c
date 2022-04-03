@@ -86,9 +86,9 @@ int tty_success(const char *format, ...)
     printf("%s\r\n", "\x1B[1;0m");
 }
 
-int tty_highlight(const char *format, ...)
+int tty_critical(const char *format, ...)
 {
-    printf("%s[HIGHLIGHT] ", "\x1B[1;33m");
+    printf("%s[CRITICAL] ", "\x1B[1;33m");
     VPRINTF
     printf("%s\r\n", "\x1B[1;0m");
 }
