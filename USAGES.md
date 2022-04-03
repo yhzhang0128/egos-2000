@@ -2,24 +2,24 @@
 
 You can use Windows, Linux or MacOS. For Windows users, use WSL (Windows Subsystem for Linux) for step1 and step2.
 
-## Step1: Setup compiler and compile egos-riscv
+## Step1: Setup compiler and compile egos-2000
 
-Setup your working directory and name it as `$ARTY`.
+Setup your working directory and name it as `$EGOS`.
 
 ```shell
-> export ARTY=/home/yunhao/arty
-> cd $ARTY
-> git clone git@github.coecis.cornell.edu:4411-riscv/egos-riscv.git
-# now the code repository is at $ARTY/egos-riscv
+> export EGOS=/home/yunhao/egos
+> cd $EGOS
+> git clone https://github.coecis.cornell.edu/4411-riscv/egos-2000.git
+# now the code repository is at $EGOS/egos-2000
 ```
 
 Download the SiFive [riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to the working directory.
 
 ```shell
-> cd $ARTY
+> cd $EGOS
 > tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
-> export PATH=$PATH:$ARTY/riscv64-unknown...../bin
-> cd $ARTY/egos-riscv
+> export PATH=$PATH:$EGOS/riscv64-unknown...../bin
+> cd $EGOS/egos-2000
 > make
 mkdir -p build/debug build/release
 -------- Compile the Apps Layer --------
@@ -36,7 +36,7 @@ mkdir -p build/debug build/release
 ## Step2: Create the disk and bootROM images
 
 ```shell
-> cd $ARTY/egos-riscv
+> cd $EGOS/egos-2000
 > make install
 -------- Create the Disk Image --------
 ......
@@ -48,19 +48,19 @@ mkdir -p build/debug build/release
 ```
 
 This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `tools` directory.
-You can use tools like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD.
+Use softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
 
 ## Step3: Program the Arty FPGA board
 
 ### Windows and Linux
-Install Vivado Lab Edition which can be downloaded [here](https://drive.google.com/file/d/1VS6_mxb6yrAxdDtlXkHdB-8jg9CScacw/view?usp=sharing) or [here](https://www.xilinx.com/support/download.html). You may need to register a Xilinx account, but the software is free.
+Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html) or [here](https://drive.google.com/file/d/1VS6_mxb6yrAxdDtlXkHdB-8jg9CScacw/view?usp=sharing). You may need to register a Xilinx account, but the software is free.
 
 1. Connect the Arty FPGA board to your computer with the USB cable
 2. Open Vivado Lab Edition
 3. Click "Open Hardware Manager"
 4. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window
 5. In the "Hardware" window, right click `xc7a35t` and click "Add Configuration Memory Device"
-6. Choose memory device "s25fl128sxxxxxx0" and click "Program Configuration Memory Device"
+6. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
 7. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
 8. Click "OK" and wait for the program to finish
 9. Click the `program` red button on the left-top corner of the Arty FPGA board
@@ -71,11 +71,11 @@ Install Vivado Lab Edition which can be downloaded [here](https://drive.google.c
 > screen /dev/ttyUSB1 115200
 ```
 12. For Mac users, use the same commands but check your `/dev` directory for the serial device name
-13. For Windows users, use software like `PuTTY` to connect with the serial port using baud rate 115200
+13. For Windows users, use software like `PuTTY` to connect with the serial port (e.g., COM6) and use baud rate 115200
 
 In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please contact Xilinx [here](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US).
 
-In step6, old versions of Arty may use "mt25ql128-spi-x1_x2_x4" as memory device. 
+In step6, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
 If you choose the wrong one, step8 will tell you.
 
 ### MacOS
@@ -84,7 +84,7 @@ Install [Homebrew](https://brew.sh/).
 Then install `openocd` using Homebrew by typing `brew install openocd` in your terminal. 
 
 Prepare a text file `7series.txt` with the following content. 
-Replace the `$(EGOS_RISCV_DIR)` with your own egos-riscv path.
+Replace the `$(EGOS_DIR)` below with your own egos-2000 path.
 
 ```
 # File: 7series.txt
@@ -111,7 +111,7 @@ puts [drscan xc7.tap 32 0]
 puts "Programming FPGA..."
 
 jtagspi_init 0 bscan_spi_xc7a35t.bit
-jtagspi_program $(EGOS_RISCV_DIR)/tools/bootROM.bin 0 
+jtagspi_program $(EGOS_DIR)/tools/bootROM.bin 0 
 
 exit
 ```
