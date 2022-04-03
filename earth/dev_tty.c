@@ -58,7 +58,7 @@ int tty_read(char* buf, int len) {
                   vprintf(format, args); \
                   va_end(args); \
 
-int tty_write(const char *format, ...)
+int tty_printf(const char *format, ...)
 {
     VPRINTF
     fflush(stdout);

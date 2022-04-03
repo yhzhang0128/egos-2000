@@ -32,7 +32,7 @@ void earth_init() {
     tty_init();
     earth->tty_intr = tty_intr;
     earth->tty_read = tty_read;
-    earth->tty_write = tty_write;
+    earth->tty_printf = tty_printf;
 
     earth->tty_info = tty_info;
     earth->tty_fatal = tty_fatal;

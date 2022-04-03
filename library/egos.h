@@ -17,7 +17,7 @@ struct earth {
 
     int (*tty_intr)();
     int (*tty_read)(char* buf, int len);
-    int (*tty_write)(const char *format, ...);
+    int (*tty_printf)(const char *format, ...);
 
     int (*tty_info)(const char *format, ...);
     int (*tty_fatal)(const char *format, ...);
@@ -40,4 +40,4 @@ extern struct earth *earth;
 #define FATAL     earth->tty_fatal
 #define SUCCESS   earth->tty_success
 #define HIGHLIGHT earth->tty_highlight
-#define printf    earth->tty_write
+#define printf    earth->tty_printf

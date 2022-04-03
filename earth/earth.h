@@ -26,7 +26,7 @@ int disk_write(int block_no, int nblocks, char* src);
 
 int tty_intr();
 int tty_read(char* buf, int len);
-int tty_write(const char *format, ...);
+int tty_printf(const char *format, ...);
 
 int tty_info(const char *format, ...);
 int tty_fatal(const char *format, ...);
