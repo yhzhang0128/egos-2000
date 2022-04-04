@@ -16,9 +16,9 @@
 #define UART0_RXCTRL  12UL
 #define UART0_DIV     24UL
 
-#define ACCESS_ONCE(x) (*(__typeof__(*x) volatile *)(x))
+#define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
 #define UART_REG(offset) (UART0_BASE + offset)
-#define UART_REGW(offset) (ACCESS_ONCE((unsigned int*)UART_REG(offset)))
+#define UART_REGW(offset) (ACCESS((unsigned int*)UART_REG(offset)))
 
 static void uart_init(long baud_rate) {
     UART_REGW(UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;

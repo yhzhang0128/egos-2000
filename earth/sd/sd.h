@@ -36,7 +36,7 @@ char send_data_byte(char);
 #define SPI1_RXDATA   76UL
 #define SPI1_FCTRL    96UL
 
-#define ACCESS_ONCE(x) (*(__typeof__(*x) volatile *)(x))
+#define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
 #define SPI_REG(offset) (SPI1_BASE + offset)
-#define SPI_REGB(offset) (ACCESS_ONCE((unsigned char*)SPI_REG(offset)))
-#define SPI_REGW(offset) (ACCESS_ONCE((unsigned int*)SPI_REG(offset)))
+#define SPI_REGW(offset) (ACCESS((unsigned int*)SPI_REG(offset)))
+#define SPI_REGB(offset) (ACCESS((unsigned char*)SPI_REG(offset)))
