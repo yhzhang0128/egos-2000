@@ -18,7 +18,7 @@ This RISC-V version of EGOS is minimal in order to help students understand the 
 
 ```shell
 # Count lines of code excluding README.md and USAGES.md
-> cloc egos-riscv --exclude-ext=md  
+> cloc egos-2000 --exclude-ext=md  
       52 text files.
       52 unique files.
        7 files ignored.
@@ -49,7 +49,7 @@ SUM:                            46            526            553           1998
 
 ## Usages and documentation
 
-For compiling and running egos-riscv, please read [USAGES.md](USAGES.md). 
-The [documentation](../../../documentation) further introduces the teaching plans, architecture and development history of egos-riscv.
+For compiling and running egos-2000, please read [USAGES.md](USAGES.md). 
+The [documentation](../../../documentation) further introduces the teaching plans, architecture and development history of egos-2000.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
