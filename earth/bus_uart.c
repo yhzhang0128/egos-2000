@@ -10,6 +10,7 @@
 
 #define UART0_BASE    0x10013000UL
 
+#define UART0_TXDATA  0UL
 #define UART0_RXDATA  4UL
 #define UART0_TXCTRL  8UL
 #define UART0_RXCTRL  12UL
@@ -28,4 +29,9 @@ static void uart_init(long baud_rate) {
 static int uart_getc(int* c) {
     int ch = UART_REGW(UART0_RXDATA);
     return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
+}
+
+static int uart_putc(char c) {
+    while ((UART_REGW(UART0_TXDATA) & (1 << 31)));
+    UART_REGW(UART0_TXDATA) = c;
 }

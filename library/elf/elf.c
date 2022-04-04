@@ -21,10 +21,6 @@ static void load_grass(elf_reader reader,
     INFO("Grass kernel file size: 0x%.8x bytes", pheader->p_filesz);
     INFO("Grass kernel memory size: 0x%.8x bytes", pheader->p_memsz);
 
-    if (pheader->p_filesz > GRASS_SIZE ||
-        pheader->p_offset % BLOCK_SIZE != 0)
-        FATAL("Invalid grass binary file");
-
     char* entry = (char*)GRASS_ENTRY;
     int block_offset = pheader->p_offset / BLOCK_SIZE;
     for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE)
@@ -41,10 +37,6 @@ static void load_app(int pid, elf_reader reader,
         INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
         INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
     }
-
-    if (pheader->p_filesz > APPS_SIZE ||
-        pheader->p_offset % BLOCK_SIZE != 0)
-        FATAL("Invalid app binary file");
 
     /* load the app code & data */
     int base, frame_no, page_no = 0;
@@ -91,10 +83,6 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
 
     struct elf32_header *header = (void*) buf;
     struct elf32_program_header *pheader = (void*)(buf + header->e_phoff);
-
-    if (header->e_phnum != 1 ||
-        header->e_phoff + header->e_phentsize > BLOCK_SIZE)
-        FATAL("Grass exec region of the disk seems to be corrupted");
 
     if (pheader->p_vaddr == GRASS_ENTRY) {
         load_grass(reader, pheader);

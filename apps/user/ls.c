@@ -12,7 +12,7 @@
 
 int main(int argc, char** argv) {
     if (argc > 1) {
-        INFO("ls with args not implemented");
+        INFO("ls: ls with args not implemented");
         return -1;
     }
 

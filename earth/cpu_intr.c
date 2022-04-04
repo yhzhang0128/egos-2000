@@ -17,16 +17,17 @@ static void trap_entry()  __attribute__((interrupt, aligned(128)));
 void intr_init() {
     INFO("Use direct mode for CPU interrupt handling");
     INFO("Put the address of trap_entry() to CSR register mtvec");
+
     __asm__ volatile("csrw mtvec, %0" ::"r"(trap_entry));
 }
 
 static void trap_entry() {
-    int mcause, mepc;
-    __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
+    int mepc, mcause;
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
+    __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
 
     int id = mcause & 0x3FF;
-    if (mcause & 0x80000000) {
+    if (mcause & (1 << 31)) {
         if (intr_handler != NULL)
             intr_handler(id);
         else

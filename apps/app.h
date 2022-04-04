@@ -5,5 +5,5 @@
 #include "syscall.h"
 #include "servers.h"
 
-struct earth *earth = (void*)GRASS_STACK_TOP;
 struct grass *grass = (void*)APPS_STACK_TOP;
+struct earth *earth = (void*)GRASS_STACK_TOP;

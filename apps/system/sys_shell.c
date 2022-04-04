@@ -30,8 +30,8 @@ int main() {
     char work_dir[] = "/home/yunhao";
     strcpy(grass->work_dir_name, "yunhao");
 
-    int home = dir_lookup(0, "home");
-    grass->work_dir_ino = dir_lookup(home, "yunhao");
+    int home_ino = dir_lookup(0, "home");
+    grass->work_dir_ino = dir_lookup(home_ino, "yunhao");
     INFO("sys_shell: %s has ino=%d", work_dir, grass->work_dir_ino);
     CRITICAL("Welcome to egos-2000!");
     
@@ -43,6 +43,7 @@ int main() {
 
         struct proc_request req;
         struct proc_reply reply;
+
         if (strcmp(buf, "pwd") == 0) {
             printf("%s\r\n", work_dir);
         } else if (strcmp(buf, "clear") == 0) {
