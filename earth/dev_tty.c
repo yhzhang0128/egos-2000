@@ -57,42 +57,36 @@ int tty_write(char* buf, int len) {
     for (int i = 0; i < len; i++) uart_putc(buf[i]);
 }
 
-#define VPRINTF   va_list args; \
-                  va_start(args, format); \
-                  vprintf(format, args); \
-                  va_end(args); \
+#define VPRINTF(x, y)  printf(x); \
+                       va_list args; \
+                       va_start(args, format); \
+                       vprintf(format, args); \
+                       va_end(args); \
+                       printf(y); \
 
 int tty_printf(const char *format, ...)
 {
-    VPRINTF
+    VPRINTF("", "")
     fflush(stdout);
 }
 
 int tty_info(const char *format, ...)
 {
-    printf("[INFO] ");
-    VPRINTF
-    printf("\r\n");
+    VPRINTF("[INFO] ", "\r\n")
 }
 
 int tty_fatal(const char *format, ...)
 {
-    printf("%s[FATAL] ", "\x1B[1;31m");
-    VPRINTF
-    printf("%s\r\n", "\x1B[1;0m");
+    VPRINTF("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n")
     while(1);
 }
 
 int tty_success(const char *format, ...)
 {
-    printf("%s[SUCCESS] ", "\x1B[1;32m");
-    VPRINTF
-    printf("%s\r\n", "\x1B[1;0m");
+    VPRINTF("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n")
 }
 
 int tty_critical(const char *format, ...)
 {
-    printf("%s[CRITICAL] ", "\x1B[1;33m");
-    VPRINTF
-    printf("%s\r\n", "\x1B[1;0m");
+    VPRINTF("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n")
 }
