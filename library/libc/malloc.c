@@ -4,8 +4,10 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: naive malloc() and free(); 
- * A better one is left to students as an exercise
+ * Description: EGOS uses my_alloc() and my_free() instead of 
+ * the malloc() and free() in metal-libc in order to reduce the
+ * size of the code segment; This file is a naive implementation 
+ * and a better one is left to students as an exercise.
  */
 
 #include "egos.h"
