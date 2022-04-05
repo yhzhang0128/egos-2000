@@ -31,7 +31,7 @@ static int uart_getc(int* c) {
     return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
 }
 
-static int uart_putc(char c) {
+static void uart_putc(char c) {
     while ((UART_REGW(UART0_TXDATA) & (1 << 31)));
     UART_REGW(UART0_TXDATA) = c;
 }

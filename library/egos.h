@@ -11,14 +11,15 @@ struct earth {
     int (*mmu_map)(int pid, int page_no, int frame_no);
     int (*mmu_switch)(int pid);
 
-    /* Disk and tty device driver interface */
+    /* Devices interface */
     int (*disk_read)(int block_no, int nblocks, char* dst);
     int (*disk_write)(int block_no, int nblocks, char* src);
 
     int (*tty_intr)();
     int (*tty_read)(char* buf, int len);
-    int (*tty_printf)(const char *format, ...);
+    int (*tty_write)(char* buf, int len);
 
+    int (*tty_printf)(const char *format, ...);
     int (*tty_info)(const char *format, ...);
     int (*tty_fatal)(const char *format, ...);
     int (*tty_success)(const char *format, ...);
@@ -26,6 +27,7 @@ struct earth {
 };
 
 struct grass {
+    /* Process interface */
     int (*proc_alloc)();
     void (*proc_free)(int);
     void (*proc_set_ready)(int);

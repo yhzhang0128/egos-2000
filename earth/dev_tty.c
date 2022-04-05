@@ -53,6 +53,10 @@ int tty_read(char* buf, int len) {
     return len - 1;
 }
 
+int tty_write(char* buf, int len) {
+    for (int i = 0; i < len; i++) uart_putc(buf[i]);
+}
+
 #define VPRINTF   va_list args; \
                   va_start(args, format); \
                   vprintf(format, args); \
