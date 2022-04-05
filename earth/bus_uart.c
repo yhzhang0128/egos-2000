@@ -27,8 +27,7 @@ void uart_init(long baud_rate) {
     UART_REGW(UART0_RXCTRL) |= 1;
 
     /* UART0 send/recv are mapped to GPIO pin16 and pin17 */
-    GPIO_ENABLE(16);
-    GPIO_ENABLE(17);
+    GPIO_REGW(GPIO0_IOF_EN) = 0x30000;
 }
 
 int uart_getc(int* c) {

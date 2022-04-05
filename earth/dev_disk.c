@@ -10,6 +10,7 @@
 
 #include "earth.h"
 #include "sd/sd.h"
+#include "bus_gpio.c"
 
 enum {
       SD_CARD,
@@ -19,19 +20,20 @@ static int type;
 
 int disk_read(int block_no, int nblocks, char* dst) {
     if (type == SD_CARD) {
-        return sdread(block_no, nblocks, dst);
+        sdread(block_no, nblocks, dst);
     } else {
         char* src = (char*)0x20800000 + block_no * BLOCK_SIZE;
         memcpy(dst, src, nblocks * BLOCK_SIZE);
-        return 0;
     }
+    return 0;
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
-    if (type == SD_CARD)
-        return sdwrite(block_no, nblocks, src);
-    else
-        FATAL("Try to write the on-board flash ROM"); 
+    if (type == FLASH_ROM)
+        FATAL("Try to write the on-board flash ROM");
+
+    sdwrite(block_no, nblocks, src);
+    return 0;
 }
 
 void disk_init() {
