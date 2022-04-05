@@ -40,7 +40,7 @@ OBJCOPY = riscv64-unknown-elf-objcopy
 CLOCK = -D CPU_CLOCK_RATE=65000000
 
 EARTH_SRCS = earth/*.S earth/*.c earth/sd/*.c library/elf/*.c
-EARTH_LAYOUT = -Tlibrary/libc/metal.lds
+EARTH_LAYOUT = -Tlibrary/libc/metal-libc.lds
 
 GRASS_SRCS = grass/*.S grass/*.c library/elf/*.c
 GRASS_LAYOUT = -Tgrass/grass.lds
@@ -59,7 +59,7 @@ CFLAGS += -ffunction-sections -fdata-sections
 
 DEFAULT_LDLIBS = -lc -lgcc
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
-EARTH_LDLIBS = -Llibrary/libc -Wl,--start-group -lc -lgcc -lm -lmetal-gloss -Wl,--end-group
+EARTH_LDLIBS = -Llibrary/libc -Wl,--start-group -lc -lgcc -lm -lmetal-libc -Wl,--end-group
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

@@ -19,7 +19,7 @@ PHDRS
 SECTIONS
 {
     __heap_size = 0x800;
-    __stack_size = 0x800;
+    __stack_size = 0x1000;
 
     /* ROM Sections */
     .init : {
@@ -82,28 +82,20 @@ SECTIONS
         PROVIDE(metal_segment_stack_end = .);
     } >ram :ram
     
-    /* Symbols for the Metal library */
+    /* Symbols for the Metal C library */
     PROVIDE(__metal_boot_hart = 0);
-    PROVIDE(__metal_eccscrub_bit = 0);
-    PROVIDE( metal_dtim_0_memory_start = 0x80000000 );
-    PROVIDE( metal_dtim_0_memory_end = 0x80000000 + 0x4000 );
-    PROVIDE( metal_itim_0_memory_start = 0x08000000 );
-    PROVIDE( metal_itim_0_memory_end = 0x08000000 + 0x4000 );
+    PROVIDE( __tbss_size = SIZEOF(.tbss) );
+    PROVIDE( __tls_size = __tls_end - __tls_base );
+
     PROVIDE( metal_segment_itim_source_start = LOADADDR(.data) );
     PROVIDE( metal_segment_itim_target_start = ADDR(.data) );
     PROVIDE( metal_segment_itim_target_end = ADDR(.data) + SIZEOF(.data) );
     PROVIDE( metal_segment_lim_source_start = LOADADDR(.data) );
     PROVIDE( metal_segment_lim_target_start = ADDR(.data) );
     PROVIDE( metal_segment_lim_target_end = ADDR(.data) + SIZEOF(.data) );
-
-    PROVIDE( __tdata_source = LOADADDR(.tdata) );
-    PROVIDE( __tdata_size = SIZEOF(.tdata) );
-
     PROVIDE( metal_segment_data_source_start = LOADADDR(.data) );
     PROVIDE( metal_segment_data_target_start = ADDR(.data) );
     PROVIDE( metal_segment_data_target_end = ADDR(.tdata) + SIZEOF(.tdata) );
-    PROVIDE( __tbss_size = SIZEOF(.tbss) );
-    PROVIDE( __tls_size = __tls_end - __tls_base );
     PROVIDE( metal_segment_bss_source_start = LOADADDR(.tbss) );
     PROVIDE( metal_segment_bss_target_start = ADDR(.tbss) );
     PROVIDE( metal_segment_bss_target_end = ADDR(.bss) + SIZEOF(.bss) );
