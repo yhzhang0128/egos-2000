@@ -1,17 +1,11 @@
-/* Copyright 2018 SiFive, Inc */
-/* SPDX-License-Identifier: Apache-2.0 */
-
-/* This code executes before _start, which is contained inside the C library.
- * In embedded systems we want to ensure that _enter, which contains the first
- * code to be executed, can be loaded at a specific address.  To enable this
- * feature we provide the '.text.metal.init.enter' section, which is
- * defined to have the first address being where execution should start. */
 .section .text.enter
 .global _enter
 _enter:
+    /* Initialize global pointer */
     la gp, __global_pointer$
+    /* SiFive specific initialization */
     csrwi 0x7C1, 0
-    call earth_scrub
+    /* Setup stack pointer and enter libc */
     li sp, 0x08003000
     li a0, 0
     li a1, 0
@@ -25,9 +19,6 @@ _enter:
 .global metal_mem_scrub
 .type metal_mem_scrub, @function
 metal_mem_scrub:
-
-    /* Disable machine interrupts,
-    restore previous mstatus value at exit */
     li      a3, 8
     csrrc   t1, mstatus, a3
 
@@ -51,6 +42,8 @@ metal_mem_scrub:
     csrw    mstatus, t1
     ret
 
+/* Temporary functions for linking with metal-gloss
+ */
     .section .init
     .global __metal_synchronize_harts
 __metal_synchronize_harts:

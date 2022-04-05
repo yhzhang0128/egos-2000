@@ -14,8 +14,6 @@
 void earth_init();
 struct earth *earth = (void*)GRASS_STACK_TOP;
 
-void earth_scrub() { memset((void*)0x08000000, 0, 0x2000); }
-
 static int grass_read(int block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
