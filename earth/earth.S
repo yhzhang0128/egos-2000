@@ -186,10 +186,6 @@ __metal_memory_scrub:
     blt     t1, t2, 1b
     ret
 
-    .global metal_shutdown, metal_tty_putc
-metal_shutdown:
-    j metal_shutdown
-
 /* Function to zero-scrub specified memory
  * a0 : start address for zero-scrub
  * a1 : size memory region size in bytes
@@ -222,3 +218,17 @@ metal_mem_scrub:
     bgtz    a1, 1b
     csrw    mstatus, t1
     ret
+
+    .section .init
+    .global __metal_synchronize_harts
+__metal_synchronize_harts:
+    ret
+
+    .global metal_shutdown, metal_init_run, metal_fini_run
+metal_shutdown:
+    j metal_shutdown
+metal_init_run:
+    ret
+metal_fini_run:
+    ret
+

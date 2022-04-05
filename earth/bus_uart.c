@@ -26,21 +26,27 @@
 #define GPIO_REG(offset) (GPIO0_BASE + offset)
 #define GPIO_REGW(offset) (ACCESS((unsigned int*)GPIO_REG(offset)))
 
-static void uart_init(long baud_rate) {
+void uart_init(long baud_rate) {
     UART_REGW(UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
     UART_REGW(UART0_TXCTRL) |= 1;
     UART_REGW(UART0_RXCTRL) |= 1;
 
+    /* UART0 maps to GPIO pin16 and pin17 on FE310 */
     GPIO_REGW(GPIO0_IOF_SEL) |= 0;
-    GPIO_REGW(GPIO0_IOF_EN) |= 196608;
+    GPIO_REGW(GPIO0_IOF_EN) |= 0x30000;
 }
 
-static int uart_getc(int* c) {
+int uart_getc(int* c) {
     int ch = UART_REGW(UART0_RXDATA);
     return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
 }
 
-static void uart_putc(int c) {
+void uart_putc(int c) {
     while ((UART_REGW(UART0_TXDATA) & (1 << 31)));
     UART_REGW(UART0_TXDATA) = c;
+}
+
+int metal_tty_putc(int c) {
+    uart_putc(c);
+    return 0;
 }
