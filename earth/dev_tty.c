@@ -45,7 +45,7 @@ int tty_read(char* buf, int len) {
         case 0x0d:  /* Enter     */
             buf[i] = is_reading = 0;
             printf("\r\n");
-            return i;
+            return c == 0x03? 0 : i;
         case 0x7f:  /* Backspace */
             c = 0;
             if (i) printf("\b \b");
