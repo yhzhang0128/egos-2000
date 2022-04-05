@@ -180,15 +180,9 @@ skip_scrub:
 __metal_memory_scrub:
 /* Zero out specified memory regions */
 1:
-#if __riscv_xlen == 32
     sw      x0, 0(t1)
     addi    t1, t1, 4
     blt     t1, t2, 1b
-#else
-    sd      x0, 0(t1)
-    addi    t1, t1, 8
-    blt     t1, t2, 1b
-#endif
     ret
 
     .global metal_shutdown, metal_tty_putc
@@ -208,7 +202,6 @@ metal_mem_scrub:
     li      a3, 8
     csrrc   t1, mstatus, a3
 
-#if __riscv_xlen == 32
     addi    t0, x0, 4
 1:
     blt     a1, t0, 2f
@@ -228,24 +221,3 @@ metal_mem_scrub:
     bgtz    a1, 1b
     csrw    mstatus, t1
     ret
-#else
-    addi    t0, x0, 8
-1:
-    blt     a1, t0, 2f
-    andi    a2, a0, 7
-    beqz    a2, 3f
-2:
-    sb      x0, 0(a0)
-    addi    a0, a0, 1
-    addi    a1, a1, -1
-    bgtz    a1, 1b
-    csrw    mstatus, t1
-    ret
-3:
-    sd      x0, 0(a0)
-    addi    a0, a0, 8
-    addi    a1, a1, -8
-    bgtz    a1, 1b
-    csrw    mstatus, t1
-    ret
-#endif

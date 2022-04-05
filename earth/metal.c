@@ -1,4 +1,3 @@
-#include "earth.h"
 #include "bus_uart.c"
 
 typedef void (*func_t)();
@@ -7,10 +6,6 @@ extern func_t metal_constructors_start;
 extern func_t metal_constructors_end;
 extern func_t metal_destructors_start;
 extern func_t metal_destructors_end;
-
-void __metal_synchronize_harts() {
-    tty_fatal("__metal_synchronize_harts is called");
-}
 
 func_t metal_tty_putc = (void*)uart_putc;
 
@@ -58,3 +53,5 @@ void metal_fini_run(void) {
         funcptr += 1;
     }
 }
+
+__attribute__((section(".init"))) void __metal_synchronize_harts() {}
