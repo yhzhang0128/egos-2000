@@ -5,7 +5,7 @@
 
 /* Author: Yunhao Zhang
  * Description: a simple tty device driver
- * uart_getc is implemented in bus_uart.c
+ * uart_getc and uart_putc are implemented in bus_uart.c
  * printf is implemented in the Sifive Metal library
  */
 
@@ -57,36 +57,36 @@ int tty_write(char* buf, int len) {
     for (int i = 0; i < len; i++) uart_putc(buf[i]);
 }
 
-#define VPRINTF(x, y)  printf(x); \
-                       va_list args; \
-                       va_start(args, format); \
-                       vprintf(format, args); \
-                       va_end(args); \
-                       printf(y); \
+#define LOG(x, y)  printf(x); \
+                   va_list args; \
+                   va_start(args, format); \
+                   vprintf(format, args); \
+                   va_end(args); \
+                   printf(y); \
 
 int tty_printf(const char *format, ...)
 {
-    VPRINTF("", "")
+    LOG("", "")
     fflush(stdout);
 }
 
 int tty_info(const char *format, ...)
 {
-    VPRINTF("[INFO] ", "\r\n")
+    LOG("[INFO] ", "\r\n")
 }
 
 int tty_fatal(const char *format, ...)
 {
-    VPRINTF("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n")
+    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n")
     while(1);
 }
 
 int tty_success(const char *format, ...)
 {
-    VPRINTF("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n")
+    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n")
 }
 
 int tty_critical(const char *format, ...)
 {
-    VPRINTF("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n")
+    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n")
 }
