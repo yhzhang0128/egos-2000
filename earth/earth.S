@@ -9,6 +9,7 @@
 .section .text.metal.init.enter
 .global _enter
 _enter:
+    li t0, 0
     .cfi_startproc
 
     /* Inform the debugger that there is nowhere to backtrace past _enter. */
