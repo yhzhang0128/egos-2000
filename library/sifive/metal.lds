@@ -23,7 +23,7 @@ SECTIONS
 
     /* ROM Sections */
     .init : {
-        KEEP (*(.text.metal.init.enter))
+        KEEP (*(.text.enter))
         KEEP (*(.text.metal.init.*))
         KEEP (*(SORT_NONE(.init)))
         KEEP (*(.text.libgloss.start))
@@ -151,7 +151,6 @@ SECTIONS
     
     /* Symbols for the Metal library */
     PROVIDE(__metal_boot_hart = 0);
-    PROVIDE(__metal_chicken_bit = 1);
     PROVIDE(__metal_eccscrub_bit = 0);
     PROVIDE( metal_dtim_0_memory_start = 0x80000000 );
     PROVIDE( metal_dtim_0_memory_end = 0x80000000 + 0x4000 );

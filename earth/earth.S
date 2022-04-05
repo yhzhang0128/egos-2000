@@ -6,47 +6,25 @@
  * code to be executed, can be loaded at a specific address.  To enable this
  * feature we provide the '.text.metal.init.enter' section, which is
  * defined to have the first address being where execution should start. */
-.section .text.metal.init.enter
+.section .text.enter
 .global _enter
 _enter:
-    li t0, 0
-    .cfi_startproc
-
-    /* Inform the debugger that there is nowhere to backtrace past _enter. */
-    .cfi_undefined ra
-
     /* The absolute first thing that must happen is configuring the global
      * pointer register, which must be done with relaxation disabled because
      * it's not valid to obtain the address of any symbol without GP
      * configured.  The C environment might go ahead and do this again, but
      * that's safe as it's a fixed register. */
-.option push
-.option norelax
     la gp, __global_pointer$
-.option pop
 
-    /* trap over the chicken bit register clearing, aloe & fe310 dont have it */
-    la t0, 1f
-    csrw mtvec, t0
-    /* chicken bit is enable if core are sifive series. */
-    la t0, __metal_chicken_bit
-    beqz t0, 1f
-    /* If set, always clear the feature disable register for all cores series */
+    /* clear the feature disable register for all cores series */
     csrwi 0x7C1, 0
 .align 4
-1:
     /* Set up a simple trap vector to catch anything that goes wrong early in
      * the boot process. */
     la t0, early_trap_vector
     csrw mtvec, t0
 
-    /* There may be pre-initialization routines inside the MBI code that run in
-     * C, so here we set up a C environment. First we set up a stack pointer,
-     * which is left as a weak reference in order to allow initialization
-     * routines that do not need a stack to be set up to transparently be
-     * called. */
-    .weak __metal_stack_pointer
-    la sp, __metal_stack_pointer
+    li sp, 0x08003000
 
    /* The METAL is designed for a bare-metal environment and therefore is expected
     * to define its own stack pointer. We also align the stack pointer here
@@ -103,8 +81,6 @@ _enter:
      lw t1, 0(x0)
      j 1b
 
-    .cfi_endproc
-
 /* The GCC port might not emit a __register_frame_info symbol, which eventually
  * results in a weak undefined reference that eventually causes crash when it
  * is dereference early in boot.  We really shouldn't need to put this here,
@@ -114,20 +90,16 @@ _enter:
 .global __register_frame_info
 .section .text.metal.init.__register_frame_info
 __register_frame_info:
-    .cfi_startproc
     ret
-    .cfi_endproc
 
 .section .text.metal.init.trapvec
 .global early_trap_vector
 .align 2
 early_trap_vector:
-    .cfi_startproc
     csrr t0, mcause
     csrr t1, mepc
     csrr t2, mtval
     j early_trap_vector
-    .cfi_endproc
 
 /*
  * Initialize memories to zero
