@@ -19,9 +19,5 @@
 /* #define LED0_GREEN  2 */
 /* #define LED0_BLUE   3 */
 
-#define LED_ON(x)  GPIO_REGW(GPIO0_IOF_EN) |= (1 << x); \
-                   GPIO_REGW(GPIO0_IOF_SEL) |= (1 << x);
-
-#define LED_OFF(x) GPIO_REGW(GPIO0_IOF_EN) &= ~(1 << x);    \
-                   GPIO_REGW(GPIO0_IOF_SEL) &= ~(1 << x);
-
+/* #define LED_ON(x)  GPIO_REGW(GPIO0_IOF_EN) |= (1 << x); GPIO_REGW(GPIO0_IOF_SEL) |= (1 << x); */
+/* #define LED_OFF(x) GPIO_REGW(GPIO0_IOF_EN) &= ~(1 << x); GPIO_REGW(GPIO0_IOF_SEL) &= ~(1 << x); */

@@ -19,20 +19,20 @@ This RISC-V version of EGOS is minimal in order to help students understand the 
 ```shell
 # Count lines of code excluding README.md and USAGES.md
 > cloc egos-2000 --exclude-ext=md  
-      52 text files.
-      52 unique files.
-       7 files ignored.
+      53 text files.
+      47 unique files.
+       9 files ignored.
 
-github.com/AlDanial/cloc v 1.82  T=0.02 s (1842.8 files/s, 123267.6 lines/s)
+github.com/AlDanial/cloc v 1.92  T=0.03 s (1771.0 files/s, 117604.4 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               31            436            436           1556
-C/C++ Header                    12             76            102            322
-Assembly                         2              4             14             61
+C                               32            447            450           1560
+C/C++ Header                    11             77            104            317
+Assembly                         3              5             26             68
 make                             1             12              0             55
 -------------------------------------------------------------------------------
-SUM:                            46            528            552           1994
+SUM:                            47            541            580           2000
 -------------------------------------------------------------------------------
 ```
 
