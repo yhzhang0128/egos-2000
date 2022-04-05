@@ -3,7 +3,6 @@
 #include "egos.h"
 #include "elf.h"
 #include "disk.h"
-#include "memory.h"
 #include <string.h>
 
 void tty_init();

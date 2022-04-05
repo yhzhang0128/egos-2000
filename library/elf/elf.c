@@ -11,7 +11,6 @@
 #include "egos.h"
 #include "elf.h"
 #include "disk.h"
-#include "memory.h"
 #include "servers.h"
 
 #include <string.h>

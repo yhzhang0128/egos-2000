@@ -33,7 +33,7 @@
 #define INFO printf
 #else
 #include "egos.h"
-#include "memory.h"
+#include "malloc.h"
 #endif
 
 /* Temporary information about the file system and a particular inode.

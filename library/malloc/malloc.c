@@ -9,7 +9,6 @@
  */
 
 #include "egos.h"
-#include "memory.h"
 
 /* heap region is defined in the memory layout scripts */
 extern char __heap_start, __heap_end;

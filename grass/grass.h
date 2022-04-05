@@ -2,7 +2,6 @@
 
 #include "elf.h"
 #include "disk.h"
-#include "memory.h"
 #include "syscall.h"
 #include "servers.h"
 

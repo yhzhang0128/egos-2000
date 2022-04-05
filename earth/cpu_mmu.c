@@ -13,6 +13,9 @@
 #include "earth.h"
 #include <stdlib.h>
 
+#define NFRAMES             256
+#define CACHED_NFRAMES      28    /* 32 - 4 */
+
 /* definitions for translation table */
 struct translation_table_t {
     struct {
