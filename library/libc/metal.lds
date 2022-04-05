@@ -5,7 +5,7 @@ ENTRY(_enter)
 MEMORY
 {
     ram (arw!xi) : ORIGIN = 0x08000000, LENGTH = 0x3000
-    rom (irx!wa) : ORIGIN = 0x20400000, LENGTH = 0x1fc00000
+    rom (irx!wa) : ORIGIN = 0x20400000, LENGTH = 0x400000
 }
 
 PHDRS
@@ -24,111 +24,44 @@ SECTIONS
     /* ROM Sections */
     .init : {
         KEEP (*(.text.enter))
-        KEEP (*(.text.metal.init.*))
-        KEEP (*(SORT_NONE(.init)))
-        KEEP (*(.text.libgloss.start))
     } >rom :rom
-
-    .fini : {
-        KEEP (*(SORT_NONE(.fini)))
-    } >rom :rom
-
-    .preinit_array : ALIGN(8) {
-        PROVIDE_HIDDEN (__preinit_array_start = .);
-        KEEP (*(.preinit_array))
-        PROVIDE_HIDDEN (__preinit_array_end = .);
-    } >rom :rom
-
-    .init_array : ALIGN(8) {
-        PROVIDE_HIDDEN (__init_array_start = .);
-        KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
-        KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
-        PROVIDE_HIDDEN (__init_array_end = .);
-        PROVIDE_HIDDEN ( metal_constructors_start = .);
-        KEEP (*(SORT_BY_INIT_PRIORITY(.metal.init_array.*)));
-        KEEP (*(.metal.init_array));
-        PROVIDE_HIDDEN ( metal_constructors_end = .);
-    } >rom :rom
-
-    .fini_array : ALIGN(8) {
-        PROVIDE_HIDDEN (__fini_array_start = .);
-        KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
-        KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
-        PROVIDE_HIDDEN (__fini_array_end = .);
-        PROVIDE_HIDDEN ( metal_destructors_start = .);
-        KEEP (*(SORT_BY_INIT_PRIORITY(.metal.fini_array.*)));
-        KEEP (*(.metal.fini_array));
-        PROVIDE_HIDDEN ( metal_destructors_end = .);
-    } >rom :rom 
-
-    .ctors : {
-        KEEP (*crtbegin.o(.ctors))
-        KEEP (*crtbegin?.o(.ctors))
-        KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .ctors))
-        KEEP (*(SORT(.ctors.*)))
-        KEEP (*(.ctors))
-        KEEP (*(.metal.ctors .metal.ctors.*))
-    } >rom :rom
-
-    .dtors : {
-        KEEP (*crtbegin.o(.dtors))
-        KEEP (*crtbegin?.o(.dtors))
-        KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .dtors))
-        KEEP (*(SORT(.dtors.*)))
-        KEEP (*(.dtors))
-        KEEP (*(.metal.dtors .metal.dtors.*))
-    } >rom : rom
 
     .rodata : {
         *(.rdata)
         *(.rodata .rodata.*)
-        *(.gnu.linkonce.r.*)
         . = ALIGN(8);
-        *(.srodata.cst16)
-        *(.srodata.cst8)
-        *(.srodata.cst4)
-        *(.srodata.cst2)
         *(.srodata .srodata.*)
     } >rom :rom
 
     .text : {
-        *(.text.unlikely .text.unlikely.*)
-        *(.text.startup .text.startup.*)
         *(.text .text.*)
-        *(.gnu.linkonce.t.*)
     } >rom :text
 
     /* RAM Sections */
 
     .data : ALIGN(8) {
         *(.data .data.*)
-        *(.gnu.linkonce.d.*)
         . = ALIGN(8);
         PROVIDE( __global_pointer$ = . + 0x800 );
         *(.sdata .sdata.* .sdata2.*)
-        *(.gnu.linkonce.s.*)
     } >ram AT>rom :ram_init
 
     .tdata : ALIGN(8) {
         PROVIDE( __tls_base = . );
-	*(.tdata .tdata.* .gnu.linkonce.td.*)
     } >ram AT>rom :ram_init
 
     .tbss : ALIGN(8) {
-	*(.tbss .tbss.* .gnu.linkonce.tb.*)
-	*(.tcommon .tcommon.*)
-	PROVIDE( __tls_end = . );
+    	*(.tcommon .tcommon.*)
+	    PROVIDE( __tls_end = . );
     } >ram AT>ram :ram
 
     .tbss_space : ALIGN(8) {
-	. = . + __tbss_size;
+    	. = . + __tbss_size;
     } >ram :ram
 
     .bss (NOLOAD): ALIGN(8) {
         *(.sbss*)
-        *(.gnu.linkonce.sb.*)
         *(.bss .bss.*)
-        *(.gnu.linkonce.b.*)
         *(COMMON)
     } >ram :ram 
 
