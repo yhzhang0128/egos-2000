@@ -9,15 +9,17 @@ extern func_t metal_destructors_end;
 
 //func_t metal_tty_putc = (void*)uart_putc;
 
-/* int metal_tty_putc(int c) { */
-/*     uart_putc(c); */
-/*     return 0; */
-/* } */
+int metal_tty_putc(int c) {
+    uart_putc(c);
+    return 0;
+}
 
 __attribute__((section(".init"))) void __metal_synchronize_harts() {}
 
 void metal_init_run(void) __attribute__((weak));
 void metal_init_run(void) {
+    uart_init(115200);
+
     /* Make sure the constructors only run once */
     static int init_done = 0;
     if (init_done) {
@@ -28,8 +30,6 @@ void metal_init_run(void) {
     if (&metal_constructors_end <= &metal_constructors_start) {
         return;
     }
-
-    uart_init(115200);
 
     func_t *funcptr = &metal_constructors_start;
     while (funcptr != &metal_constructors_end) {

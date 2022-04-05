@@ -9,7 +9,6 @@
  */
 
 #define UART0_BASE    0x10013000UL
-
 #define UART0_TXDATA  0UL
 #define UART0_RXDATA  4UL
 #define UART0_TXCTRL  8UL
@@ -20,10 +19,20 @@
 #define UART_REG(offset) (UART0_BASE + offset)
 #define UART_REGW(offset) (ACCESS((unsigned int*)UART_REG(offset)))
 
+#define GPIO0_BASE    0x10012000UL
+#define GPIO0_IOF_EN  56UL
+#define GPIO0_IOF_SEL 60UL
+
+#define GPIO_REG(offset) (GPIO0_BASE + offset)
+#define GPIO_REGW(offset) (ACCESS((unsigned int*)GPIO_REG(offset)))
+
 static void uart_init(long baud_rate) {
     UART_REGW(UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
     UART_REGW(UART0_TXCTRL) |= 1;
     UART_REGW(UART0_RXCTRL) |= 1;
+
+    GPIO_REGW(GPIO0_IOF_SEL) |= 0;
+    GPIO_REGW(GPIO0_IOF_EN) |= 196608;
 }
 
 static int uart_getc(int* c) {
