@@ -40,7 +40,7 @@ OBJCOPY = riscv64-unknown-elf-objcopy
 CLOCK = -D CPU_CLOCK_RATE=65000000
 
 EARTH_SRCS = earth/*.S earth/*.c earth/sd/*.c library/elf/*.c
-EARTH_LAYOUT = -Tlibrary/sifive/metal.lds
+EARTH_LAYOUT = -Tlibrary/libc/metal.lds
 
 GRASS_SRCS = grass/*.S grass/*.c library/elf/*.c
 GRASS_LAYOUT = -Tgrass/grass.lds
@@ -53,13 +53,13 @@ DEBUG_DIR = build/debug
 RELEASE_DIR = build/release
 
 INCLUDE = -Ilibrary
-INCLUDE += -Ilibrary/elf -Ilibrary/malloc -Ilibrary/file -Ilibrary/syscall
+INCLUDE += -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/syscall
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 
 DEFAULT_LDLIBS = -lc -lgcc
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
-EARTH_LDLIBS = -Llibrary/sifive -Wl,--start-group -lc -lgcc -lm -lmetal-gloss -Wl,--end-group
+EARTH_LDLIBS = -Llibrary/libc -Wl,--start-group -lc -lgcc -lm -lmetal-gloss -Wl,--end-group
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
