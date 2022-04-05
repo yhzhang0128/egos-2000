@@ -45,8 +45,3 @@ void uart_putc(int c) {
     while ((UART_REGW(UART0_TXDATA) & (1 << 31)));
     UART_REGW(UART0_TXDATA) = c;
 }
-
-int metal_tty_putc(int c) {
-    uart_putc(c);
-    return 0;
-}

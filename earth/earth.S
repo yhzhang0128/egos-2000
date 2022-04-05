@@ -1,8 +1,6 @@
 .section .text.enter
 .global _enter
 _enter:
-    /* Initialize global pointer */
-    la gp, __global_pointer$
     /* SiFive specific initialization */
     csrwi 0x7C1, 0
     /* Setup stack pointer and enter libc */
