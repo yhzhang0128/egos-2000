@@ -63,15 +63,14 @@ Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com
 6. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
 7. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
 8. Click "OK" and wait for the program to finish
-9. Click the `program` red button on the left-top corner of the Arty FPGA board
-10. Click the `reset` red button on the right-top corner of the Arty FPGA board, for rebooting EGOS
-11. For Linux users, type in your shell
+9. Press the `program` red button on the left-top corner of the Arty FPGA board
+10. For Linux users, type in your shell
 ```shell
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
 ```
-12. For Mac users, use the same commands but check your `/dev` directory for the serial device name
-13. For Windows users, use software like `PuTTY` to connect with the serial port (e.g., COM6) and use baud rate 115200
+11. For Mac users, use the same commands but check your `/dev` directory for the serial device name
+12. For Windows users, use software like `PuTTY` to connect with the serial port (e.g., COM6) and use baud rate 115200
 
 In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please contact Xilinx [here](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US).
 

@@ -1,6 +1,6 @@
 # A minimal operating system on a real RISC-V board
 
-With only **2K** lines of code, **egos-2000** implements microSD driver, tty driver, interrupt handling, address translation, memory paging, process scheduling and messaging, system call, file system, shell, seven user commands and the `mkfs/mkrom` tools.
+With only **2K** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
@@ -20,19 +20,19 @@ This RISC-V version of EGOS is minimal in order to help students understand the 
 # Count lines of code excluding README.md and USAGES.md
 > cloc egos-2000 --exclude-ext=md  
       53 text files.
-      47 unique files.
-       9 files ignored.
+      53 unique files.
+       7 files ignored.
 
-github.com/AlDanial/cloc v 1.92  T=0.03 s (1771.0 files/s, 117604.4 lines/s)
+github.com/AlDanial/cloc v 1.82  T=0.03 s (1835.3 files/s, 121949.2 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               32            447            450           1560
+C                               32            447            452           1560
 C/C++ Header                    11             77            104            317
 Assembly                         3              5             26             68
 make                             1             12              0             55
 -------------------------------------------------------------------------------
-SUM:                            47            541            580           2000
+SUM:                            47            541            582           2000
 -------------------------------------------------------------------------------
 ```
 
