@@ -54,6 +54,8 @@ struct grass {
 #define GRASS_ENTRY         0x08003000  /* 8KB    grass code+data      */
                                         /* 12KB   earth data+stack     */
                                         /* earth code is in QSPI flash */
+
+/* C library interface */
 extern struct earth *earth;
 
 #define printf    earth->tty_printf
@@ -61,3 +63,11 @@ extern struct earth *earth;
 #define FATAL     earth->tty_fatal
 #define SUCCESS   earth->tty_success
 #define CRITICAL  earth->tty_critical
+
+#undef  malloc
+#define malloc my_alloc
+void* my_alloc(unsigned int size);
+
+#undef  free
+#define free my_free
+void my_free(void* ptr);

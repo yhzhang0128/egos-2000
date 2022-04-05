@@ -9,7 +9,6 @@
 
 #include "egos.h"
 #include "syscall.h"
-#include "servers.h"
 
 #include <string.h>
 

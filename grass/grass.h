@@ -3,7 +3,6 @@
 #include "elf.h"
 #include "disk.h"
 #include "syscall.h"
-#include "servers.h"
 
 #define MAX_NPROCESS       16
 

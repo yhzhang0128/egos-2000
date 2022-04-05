@@ -27,3 +27,5 @@ struct syscall {
 void sys_exit(int status);
 int sys_send(int pid, char* msg, int size);
 int sys_recv(int* pid, char* buf, int size);
+
+#include "servers.h"
