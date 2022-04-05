@@ -26,6 +26,10 @@ int tty_intr() {
     return (is_reading)? 0 : (uart_getc(&c) == 3);
 }
 
+int tty_write(char* buf, int len) {
+    for (int i = 0; i < len; i++) uart_putc(buf[i]);
+}
+
 int tty_read(char* buf, int len) {
     is_reading = 1;
     for (int i = 0; i < len - 1; i++) {
@@ -51,10 +55,6 @@ int tty_read(char* buf, int len) {
 
     buf[len - 1] = is_reading = 0;    
     return len - 1;
-}
-
-int tty_write(char* buf, int len) {
-    for (int i = 0; i < len; i++) uart_putc(buf[i]);
 }
 
 #define LOG(x, y)  printf(x); \
