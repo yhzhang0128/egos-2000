@@ -83,9 +83,7 @@ SECTIONS
     } >ram :ram
     
     /* Symbols for the Metal C library */
-    PROVIDE(__metal_boot_hart = 0);
     PROVIDE( __tbss_size = SIZEOF(.tbss) );
-    PROVIDE( __tls_size = __tls_end - __tls_base );
 
     PROVIDE( metal_segment_data_source_start = LOADADDR(.data) );
     PROVIDE( metal_segment_data_target_start = ADDR(.data) );
