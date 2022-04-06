@@ -22,8 +22,12 @@ SECTIONS
 
     /* ROM Sections */
     .init : {
-        KEEP (*(.text.enter))
+        *(.text.enter)
     } >rom :rom
+
+    .text : {
+        *(.text .text.*)
+    } >rom :text
 
     .rodata : {
         *(.rdata)
@@ -32,12 +36,7 @@ SECTIONS
         *(.srodata .srodata.*)
     } >rom :rom
 
-    .text : {
-        *(.text .text.*)
-    } >rom :text
-
     /* RAM Sections */
-
     .data : ALIGN(8) {
         *(.data .data.*)
         . = ALIGN(8);
@@ -52,9 +51,7 @@ SECTIONS
 
     .heap (NOLOAD) : ALIGN(8) {
         PROVIDE( __heap_start = . );
-        PROVIDE( metal_segment_heap_target_start = . );
         . +=  __heap_size;
-        PROVIDE( metal_segment_heap_target_end = . );
         PROVIDE( __heap_end = . );
     } >ram :ram
     

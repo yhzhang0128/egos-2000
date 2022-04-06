@@ -40,7 +40,7 @@ OBJCOPY = riscv64-unknown-elf-objcopy
 CLOCK = -D CPU_CLOCK_RATE=65000000
 
 EARTH_SRCS = earth/*.S earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
-EARTH_LAYOUT = -Tlibrary/libc/metal.lds
+EARTH_LAYOUT = -Tearth/earth.lds
 
 GRASS_SRCS = grass/*.S grass/*.c library/elf/*.c
 GRASS_LAYOUT = -Tgrass/grass.lds
