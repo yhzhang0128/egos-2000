@@ -4,7 +4,7 @@ ENTRY(_enter)
 
 MEMORY
 {
-    ram (arw!xi) : ORIGIN = 0x08000000, LENGTH = 0x2800
+    ram (arw!xi) : ORIGIN = 0x08000000, LENGTH = 0x2000
     rom (irx!wa) : ORIGIN = 0x20400000, LENGTH = 0x400000
 }
 
@@ -51,9 +51,8 @@ SECTIONS
 
     .heap (NOLOAD) : ALIGN(8) {
         PROVIDE( __heap_start = . );
-        . +=  __heap_size;
     } >ram :ram    
-    PROVIDE( __heap_end = 0x08002800 );
+    PROVIDE( __heap_end = 0x08003000 );
 
     PROVIDE( bss_start = ADDR(.bss) );
     PROVIDE( bss_end = ADDR(.bss) + SIZEOF(.bss) );
