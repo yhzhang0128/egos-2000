@@ -16,6 +16,18 @@
 extern char __heap_start, __heap_end;
 static char* brk = &__heap_start;
 
+
+char *_sbrk(int size) {
+    if (brk + size >= &__heap_end) return (void*)-1;
+
+    char *old_brk = brk;
+    brk += size;
+    for (int i = 0; i < size; i++) old_brk[i] = 0;
+
+    return old_brk;
+}
+
+
 void* my_alloc(unsigned int size) {
     if (brk + size >= &__heap_end) FATAL("Heap is full");
 
