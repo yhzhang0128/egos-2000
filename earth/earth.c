@@ -12,22 +12,16 @@
 #include "earth.h"
 
 void earth_init();
-struct earth *earth = (void*)GRASS_STACK_TOP;
-
-static int grass_read(int block_no, char* dst) {
-    return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
-}
+static int grass_read(int block_no, char* dst);
 
 extern char bss_start, bss_end;
 extern char data_rom_start, data_ram_start, data_ram_end;
+struct earth *earth = (void*)GRASS_STACK_TOP;
 
 int main() {
-    for (char* bss = &bss_start; bss < &bss_end; bss++) *bss = 0;
-
-    char *data_src = &data_rom_start, *data_dst = &data_ram_start;
-    int data_size = &data_ram_end - data_dst;
-    for (int i = 0; i < data_size; i++) data_dst[i] = data_src[i];
-
+    memset(&bss_start, 0, &bss_end - &bss_start);
+    int data_size = &data_ram_end - &data_ram_start;
+    memcpy(&data_ram_start, &data_rom_start, data_size);
     
     earth_init();
 
@@ -35,6 +29,10 @@ int main() {
     elf_load(0, grass_read, 0, NULL);
     void (*grass_entry)() = (void*)GRASS_ENTRY;
     grass_entry();
+}
+
+static int grass_read(int block_no, char* dst) {
+    return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
 void earth_init() {
