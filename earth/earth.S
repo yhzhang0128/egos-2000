@@ -28,6 +28,13 @@ _enter:
 _start:
   /* Stack pointer is expected to be initialized before _start */
 
+  /* Embedded systems frequently require relocating the data segment before C
+   * code can be run -- for example, the data segment may exist in flash upon
+   * boot and then need to get relocated into a non-persistant writable memory
+   * before C code can execute.  If this is the case we do so here.  This step
+   * is optional: if the METAL provides an environment in which this relocation
+   * is not necessary then it must simply set metal_segment_data_source_start to
+   * be equal to metal_segment_data_target_start. */
   la t0, metal_segment_data_source_start
   la t1, metal_segment_data_target_start
   la t2, metal_segment_data_target_end
@@ -41,11 +48,23 @@ _start:
   sw   a0, 0(t1)
   addi t1, t1, 4
   blt  t1, t2, 1b
+2:
 
+  /* Copy the ITIM section */
+1:
+2:
+2:
+
+  /* Copy the LIM section */
+1:
+2:
+
+  /* Zero the BSS segment. */
   la t1, metal_segment_bss_target_start
   la t2, metal_segment_bss_target_end
   bge t1, t2, 2f
 
+1:
   sw   x0, 0(t1)
   addi t1, t1, 4
   blt  t1, t2, 1b
@@ -53,7 +72,11 @@ _start:
 
   /* Set TLS pointer */
   .weak __tls_base	
+#ifdef __riscv_cmodel_compact
+  lla.gprel tp, __tls_base
+#else
   la tp, __tls_base
+#endif
 
   /* At this point we're in an environment that can execute C code.  The first
    * thing to do is to make the callback to the parent environment if it's been

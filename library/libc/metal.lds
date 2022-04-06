@@ -87,12 +87,6 @@ SECTIONS
     PROVIDE( __tbss_size = SIZEOF(.tbss) );
     PROVIDE( __tls_size = __tls_end - __tls_base );
 
-    PROVIDE( metal_segment_itim_source_start = LOADADDR(.data) );
-    PROVIDE( metal_segment_itim_target_start = ADDR(.data) );
-    PROVIDE( metal_segment_itim_target_end = ADDR(.data) + SIZEOF(.data) );
-    PROVIDE( metal_segment_lim_source_start = LOADADDR(.data) );
-    PROVIDE( metal_segment_lim_target_start = ADDR(.data) );
-    PROVIDE( metal_segment_lim_target_end = ADDR(.data) + SIZEOF(.data) );
     PROVIDE( metal_segment_data_source_start = LOADADDR(.data) );
     PROVIDE( metal_segment_data_target_start = ADDR(.data) );
     PROVIDE( metal_segment_data_target_end = ADDR(.tdata) + SIZEOF(.tdata) );
