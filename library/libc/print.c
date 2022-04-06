@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: system support to C library functions such as printf
+ * Description: system support to C library functions like printf()
  */
 
 #include "egos.h"

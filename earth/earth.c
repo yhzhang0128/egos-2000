@@ -19,10 +19,11 @@ extern char data_rom_start, data_ram_start, data_ram_end;
 struct earth *earth = (void*)GRASS_STACK_TOP;
 
 int main() {
-    memset(&bss_start, 0, &bss_end - &bss_start);
-    int data_size = &data_ram_end - &data_ram_start;
-    memcpy(&data_ram_start, &data_rom_start, data_size);
-    
+    for (int i = 0; i < (&bss_end - &bss_start); i++)
+        ((char*)&bss_start)[i] = 0;
+    for (int i = 0; i < (&data_ram_end - &data_ram_start); i++)
+        ((char*)&data_ram_start)[i] = ((char*)&data_rom_start)[i];
+
     earth_init();
 
     INFO("Start to load the grass layer");

@@ -42,6 +42,7 @@ SECTIONS
     .heap (NOLOAD) : ALIGN(8) {
           PROVIDE( __heap_start = . );
           . = __heap_size;
-          PROVIDE( __heap_end = . );
     } >ram :ram
+
+    PROVIDE( __heap_end = 0x08008000 );
 }

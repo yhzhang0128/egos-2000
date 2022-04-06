@@ -4,21 +4,19 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: EGOS uses my_alloc() and my_free() instead of 
- * the malloc() and free() in metal-libc in order to reduce the
- * size of the code segment; This file is a naive implementation 
- * and a better one is left to students as an exercise.
+ * Description: system support to C library function malloc()
  */
 
 #include "egos.h"
 
-/* heap region is defined in the memory layout scripts */
 extern char __heap_start, __heap_end;
-static char* brk = &__heap_start;
-
+char* brk = &__heap_start;
 
 char *_sbrk(int size) {
-    if (brk + size >= &__heap_end) return (void*)-1;
+    if ((brk + size) > (&__heap_end)) {
+        earth->tty_write("_sbrk: heap is full\r\n", 21);
+        while(1);
+    }
 
     char *old_brk = brk;
     brk += size;
@@ -26,14 +24,3 @@ char *_sbrk(int size) {
 
     return old_brk;
 }
-
-
-void* my_alloc(unsigned int size) {
-    if (brk + size >= &__heap_end) FATAL("Heap is full");
-
-    char* old_brk = brk;
-    brk += size;
-    return old_brk;
-}
-
-void my_free(void* ptr) {}
