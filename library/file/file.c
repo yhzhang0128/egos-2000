@@ -433,7 +433,7 @@ int treedisk_create(block_store_t *below, unsigned int below_ino, unsigned int n
         INFO("treedisk: Created a new filesystem with %d inodes\n", ninodes);
     }
     else {
-        INFO("treedisk: A filesystem already exists with %lu inodes",
+        INFO("treedisk: a filesystem already exists with %lu inodes",
              superblock.superblock.n_inodeblocks * INODES_PER_BLOCK);
     }
 

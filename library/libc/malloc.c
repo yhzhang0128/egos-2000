@@ -10,12 +10,12 @@
 #include "egos.h"
 
 extern char __heap_start, __heap_end;
-char* brk = &__heap_start;
+static char* brk = &__heap_start;
 
 char *_sbrk(int size) {
     if ((brk + size) > (&__heap_end)) {
-        earth->tty_write("_sbrk: heap is full\r\n", 21);
-        while(1);
+        earth->tty_write("\r\n[FATAL] _sbrk: heap is full\r\n", 31);
+        *(int*)(0x1000) = 1; /* Trigger a memory exception */
     }
 
     char *old_brk = brk;

@@ -57,7 +57,7 @@ SECTIONS
 
     PROVIDE( bss_start = ADDR(.bss) );
     PROVIDE( bss_end = ADDR(.bss) + SIZEOF(.bss) );
-    PROVIDE( data_rom_start = LOADADDR(.data) );
-    PROVIDE( data_ram_start = ADDR(.data) );
-    PROVIDE( data_ram_end = ADDR(.data) + SIZEOF(.data) );
+    PROVIDE( data_rom = LOADADDR(.data) );
+    PROVIDE( data_start = ADDR(.data) );
+    PROVIDE( data_end = ADDR(.data) + SIZEOF(.data) );
 }
