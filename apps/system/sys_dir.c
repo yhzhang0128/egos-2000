@@ -35,7 +35,7 @@ int main() {
     /* Send notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
     strcpy(buf, "Finish GPID_DIR initialization");
-    sys_send(GPID_PROCESS, buf, 32);
+    sys_send(GPID_PROCESS, buf, strlen(buf));
 
     /* Wait for dir requests */
     while (1) {

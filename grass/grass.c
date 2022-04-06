@@ -12,8 +12,8 @@
 #include "grass.h"
 #include <stdlib.h>
 
-struct earth *earth = (void*)GRASS_STACK_TOP;
 struct grass *grass = (void*)APPS_STACK_TOP;
+struct earth *earth = (void*)GRASS_STACK_TOP;
 
 static int sys_proc_read(int block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
@@ -37,6 +37,4 @@ int main() {
     earth->intr_enable();
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     sys_proc_entry();
-
-    FATAL("Should never return to the grass layer main()");
 }
