@@ -23,7 +23,7 @@ int main() {
     /* Send notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
     strcpy(buf, "Finish GPID_FILE initialization");
-    sys_send(GPID_PROCESS, buf, strlen(buf) + 1);
+    sys_send(GPID_PROCESS, buf, 32);
 
     /* Wait for file requests */
     while (1) {
