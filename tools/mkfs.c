@@ -34,7 +34,7 @@ char* kernel_processes[] = {
 #0: /              #1: /home               #2: /home/yunhao
 #3: /home/rvr      #4: /home/yunhao/README #5: /bin
 #6: /bin/echo      #7: /bin/ls             #8: /bin/cat
-#9: /bin/clock
+#9: /bin/clock     #10: /bin/crash1        #11: /bin/crash2
 */
 #define NINODE 12
 char* contents[] = {

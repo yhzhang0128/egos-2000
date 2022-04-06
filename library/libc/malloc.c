@@ -20,7 +20,5 @@ char *_sbrk(int size) {
 
     char *old_brk = brk;
     brk += size;
-    for (int i = 0; i < size; i++) old_brk[i] = 0;
-
     return old_brk;
 }
