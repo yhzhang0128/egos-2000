@@ -4,7 +4,7 @@ ENTRY(_enter)
 
 MEMORY
 {
-    ram (arw!xi) : ORIGIN = 0x08000000, LENGTH = 0x3000
+    ram (arw!xi) : ORIGIN = 0x08000000, LENGTH = 0x2000
     rom (irx!wa) : ORIGIN = 0x20400000, LENGTH = 0x400000
 }
 
@@ -19,7 +19,6 @@ PHDRS
 SECTIONS
 {
     __heap_size = 0x800;
-    __stack_size = 0x1000;
 
     /* ROM Sections */
     .init : {
@@ -42,22 +41,8 @@ SECTIONS
     .data : ALIGN(8) {
         *(.data .data.*)
         . = ALIGN(8);
-        PROVIDE( __global_pointer$ = . + 0x800 );
         *(.sdata .sdata.* .sdata2.*)
     } >ram AT>rom :ram_init
-
-    .tdata : ALIGN(8) {
-        PROVIDE( __tls_base = . );
-    } >ram AT>rom :ram_init
-
-    .tbss : ALIGN(8) {
-    	*(.tcommon .tcommon.*)
-	    PROVIDE( __tls_end = . );
-    } >ram AT>ram :ram
-
-    .tbss_space : ALIGN(8) {
-    	. = . + __tbss_size;
-    } >ram :ram
 
     .bss (NOLOAD): ALIGN(8) {
         *(.sbss*)
@@ -66,33 +51,16 @@ SECTIONS
     } >ram :ram 
 
     .heap (NOLOAD) : ALIGN(8) {
-        PROVIDE( __end = . );
         PROVIDE( __heap_start = . );
         PROVIDE( metal_segment_heap_target_start = . );
         . +=  __heap_size;
         PROVIDE( metal_segment_heap_target_end = . );
-        PROVIDE( _heap_end = . );
         PROVIDE( __heap_end = . );
     } >ram :ram
-
-    .stack (NOLOAD) : ALIGN(16) {
-        PROVIDE(metal_segment_stack_begin = .);
-        . = __stack_size; /* Hart 0 */
-        PROVIDE( _sp = . );
-        PROVIDE(metal_segment_stack_end = .);
-    } >ram :ram
     
-    /* Symbols for the Metal C library */
-    PROVIDE( __tbss_size = SIZEOF(.tbss) );
-
-    PROVIDE( metal_segment_data_source_start = LOADADDR(.data) );
-    PROVIDE( metal_segment_data_target_start = ADDR(.data) );
-    PROVIDE( metal_segment_data_target_end = ADDR(.tdata) + SIZEOF(.tdata) );
-    PROVIDE( metal_segment_bss_source_start = LOADADDR(.tbss) );
-    PROVIDE( metal_segment_bss_target_start = ADDR(.tbss) );
-    PROVIDE( metal_segment_bss_target_end = ADDR(.bss) + SIZEOF(.bss) );
-
-    /DISCARD/ : {
-	*(.eh_frame .eh_frame.*)
-    }
+    PROVIDE( bss_start = ADDR(.bss) );
+    PROVIDE( bss_end = ADDR(.bss) + SIZEOF(.bss) );
+    PROVIDE( data_rom_start = LOADADDR(.data) );
+    PROVIDE( data_ram_start = ADDR(.data) );
+    PROVIDE( data_ram_end = ADDR(.data) + SIZEOF(.data) );
 }

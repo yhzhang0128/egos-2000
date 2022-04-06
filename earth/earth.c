@@ -18,22 +18,16 @@ static int grass_read(int block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
-extern char metal_segment_data_source_start;
-extern char metal_segment_data_target_start;
-extern char metal_segment_data_target_end;
-
-extern char metal_segment_bss_target_start;
-extern char metal_segment_bss_target_end;
+extern char bss_start, bss_end;
+extern char data_rom_start, data_ram_start, data_ram_end;
 
 int main() {
-    char* data_src = &metal_segment_data_source_start;
-    char* data_dst = &metal_segment_data_target_start;
-    int size = &metal_segment_data_target_end - data_dst;
-    for (int i = 0; i < size; i++) data_dst[i] = data_src[i];
+    for (char* bss = &bss_start; bss < &bss_end; bss++) *bss = 0;
 
-    char* bss = &metal_segment_bss_target_start;
-    int bss_size = &metal_segment_bss_target_end - bss;
-    for (int i = 0; i < bss_size; i++) bss[i] = 0;
+    char *data_src = &data_rom_start, *data_dst = &data_ram_start;
+    int data_size = &data_ram_end - data_dst;
+    for (int i = 0; i < data_size; i++) data_dst[i] = data_src[i];
+
     
     earth_init();
 
