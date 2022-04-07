@@ -37,7 +37,9 @@ int main() {
 
         struct proc_request *req = (void*)buf;
         struct proc_reply *reply = (void*)buf;
-        if (req->type == PROC_SPAWN) {
+        if (req->type == PROC_KILLALL){
+            grass->proc_free(-1);
+        } else if (req->type == PROC_SPAWN) {
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
 
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
@@ -51,8 +53,6 @@ int main() {
                 sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
             else
                 INFO("background process %d terminated", sender);
-        } else if (req->type == PROC_KILLALL){
-            grass->proc_free(-1);
         }
     }
 }

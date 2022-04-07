@@ -14,10 +14,8 @@
 int main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
-    /* Initialize the file system */
+    /* Initialize the file system interface */
     block_if disk = fs_disk_init();    
-    if (treedisk_create(disk, 0, NINODES) < 0)
-        FATAL("proc_file: can't create treedisk file system");
     block_if fs = treedisk_init(disk, 0);
 
     /* Send notification to GPID_PROCESS */

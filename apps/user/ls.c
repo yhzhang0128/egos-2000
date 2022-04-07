@@ -16,14 +16,13 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    char result[BLOCK_SIZE];
-    file_read(grass->work_dir_ino, 0, result);
+    char buf[BLOCK_SIZE];
+    file_read(grass->work_dir_ino, 0, buf);
     
-    for (int i = 1; i < strlen(result); i++)
-        if (result[i - 1] == ' ' && result[i] >= '0' && result[i] <= '9')
-            result[i] = ' ';
+    /* Remove the inode numbers from the string */
+    for (int i = 1; i < strlen(buf); i++)
+        if (buf[i - 1] == ' ' && buf[i] >= '0' && buf[i] <= '9') buf[i] = ' ';
 
-    printf("%s\r\n", result);
-
+    printf("%s\r\n", buf);
     return 0;
 }

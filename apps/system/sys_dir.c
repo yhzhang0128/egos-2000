@@ -9,21 +9,18 @@
 
 #include "app.h"
 #include <string.h>
+#include <stdlib.h>
 
 int dir_do_lookup(int dir_ino, char* name) {
-    char block[BLOCK_SIZE];
-    file_read(dir_ino, 0, block);
+    char buf[BLOCK_SIZE];
+    file_read(dir_ino, 0, buf);
 
-    int dir_len = strlen(block);
-    int name_len = strlen(name);
+    int dir_len = strlen(buf), name_len = strlen(name);
 
-    for (int i = 0, ret = 0; i < dir_len - name_len; i++)
-        if (strncmp(name, block + i, name_len) == 0 &&
-            block[i + name_len] == ' ') {
-            for (int k = 0; k < 4; k++)
-                if (block[i + name_len + k] != ' ')
-                    ret = ret * 10 + block[i + name_len + k] - '0';
-            return ret;
+    for (int i = 0; i < dir_len - name_len; i++)
+        if (!strncmp(name, buf + i, name_len) && buf[i + name_len] == ' ') {
+            buf[i + name_len + 4] = 0;
+            return atoi(buf + i + name_len);
         }
 
     return -1;

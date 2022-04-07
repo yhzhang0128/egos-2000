@@ -12,8 +12,8 @@
 
 int main(int argc, char** argv) {
     if (argc == 1) {
-        INFO("cat: please provide an argument");
-        return 0;
+        INFO("usage: cat [FILE]");
+        return -1;
     }
 
     /* Get the inode number of the file */
@@ -24,11 +24,10 @@ int main(int argc, char** argv) {
     }
 
     /* Read and print the first block of the file */
-    char result[BLOCK_SIZE];
-    file_read(file_ino, 0, result);
-
-    printf("%s", result);
-    if (result[strlen(result) - 1] != '\n') printf("\r\n");
+    char buf[BLOCK_SIZE];
+    file_read(file_ino, 0, buf);
+    printf("%s", buf);
+    if (buf[strlen(buf) - 1] != '\n') printf("\r\n");
 
     return 0;
 }
