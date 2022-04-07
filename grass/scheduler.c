@@ -40,19 +40,19 @@ void intr_entry(int id) {
         return;
     }
 
-    /* switch to the grass kernel stack */
     switch (id) {
     case INTR_ID_TMR:
         kernel_entry = proc_yield;
-        ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
         break;
     case INTR_ID_SOFT:
         kernel_entry = proc_syscall;
-        ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
         break;
     default:
         FATAL("Got unknown interrupt #%d", id);
     }
+
+    /* Switch to the grass kernel stack */
+    ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
 }
 
 void ctx_entry() {
@@ -91,7 +91,7 @@ static void proc_yield() {
         /* Prepare argc and argv */
         __asm__ volatile("mv a0, %0" ::"r"(*((int*)APPS_ARG)));
         __asm__ volatile("mv a1, %0" ::"r"(APPS_ARG + 4));
-        /* Enter application code */
+        /* Enter application code directly by mret */
         __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
         __asm__ volatile("mret");
     }
@@ -128,8 +128,7 @@ static void proc_send(struct syscall *sc) {
     int receiver = sc->payload.msg.receiver;
 
     for (int i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == receiver)
-            receiver_idx = i;
+        if (proc_set[i].pid == receiver) receiver_idx = i;
 
     if (receiver_idx == -1) {
         sc->retval = -1;
