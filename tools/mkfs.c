@@ -27,7 +27,7 @@ char* kernel_processes[] = {
                             "../build/release/sys_proc.elf",
                             "../build/release/sys_file.elf",
                             "../build/release/sys_dir.elf",
-                            "../build/release/sys_shell.elf"
+                            "../build/release/sys_shell.elf",
 };
 
 /* inode mappings:
@@ -75,8 +75,7 @@ int main() {
     for (int i = 0; i < NKERNEL_PROC; i++) {
         struct stat st;
         stat(kernel_processes[i], &st);
-        assert(st.st_size > 0);
-        assert(st.st_size <= exec_size);
+        assert((st.st_size > 0) && (st.st_size <= exec_size));
         fprintf(stderr, "[INFO] Loading %s: %ld bytes\n", kernel_processes[i], (long)st.st_size);
 
         freopen(kernel_processes[i], "r", stdin);

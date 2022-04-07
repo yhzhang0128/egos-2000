@@ -10,7 +10,8 @@
  */
 
 #include "app.h"
+#include <stdlib.h>
 
 int main() {
-    *(int*)(0x1000) = 1;
+    char* too_large = malloc(4096 * 4);
 }
