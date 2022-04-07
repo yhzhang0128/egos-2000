@@ -28,7 +28,7 @@ struct  process     proc_set[MAX_NPROCESS];
 
 void intr_entry(int id) {
     if (curr_pid < GPID_SHELL && id == INTR_ID_TMR) {
-        /* IO may be busy in kernel processes */
+        /* Do not interrupt kernel processes since IO may be busy */
         timer_reset();
         return;
     }

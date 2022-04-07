@@ -39,7 +39,6 @@ static int cache_write(int frame_no, char* src);
 void mmu_init() {
     curr_vm_pid = -1;
     memset(lookup_table, 0xFF, sizeof(lookup_table));
-    memset(&translate_table, 0, sizeof(translate_table));
 }
 
 int mmu_alloc(int* frame_no, int* cached_addr) {
