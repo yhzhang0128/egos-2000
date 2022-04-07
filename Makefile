@@ -31,7 +31,7 @@ install:
 clean:
 	rm -rf build
 	rm -rf $(TOOLS)/mkfs $(TOOLS)/mkrom
-	rm -rf $(TOOLS)/disk.img $(TOOL)/bootROM.bin $(TOOLS)/bootROM.mcs
+	rm -rf $(TOOLS)/disk.img $(TOOLS)/bootROM.bin $(TOOLS)/bootROM.mcs
 
 RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
