@@ -1,65 +1,64 @@
 all: apps
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
-	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(CLOCK) $(GRASS_LAYOUT) $(GRASS_SRCS) $(DEFAULT_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/grass.elf
-	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/grass.elf > $(DEBUG_DIR)/grass.lst
+	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
+	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/grass.elf > $(DEBUG)/grass.lst
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
-	$(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(CLOCK) $(EARTH_LAYOUT) $(EARTH_SRCS) $(EARTH_LDLIBS) $(INCLUDE) -o $(RELEASE_DIR)/earth.elf
-	$(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/earth.elf > $(DEBUG_DIR)/earth.lst
+	$(RISCV_CC) $(COMMON) $(EARTH_SRCS) $(EARTH_LD) -o $(RELEASE)/earth.elf
+	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/earth.elf > $(DEBUG)/earth.lst
 
 .PHONY: apps
 apps: apps/system/*.c apps/user/*.c
-	mkdir -p $(DEBUG_DIR) $(RELEASE_DIR)
+	mkdir -p $(DEBUG) $(RELEASE)
 	@echo "$(CYAN)-------- Compile the Apps Layer --------$(END)"
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
-	  echo "Compile" $${FILE} "=>" $(RELEASE_DIR)/$${APP}.elf;\
-	  $(RISCV_CC) $(CFLAGS) $(LDFLAGS) $(CLOCK) $(APPS_LAYOUT) $(APPS_SRCS) $${FILE} $(DEFAULT_LDLIBS) $(INCLUDE) -Iapps -o $(RELEASE_DIR)/$${APP}.elf || exit 1 ;\
-	  echo "Compile" $${FILE} "=>" $(DEBUG_DIR)/$${APP}.lst;\
-	  $(OBJDUMP) --source --all-headers --demangle --line-numbers --wide $(RELEASE_DIR)/$${APP}.elf > $(DEBUG_DIR)/$${APP}.lst;\
+	  echo "Compile" $${FILE} "=>" $(RELEASE)/$${APP}.elf;\
+	  $(RISCV_CC) $(COMMON) $(APPS_SRCS) $${FILE} $(APPS_LD) -Iapps -o $(RELEASE)/$${APP}.elf || exit 1 ;\
+	  echo "Compile" $${FILE} "=>" $(DEBUG)/$${APP}.lst;\
+	  $(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/$${APP}.elf > $(DEBUG)/$${APP}.lst;\
 	done
 
 .PHONY: install
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(TOOLS_DIR)/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o $(TOOLS_DIR)/mkfs
-	cd $(TOOLS_DIR); ./mkfs
+	$(CC) $(TOOLS)/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs
+	cd $(TOOLS); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	$(OBJCOPY) -O binary $(RELEASE_DIR)/earth.elf $(TOOLS_DIR)/earth.bin
-	$(CC) $(TOOLS_DIR)/mkrom.c -o $(TOOLS_DIR)/mkrom
-	cd $(TOOLS_DIR); ./mkrom ; rm earth.bin
+	$(OBJCOPY) -O binary $(RELEASE)/earth.elf $(TOOLS)/earth.bin
+	$(CC) $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
+	cd $(TOOLS); ./mkrom ; rm earth.bin
 
 clean:
 	rm -rf build
-	rm -rf $(TOOLS_DIR)/mkfs $(TOOLS_DIR)/mkrom
-	rm -rf $(TOOLS_DIR)/disk.img $(TOOLS_DIR)/bootROM.bin $(TOOLS_DIR)/bootROM.mcs
+	rm -rf $(TOOLS)/mkfs $(TOOLS)/mkrom
+	rm -rf $(TOOLS)/disk.img $(TOOL)/bootROM.bin $(TOOLS)/bootROM.mcs
 
 RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
-CLOCK = -D CPU_CLOCK_RATE=65000000
-
-EARTH_SRCS = earth/*.S earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
-EARTH_LAYOUT = -Tearth/earth.lds
-
-GRASS_SRCS = grass/*.S grass/*.c library/elf/*.c
-GRASS_LAYOUT = -Tgrass/grass.lds
-
 APPS_SRCS = apps/app.S library/*/*.c
-APPS_LAYOUT = -Tapps/app.lds
+GRASS_SRCS = grass/grass.S grass/*.c library/elf/*.c
+EARTH_SRCS = earth/earth.S earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
 
-TOOLS_DIR = tools
-DEBUG_DIR = build/debug
-RELEASE_DIR = build/release
+CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
+CFLAGS += -ffunction-sections -fdata-sections
+LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 INCLUDE = -Ilibrary
 INCLUDE += -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/syscall
-CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
-CFLAGS += -ffunction-sections -fdata-sections
 
-DEFAULT_LDLIBS = -lc -lgcc
-LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
-EARTH_LDLIBS = -Llibrary/libc -Wl,--start-group -lc -lgcc -lm -Wl,--end-group
+CLOCK = -D CPU_CLOCK_RATE=65000000
+COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) $(CLOCK)
+
+APPS_LD = -Tapps/app.lds -lc -lgcc
+GRASS_LD = -Tgrass/grass.lds -lc -lgcc
+EARTH_LD = -Tearth/earth.lds -lc -lgcc
+
+TOOLS = tools
+DEBUG = build/debug
+RELEASE = build/release
+OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
