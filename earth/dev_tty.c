@@ -5,8 +5,8 @@
 
 /* Author: Yunhao Zhang
  * Description: a simple tty device driver
- * uart_getc and uart_putc are implemented in bus_uart.c
- * printf is implemented in the Sifive Metal library
+ * uart_getc() and uart_putc() are implemented in bus_uart.c
+ * printf() is implemented in the C library, see library/libc/print.c
  */
 
 #include <stdio.h>
