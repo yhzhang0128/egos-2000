@@ -48,7 +48,25 @@ mkdir -p build/debug build/release
 ```
 
 This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `tools` directory.
-Use softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
+To program `disk.img` to the microSD card:
+
+```shell
+# Find your microSD card in /dev
+> sudo fdisk -l
+......
+Disk /dev/sdb: 117.8 GiB, 126437294080 bytes, 246947840 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+...
+# Say it is /dev/sdb
+> sudo dd if=$EGOS/egos-2000/tools/disk.img of=/dev/sdb
+8192+0 records in
+8192+0 records out
+4194304 bytes (4.2 MB, 4.0 MiB) copied, 0.377515 s, 11.1 MB/s
+```
+
+You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program your microSD card.
 
 ## Step3: Program the Arty FPGA board
 
