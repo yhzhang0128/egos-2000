@@ -5,7 +5,6 @@
 
 /* Author: Yunhao Zhang
  * Description: process scheduling and communication
- * system calls are basically inter-process communication
  */
 
 

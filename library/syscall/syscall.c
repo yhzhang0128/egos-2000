@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: the grass kernel system calls
+ * Description: the system call interface to user applications
  */
 
 #include "egos.h"
@@ -15,8 +15,8 @@
 static struct syscall *sc = (struct syscall*)SYSCALL_ARG;
 
 static void sys_invoke() {
-    /* The standard way of doing syscall is to use the `ecall`
-     * instruction; Here uses software interrupt for simplicity */
+    /* The standard way of system call is using the `ecall` instruction; 
+     * Here uses software interrupt for simplicity. */
     *((int*)RISCV_CLINT0_MSIP_BASE) = 1;
     while (sc->type != SYS_UNUSED);
 }

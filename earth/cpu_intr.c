@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: abstractions of the CPU interrupt/exception interface
+ * Description: abstractions of CPU interrupt and exception handling
  */
 
 #include "egos.h"

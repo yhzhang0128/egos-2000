@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: read and write blocks of an SD card
+ * Description: Read and write data blocks of an SD card.
  */
 
 #include "sd.h"

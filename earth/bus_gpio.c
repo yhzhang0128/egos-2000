@@ -3,8 +3,7 @@
  * All rights reserved.
  */
 
-/* 
- * definitions for controlling GPIO0 in FE310
+/* definitions for controlling GPIO0 in FE310
  * see chapter17 of the SiFive FE310-G002 Manual
  */
 

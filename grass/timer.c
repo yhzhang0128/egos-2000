@@ -4,9 +4,9 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: read mtime register and write mtimecmp register;
- * see section 3.1.15 of the RISC-V manual, volume2, v1.10
- * and section 9.1, 9.3 of the Sifive FE310 manual, v19p04
+ * Description: Initialize and reset the timer;
+ * See section 3.1.15 of the RISC-V manual, volume2, v1.10
+ * and section 9.1, 9.3 of the Sifive FE310 manual, v19p04.
  */
 
 #include "egos.h"

@@ -4,7 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: directory layer of the file system
+ * Description: directory server,
+ * handling requests to the directory layer of the file system
  */
 
 #include "app.h"

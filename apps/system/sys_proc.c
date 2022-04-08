@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: spawn and kill processes
+ * Description: process server spawning and killing other processes
  */
 
 #include "elf.h"

@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: block_store interface for the physical disk
+ * Description: the block_store for accessing the physical disk
  */
 
 #include "egos.h"

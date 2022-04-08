@@ -10,7 +10,10 @@
 #include "egos.h"
 #include <unistd.h>
 
-/* printf() constructs a string based on its arguments and call _write() */
+/* printf() constructs a string based on its arguments 
+ * and then print this string to tty by calling _write() 
+ */
+
 int _write(int file, char *ptr, int len) {
     if (file != STDOUT_FILENO) return -1;
     return earth->tty_write(ptr, len);

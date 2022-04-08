@@ -5,7 +5,7 @@
 
 /* Author: Yunhao Zhang
  * Description: boot loader
- * i.e., the first instructions executed by the processor when boot up
+ * i.e., the first instructions executed by the CPU when boot up
  */
     .section .text.enter
     .global _enter

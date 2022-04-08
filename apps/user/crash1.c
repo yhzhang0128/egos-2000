@@ -6,7 +6,7 @@
 /* Author: Yunhao Zhang
  * Description: a program causing a memory exception;
  * Students are asked to modify the grass kernel so that this 
- * program crashes gracefully without crashing the grass kernel
+ * program terminates gracefully without crashing the grass kernel
  */
 
 #include "app.h"

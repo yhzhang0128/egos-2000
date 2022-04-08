@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: user friendly interfaces of kernel processes
+ * Description: user friendly interfaces of the servers
  */
 
 #include "egos.h"

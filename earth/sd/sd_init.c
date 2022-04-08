@@ -4,8 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: reset and initialize the microSD card; 
- * This library has only been tested with SDHC cards.
+ * Description: Reset and initialize the microSD card; 
+ * This library has only been tested with SDHC and SDXC cards.
  */
 
 #include "sd.h"

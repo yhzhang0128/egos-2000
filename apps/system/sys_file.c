@@ -4,7 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: inode layer of the file system
+ * Description: file server, 
+ * handling requests to the inode layer of the file system
  */
 
 #include "app.h"

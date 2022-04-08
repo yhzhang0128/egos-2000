@@ -19,8 +19,7 @@ char sd_exec_acmd(char*);
 char recv_data_byte();
 char send_data_byte(char);
 
-/* 
- * definitions for controlling SPI1 in FE310
+/* definitions for controlling SPI1 in FE310
  * see chapter19 of the SiFive FE310-G002 Manual
  */
 

@@ -4,8 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: initialize the process control block
- * and spawn the first kernel process, GPID_PROCESS
+ * Description: Initialize the timer and the process control block; 
+ * Spawn the first kernel process, GPID_PROCESS.
  */
 
 #include "egos.h"

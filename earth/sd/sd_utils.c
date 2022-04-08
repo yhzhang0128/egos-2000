@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: util functions for sending/receiving bytes to the SD card
+ * Description: helper functions for communicating with the SD card
  */
 
 #include "sd.h"

@@ -4,8 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: load an ELF file into memory
- * Only using the program header instead of the multiple section headers
+ * Description: Load an ELF-format executable file into memory;
+ * Only using the program header instead of the multiple section headers.
  */
 
 #include "egos.h"
