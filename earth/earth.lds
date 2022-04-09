@@ -18,8 +18,6 @@ PHDRS
 
 SECTIONS
 {
-    __heap_size = 0x1000;
-
     /* ROM Sections */
     .init : {
         *(.text.enter)

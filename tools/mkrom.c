@@ -19,9 +19,12 @@
 #include <assert.h>
 #include <sys/stat.h>
 
-char mem_fe310[4 * 1024 * 1024];
-char mem_earth[4 * 1024 * 1024];
-char mem_disk [6 * 1024 * 1024];
+#define SIZE_1MB  1 * 1024 * 1024
+#define SIZE_4MB  4 * 1024 * 1024
+
+char mem_fe310[SIZE_4MB];
+char mem_earth[SIZE_4MB];
+char mem_disk [SIZE_4MB];
 int fe310_size, earth_size, disk_size;
 
 void write_binary();
@@ -33,9 +36,9 @@ int main() {
     earth_size = load_file("earth.bin", "Earth binary", mem_earth);
     disk_size = load_file("disk.img", "Disk  image ", mem_disk);
 
-    assert(fe310_size <= 4 * 1024 * 1024);
-    assert(earth_size <= 4 * 1024 * 1024);
-    assert(disk_size  <= 6 * 1024 * 1024);
+    assert(fe310_size <= SIZE_4MB);
+    assert(earth_size <= SIZE_4MB);
+    assert(disk_size  == SIZE_4MB);
 
     write_binary();
     write_intel_mcs();
@@ -45,9 +48,9 @@ int main() {
 void write_binary() {
     freopen("bootROM.bin", "w", stdout);
 
-    for (int i = 0; i < 4 * 1024 * 1024; i++) putchar(mem_fe310[i]);
-    for (int i = 0; i < 4 * 1024 * 1024; i++) putchar(mem_earth[i]);
-    for (int i = 0; i < 6 * 1024 * 1024; i++) putchar(mem_disk[i]);
+    for (int i = 0; i < SIZE_4MB; i++) putchar(mem_fe310[i]);
+    for (int i = 0; i < SIZE_4MB; i++) putchar(mem_earth[i]);
+    for (int i = 0; i < SIZE_4MB; i++) putchar(mem_disk[i]);
 
     fclose(stdout);
     fprintf(stderr, "[INFO] Finish making the bootROM binary\n");
@@ -60,10 +63,9 @@ void write_intel_mcs() {
     write_mcs_section(mem_fe310, 0x00, fe310_size);
     write_mcs_section(mem_earth, 0x40, earth_size);
 
-    int paging_size = 1024 * 1024;
-    write_mcs_section(mem_disk + paging_size,
-                      0x80 + 0x10,
-                      disk_size - paging_size);
+    int paging = SIZE_1MB;
+    write_mcs_section(mem_disk + paging,
+                      0x80 + (paging >> 16), disk_size - paging);
     printf(":00000001FF\n");
     
     fclose(stdout);
@@ -72,8 +74,7 @@ void write_intel_mcs() {
 
 void write_mcs_section(char* mem, int base, int size) {
     /* using a dummy checksum */
-    int ngroups = (size >> 16) + 1;
-    for (int i = 0; i < ngroups; i++) {
+    for (int i = 0; i < (size >> 16) + 1; i++) {
         printf(":02000004%.4X%.2X\n", i + base, 0xFF);
         for (int j = 0; j < 0x10000; j += 16) {
             printf(":10%.4X00", j);
