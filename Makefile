@@ -1,9 +1,9 @@
 all: apps
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
-	$(CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
+	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/grass.elf > $(DEBUG)/grass.lst
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
-	$(CC) $(COMMON) $(EARTH_SRCS) $(EARTH_LD) -o $(RELEASE)/earth.elf
+	$(RISCV_CC) $(COMMON) $(EARTH_SRCS) $(EARTH_LD) -o $(RELEASE)/earth.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/earth.elf > $(DEBUG)/earth.lst
 
 .PHONY: apps
@@ -13,7 +13,7 @@ apps: apps/system/*.c apps/user/*.c
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
 	  echo "Compile" $${FILE} "=>" $(RELEASE)/$${APP}.elf;\
-	  $(CC) $(COMMON) $(APPS_SRCS) $${FILE} $(APPS_LD) -Iapps -o $(RELEASE)/$${APP}.elf || exit 1 ;\
+	  $(RISCV_CC) $(COMMON) $(APPS_SRCS) $${FILE} $(APPS_LD) -Iapps -o $(RELEASE)/$${APP}.elf || exit 1 ;\
 	  echo "Compile" $${FILE} "=>" $(DEBUG)/$${APP}.lst;\
 	  $(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/$${APP}.elf > $(DEBUG)/$${APP}.lst;\
 	done
@@ -33,7 +33,7 @@ clean:
 	rm -rf $(TOOLS)/mkfs $(TOOLS)/mkrom
 	rm -rf $(TOOLS)/disk.img $(TOOLS)/bootROM.bin $(TOOLS)/bootROM.mcs
 
-CC = riscv64-unknown-elf-gcc
+RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
