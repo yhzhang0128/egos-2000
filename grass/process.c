@@ -23,7 +23,8 @@ void proc_init() {
 
 static void proc_set_status(int pid, int status) {
     for (int i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == pid) proc_set[i].status = status;
+        if (proc_set[i].pid == pid)
+            proc_set[i].status = status;
 }
 
 int proc_alloc() {
@@ -35,7 +36,7 @@ int proc_alloc() {
             return proc_nprocs;
         }
 
-    FATAL("Reach the limit of %d concurrent processes", MAX_NPROCESS);
+    FATAL("proc_alloc: reach the limit of %d processes", MAX_NPROCESS);
 }
 
 void proc_free(int pid) {

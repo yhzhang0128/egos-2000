@@ -88,7 +88,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     } else if (pheader->p_vaddr == APPS_ENTRY) {
         load_app(pid, reader, argc, argv, pheader);
     } else {
-        FATAL("ELF gives invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
+        FATAL("elf_load: ELF gives invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
     }
 }
 

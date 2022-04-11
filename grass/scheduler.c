@@ -47,7 +47,7 @@ void intr_entry(int id) {
         kernel_entry = proc_syscall;
         break;
     default:
-        FATAL("Got unknown interrupt #%d", id);
+        FATAL("intr_entry: got unknown interrupt #%d", id);
     }
 
     /* Switch to the grass kernel stack */
@@ -117,47 +117,41 @@ static void proc_syscall() {
         proc_send(sc);
         break;
     default:
-        FATAL("proc_sched: got unknown syscall type=%d", type);
+        FATAL("proc_syscall: got unknown syscall type=%d", type);
     }
 }
 
 static void proc_send(struct syscall *sc) {
     sc->msg.sender = curr_pid;
-    int receiver_idx = -1;
     int receiver = sc->msg.receiver;
 
     for (int i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == receiver) receiver_idx = i;
+        if (proc_set[i].pid == receiver) {
+            /* Find the receiver */
+            if (proc_set[i].status != PROC_WAIT_TO_RECV) {
+                curr_status = PROC_WAIT_TO_SEND;
+                proc_set[proc_curr_idx].receiver_pid = receiver;
+            } else {
+                /* Copy message from sender to kernel stack */
+                struct sys_msg tmp;
+                memcpy(&tmp, &sc->msg, sizeof(tmp));
 
-    if (receiver_idx == -1) {
-        sc->retval = -1;
-        return;
-    }
+                /* Copy message from kernel stack to receiver */
+                earth->mmu_switch(receiver);
+                memcpy(&sc->msg, &tmp, sizeof(tmp));
+                earth->mmu_switch(curr_pid);
 
-    if (proc_set[receiver_idx].status != PROC_WAIT_TO_RECV) {
-        proc_set[proc_curr_idx].status = PROC_WAIT_TO_SEND;
-        proc_set[proc_curr_idx].receiver_pid = receiver;
-    } else {
-        /* Copy message from sender to kernel stack */
-        struct sys_msg tmp;
-        memcpy(&tmp, &sc->msg, sizeof(tmp));
+                /* Set receiver process as runnable */
+                proc_set_runnable(receiver);
+            }
+            proc_yield();
+            return;
+        }
 
-        /* Copy message from kernel stack to receiver */
-        earth->mmu_switch(receiver);
-        memcpy(&sc->msg, &tmp, sizeof(tmp));
-        earth->mmu_switch(curr_pid);
-
-        /* Set receiver process as runnable */
-        proc_set_runnable(receiver);
-    }
-
-    proc_yield();
+    sc->retval = -1;
 }
 
 static void proc_recv(struct syscall *sc) {
-    sc->msg.sender = 0;
-    sc->msg.receiver = curr_pid;
-
     int sender = -1;
     for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_WAIT_TO_SEND &&

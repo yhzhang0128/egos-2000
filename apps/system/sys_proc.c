@@ -56,6 +56,9 @@ int main() {
                 grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
             else
                 INFO("background process %d terminated", sender);
+            break;
+        default:
+            FATAL("sys_proc: request%d not implemented", req->type);
         }
     }
 }

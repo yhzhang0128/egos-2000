@@ -51,7 +51,7 @@ int main() {
         case DIR_INSERT:
         case DIR_REMOVE:
         default:
-            FATAL("proc_dir: request%d not implemented", req->type);
+            FATAL("sys_dir: request%d not implemented", req->type);
         }
     }
 }

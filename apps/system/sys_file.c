@@ -39,7 +39,7 @@ int main() {
             break;
         case FILE_WRITE:
         default:
-            FATAL("proc_file: request%d not implemented", req->type);
+            FATAL("sys_file: request%d not implemented", req->type);
         }
     }
 }
