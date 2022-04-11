@@ -1,4 +1,4 @@
-# A Minimal Operating System on a Real RISC-V Board
+# A Minimal Operating System on a Cheap RISC-V Board
 
 With only **2K** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
 
