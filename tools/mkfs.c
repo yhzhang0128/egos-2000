@@ -109,8 +109,8 @@ void mkfs() {
             strncpy(buf, contents[ino], BLOCK_SIZE);
             treedisk->write(treedisk, ino, 0, (void*)buf);
         } else {
-            char* file_name = &contents[ino][1];
             struct stat st;
+            char* file_name = &contents[ino][1];
             stat(file_name, &st);
             
             freopen(file_name, "r", stdin);
@@ -126,20 +126,16 @@ void mkfs() {
 }
 
 
-int getsize(block_if this_bs, unsigned int ino){
-    return FS_DISK_SIZE / BLOCK_SIZE;
-}
+int getsize() { return FS_DISK_SIZE / BLOCK_SIZE; }
 
-int setsize(block_if this_bs, unsigned int ino, block_no newsize) {
-    assert(0);
-}
+int setsize() { assert(0); }
 
-int ramread(block_if this_bs, unsigned int ino, block_no offset, block_t *block) {
+int ramread(block_if bs, unsigned int ino, block_no offset, block_t *block) {
     memcpy(block, fs + offset * BLOCK_SIZE, BLOCK_SIZE);
     return 0;
 }
 
-int ramwrite(block_if this_bs, unsigned int ino, block_no offset, block_t *block) {
+int ramwrite(block_if bs, unsigned int ino, block_no offset, block_t *block) {
     memcpy(fs + offset * BLOCK_SIZE, block, BLOCK_SIZE);
     return 0;
 }
@@ -147,10 +143,10 @@ int ramwrite(block_if this_bs, unsigned int ino, block_no offset, block_t *block
 block_if ramdisk_init() {
     block_store_t *ramdisk = malloc(sizeof(*ramdisk));
 
-    ramdisk->read = ramread;
-    ramdisk->write = ramwrite;
-    ramdisk->getsize = getsize;
-    ramdisk->setsize = setsize;
+    ramdisk->read = (void*)ramread;
+    ramdisk->write = (void*)ramwrite;
+    ramdisk->getsize = (void*)getsize;
+    ramdisk->setsize = (void*)setsize;
 
     return ramdisk;
 }
