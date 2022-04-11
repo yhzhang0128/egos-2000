@@ -49,6 +49,6 @@ SUM:                            48            544            587           2000
 ## Usages and documentation
 
 For compiling and running egos-2000, please read [USAGES.md](USAGES.md). 
-The [documentation](../../../documentation) further introduces the teaching plans, architecture and development history of egos-2000.
+The [documentation](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
