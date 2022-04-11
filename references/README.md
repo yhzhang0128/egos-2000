@@ -1,4 +1,4 @@
-This document contains the teaching plan, architecture and development history of egos-2000.
+This document describes the teaching plan, architecture and development history of egos-2000.
 
 ## Teaching plan (EGOS + EGOS2000)
 
