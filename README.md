@@ -1,7 +1,7 @@
 # A minimal operating system on a cheap RISC-V board
 
 With only **2K** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
-egos-2000 runs on a **$129** development board:
+It runs on a **$129** small development board.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
 
@@ -23,7 +23,7 @@ SUM:                            48            544            587           2000 
 
 ## Earth and Grass Operating System 2000 (EGOS-2000)
 
-EGOS-2000 and [EGOS]() are the two teaching operating systems used at Cornell. They follow the same architecture:
+EGOS-2000 and [EGOS]() are the two teaching operating systems used at Cornell. They have the same architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
@@ -46,7 +46,7 @@ EGOS-2000 and [EGOS]() are the two teaching operating systems used at Cornell. T
 
 ## Usages and Documentation
 
-For compiling and running egos-2000, please read [this document](references/USAGES.md). 
+For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md). 
 [This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
 
 The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged registers used by egos-2000.
