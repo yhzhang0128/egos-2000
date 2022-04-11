@@ -30,6 +30,7 @@ And some optional projects:
 
 **Grass layer (hardware independent)**
 * `grass/timer`: control timer registers
+* `grass/syscall`: system call interfaces to user applications
 * `grass/process`: manage process data structures (touched by P1)
 * `grass/scheduler`: preemptive scheduling and inter-process communication (touched by P2)
 
