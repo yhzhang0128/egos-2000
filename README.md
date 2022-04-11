@@ -48,7 +48,7 @@ SUM:                            48            544            587           2000
 
 ## Usages and documentation
 
-For compiling and running egos-2000, please read [references/USAGES.md](USAGES.md). 
+For compiling and running egos-2000, please read [this document](references/USAGES.md). 
 [This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
 
 The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged instructions used by egos-2000.
