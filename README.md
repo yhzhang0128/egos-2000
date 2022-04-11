@@ -25,7 +25,7 @@ SUM:                            48            544            587           2000
 -------------------------------------------------------------------------------
 ```
 
-## EGOS: Earth and Grass Operating System
+## Earth and Grass Operating System (EGOS)
 
 EGOS is our teaching operating system at Cornell. It has three layers: 
 
