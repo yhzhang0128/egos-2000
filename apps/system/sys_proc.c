@@ -33,20 +33,23 @@ int main() {
     sys_spawn(SYS_SHELL_EXEC_START);
     
     while (1) {
-        grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
-
         struct proc_request *req = (void*)buf;
         struct proc_reply *reply = (void*)buf;
-        if (req->type == PROC_KILLALL){
+        grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+
+        switch (req->type) {
+        case PROC_KILLALL:
             grass->proc_free(-1);
-        } else if (req->type == PROC_SPAWN) {
+            break;
+        case PROC_SPAWN:
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
 
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
             if (!shell_waiting && app_pid > 0)
                 INFO("process %d running in the background", app_pid);
             grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
-        } else if (req->type == PROC_EXIT) {
+            break;
+        case PROC_EXIT:
             grass->proc_free(sender);
 
             if (shell_waiting && app_pid == sender)
