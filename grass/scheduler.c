@@ -9,7 +9,7 @@
 
 
 #include "egos.h"
-#include "grass.h"
+#include "process.h"
 #include "syscall.h"
 #include <string.h>
 
@@ -122,9 +122,9 @@ static void proc_syscall() {
 }
 
 static void proc_send(struct syscall *sc) {
-    sc->payload.msg.sender = curr_pid;
+    sc->msg.sender = curr_pid;
     int receiver_idx = -1;
-    int receiver = sc->payload.msg.receiver;
+    int receiver = sc->msg.receiver;
 
     for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == receiver) receiver_idx = i;
@@ -140,12 +140,12 @@ static void proc_send(struct syscall *sc) {
     } else {
         /* Copy message from sender to kernel stack */
         struct sys_msg tmp;
-        memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
+        memcpy(&tmp, &sc->msg, SYSCALL_MSG_LEN);
 
         /* Copy message from kernel stack to receiver */
         earth->mmu_switch(receiver);
-        sc->payload.msg.sender = curr_pid;
-        memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
+        sc->msg.sender = curr_pid;
+        memcpy(&sc->msg, &tmp, SYSCALL_MSG_LEN);
         proc_set_runnable(receiver);
 
         /* Switch back to sender address space */
@@ -156,8 +156,8 @@ static void proc_send(struct syscall *sc) {
 }
 
 static void proc_recv(struct syscall *sc) {
-    sc->payload.msg.sender = 0;
-    sc->payload.msg.receiver = curr_pid;
+    sc->msg.sender = 0;
+    sc->msg.receiver = curr_pid;
 
     int sender = -1;
     for (int i = 0; i < MAX_NPROCESS; i++)
@@ -171,14 +171,14 @@ static void proc_recv(struct syscall *sc) {
         /* Copy message from sender to kernel stack */
         struct sys_msg tmp;
         earth->mmu_switch(sender);
-        memcpy(&tmp, &sc->payload.msg, SYSCALL_MSG_LEN);
-        sc->payload.msg.receiver = curr_pid;
+        memcpy(&tmp, &sc->msg, SYSCALL_MSG_LEN);
+        sc->msg.receiver = curr_pid;
         proc_set_runnable(sender);
 
         /* Copy message from kernel stack to receiver */
         earth->mmu_switch(curr_pid);
-        memcpy(&sc->payload.msg, &tmp, SYSCALL_MSG_LEN);
-        sc->payload.msg.sender = sender;
+        memcpy(&sc->msg, &tmp, SYSCALL_MSG_LEN);
+        sc->msg.sender = sender;
     }
 
     proc_yield();

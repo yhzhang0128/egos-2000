@@ -33,20 +33,20 @@ int main() {
     /* Send notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
     strcpy(buf, "Finish GPID_DIR initialization");
-    sys_send(GPID_PROCESS, buf, 31);
+    grass->sys_send(GPID_PROCESS, buf, 31);
 
     /* Wait for dir requests */
     while (1) {
         int sender;
         struct dir_request *req = (void*)buf;
         struct dir_reply *reply = (void*)buf;
-        sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+        grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
 
         switch (req->type) {
         case DIR_LOOKUP:
             reply->ino = dir_do_lookup(req->ino, req->name);
             reply->status = reply->ino == -1? DIR_ERROR : DIR_OK;
-            sys_send(sender, (void*)reply, sizeof(*reply));
+            grass->sys_send(sender, (void*)reply, sizeof(*reply));
             break;
         case DIR_INSERT:
         case DIR_REMOVE:

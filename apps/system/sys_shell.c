@@ -50,19 +50,19 @@ int main() {
             printf("\e[1;1H\e[2J");
         } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
-            sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+            grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
         } else {
             int sender;
             req.type = PROC_SPAWN;
             parse_request(buf, &req);
-            sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
-            sys_recv(&sender, (void*)&reply, sizeof(reply));
+            grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+            grass->sys_recv(&sender, (void*)&reply, sizeof(reply));
 
             if (reply.type != CMD_OK)
                 INFO("sys_shell: command causes an error");
             else if (req.argv[req.argc - 1][0] != '&')
                 /* Wait for foreground process */
-                sys_recv(&sender, (void*)&reply, sizeof(reply));            
+                grass->sys_recv(&sender, (void*)&reply, sizeof(reply));
         }
     }
 }

@@ -22,20 +22,20 @@ int main() {
     /* Send notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
     strcpy(buf, "Finish GPID_FILE initialization");
-    sys_send(GPID_PROCESS, buf, 32);
+    grass->sys_send(GPID_PROCESS, buf, 32);
 
     /* Wait for file requests */
     while (1) {
         int sender, r;
         struct file_request *req = (void*)buf;
         struct file_reply *reply = (void*)buf;
-        sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+        grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
 
         switch (req->type) {
         case FILE_READ:
             r = fs->read(fs, req->ino, req->offset, (void*)&reply->block);
             reply->status = r == 0 ? FILE_OK : FILE_ERROR;
-            sys_send(sender, (void*)reply, sizeof(*reply));
+            grass->sys_send(sender, (void*)reply, sizeof(*reply));
             break;
         case FILE_WRITE:
         default:

@@ -9,8 +9,8 @@
 	.section .text
     .global _enter, ctx_start, ctx_switch
 _enter:
-        li sp,0x80003f80
-        call main
+    li sp,0x80003f80
+    call main
 
 ctx_start:
 	addi sp,sp,-64

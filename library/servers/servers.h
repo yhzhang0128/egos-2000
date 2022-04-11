@@ -2,6 +2,10 @@
 
 #include "block_store.h"
 
+void exit(int status);
+int dir_lookup(int dir_ino, char* name);
+int file_read(int file_ino, int offset, char* block);
+
 enum grass_servers {
     GPID_UNUSED,
     GPID_PROCESS,
@@ -66,6 +70,3 @@ struct dir_reply {
     enum dir_status { DIR_OK, DIR_ERROR } status;
     int ino;
 };
-
-int dir_lookup(int dir_ino, char* name);
-int file_read(int file_ino, int offset, char* block);

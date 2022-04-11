@@ -23,17 +23,17 @@ int main() {
     char buf[SYSCALL_MSG_LEN];
 
     sys_spawn(SYS_FILE_EXEC_START);
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(SYS_DIR_EXEC_START);
-    sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(SYS_SHELL_EXEC_START);
     
     while (1) {
-        sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+        grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
 
         struct proc_request *req = (void*)buf;
         struct proc_reply *reply = (void*)buf;
@@ -45,12 +45,12 @@ int main() {
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
             if (!shell_waiting && app_pid > 0)
                 INFO("process %d running in the background", app_pid);
-            sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
+            grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
         } else if (req->type == PROC_EXIT) {
             grass->proc_free(sender);
 
             if (shell_waiting && app_pid == sender)
-                sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
+                grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
             else
                 INFO("background process %d terminated", sender);
         }

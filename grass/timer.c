@@ -10,7 +10,6 @@
  */
 
 #include "egos.h"
-#include "grass.h"
 
 #define QUANTUM_NCYCLES  5000
 #define CLINT0_MTIME     0x200bff8

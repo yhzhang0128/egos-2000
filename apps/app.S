@@ -11,4 +11,4 @@
 _enter:
         li sp,0x80002000
         call main
-        call sys_exit
+        call exit

@@ -9,7 +9,6 @@
 
 #include "egos.h"
 #include "syscall.h"
-
 #include <string.h>
 
 static struct syscall *sc = (struct syscall*)SYSCALL_ARG;
@@ -25,8 +24,8 @@ int sys_send(int receiver, char* msg, int size) {
     if (size > SYSCALL_MSG_LEN) return -1;
 
     sc->type = SYS_SEND;
-    sc->payload.msg.receiver = receiver;
-    memcpy(sc->payload.msg.msg, msg, size);
+    sc->msg.receiver = receiver;
+    memcpy(&sc->msg, msg, size);
     sys_invoke();
     return sc->retval;    
 }
@@ -36,8 +35,8 @@ int sys_recv(int* sender, char* buf, int size) {
 
     sc->type = SYS_RECV;
     sys_invoke();
-    memcpy(buf, sc->payload.msg.msg, size);
-    *sender = sc->payload.msg.sender;
+    memcpy(buf, &sc->msg, size);
+    *sender = sc->msg.sender;
     return sc->retval;
 }
 
@@ -45,5 +44,4 @@ void sys_exit(int status) {
     struct proc_request req;
     req.type = PROC_EXIT;
     sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
-    while(1);
 }

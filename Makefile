@@ -46,10 +46,9 @@ CFLAGS += -ffunction-sections -fdata-sections
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 
 INCLUDE = -Ilibrary
-INCLUDE += -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/syscall
+INCLUDE += -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers
 
-CLOCK = -D CPU_CLOCK_RATE=65000000
-COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) $(CLOCK)
+COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
 
 APPS_LD = -Tapps/app.lds -lc -lgcc
 GRASS_LD = -Tgrass/grass.lds -lc -lgcc

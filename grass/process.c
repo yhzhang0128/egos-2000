@@ -8,7 +8,8 @@
  */
 
 #include "egos.h"
-#include "grass.h"
+#include "process.h"
+#include "syscall.h"
 #include <string.h>
 
 void intr_entry(int id);
