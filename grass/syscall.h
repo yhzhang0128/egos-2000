@@ -16,7 +16,7 @@ struct sys_msg {
 };
 
 struct syscall {
-	enum syscall_type type;
+    enum syscall_type type;
     struct sys_msg msg;
     int retval;
 };

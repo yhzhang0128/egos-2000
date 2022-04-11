@@ -25,7 +25,7 @@ int sys_send(int receiver, char* msg, int size) {
 
     sc->type = SYS_SEND;
     sc->msg.receiver = receiver;
-    memcpy(&sc->msg.content, msg, size);
+    memcpy(sc->msg.content, msg, size);
     sys_invoke();
     return sc->retval;    
 }
@@ -35,7 +35,7 @@ int sys_recv(int* sender, char* buf, int size) {
 
     sc->type = SYS_RECV;
     sys_invoke();
-    memcpy(buf, &sc->msg.content, size);
+    memcpy(buf, sc->msg.content, size);
     *sender = sc->msg.sender;
     return sc->retval;
 }
