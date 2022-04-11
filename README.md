@@ -16,7 +16,7 @@ The earth and grass operating system (EGOS) is our teaching OS at Cornell. It ha
 This RISC-V version of EGOS is minimal in order to help students understand the complete picture of an OS.
 
 ```shell
-# Count lines of code excluding README.md and USAGES.md
+# Count lines of code excluding references and README.md
 > cloc egos-2000 --exclude-ext=md  
       54 text files.
       54 unique files.
@@ -48,7 +48,7 @@ SUM:                            48            544            587           2000
 
 ## Usages and documentation
 
-For compiling and running egos-2000, please read [USAGES.md](USAGES.md). 
+For compiling and running egos-2000, please read [references/USAGES.md](USAGES.md). 
 [This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
 
 The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged instructions used by egos-2000.
