@@ -3,18 +3,6 @@
 With only **2K** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
-
-The earth and grass operating system (EGOS) is our teaching OS at Cornell. It has three layers: 
-
-* The **earth layer** implements hardware-specific abstractions.
-    * tty and disk device interfaces
-    * cpu interrupt and memory management interfaces
-* The **grass layer** implements hardware-independent abstractions.
-    * processes, system calls and inter-process communication
-* The **application layer** implements file system, shell and user commands.
-
-This RISC-V version of EGOS is minimal in order to help students understand the complete picture of an OS.
-
 ```shell
 # Count lines of code excluding references and README.md
 > cloc egos-2000 --exclude-ext=md  
@@ -34,6 +22,17 @@ make                             1             11              0             55
 SUM:                            48            544            587           2000
 -------------------------------------------------------------------------------
 ```
+
+
+The earth and grass operating system (EGOS) is our teaching OS at Cornell. It has three layers: 
+
+* The **earth layer** implements hardware-specific abstractions.
+    * tty and disk device interfaces
+    * cpu interrupt and memory management interfaces
+* The **grass layer** implements hardware-independent abstractions.
+    * processes, system calls and inter-process communication
+* The **application layer** implements file system, shell and user commands.
+
 
 ## Hardware requirements
 * an Artix-7 35T [Arty FPGA development board](https://www.xilinx.com/products/boards-and-kits/arty.html)
