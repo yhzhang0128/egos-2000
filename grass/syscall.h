@@ -12,7 +12,7 @@ enum syscall_type {
 struct sys_msg {
     int sender;
     int receiver;
-    char msg[SYSCALL_MSG_LEN];
+    char content[SYSCALL_MSG_LEN];
 };
 
 struct syscall {
