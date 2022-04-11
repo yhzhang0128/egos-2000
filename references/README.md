@@ -43,28 +43,28 @@ Every layer has a dedicated memory region as described below (and in `library/eg
 
 **Selected RAM regions**
 
-| Base        | Top         | Attributes | Description       | Notes                                                                                      |
-|-------------|-------------|------------|-------------------|--------------------------------------------------------------------------------------------|
-| 0x0800_0000 | 0x0800_2FFF | RWX A      | ITIM, 12KB        | Earth layer bss, data and heap                                                             |
-| 0x0800_3000 | 0x0800_4FFF | RWX A      | ITIM, 8KB         | Grass layer code, bss, data and heap                                                       |
-| 0x0800_5000 | 0x0800_7FFF | RWX A      | ITIM, 12KB        | App code, bss, data and heap                                                               |
-| ......      | ......      | ......     | ......            |                                                                                            |
-| 0x2000_0000 | 0x203F_FFFF | R XC       | Flash ROM, 4MB    | FPGA binary of the FE310 RISC-V processor                                                  |
-| 0x2040_0000 | 0x207F_FFFF | R XC       | Flash ROM, 4MB    | Earth layer code and rodata                                                                |
-| 0x2080_0000 | 0x20BF_FFFF | R XC       | Flash ROM, 4MB    | Disk image, similar to the SD card, programmed by the disk.img file                        |
-| ......      | ......      | ......     | ......            |                                                                                            |
-| 0x8000_0000 | 0x8000_1FFF | RW- A      | DTIM, 8KB         | App stack                                                                                  |
-| 0x8000_2000 | 0x8000_3FFF | RW- A      | DTIM, 8KB         | Earth and grass stack                                                                      |
-| 0x8000_4000 | 0x8001_FFFF | RW- A      | DTIM, 112KB       | MMU cache of physical frames for suspended grass processes                                 |
+| Base        | Top         | Attributes | Description       | Notes                                                           |
+|-------------|-------------|------------|-------------------|-----------------------------------------------------------------|
+| 0x0800_0000 | 0x0800_2FFF | RWX A      | ITIM, 12KB        | Earth layer bss, data and heap                                  |
+| 0x0800_3000 | 0x0800_4FFF | RWX A      | ITIM, 8KB         | Grass layer code, bss, data and heap                            |
+| 0x0800_5000 | 0x0800_7FFF | RWX A      | ITIM, 12KB        | App code, bss, data and heap                                    |
+| ......      | ......      | ......     | ......            |                                                                 |
+| 0x2000_0000 | 0x203F_FFFF | R XC       | Flash ROM, 4MB    | FPGA binary of the FE310 RISC-V processor                       |
+| 0x2040_0000 | 0x207F_FFFF | R XC       | Flash ROM, 4MB    | Earth layer code and rodata                                     |
+| 0x2080_0000 | 0x20BF_FFFF | R XC       | Flash ROM, 4MB    | Disk image (disk.img produced by mkrom), similar to the SD card |
+| ......      | ......      | ......     | ......            |                                                                 |
+| 0x8000_0000 | 0x8000_1FFF | RW- A      | DTIM, 8KB         | App stack                                                       |
+| 0x8000_2000 | 0x8000_3FFF | RW- A      | DTIM, 8KB         | Earth and grass stack                                           |
+| 0x8000_4000 | 0x8001_FFFF | RW- A      | DTIM, 112KB       | MMU cache of physical frames for suspended grass processes      |
 
 The first 1MB of the microSD card is used as 256 physical frames by the MMU for paging.
 
 **Selected memory-mapped I/O regions**
 
-| Base        | Top         | Attributes | Description   | Notes                                                                                      |
-|-------------|-------------|------------|---------------|--------------------------------------------------------------------------------------------|
-| 0x1001_4000 | 0x1001_4FFF | RW A       | QSPI 0        | Control the 16MB on-board flash ROM                                                        |
-| 0x1002_4000 | 0x1002_4FFF | RW A       | SPI 1         | Control the Pmod1 (microSD card) pins                                                      |
+| Base        | Top         | Attributes | Description   | Notes                                 |
+|-------------|-------------|------------|---------------|---------------------------------------|
+| 0x1001_4000 | 0x1001_4FFF | RW A       | QSPI 0        | Control the 16MB on-board flash ROM   |
+| 0x1002_4000 | 0x1002_4FFF | RW A       | SPI 1         | Control the Pmod1 (microSD card) pins |
 
 ## Software development history
 
