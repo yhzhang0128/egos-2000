@@ -46,7 +46,7 @@ SUM:                            48            544            587           2000
 * a software to connect with ttyUSB (e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows)
 * [optional] a software to program a disk image file to the microSD card (e.g., [dd](https://linux.die.net/man/1/dd) or [balena Etcher](https://www.balena.io/etcher/)) 
 
-## Usages and documentation
+## References
 
 For compiling and running egos-2000, please read [this document](references/USAGES.md). 
 [This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
