@@ -7,12 +7,8 @@ egos-2000 runs on a **$129** development board:
 
 ```shell
 # Count lines of code excluding references and README.md
-> cloc egos-2000 --exclude-ext=md  
-      54 text files.
-      54 unique files.
-       7 files ignored.
-
-github.com/AlDanial/cloc v 1.82  T=0.03 s (1858.8 files/s, 121016.7 lines/s)
+> cloc egos-2000 --exclude-ext=md
+......
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -21,7 +17,7 @@ C/C++ Header                    11             75            102            311
 Assembly                         3              6             24             68
 make                             1             11              0             55
 -------------------------------------------------------------------------------
-SUM:                            48            544            587           <pre><b>2000</b></pre>
+SUM:                            48            544            587           2000
 -------------------------------------------------------------------------------
 ```
 
