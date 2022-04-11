@@ -44,7 +44,7 @@ EGOS-2000 and [EGOS]() are the two teaching operating systems used at Cornell. T
 * a software to connect with ttyUSB (e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows)
 * [optional] a software to program a disk image file to the microSD card (e.g., [dd](https://linux.die.net/man/1/dd) or [balena Etcher](https://www.balena.io/etcher/)) 
 
-## Usages and Documents
+## Usages and Documentation
 
 For compiling and running egos-2000, please read [this document](references/USAGES.md). 
 [This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
