@@ -49,6 +49,9 @@ SUM:                            48            544            587           2000
 ## Usages and documentation
 
 For compiling and running egos-2000, please read [USAGES.md](USAGES.md). 
-The [documentation](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
+This [document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
+
+The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged instructions used by egos-2000.
+The [SiFive FE310 manual](references/sifive-fe310-manual.pdf) introduces the processor used by egos-2000, especially the GPIO, UART and SPI bus controllers.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/) or [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/).
