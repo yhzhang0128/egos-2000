@@ -1,9 +1,5 @@
 #pragma once
 
-#define ENV_DIR_LEN        32
-#define PAGE_SIZE          4096
-#define SYSCALL_MSG_LEN    1024
-
 struct earth {
     /* CPU interface */
     int (*intr_enable)();
@@ -30,6 +26,7 @@ struct earth {
     int (*tty_critical)(const char *format, ...);
 };
 
+#define ENV_DIR_LEN        32
 struct grass {
     /* Process control interface */
     int  (*proc_alloc)();
@@ -56,6 +53,7 @@ extern struct grass *grass;
 #define CRITICAL           earth->tty_critical
 
 /* memory layout */
+#define PAGE_SIZE          4096
 #define FRAME_CACHE_END    0x80020000
 #define FRAME_CACHE_START  0x80004000  /* 112KB  frame cache          */
                                        /*        earth interface      */

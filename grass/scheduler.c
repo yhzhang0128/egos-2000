@@ -140,11 +140,11 @@ static void proc_send(struct syscall *sc) {
     } else {
         /* Copy message from sender to kernel stack */
         struct sys_msg tmp;
-        memcpy(&tmp, &sc->msg, SYSCALL_MSG_LEN);
+        memcpy(&tmp, &sc->msg, sizeof(tmp));
 
         /* Copy message from kernel stack to receiver */
         earth->mmu_switch(receiver);
-        memcpy(&sc->msg, &tmp, SYSCALL_MSG_LEN);
+        memcpy(&sc->msg, &tmp, sizeof(tmp));
         earth->mmu_switch(curr_pid);
 
         /* Set receiver process as runnable */
@@ -170,11 +170,11 @@ static void proc_recv(struct syscall *sc) {
         /* Copy message from sender to kernel stack */
         struct sys_msg tmp;
         earth->mmu_switch(sender);
-        memcpy(&tmp, &sc->msg, SYSCALL_MSG_LEN);
+        memcpy(&tmp, &sc->msg, sizeof(tmp));
 
         /* Copy message from kernel stack to receiver */
         earth->mmu_switch(curr_pid);
-        memcpy(&sc->msg, &tmp, SYSCALL_MSG_LEN);
+        memcpy(&sc->msg, &tmp, sizeof(tmp));
 
         /* Set sender process as runnable */
         proc_set_runnable(sender);

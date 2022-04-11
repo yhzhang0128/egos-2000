@@ -1,6 +1,7 @@
 #pragma once
 
 #include "block_store.h"
+#define SYSCALL_MSG_LEN    1024
 
 void exit(int status);
 int dir_lookup(int dir_ino, char* name);
