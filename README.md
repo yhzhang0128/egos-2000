@@ -1,4 +1,4 @@
-# A minimal operating system on a real RISC-V board
+# A Minimal Operating System on a Real RISC-V Board
 
 With only **2K** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
 
@@ -46,7 +46,7 @@ EGOS is our teaching operating system at Cornell. It has three layers:
 * a software to connect with ttyUSB (e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows)
 * [optional] a software to program a disk image file to the microSD card (e.g., [dd](https://linux.die.net/man/1/dd) or [balena Etcher](https://www.balena.io/etcher/)) 
 
-## Usages and documents
+## Usages and Documents
 
 For compiling and running egos-2000, please read [this document](references/USAGES.md). 
 [This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
