@@ -98,11 +98,11 @@ The first 1MB of the microSD card is used as 256 physical frames by the MMU for 
 * [2022.01] Implement `mkrom` so that creating the bootROM image no longer require Vivado or Docker
 
 **Iteration #2**
+* Yeah, I didn't work on this project in most of 2021...
 * [2021.12] Create a docker image for portable toolchain setup: [Docker Hub repo](https://hub.docker.com/repository/docker/yhzhang0128/arty-toolchain)
 * [2021.12] Reconnect the processor SPI bus controller to the Arty Pmod1 ports
 * [2021.12] Implement the SD card initialize, read_block and write_block functions
 * [2021.12] Increase the processor clock frequency from 32MHz to 65MHz so that read/write blocks becomes faster
-* Yeah, I didn't do much for this project in most of 2021...
 
 **Iteration #1**
 * [2020.12] Increase the processor memory from 32KB to 160KB (128KB + 32KB)
