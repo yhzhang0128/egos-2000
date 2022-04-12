@@ -74,7 +74,7 @@ The first 1MB of the microSD card is used as 256 physical frames by the MMU for 
 * [2022.04] Add a simple boot loader `earth/earth.S`; Remove dependency on the Freedom Metal library
 * [2022.04] Add `_write()` and `_sbrk()` in `library/libc`; Remove the Freedom Metal library entirely
 * [2022.04] Enrich `struct grass` in order to improve clarity of the architecture
-* [2022.04] Experiment with RISC-V PMP and memory exception handling
+* [2022.04] Experiment with RISC-V Physical Memory Protection (PMP) and memory exception handling
 
 **Iteration #5**
 
@@ -86,9 +86,8 @@ The first 1MB of the microSD card is used as 256 physical frames by the MMU for 
 **Iteration #4**
 * [2022.02] Read Chapter 1, 2 and 3 of RISC-V manual
 * [2022.02] Read Chapter 8, 9 and 10 of FE310 manual
-* [2022.02] Implement timer reset and preemptive scheduling
-* [2022.02] Implement inter-process communication
-* [2022.02] Implement kernel processes: GPID_PROCESS, GPID_FILE, GPID_DIR, GPID_SHELL
+* [2022.02] Implement timer reset, preemptive scheduling and inter-process communication
+* [2022.02] Implement the kernel processes: GPID_PROCESS, GPID_FILE, GPID_DIR, GPID_SHELL
 
 **Iteration #3**
 * [2022.01] Confrim that the processor clock frequency cannot be further increased
