@@ -84,8 +84,8 @@ The first 1MB of the microSD card is used as 256 physical frames by the MMU for 
 * [2022.03] Cleanup the code controlling UART and SPI; Remove dependency on the Freedom Metal library
 
 **Iteration #4**
-* [2022.02] Read Chapter 1, 2 and 3 of RISC-V manual
-* [2022.02] Read Chapter 8, 9 and 10 of FE310 manual
+* [2022.02] Read Chapter 1, 2 and 3 of [RISC-V manual](riscv-privileged-v1.10.pdf)
+* [2022.02] Read Chapter 8, 9 and 10 of [FE310 manual](sifive-fe310-v19p04.pdf)
 * [2022.02] Implement timer reset, preemptive scheduling and inter-process communication
 * [2022.02] Implement the kernel processes: GPID_PROCESS, GPID_FILE, GPID_DIR, GPID_SHELL
 
