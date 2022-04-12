@@ -2,7 +2,7 @@ This document describes the teaching plan, architecture and development history 
 
 ## Teaching plan (EGOS + EGOS2000)
 
-We use EGOS to teach our Practicum in Operating Systems (CS4411) at Cornell, a 2-credit course focusing solely on projects.
+We use EGOS to teach our Practicum in Operating Systems (CS4411) at Cornell.
 There are five mandatory projects:
 
 |    | Description                     | Concepts to teach                                           | Platform  |
@@ -40,7 +40,8 @@ And some optional projects:
 * `app/system/proc_shell`: interactive user interface
 * user commands: `pwd`, `clear`, `killall`, `ls`, `cat`, `echo`, `clock`
 
-Every layer has a dedicated memory region as described below (and in `library/egos.h`). The complete memory layout is described in Chapter 4 of the FE310 manual in this repository.
+Every layer has a dedicated memory region as described below (and in `library/egos.h`).
+The complete memory layout is described in Chapter 4 of the FE310 manual in this repository.
 
 **Selected RAM regions**
 
