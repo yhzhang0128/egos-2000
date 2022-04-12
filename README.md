@@ -54,3 +54,5 @@ The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) intro
 The [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduces the processor used by egos-2000, especially the GPIO, UART and SPI bus controllers.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
+Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/) and [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/) for supporting this project.
+This project is also supported by a [Facebook fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
