@@ -23,7 +23,7 @@ SUM:                            48            541            592           2000 
 
 ## Earth and Grass Operating System 2000 (EGOS-2000)
 
-EGOS-2000 and [EGOS]() are the two teaching operating systems used at Cornell. They have the same architecture.
+EGOS-2000 and [EGOS]() are the teaching operating systems we use at Cornell. They have the same architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
@@ -32,6 +32,7 @@ EGOS-2000 and [EGOS]() are the two teaching operating systems used at Cornell. T
     * processes, system calls and inter-process communication
 * The **application layer** implements file system, shell and user commands.
 
+The definitions of `struct earth` and `struct grass` in [egos.h](library/egos.h) specify the interfaces between different layers.
 
 ## Hardware Requirements
 * an Artix-7 35T [Arty FPGA development board](https://www.xilinx.com/products/boards-and-kits/arty.html)
