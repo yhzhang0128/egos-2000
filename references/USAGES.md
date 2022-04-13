@@ -1,8 +1,8 @@
-# Compile and Run EGOS on Arty
+# Compile and run egos-2000
 
 You can use Windows, Linux or MacOS. For Windows users, use WSL (Windows Subsystem for Linux) for step1 and step2.
 
-## Step1: Setup compiler and compile egos-2000
+## Step1: Setup the compiler and compile egos-2000
 
 Setup your working directory and name it as `$EGOS`.
 
@@ -59,16 +59,16 @@ Units: sectors of 1 * 512 = 512 bytes
 Sector size (logical/physical): 512 bytes / 512 bytes
 I/O size (minimum/optimal): 512 bytes / 512 bytes
 ...
-# Say it is /dev/sdb
+# Say it is /dev/sdb as shown above
 > sudo dd if=$EGOS/egos-2000/tools/disk.img of=/dev/sdb
 8192+0 records in
 8192+0 records out
 4194304 bytes (4.2 MB, 4.0 MiB) copied, 0.377515 s, 11.1 MB/s
 ```
 
-You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program your microSD card.
+You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
 
-## Step3: Program the Arty FPGA board
+## Step3: Program the Arty board
 
 ### Windows and Linux
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html) or [here](https://drive.google.com/file/d/1VS6_mxb6yrAxdDtlXkHdB-8jg9CScacw/view?usp=sharing). You may need to register a Xilinx account, but the software is free.

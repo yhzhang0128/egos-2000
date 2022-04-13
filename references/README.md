@@ -1,24 +1,24 @@
 This document describes the teaching plan, architecture and development history of egos-2000.
 
-## Teaching plan (EGOS + EGOS2000)
+## Teaching plan (egos + egos-2000)
 
-We use EGOS to teach our Practicum in Operating Systems (CS4411) at Cornell.
+We use **egos** and **egos-2000** to teach our Practicum in Operating Systems (CS4411) at Cornell.
 There are five mandatory projects:
 
-|    | Description                     | Concepts to teach                                           | Platform  |
-|----|---------------------------------|-------------------------------------------------------------|-----------|
-| P0 | Queue                           | memory, pointer, instruction and stack pointers             | Linux/Mac |
-| P1 | User-level threading            | thread, context switch, synchronization                     | Linux/Mac |
-| P2 | Multi-level feedback queue      | timer and quantum, scheduling, priority                     | Linux/Mac |
-| P3 | Memory management               | control register, exception handling, privilege level       | Arty FPGA |
-| P5 | File system                     | inode layer, directory layer, layered file system           | Arty FPGA |
+|    | Description                     | Concepts to teach                                           | Platform   |
+|----|---------------------------------|-------------------------------------------------------------|------------|
+| P0 | Queue                           | memory, pointer, instruction and stack pointers             | Linux/Mac  |
+| P1 | User-level threading            | thread, context switch, synchronization                     | Linux/Mac  |
+| P2 | Multi-level feedback queue      | timer and quantum, scheduling, priority                     | Linux/Mac  |
+| P3 | Memory management               | control register, exception handling, privilege level       | Arty board |
+| P5 | File system                     | inode layer, directory layer, layered file system           | Arty board |
 
 And some optional projects:
-|    | Description                     | Concepts to teach                                                  | Platform  |
-|----|---------------------------------|--------------------------------------------------------------------|-----------|
-| P4 | SD card driver                  | I/O bus, memory-mapped bus controller, device driver               | Arty FPGA |
-| P6 | Networking                      | IP layer (Ethernet driver with SPI), transportation layer (UDP)    | Arty FPGA |
-| P7 | Graphic user interface          | VGA driver with GPIO ([example](https://digilent.com/reference/learn/programmable-logic/tutorials/arty-pmod-vga-demo/start))                        | Arty FPGA |
+|    | Description                     | Concepts to teach                                                  | Platform   |
+|----|---------------------------------|--------------------------------------------------------------------|------------|
+| P4 | SD card driver                  | I/O bus, memory-mapped bus controller, device driver               | Arty board |
+| P6 | Networking                      | IP layer (Ethernet driver with SPI), transportation layer (UDP)    | Arty board |
+| P7 | Graphic user interface          | VGA driver with GPIO ([example](https://digilent.com/reference/learn/programmable-logic/tutorials/arty-pmod-vga-demo/start))                        | Arty board |
 
 ## Architecture
 
