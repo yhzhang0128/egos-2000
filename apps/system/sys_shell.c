@@ -18,8 +18,8 @@ void parse_request(char* buf, struct proc_request* req) {
         if (buf[i] != ' ') {
             req->argv[nargs][idx++] = buf[i];
         } else if (idx != 0) {
+            idx = req->argv[nargs][idx] = 0;
             nargs++;
-            idx = 0;
         }
     req->argc = idx ? nargs + 1 : nargs;
 }
@@ -32,9 +32,7 @@ int main() {
         struct proc_request req;
         struct proc_reply reply;
 
-        if (strcmp(buf, "clear") == 0) {
-            printf("\e[1;1H\e[2J");
-        } else if (strcmp(buf, "killall") == 0) {
+        if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
             grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
         } else {
@@ -46,12 +44,11 @@ int main() {
             if (reply.type != CMD_OK)
                 INFO("sys_shell: command causes an error");
             else if (req.argv[req.argc - 1][0] != '&')
-                /* Wait for foreground process */
                 grass->sys_recv(NULL, (void*)&reply, sizeof(reply));
         }
 
         do {
-            printf("%s➜ %s%s%s ", "\x1B[1;32m", "\x1B[1;36m", grass->workdir, "\x1B[1;0m");
+            printf("\x1B[1;32m➜ \x1B[1;36m%s\x1B[1;0m ", grass->workdir);
         } while (earth->tty_read(buf, 256) == 0);
     }
 }

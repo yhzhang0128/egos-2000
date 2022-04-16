@@ -23,11 +23,11 @@ int main() {
     char buf[SYSCALL_MSG_LEN];
 
     sys_spawn(SYS_FILE_EXEC_START);
-    grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(SYS_DIR_EXEC_START);
-    grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+    grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(SYS_SHELL_EXEC_START);
@@ -38,9 +38,6 @@ int main() {
         grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
 
         switch (req->type) {
-        case PROC_KILLALL:
-            grass->proc_free(-1);
-            break;
         case PROC_SPAWN:
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
 
@@ -57,15 +54,15 @@ int main() {
             else
                 INFO("background process %d terminated", sender);
             break;
+        case PROC_KILLALL:
+            grass->proc_free(-1); break;
         default:
             FATAL("sys_proc: request%d not implemented", req->type);
         }
     }
 }
 
-static int app_read(int block_no, char* dst) {
-    file_read(app_ino, block_no, dst);
-}
+static int app_read(int off, char* dst) { file_read(app_ino, off, dst); }
 
 static int app_spawn(struct proc_request *req) {
     int bin_ino = dir_lookup(0, "bin/");
@@ -80,11 +77,12 @@ static int app_spawn(struct proc_request *req) {
 }
 
 static int sys_proc_base;
+char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
+
 static int sys_proc_read(int block_no, char* dst) {
     return earth->disk_read(sys_proc_base + block_no, 1, dst);
 }
 
-char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
 static void sys_spawn(int base) {
     int pid = grass->proc_alloc();
     INFO("Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);

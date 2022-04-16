@@ -16,13 +16,10 @@ int dir_do_lookup(int dir_ino, char* name) {
     char buf[BLOCK_SIZE];
     file_read(dir_ino, 0, buf);
 
-    int dir_len = strlen(buf), name_len = strlen(name);
-
-    for (int i = 0; i < dir_len - name_len; i++)
-        if (!strncmp(name, buf + i, name_len) && buf[i + name_len] == ' ') {
-            buf[i + name_len + 4] = 0;
+    for (int i = 0, name_len = strlen(name); i < strlen(buf) - name_len; i++)
+        if (!strncmp(name, buf + i, name_len) &&
+            buf[i + name_len] == ' ' && (i == 0 || buf[i - 1] == ' '))
             return atoi(buf + i + name_len);
-        }
 
     return -1;
 }
@@ -48,9 +45,7 @@ int main() {
             reply->status = reply->ino == -1? DIR_ERROR : DIR_OK;
             grass->sys_send(sender, (void*)reply, sizeof(*reply));
             break;
-        case DIR_INSERT:
-        case DIR_REMOVE:
-        default:
+        case DIR_INSERT: case DIR_REMOVE: default:
             FATAL("sys_dir: request%d not implemented", req->type);
         }
     }

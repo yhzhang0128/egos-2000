@@ -16,8 +16,7 @@ int main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
     /* Initialize the file system interface */
-    block_if disk = fs_disk_init();    
-    block_if fs = treedisk_init(disk, 0);
+    block_if fs = treedisk_init(fs_disk_init(), 0);
 
     /* Send notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
@@ -37,8 +36,7 @@ int main() {
             reply->status = r == 0 ? FILE_OK : FILE_ERROR;
             grass->sys_send(sender, (void*)reply, sizeof(*reply));
             break;
-        case FILE_WRITE:
-        default:
+        case FILE_WRITE: default:
             FATAL("sys_file: request%d not implemented", req->type);
         }
     }
