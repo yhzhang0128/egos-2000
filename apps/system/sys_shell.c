@@ -25,7 +25,6 @@ void parse_request(char* buf, struct proc_request* req) {
 }
 
 int main() {
-    SUCCESS("Enter kernel process GPID_SHELL");
     CRITICAL("Welcome to egos-2000!");
     
     char buf[256] = "cd";  /* Enter the home directory first */
@@ -51,7 +50,8 @@ int main() {
                 grass->sys_recv(NULL, (void*)&reply, sizeof(reply));
         }
 
-        printf("%s➜ %s%s%s ", "\x1B[1;32m", "\x1B[1;36m", grass->workdir, "\x1B[1;0m");
-        while (earth->tty_read(buf, 256) == 0);
+        do {
+            printf("%s➜ %s%s%s ", "\x1B[1;32m", "\x1B[1;36m", grass->workdir, "\x1B[1;0m");
+        } while (earth->tty_read(buf, 256) == 0);
     }
 }
