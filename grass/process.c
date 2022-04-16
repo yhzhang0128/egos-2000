@@ -46,8 +46,8 @@ void proc_free(int pid) {
     } else {
         /* Free all user applications */
         for (int i = 0; i < MAX_NPROCESS; i++)
-            if (proc_set[i].pid >= GPID_USER_START
-                && proc_set[i].status != PROC_UNUSED) {
+            if (proc_set[i].pid >= GPID_USER_START &&
+                proc_set[i].status != PROC_UNUSED) {
                 earth->mmu_free(proc_set[i].pid);
                 proc_set[i].status = PROC_UNUSED;
             }

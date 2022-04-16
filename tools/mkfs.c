@@ -31,30 +31,30 @@ char* kernel_processes[] = {
 };
 
 /* inode mappings:
-#0: /              #1: /home               #2: /home/yunhao
-#3: /home/rvr      #4: /home/yunhao/README #5: /bin
-#6: /bin/echo      #7: /bin/ls             #8: /bin/cat
-#9: /bin/clock     #10: /bin/cd            #11:/bin/pwd
-#12: /bin/crash1   #13: /bin/crash2
+#0: /           #1: /home          #2: /home/yunhao
+#3: /home/rvr   #4: /home/lorenzo  #5: /home/yunhao/README 
+#6: /bin        #7: /bin/echo      #8: /bin/cat
+#9: /bin/ls     #10: /bin/cd       #11:/bin/pwd
+#12:/bin/clock  #13: /bin/crash1   #14: /bin/crash2
 */
-#define NINODE 14
+#define NINODE 15
 char* contents[] = {
-                    "./   0 ../   0 home/   1 bin/   5 ",
-                    "./   1 ../   0 yunhao/   2 rvr/   3 ",
-                    "./   2 ../   1 README   4 ",
+                    "./   0 ../   0 home/   1 bin/   6 ",
+                    "./   1 ../   0 yunhao/   2 rvr/   3 lorenzo/   4 ",
+                    "./   2 ../   1 README   5 ",
                     "./   3 ../   1 ",
+                    "./   4 ../   1 ",
                     "With only 2K lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.",
-                    "./   5 ../   0 echo   6 ls   7 cat   8 clock   9 cd  10 pwd  11 crash1  12 crash2  13 ",
+                    "./   6 ../   0 echo   7 cat   8 ls   9 cd  10 pwd  11 clock  12 crash1  13 crash2  14 ",
                     "#../build/release/echo.elf",
-                    "#../build/release/ls.elf",
                     "#../build/release/cat.elf",
-                    "#../build/release/clock.elf",
+                    "#../build/release/ls.elf",
                     "#../build/release/cd.elf",
                     "#../build/release/pwd.elf",
+                    "#../build/release/clock.elf",
                     "#../build/release/crash1.elf",
                     "#../build/release/crash2.elf",
 };
-/*NOTICE: in a dir, *4* bytes following the name gives the inode number*/
 
 char fs[FS_DISK_SIZE];
 char exec[GRASS_EXEC_SIZE];
