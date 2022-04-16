@@ -18,14 +18,16 @@ int main(int argc, char** argv) {
         return 0;
     }
 
+    /* Get the inode number of the new working directory */
     strcat(argv[1], "/");
     int dir_ino = dir_lookup(grass->workdir_ino, argv[1]);
     if (dir_ino == -1) {
         INFO("cd: directory %s not found", argv[1]);
         return -1;
     }
-    
     grass->workdir_ino = dir_ino;
+
+    /* Get the path name of the new working directory */
     if (!strcmp(".", argv[1])) return 0;
 
     int len = strlen(grass->workdir);

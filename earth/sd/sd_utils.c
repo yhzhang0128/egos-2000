@@ -10,11 +10,11 @@
 #include "sd.h"
 
 char send_data_byte(char byte) {
-    while (SPI_REGW(SPI1_TXDATA) & (1 << 31));
-    SPI_REGB(SPI1_TXDATA) = byte;
+    while (REGW(SPI1_BASE, SPI1_TXDATA) & (1 << 31));
+    REGB(SPI1_BASE, SPI1_TXDATA) = byte;
 
     long rxdata;
-    while ((rxdata = SPI_REGW(SPI1_RXDATA)) & (1 << 31));
+    while ((rxdata = REGW(SPI1_BASE, SPI1_RXDATA)) & (1 << 31));
     return (char)(rxdata & 0xFF);
 }
 
@@ -23,12 +23,10 @@ inline char recv_data_byte() {
 }
 
 char sd_exec_cmd(char* cmd) {
-    for (int i = 0; i < 6; i++)
-        send_data_byte(cmd[i]);
+    for (int i = 0; i < 6; i++) send_data_byte(cmd[i]);
 
     for (int reply, i = 0; i < 8000; i++)
-        if ((reply = recv_data_byte()) != 0xFF)
-            return reply;
+        if ((reply = recv_data_byte()) != 0xFF) return reply;
 
     FATAL("SD card not responding cmd%d", cmd[0] ^ 0x40);
 }

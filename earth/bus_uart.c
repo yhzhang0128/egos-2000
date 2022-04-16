@@ -16,25 +16,21 @@
 #define UART0_RXCTRL  12UL
 #define UART0_DIV     24UL
 
-#define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
-#define UART_REG(offset) (UART0_BASE + offset)
-#define UART_REGW(offset) (ACCESS((unsigned int*)UART_REG(offset)))
-
 void uart_init(long baud_rate) {
-    UART_REGW(UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
-    UART_REGW(UART0_TXCTRL) |= 1;
-    UART_REGW(UART0_RXCTRL) |= 1;
+    REGW(UART0_BASE, UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
+    REGW(UART0_BASE, UART0_TXCTRL) |= 1;
+    REGW(UART0_BASE, UART0_RXCTRL) |= 1;
 
     /* UART0 send/recv are mapped to GPIO pin16 and pin17 */
-    GPIO_REGW(GPIO0_IOF_ENABLE) |= (1 << 16) | (1 << 17);
+    REGW(GPIO0_BASE, GPIO0_IOF_ENABLE) |= (1 << 16) | (1 << 17);
 }
 
 int uart_getc(int* c) {
-    int ch = UART_REGW(UART0_RXDATA);
+    int ch = REGW(UART0_BASE, UART0_RXDATA);
     return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
 }
 
 void uart_putc(int c) {
-    while ((UART_REGW(UART0_TXDATA) & (1 << 31)));
-    UART_REGW(UART0_TXDATA) = c;
+    while ((REGW(UART0_BASE, UART0_TXDATA) & (1 << 31)));
+    REGW(UART0_BASE, UART0_TXDATA) = c;
 }

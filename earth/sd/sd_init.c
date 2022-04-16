@@ -95,16 +95,16 @@ static void sd_spi_reset() {
     INFO("Set CS and MOSI to 1 and toggle clock.");
 
     /* Keep chip select line high */
-    SPI_REGW(SPI1_CSMODE) &= ~3;
-    SPI_REGW(SPI1_CSMODE) |= 2;
+    REGW(SPI1_BASE, SPI1_CSMODE) &= ~3;
+    REGW(SPI1_BASE, SPI1_CSMODE) |= 2;
 
     unsigned long i, rxdata;
     for (i = 0; i < 1000; i++) send_data_byte(0xFF);
 
     /* Keep chip select line low */
-    SPI_REGW(SPI1_CSDEF) = 1;
-    SPI_REGW(SPI1_CSMODE) &= ~3;
-    SPI_REGW(SPI1_CSMODE) |= 2;
+    REGW(SPI1_BASE, SPI1_CSDEF) = 1;
+    REGW(SPI1_BASE, SPI1_CSMODE) &= ~3;
+    REGW(SPI1_BASE, SPI1_CSMODE) |= 2;
     for (i = 0; i < 200000; i++);
     
     INFO("Set CS to 0 and send cmd0 through MOSI.");
@@ -119,41 +119,41 @@ static void sd_spi_reset() {
 
 static void sd_spi_config() {
     /* Set protocol as SPI_SINGLE */
-    SPI_REGW(SPI1_FMT) &= ~3;
+    REGW(SPI1_BASE, SPI1_FMT) &= ~3;
 
     /* Set phase as 0*/
-    SPI_REGW(SPI1_SCKMODE) &= ~1;
+    REGW(SPI1_BASE, SPI1_SCKMODE) &= ~1;
 
     /* Set polarity as 0 */
-    SPI_REGW(SPI1_SCKMODE) &= ~2;
+    REGW(SPI1_BASE, SPI1_SCKMODE) &= ~2;
 
     /* Set endianness as 0 */
-    SPI_REGW(SPI1_FMT) &= ~4;
+    REGW(SPI1_BASE, SPI1_FMT) &= ~4;
 
     /* Always populate receive FIFO */
-    SPI_REGW(SPI1_FMT) &= ~8;
+    REGW(SPI1_BASE, SPI1_FMT) &= ~8;
 
     /* Set CS active-high as 0 */
-    SPI_REGW(SPI1_CSDEF) = 0;
+    REGW(SPI1_BASE, SPI1_CSDEF) = 0;
 
     /* Set frame length */
-    if ((SPI_REGW(SPI1_FMT) & 0xF0000) != 0x80000) {
-        SPI_REGW(SPI1_FMT) &= ~0xF0000;
-        SPI_REGW(SPI1_FMT) |= 0x80000;
+    if ((REGW(SPI1_BASE, SPI1_FMT) & 0xF0000) != 0x80000) {
+        REGW(SPI1_BASE, SPI1_FMT) &= ~0xF0000;
+        REGW(SPI1_BASE, SPI1_FMT) |= 0x80000;
     }
 
     /* Set CS line */
-    SPI_REGW(SPI1_CSID) = 0;
+    REGW(SPI1_BASE, SPI1_CSID) = 0;
 
     /* Toggle off memory-mapped SPI flash mode;
      * toggle on programmable IO mode */
-    SPI_REGW(SPI1_FCTRL) = 0;
+    REGW(SPI1_BASE, SPI1_FCTRL) = 0;
 }
 
 static void sd_spi_set_clock(long baud_rate) {
     long div = (CPU_CLOCK_RATE / (2 * baud_rate)) - 1;
     if (div > 0xFFF) FATAL("SPI baud rate too low");
 
-    SPI_REGW(SPI1_SCKDIV) &= ~0xFFF;
-    SPI_REGW(SPI1_SCKDIV) |= (div & 0xFFF);
+    REGW(SPI1_BASE, SPI1_SCKDIV) &= ~0xFFF;
+    REGW(SPI1_BASE, SPI1_SCKDIV) |= (div & 0xFFF);
 }

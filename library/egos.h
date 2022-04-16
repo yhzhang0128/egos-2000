@@ -67,3 +67,8 @@ extern struct grass *grass;
 #define GRASS_ENTRY        0x08003000  /* 8KB    grass code+data      */
                                        /* 12KB   earth data           */
                                        /* earth code is in QSPI flash */
+
+/* memory-mapped I/O register access macros */
+#define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
+#define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
+#define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))
