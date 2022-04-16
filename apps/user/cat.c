@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     }
 
     /* Get the inode number of the file */
-    int file_ino = dir_lookup(grass->work_dir_ino, argv[1]);
+    int file_ino = dir_lookup(grass->workdir_ino, argv[1]);
     if (file_ino < 0) {
         INFO("cat: file %s not found", argv[1]);
         return -1;

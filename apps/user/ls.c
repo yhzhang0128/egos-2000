@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     }
 
     char buf[BLOCK_SIZE];
-    file_read(grass->work_dir_ino, 0, buf);
+    file_read(grass->workdir_ino, 0, buf);
     
     /* Remove the inode numbers from the string */
     for (int i = 1; i < strlen(buf); i++)

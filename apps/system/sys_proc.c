@@ -68,7 +68,7 @@ static int app_read(int block_no, char* dst) {
 }
 
 static int app_spawn(struct proc_request *req) {
-    int bin_ino = dir_lookup(0, "bin");
+    int bin_ino = dir_lookup(0, "bin/");
     if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
 
     app_pid = grass->proc_alloc();

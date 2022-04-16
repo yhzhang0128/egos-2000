@@ -26,7 +26,6 @@ struct earth {
     int (*tty_critical)(const char *format, ...);
 };
 
-#define ENV_DIR_LEN        32
 struct grass {
     /* Process control interface */
     int  (*proc_alloc)();
@@ -39,8 +38,8 @@ struct grass {
     int  (*sys_recv)(int* pid, char* buf, int size);
 
     /* Shell environment variables */
-    int work_dir_ino;
-    char work_dir_name[ENV_DIR_LEN];
+    int workdir_ino;
+    char workdir[128];
 };
 
 extern struct earth *earth;

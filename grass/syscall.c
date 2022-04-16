@@ -36,7 +36,7 @@ int sys_recv(int* sender, char* buf, int size) {
     sc->type = SYS_RECV;
     sys_invoke();
     memcpy(buf, sc->msg.content, size);
-    *sender = sc->msg.sender;
+    if (sender) *sender = sc->msg.sender;
     return sc->retval;
 }
 
