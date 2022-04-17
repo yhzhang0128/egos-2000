@@ -70,6 +70,14 @@ You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher
 
 ## Step3: Program the Arty board
 
+### MacOS
+
+1. Install [Homebrew](https://brew.sh/)
+2. Install `openocd` by typing `brew install openocd` in your shell
+3. Enter directory `$EGOS/egos-2000/tools/openocd` and type `./program`
+4. Wait for about 3 minutes until the program finishes
+5. Goto step4
+
 ### Windows and Linux
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html) or [here](https://drive.google.com/file/d/1VS6_mxb6yrAxdDtlXkHdB-8jg9CScacw/view?usp=sharing). You may need to register a Xilinx account, but the software is free.
 
@@ -81,62 +89,20 @@ Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com
 6. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
 7. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
 8. Click "OK" and wait for the program to finish
-9. Press the `program` red button on the left-top corner of the Arty board
-10. For Linux users, type in your shell
-```shell
-> sudo chmod 666 /dev/ttyUSB1
-> screen /dev/ttyUSB1 115200
-```
-11. For Mac users, use the same commands but check your `/dev` directory for the serial device name
-12. For Windows users, use software like `PuTTY` to connect with the serial port (e.g., COM6) and use baud rate 115200
-
-To restart egos, press the `reset` red button on the right-top corner of the Arty board.
-
-In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please contact Xilinx [here](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US).
 
 In step6, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
 If you choose the wrong one, step8 will tell you.
 
-### MacOS
+In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try openocd as described above for Mac.
 
-Install [Homebrew](https://brew.sh/).
-Then install `openocd` using Homebrew by typing `brew install openocd` in your terminal. 
+## Step4: Connect with egos-2000
 
-Prepare a text file `7series.txt` with the following content. 
-Replace the `$(EGOS_DIR)` below with your own egos-2000 path.
-
+1. Press the `program` red button on the left-top corner of the Arty board
+2. For Linux users, type in your shell
+```shell
+> sudo chmod 666 /dev/ttyUSB1
+> screen /dev/ttyUSB1 115200
 ```
-# File: 7series.txt
-interface ftdi
-ftdi_device_desc "Digilent USB Device"
-ftdi_vid_pid 0x0403 0x6010
-
-# channel 1 does not have any functionality
-ftdi_channel 0
-
-# just TCK TDI TDO TMS, no reset
-ftdi_layout_init 0x0088 0x008b
-reset_config none
-adapter_khz 10000
-
-source [find cpld/xilinx-xc7.cfg]
-source [find cpld/jtagspi.cfg]
-
-init
-
-puts [irscan xc7.tap 0x09]
-puts [drscan xc7.tap 32 0]  
-
-puts "Programming FPGA..."
-
-jtagspi_init 0 bscan_spi_xc7a35t.bit
-jtagspi_program $(EGOS_DIR)/tools/bootROM.bin 0 
-
-exit
-```
-
-Download file `bscan_spi_xc7a35t.bit` from [here](https://github.com/quartiq/bscan_spi_bitstreams/blob/master/bscan_spi_xc7a35t.bit) and put it in the same directory as `7series.txt`.
-In your terminal, type `openocd -f 7series.txt` and wait for about 3 minutes until the program finishes.
-Then refer to step9-13 in the Windows/Linux instructions above.
-
-This method is borrowed from [this wiki](https://github.com/byu-cpe/BYU-Computing-Tutorials/wiki/Program-7-Series-FPGA-from-a-Mac-or-Linux-Without-Xilinx?_ga=2.208554260.708413845.1647041461-635131311.1640671103).
+3. For Mac users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-...`)
+4. For Windows users, use software like `PuTTY` to connect with the serial port (e.g., COM6) and use baud rate 115200
+5. Press the `reset` red button on the right-top corner to restart egos-2000
