@@ -44,7 +44,7 @@ char* contents[] = {
                     "./   2 ../   1 README   5 ",
                     "./   3 ../   1 ",
                     "./   4 ../   1 ",
-                    "With only 2K lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.",
+                    "With only 2000 lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.",
                     "./   6 ../   0 echo   7 cat   8 ls   9 cd  10 pwd  11 clock  12 crash1  13 crash2  14 ",
                     "#../build/release/echo.elf",
                     "#../build/release/cat.elf",
