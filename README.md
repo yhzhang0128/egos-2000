@@ -3,7 +3,7 @@
 With only **2000** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
 It runs on a **$129** small development board.
 
-![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
+![This is an image](https://dolobyte.net/print/egos-2000.jpg)
 
 ```shell
 # Count lines of code excluding references and README.md

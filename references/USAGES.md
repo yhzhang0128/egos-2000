@@ -75,7 +75,7 @@ You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher
 1. Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to working directory `$EGOS`.
 2. In `$EGOS`, type `tar -zxvf xpack-openocd-0.11.0-1-xxx-xxx.tar.gz`
 3. Add OpenOCD to path by typing `export PATH=$PATH:$EGOS/xpack-openocd-0.11.0-1/bin`
-4. Enter directory `$EGOS/egos-2000/tools/openocd` and type `./program`
+4. Enter directory `$EGOS/egos-2000/tools/openocd` and type `./program`; If fails, restart your machine and retry
 5. Wait for about 3 minutes until the program finishes
 
 ### Windows or Linux
@@ -90,6 +90,8 @@ You may need to register a Xilinx account, but the software is free.
 6. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
 7. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
 8. Click "OK" and wait for the program to finish
+
+![This is an image](https://dolobyte.net/print/vivado.png)
 
 In step6, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
 If you choose the wrong one, step8 will tell you.
