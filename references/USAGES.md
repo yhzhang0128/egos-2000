@@ -73,7 +73,7 @@ You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher
 ### MacOS or Linux
 
 1. Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to working directory `$EGOS`.
-2. In `$EGOS`, type `tar -zxvf xpack-openocd-0.11.0-1-linux-x64.tar.gz`
+2. In `$EGOS`, type `tar -zxvf xpack-openocd-0.11.0-1-xxx-xxx.tar.gz`
 3. Add OpenOCD to path by typing `export PATH=$PATH:$EGOS/xpack-openocd-0.11.0-1/bin`
 4. Enter directory `$EGOS/egos-2000/tools/openocd` and type `./program`
 5. Wait for about 3 minutes until the program finishes
@@ -94,7 +94,7 @@ You may need to register a Xilinx account, but the software is free.
 In step6, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
 If you choose the wrong one, step8 will tell you.
 
-In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try openocd as described above for Mac.
+In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try the openocd method described above.
 
 ## Step4: Connect with egos-2000
 
