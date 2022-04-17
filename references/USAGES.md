@@ -91,12 +91,13 @@ You may need to register a Xilinx account, but the software is free.
 7. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
 8. Click "OK" and wait for the program to finish
 
-![This is an image](https://dolobyte.net/print/vivado.png)
-
-In step6, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
+In **6**, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
 If you choose the wrong one, step8 will tell you.
 
-In step4, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try the openocd method described above.
+In **4**, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try the openocd method described above.
+
+![This is an image](https://dolobyte.net/print/vivado.png)
+
 
 ## Step4: Connect with egos-2000
 
