@@ -32,7 +32,7 @@ void write_intel_mcs();
 int load_file(char* file_name, char* print_name, char* dst);
 
 int main() {
-    fe310_size = load_file("fe310_cpu.bin", "FE310 binary", mem_fe310);
+    fe310_size = load_file("sifive/fe310_cpu.bin", "FE310 binary", mem_fe310);
     earth_size = load_file("earth.bin", "Earth binary", mem_earth);
     disk_size = load_file("disk.img", "Disk  image ", mem_disk);
 
