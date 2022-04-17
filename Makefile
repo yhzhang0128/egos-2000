@@ -28,6 +28,7 @@ install:
 	cd $(TOOLS); ./mkrom ; rm earth.bin
 
 program:
+	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
 	cd $(TOOLS)/openocd; time openocd -f 7series.txt
 
 clean:
@@ -43,8 +44,7 @@ APPS_SRCS = apps/app.S library/*/*.c
 GRASS_SRCS = grass/grass.S grass/*.c library/elf/*.c
 EARTH_SRCS = earth/earth.S earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
 
-CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
-CFLAGS += -ffunction-sections -fdata-sections
+CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
 INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers
 
