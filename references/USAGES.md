@@ -70,16 +70,17 @@ You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher
 
 ## Step3: Program the Arty board
 
-### MacOS
+### MacOS or Linux
 
-1. Install [Homebrew](https://brew.sh/)
-2. Install `openocd` by typing `brew install openocd` in your shell
-3. Enter directory `$EGOS/egos-2000/tools/openocd` and type `./program`
-4. Wait for about 3 minutes until the program finishes
-5. Goto step4
+1. Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to working directory `$EGOS`.
+2. In `$EGOS`, type `tar -zxvf xpack-openocd-0.11.0-1-linux-x64.tar.gz`
+3. Add OpenOCD to path by typing `export PATH=$PATH:$EGOS/xpack-openocd-0.11.0-1/bin`
+4. Enter directory `$EGOS/egos-2000/tools/openocd` and type `./program`
+5. Wait for about 3 minutes until the program finishes
 
-### Windows and Linux
-Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html) or [here](https://drive.google.com/file/d/1VS6_mxb6yrAxdDtlXkHdB-8jg9CScacw/view?usp=sharing). You may need to register a Xilinx account, but the software is free.
+### Windows or Linux
+Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
+You may need to register a Xilinx account, but the software is free.
 
 1. Connect the Arty FPGA board to your computer with the USB cable
 2. Open Vivado Lab Edition

@@ -41,8 +41,8 @@ The definitions of `struct earth` and `struct grass` in [**egos.h**](library/ego
 
 ## Software Requirements
 * SiFive [freedom riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
-* [Vivado lab solutions](https://www.xilinx.com/support/download.html) or any edition with the hardware manager
-* a software to connect with ttyUSB (e.g., [screen](https://linux.die.net/man/1/screen) for Linux/Mac or [PuTTY](https://www.putty.org/) for Windows)
+* [OpenOCD](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) for Linux/MacOS or [Vivado lab solutions](https://www.xilinx.com/support/download.html) for Windows
+* a software to connect with ttyUSB (e.g., [screen](https://linux.die.net/man/1/screen) for Linux/MacOS or [PuTTY](https://www.putty.org/) for Windows)
 * [optional] a software to program a disk image file to the microSD card (e.g., [dd](https://linux.die.net/man/1/dd) or [balena Etcher](https://www.balena.io/etcher/)) 
 
 ## Usages and Documentation
