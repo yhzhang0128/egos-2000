@@ -152,7 +152,6 @@ static void sd_spi_config() {
 
 static void sd_spi_set_clock(long baud_rate) {
     long div = (CPU_CLOCK_RATE / (2 * baud_rate)) - 1;
-    if (div > 0xFFF) FATAL("SPI baud rate too low");
 
     REGW(SPI1_BASE, SPI1_SCKDIV) &= ~0xFFF;
     REGW(SPI1_BASE, SPI1_SCKDIV) |= (div & 0xFFF);

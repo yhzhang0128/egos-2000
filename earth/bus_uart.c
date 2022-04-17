@@ -16,7 +16,7 @@
 #define UART0_RXCTRL  12UL
 #define UART0_DIV     24UL
 
-static void uart_init(long baud_rate) {
+void uart_init(long baud_rate) {
     REGW(UART0_BASE, UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
     REGW(UART0_BASE, UART0_TXCTRL) |= 1;
     REGW(UART0_BASE, UART0_RXCTRL) |= 1;
@@ -25,12 +25,12 @@ static void uart_init(long baud_rate) {
     REGW(GPIO0_BASE, GPIO0_IOF_ENABLE) |= (1 << 16) | (1 << 17);
 }
 
-static int uart_getc(int* c) {
+int uart_getc(int* c) {
     int ch = REGW(UART0_BASE, UART0_RXDATA);
     return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
 }
 
-static void uart_putc(int c) {
+void uart_putc(int c) {
     while ((REGW(UART0_BASE, UART0_TXDATA) & (1 << 31)));
     REGW(UART0_BASE, UART0_TXDATA) = c;
 }

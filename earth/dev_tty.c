@@ -11,7 +11,10 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "bus_uart.c"
+
+int uart_getc(int* c);
+void uart_putc(int c);
+void uart_init(long baud_rate);
 
 void tty_init() {
     uart_init(115200);
