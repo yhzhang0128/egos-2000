@@ -1,6 +1,6 @@
 # A minimal operating system on a small RISC-V board
 
-With only **2K** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
+With only **2000** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
 It runs on a **$129** small development board.
 
 ![This is an image](https://dolobyte.net/print/egos-riscv.jpg)
@@ -32,7 +32,7 @@ SUM:                            50            546            615           2000 
     * processes, system calls and inter-process communication
 * The **application layer** implements file system, shell and user commands.
 
-The definitions of `struct earth` and `struct grass` in [egos.h](library/egos.h) specify the interfaces between different layers.
+The definitions of `struct earth` and `struct grass` in [**egos.h**](library/egos.h) specify the interfaces between these layers.
 
 ## Hardware Requirements
 * an Artix-7 35T [Arty FPGA development board](https://www.xilinx.com/products/boards-and-kits/arty.html)
@@ -55,4 +55,4 @@ The [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduces the pro
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
 Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/) and [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/) for their support.
-This project is also supported by a [Facebook fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
+Many thanks to [Meta](https://about.facebook.com/meta/) for their support with a [Facebook fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
