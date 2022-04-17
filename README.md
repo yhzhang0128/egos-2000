@@ -40,9 +40,9 @@ The definitions of `struct earth` and `struct grass` in [**egos.h**](library/ego
 * [optional] a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card (e.g., [Sandisk](https://www.amazon.com/dp/B073K14CVB?ref=ppx_yo2_dt_b_product_details&th=1), [Samsung](https://www.amazon.com/dp/B09B1F9L52?ref=ppx_yo2_dt_b_product_details&th=1) or [PNY](https://www.amazon.com/dp/B08RG87JN5?ref=ppx_yo2_dt_b_product_details&th=1))
 
 ## Software Requirements
-* SiFive [freedom riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
+* To compile egos-2000: [SiFive freedom riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
 * To program the on-board ROM: [OpenOCD](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) for Linux/MacOS or [Vivado](https://www.xilinx.com/support/download.html) for Windows
-* To connect with ttyUSB: [screen](https://linux.die.net/man/1/screen) for Linux/MacOS or [PuTTY](https://www.putty.org/) for Windows
+* To connect with the serial tty: [screen](https://linux.die.net/man/1/screen) for Linux/MacOS or [PuTTY](https://www.putty.org/) for Windows
 * [optional] To program a disk image file to the microSD card: [dd](https://linux.die.net/man/1/dd) or [balena Etcher](https://www.balena.io/etcher/)
 
 ## Usages and Documentation
