@@ -7,17 +7,17 @@ It runs on a **$129** small development board.
 
 ```shell
 # Count lines of code excluding references and README.md
-> cloc egos-2000 --exclude-ext=md
-......
+> cloc egos-2000 --exclude-ext=md,pdf
+github.com/AlDanial/cloc v 1.92  T=0.03 s (1668.0 files/s, 105414.7 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               33            449            464           1564
-C/C++ Header                    11             75            104            314
+C                               35            453            486           1566
+C/C++ Header                    11             75            105            312
 Assembly                         3              6             24             68
 make                             1             11              0             54
 -------------------------------------------------------------------------------
-SUM:                            48            541            592           2000 << exactly 2000!
+SUM:                            50            545            615           2000 << exactly 2000!
 -------------------------------------------------------------------------------
 ```
 
