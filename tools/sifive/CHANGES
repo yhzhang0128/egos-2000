@@ -1,4 +1,6 @@
-The SiFive FE310 processor is open-sourced under the Apache 2.0 license. 
+The file fe310_cpu.bin is compiled from https://github.com/sifive/freedom
+
+This Github repo from SiFive is open-sourced under the Apache 2.0 license. 
 A copy of this license can be found in this directory. Apache 2.0 requires 
 us to state the changes made to the original code. So here are our changes:
 
