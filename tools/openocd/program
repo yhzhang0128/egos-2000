@@ -1,1 +1,0 @@
-time openocd -f 7series.txt

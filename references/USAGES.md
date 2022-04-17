@@ -48,7 +48,7 @@ mkdir -p build/debug build/release
 ```
 
 This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `tools` directory.
-To program `disk.img` to the microSD card:
+To program `disk.img` to a microSD card:
 
 ```shell
 # Find your microSD card in /dev
@@ -68,14 +68,14 @@ I/O size (minimum/optimal): 512 bytes / 512 bytes
 
 You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
 
-## Step3: Program the Arty board
+## Step3: Program the Arty on-board ROM
 
 ### MacOS or Linux
 
 1. Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to working directory `$EGOS`.
 2. In `$EGOS`, type `tar -zxvf xpack-openocd-0.11.0-1-xxx-xxx.tar.gz`
 3. Add OpenOCD to path by typing `export PATH=$PATH:$EGOS/xpack-openocd-0.11.0-1/bin`
-4. Enter directory `$EGOS/egos-2000/tools/openocd` and type `./program`; If fails, restart your machine and retry
+4. In `$EGOS`, type `make program`; If fails, restart your machine and retry
 5. Wait for about 3 minutes until the program finishes
 
 ### Windows or Linux

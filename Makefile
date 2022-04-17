@@ -18,7 +18,6 @@ apps: apps/system/*.c apps/user/*.c
 	  $(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/$${APP}.elf > $(DEBUG)/$${APP}.lst;\
 	done
 
-.PHONY: install
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
 	$(CC) $(TOOLS)/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs
@@ -27,6 +26,9 @@ install:
 	$(OBJCOPY) -O binary $(RELEASE)/earth.elf $(TOOLS)/earth.bin
 	$(CC) $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
 	cd $(TOOLS); ./mkrom ; rm earth.bin
+
+program:
+	cd $(TOOLS)/openocd; time openocd -f 7series.txt
 
 clean:
 	rm -rf build
@@ -44,9 +46,7 @@ EARTH_SRCS = earth/earth.S earth/*.c earth/sd/*.c library/elf/*.c library/libc/*
 CFLAGS = -march=rv32imac -mabi=ilp32 -mcmodel=medlow
 CFLAGS += -ffunction-sections -fdata-sections
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
-
-INCLUDE = -Ilibrary
-INCLUDE += -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers
+INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers
 
 COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
 
