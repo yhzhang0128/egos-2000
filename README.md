@@ -62,5 +62,5 @@ For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
 ## Acknowledgements
 
 Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/) and [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/) for their support.
-Many thanks to [Meta](https://about.facebook.com/meta/) for their support with a [Facebook fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
-Many thanks to all my CS4411 students at Cornell for helping me improve this course over the years.
+Many thanks to [Meta](https://about.facebook.com/meta/) for supporting me with a [fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
+Many thanks to all CS4411 students at Cornell over the years for helping improve this course.
