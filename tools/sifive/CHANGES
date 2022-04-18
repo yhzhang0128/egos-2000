@@ -4,7 +4,7 @@ This Github repo from SiFive is open-sourced under the Apache 2.0 license.
 A copy of this license can be found in this directory. Apache 2.0 requires 
 us to state the changes made to the original code. So here are our changes:
 
-1. Increase the ITIM cache from 16KB to 32KB.
+1. Increase the ITIM cache from 8KB to 32KB.
 
 2. Increase the DTIM cache from 16KB to 128KB.
 
