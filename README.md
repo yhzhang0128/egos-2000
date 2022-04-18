@@ -8,6 +8,10 @@ It runs on a **$129** small development board.
 ```shell
 # Count lines of code excluding references and README.md
 > cloc egos-2000 --exclude-ext=md,pdf
+      62 text files.
+      61 unique files.
+      13 files ignored.
+
 github.com/AlDanial/cloc v 1.92  T=0.03 s (1668.0 files/s, 105414.7 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
