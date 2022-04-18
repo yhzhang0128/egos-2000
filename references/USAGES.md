@@ -123,6 +123,13 @@ In **4**, if the Arty board is not detected, try to reinstall the USB cable driv
 ```shell
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
+[INFO] -----------------------------------
+[INFO] Start to initialize the earth layer
+[SUCCESS] Finished initializing the tty device
+[CRITICAL] Choose a disk:
+  Enter 0: use the microSD card
+  Enter 1: use the on-board flash ROM @0x20800000
+......
 ```
 3. For Mac users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-xxxxxx`)
 4. For Windows users, use software like `PuTTY` to connect with the serial port (e.g., COM6) and use baud rate 115200
