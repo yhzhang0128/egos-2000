@@ -111,7 +111,7 @@ If you choose the wrong one, **6** will tell you.
 
 In **2**, if the Arty board doesn't appear, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try the openocd method described above.
 
-![This is an image](https://dolobyte.net/print/vivado.png)
+![This is an image](screenshots/vivado.png)
 
 
 ## Step4: Connect with egos-2000
@@ -133,4 +133,4 @@ In **2**, if the Arty board doesn't appear, try to reinstall the USB cable drive
 4. For Mac users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-xxxxxx`)
 5. For Windows users, find the board in your "Device Manager" (e.g., COM4) and use `PuTTY` to connect with the board:
 
-![This is an image](https://dolobyte.net/print/putty.png)
+![This is an image](screenshots/putty.png)
