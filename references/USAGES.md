@@ -9,7 +9,7 @@ Setup your working directory and name it as `$EGOS`.
 ```shell
 > export EGOS=/home/yunhao/egos
 > cd $EGOS
-> git clone https://github.coecis.cornell.edu/4411-riscv/egos-2000.git
+> git clone https://github.com/yhzhang0128/egos-2000.git
 # now the code repository is at $EGOS/egos-2000
 ```
 
