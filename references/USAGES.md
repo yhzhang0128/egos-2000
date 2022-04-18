@@ -13,7 +13,7 @@ Setup your working directory and name it as `$EGOS`.
 # now the code repository is at $EGOS/egos-2000
 ```
 
-Download the SiFive [riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to the working directory.
+Download the [SiFive riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to the working directory `$EGOS`.
 
 ```shell
 > cd $EGOS
@@ -72,9 +72,29 @@ You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher
 
 ### MacOS or Linux
 
-1. Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to working directory `$EGOS`.
-2. In `$EGOS`, type `tar -zxvf xpack-openocd-0.11.0-1-xxx-xxx.tar.gz`
-3. Add OpenOCD to path by typing `export PATH=$PATH:$EGOS/xpack-openocd-0.11.0-1/bin`
+Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to the working directory `$EGOS`.
+
+```shell
+> cd $EGOS
+> tar -zxvf xpack-openocd-0.11.0-1-xxx-xxx.tar.gz
+> export PATH=$PATH:$EGOS/xpack-openocd-0.11.0-1-xxx-xxx/bin
+> cd $EGOS/egos-2000
+> make program
+-------- Program the on-board ROM --------
+cd tools/openocd; time openocd -f 7series.txt
+......
+Info : sector 188 took 223 ms
+Info : sector 189 took 223 ms
+Info : sector 190 took 229 ms
+Info : sector 191 took 243 ms  # It will pause at this point for a while
+Info : Found flash device 'micron n25q128' (ID 0x0018ba20)
+
+real    2m51.019s
+user    0m11.540s
+sys     0m37.338s
+
+```
+
 4. In `$EGOS`, type `make program`; If fails, restart your machine and retry
 5. Wait for about 3 minutes until the program finishes
 
@@ -107,6 +127,6 @@ In **4**, if the Arty board is not detected, try to reinstall the USB cable driv
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
 ```
-3. For Mac users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-...`)
+3. For Mac users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-xxxxxx`)
 4. For Windows users, use software like `PuTTY` to connect with the serial port (e.g., COM6) and use baud rate 115200
 5. Press the `reset` red button on the right-top corner to restart egos-2000
