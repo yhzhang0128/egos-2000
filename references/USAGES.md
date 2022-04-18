@@ -95,9 +95,6 @@ sys     0m37.338s
 
 ```
 
-4. In `$EGOS`, type `make program`; If fails, restart your machine and retry
-5. Wait for about 3 minutes until the program finishes
-
 ### Windows or Linux
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
