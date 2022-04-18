@@ -99,19 +99,17 @@ sys     0m37.338s
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
 
-1. Connect the Arty FPGA board to your computer with the USB cable
-2. Open Vivado Lab Edition
-3. Click "Open Hardware Manager"
-4. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window
-5. In the "Hardware" window, right click `xc7a35t` and click "Add Configuration Memory Device"
-6. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
-7. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
-8. Click "OK" and wait for the program to finish
+1. Open Vivado Lab Edition and click "Open Hardware Manager"
+2. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window
+3. In the "Hardware" window, right click `xc7a35t` and click "Add Configuration Memory Device"
+4. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
+5. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
+6. Click "OK" and wait for the program to finish
 
-In **6**, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
-If you choose the wrong one, step8 will tell you.
+In **4**, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
+If you choose the wrong one, **6** will tell you.
 
-In **4**, if the Arty board is not detected, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try the openocd method described above.
+In **2**, if the Arty board doesn't appear, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try the openocd method described above.
 
 ![This is an image](https://dolobyte.net/print/vivado.png)
 
@@ -119,7 +117,8 @@ In **4**, if the Arty board is not detected, try to reinstall the USB cable driv
 ## Step4: Connect with egos-2000
 
 1. Press the `program` red button on the left-top corner of the Arty board
-2. For Linux users, type in your shell
+2. To restart, press the `reset` red button on the right-top corner 
+3. For Linux users, type in your shell
 ```shell
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
@@ -131,6 +130,7 @@ In **4**, if the Arty board is not detected, try to reinstall the USB cable driv
   Enter 1: use the on-board flash ROM @0x20800000
 ......
 ```
-3. For Mac users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-xxxxxx`)
-4. For Windows users, use software like `PuTTY` to connect with the serial port (e.g., COM6) and use baud rate 115200
-5. Press the `reset` red button on the right-top corner to restart egos-2000
+4. For Mac users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-xxxxxx`)
+5. For Windows users, find the board in your "Device Manager" (e.g., COM4) and use `PuTTY` to connect with the board as shown in this picture.
+
+![This is an image](https://dolobyte.net/print/putty.png)
