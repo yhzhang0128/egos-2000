@@ -38,18 +38,18 @@ SUM:                            50            546            615           2000 
 
 The definitions of `struct earth` and `struct grass` in [**egos.h**](library/egos.h) specify the interfaces between these layers.
 
-## Hardware Requirements
+### Hardware Requirements
 * an Artix-7 35T [Arty FPGA development board](https://www.xilinx.com/products/boards-and-kits/arty.html)
 * a microUSB cable (e.g., [microUSB-to-USB](https://www.amazon.com/CableCreation-Charging-Shielded-Charger-Compatible/dp/B07CKXQ9NB?ref_=ast_sto_dp&th=1&psc=1) or [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
 * [optional] a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card (e.g., [Sandisk](https://www.amazon.com/dp/B073K14CVB?ref=ppx_yo2_dt_b_product_details&th=1), [Samsung](https://www.amazon.com/dp/B09B1F9L52?ref=ppx_yo2_dt_b_product_details&th=1) or [PNY](https://www.amazon.com/dp/B08RG87JN5?ref=ppx_yo2_dt_b_product_details&th=1))
 
-## Software Requirements
+### Software Requirements
 * To compile egos-2000: [SiFive freedom riscv-gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only)
 * To program the on-board ROM: [OpenOCD](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) for Linux/MacOS or [Vivado](https://www.xilinx.com/support/download.html) for Windows
 * To connect with the serial tty: [screen](https://linux.die.net/man/1/screen) for Linux/MacOS or [PuTTY](https://www.putty.org/) for Windows
 * [optional] To program a disk image file to the microSD card: [dd](https://linux.die.net/man/1/dd) or [balena Etcher](https://www.balena.io/etcher/)
 
-## Usages and Documentation
+### Usages and Documentation
 
 For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md). 
 [This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
@@ -58,5 +58,9 @@ The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) intro
 The [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduces the processor used by egos-2000, especially the GPIO, UART and SPI bus controllers.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
+
+## Acknowledgements
+
 Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/) and [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/) for their support.
 Many thanks to [Meta](https://about.facebook.com/meta/) for their support with a [Facebook fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
+Many thanks to all my CS4411 students at Cornell for helping me improve this course over the years.
