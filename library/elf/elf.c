@@ -70,7 +70,7 @@ static void load_app(int pid, elf_reader reader,
     *argc_addr = argc;
     if (argv) memcpy(args_addr, argv, argc * CMD_ARG_LEN);
     for (int i = 0; i < argc; i++)
-        argv_addr[i] = (int)((char*)args_addr + i * CMD_ARG_LEN);
+        argv_addr[i] = APPS_ARG + 4 + 4 * CMD_NARGS + i * CMD_ARG_LEN;
 
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, page_no++, frame_no);

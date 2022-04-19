@@ -31,9 +31,9 @@ int main(int argc, char** argv) {
     if (!strcmp(".", argv[1])) return 0;
 
     int len = strlen(grass->workdir);
-    if (strcmp("..", argv[1])) {
+    if (strcmp("../", argv[1])) {
         if (len > 1) strcat(grass->workdir, "/");
-        strncat(grass->workdir, argv[1], strlen(argv[1]));
+        strncat(grass->workdir, argv[1], strlen(argv[1]) - 1);
     } else {
         while (grass->workdir[len] != '/') grass->workdir[len--] = 0;
         if (len) grass->workdir[len] = 0;
