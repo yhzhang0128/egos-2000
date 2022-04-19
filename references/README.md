@@ -40,7 +40,7 @@ And some optional projects:
 * `app/system/proc_shell`: interactive user interface
 * user commands: `pwd`, `clear`, `killall`, `ls`, `cat`, `echo`, `clock`
 
-Every layer has a dedicated memory region as described below (and in `library/egos.h`).
+Every layer has dedicated memory regions as described below (and in `library/egos.h`).
 The complete memory layout is described in Chapter 4 of the FE310 manual in this repository.
 
 **Selected RAM regions**

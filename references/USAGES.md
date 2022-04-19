@@ -35,6 +35,8 @@ mkdir -p build/debug build/release
 
 ## Step2: Create the disk and bootROM images
 
+Make sure you have a C compiler (i.e., the `cc` command) in your shell environment.
+
 ```shell
 > cd $EGOS/egos-2000
 > make install
