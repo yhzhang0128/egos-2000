@@ -1,6 +1,7 @@
 # Compile and run egos-2000
 
 You can use Windows, Linux or MacOS. For Windows users, use WSL (Windows Subsystem for Linux) for step1 and step2.
+There is a [tutorial video](https://youtu.be/JDApdvnnz4A) following the steps described below.
 
 ## Step1: Setup the compiler and compile egos-2000
 
