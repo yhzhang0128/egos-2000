@@ -10,7 +10,7 @@ us to state the changes made to the original code. So here are our changes:
 
 3. Increase the clock frequency from 32MHz to 65MHz.
 
-4. Change RocketCoreParams to enable user mode by setting useUser to true
+4. Change RocketCoreParams to enable user-mode by setting useUser to true.
 
 5. The SPI1 bus controller (0x10024000) was mapped to the ChipKit SPI pins 
 on the Arty board. We changed this mapping to the Pmod1 pins on the board, 
