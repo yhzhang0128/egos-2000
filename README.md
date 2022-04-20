@@ -27,7 +27,7 @@ SUM:                            50            546            615           2000 
 
 ## Earth and Grass Operating System 2000
 
-**egos-2000** and [**egos**]() are the teaching operating systems we use at Cornell. They have the same architecture.
+**egos** and **egos-2000** are the teaching operating systems we use at Cornell. They have the same architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces

@@ -17,8 +17,7 @@ And some optional projects:
 |    | Description                     | Concepts to teach                                                  | Platform   |
 |----|---------------------------------|--------------------------------------------------------------------|------------|
 | P4 | SD card driver                  | I/O bus, memory-mapped bus controller, device driver               | Arty board |
-| P6 | Networking                      | IP layer (Ethernet driver with SPI), transportation layer (UDP)    | Arty board |
-| P7 | Graphic user interface          | VGA driver with GPIO ([example](https://digilent.com/reference/learn/programmable-logic/tutorials/arty-pmod-vga-demo/start))                        | Arty board |
+| P6 | Graphic user interface          | VGA driver with GPIO ([example](https://digilent.com/reference/learn/programmable-logic/tutorials/arty-pmod-vga-demo/start))                        | Arty board |
 
 ## Architecture
 
@@ -35,9 +34,10 @@ And some optional projects:
 * `grass/scheduler`: preemptive scheduling and inter-process communication (touched by P2)
 
 **Application layer**
-* `app/system/proc_file`: manage an inode layer on the SD card (touched by P5)
-* `app/system/proc_dir`: manage the directory layer on top of inode layer (touched by P5)
-* `app/system/proc_shell`: interactive user interface
+* `app/system/sys_proc`: manage allocation and free of user processes
+* `app/system/sys_file`: manage an inode layer on the SD card (touched by P5)
+* `app/system/sys_dir`: manage the directory layer on top of inode layer (touched by P5)
+* `app/system/sys_shell`: interactive user interface
 * user commands: `pwd`, `clear`, `killall`, `ls`, `cat`, `echo`, `clock`
 
 Every layer has dedicated memory regions as described below (and in `library/egos.h`).
