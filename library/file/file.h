@@ -30,7 +30,7 @@
  * the list, or otherwise a pointer to the next block on the list.  The
  * remaining slots point to free blocks, or 0 if the slot is empty.
  */
-
+#pragma once
 #include "block_store.h"
 
 #define INODES_PER_BLOCK  (BLOCK_SIZE / sizeof(struct treedisk_inode))

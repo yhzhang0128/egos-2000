@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 /* printf() constructs a string based on its arguments 
- * and then print this string to tty by calling _write() 
+ * and then print the string to tty by calling _write() 
  */
 
 int _write(int file, char *ptr, int len) {

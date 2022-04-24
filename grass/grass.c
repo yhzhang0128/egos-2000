@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: Initialize the timer and the process control block; 
+ * Description: Initialize timer and the process control block; 
  * Spawn the first kernel process, GPID_PROCESS (pid=1).
  */
 

@@ -1,4 +1,3 @@
-#pragma once
 /*
  * (C) 2017, Cornell University
  * All rights reserved.
@@ -39,6 +38,7 @@
  * state the block store module needs to keep.
  */
 
+#pragma once
 #include "disk.h"
 
 #define NINODES  128

@@ -5,10 +5,11 @@
 
 /* Author: Yunhao Zhang
  * Description: create the disk image file (disk.img)
- * the first  1MB is reserved as 256 physical frames for paging
- * the second 1MB contains some ELF binary executables for booting
- * the last   2MB is managed by a file system
- * in total, disk.img should be exactly 4MB
+ * The disk image should be exactly 4MB
+ *     the first 1MB is reserved as 256 frames for memory paging
+ *     the next  1MB contains some ELF binary executables for booting
+ *     the last  2MB is managed by a file system
+ * the output is in binary format (disk.img)
  */
 
 #include <stdio.h>
@@ -71,7 +72,6 @@ int main() {
     write(1, exec, PAGING_DEV_SIZE);
 
     /* grass kernel processes */
-    assert(NKERNEL_PROC <= GRASS_NEXEC);
     int exec_size = GRASS_EXEC_SIZE / GRASS_NEXEC;
     fprintf(stderr, "[INFO] Loading %d kernel binary files\n", NKERNEL_PROC);
 

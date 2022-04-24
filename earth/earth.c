@@ -4,7 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: Initialize dev_tty, dev_disk, cpu_intr and cpu_mmu;
+ * Description: Initialize the bss and data segments;
+ * Initialize dev_tty, dev_disk, cpu_intr and cpu_mmu;
  * Load the grass layer binary from disk and run it.
  */
 

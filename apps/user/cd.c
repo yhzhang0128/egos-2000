@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     grass->workdir_ino = dir_ino;
 
     /* Get the path name of the new working directory */
-    if (!strcmp(".", argv[1])) return 0;
+    if (!strcmp("./", argv[1])) return 0;
 
     int len = strlen(grass->workdir);
     if (strcmp("../", argv[1])) {

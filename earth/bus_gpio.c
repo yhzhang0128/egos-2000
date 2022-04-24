@@ -3,7 +3,8 @@
  * All rights reserved.
  */
 
-/* definitions for controlling GPIO0 in FE310
+/* Author: Yunhao Zhang
+ * Description: definitions for controlling GPIO0 in FE310;
  * see chapter17 of the SiFive FE310-G002 Manual
  */
 
