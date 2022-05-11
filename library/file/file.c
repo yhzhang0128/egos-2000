@@ -114,8 +114,7 @@ static block_no treedisk_alloc_block(struct treedisk_state *ts, struct treedisk_
     /* Read the freelist block and scan for a free block reference.
      */
     union treedisk_block freelistblock;
-    if ((*ts->below->read)(ts->below, ts->below_ino, b, (block_t *) &freelistblock) < 0)
-        panic("treedisk_alloc_block");
+    (*ts->below->read)(ts->below, ts->below_ino, b, (block_t *) &freelistblock);
 
     int i;
     for (i = REFS_PER_BLOCK; --i > 0;)
@@ -429,11 +428,11 @@ int treedisk_create(block_store_t *below, unsigned int below_ino, unsigned int n
                 return -1;
             }
 
-        printf("treedisk: Created a new filesystem with %d inodes\n", ninodes);
+        /* printf("treedisk: Created a new filesystem with %d inodes\n", ninodes); */
     }
     else {
-        printf("treedisk: a filesystem already exists with %lu inodes",
-             superblock.superblock.n_inodeblocks * INODES_PER_BLOCK);
+        /* printf("treedisk: a filesystem already exists with %lu inodes", */
+        /*      superblock.superblock.n_inodeblocks * INODES_PER_BLOCK); */
     }
 
     return 0;

@@ -50,7 +50,7 @@ SECTIONS
     .heap (NOLOAD) : ALIGN(8) {
         PROVIDE( __heap_start = . );
     } >ram :ram    
-    PROVIDE( __heap_end = 0x08003000 );
+    PROVIDE( __heap_end = 0x08002800 );
 
     PROVIDE( bss_start = ADDR(.bss) );
     PROVIDE( bss_end = ADDR(.bss) + SIZEOF(.bss) );
