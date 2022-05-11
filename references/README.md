@@ -47,8 +47,8 @@ The complete memory layout is described in Chapter 4 of the [FE310 manual](sifiv
 
 | Base        | Top         | Attributes | Description       | Notes                                                      |
 |-------------|-------------|------------|-------------------|------------------------------------------------------------|
-| 0x0800_0000 | 0x0800_2FFF | RWX A      | ITIM, 12KB        | Earth layer bss, data and heap                             |
-| 0x0800_3000 | 0x0800_4FFF | RWX A      | ITIM, 8KB         | Grass layer code, bss, data and heap                       |
+| 0x0800_0000 | 0x0800_27FF | RWX A      | ITIM, 10KB        | Earth layer bss, data and heap                             |
+| 0x0800_2800 | 0x0800_4FFF | RWX A      | ITIM, 10KB        | Grass layer code, bss, data and heap                       |
 | 0x0800_5000 | 0x0800_7FFF | RWX A      | ITIM, 12KB        | App layer code, bss, data and heap                         |
 | ......      | ......      | ......     | ......            |                                                            |
 | 0x2000_0000 | 0x203F_FFFF | R XC       | Flash ROM, 4MB    | FPGA binary of the FE310 RISC-V processor                  |
