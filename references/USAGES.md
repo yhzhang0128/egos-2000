@@ -1,7 +1,7 @@
 # Compile and run egos-2000
 
 You can use Windows, Linux or MacOS. For Windows users, use WSL (Windows Subsystem for Linux) for step1 and step2.
-There is a [tutorial video](https://youtu.be/JDApdvnnz4A) following the steps described below.
+There are also two tutorial videos for [Linux/MacOS](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
 
 ## Step1: Setup the compiler and compile egos-2000
 
@@ -112,10 +112,9 @@ You may need to register a Xilinx account, but the software is free.
 In **4**, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
 If you choose the wrong one, **6** will tell you.
 
-In **2**, if the Arty board doesn't appear, try to reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US) or try the openocd method described above.
+In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](https://digilent.com/reference/software/adept/start) or reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US).
 
 ![This is an image](screenshots/vivado.png)
-
 
 ## Step4: Connect with egos-2000
 
