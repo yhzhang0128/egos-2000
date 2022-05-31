@@ -21,9 +21,7 @@ static void proc_syscall();
 static void (*kernel_entry)();
 
 int proc_curr_idx;
-struct  process     proc_set[MAX_NPROCESS];
-#define curr_pid    proc_set[proc_curr_idx].pid
-#define curr_status proc_set[proc_curr_idx].status
+struct process proc_set[MAX_NPROCESS];
 
 void intr_entry(int id) {
     if (curr_pid < GPID_SHELL && id == INTR_ID_TMR) {
@@ -84,6 +82,14 @@ static void proc_yield() {
     proc_curr_idx = next_idx;
     earth->mmu_switch(curr_pid);
     timer_reset();
+
+    /* Student's code goes here: */
+
+    /* Modify mstatus.MPP to enter machine or user mode during mret
+     * depending on whether curr_pid is a grass server or a user app
+     */
+
+    /* Student's code ends here. */
 
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
