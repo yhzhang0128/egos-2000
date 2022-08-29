@@ -45,7 +45,7 @@ The definitions of `struct earth` and `struct grass` in [**egos.h**](library/ego
 
 ### Usages and Documentation
 
-For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md) or watch the tutorial videos ([Linux/MacOS user](https://youtu.be/JDApdvnnz4A), [Windows user](https://youtu.be/VTTynr9MZRg)).
+For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md) or watch the tutorial videos ([MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) or [Windows](https://youtu.be/VTTynr9MZRg)).
 [This document](references/README.md) further introduces the teaching plans, architecture and development history.
 
 The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged registers used by egos-2000.
