@@ -2,6 +2,7 @@
 
 With only **2000** lines of code, **egos-2000** implements every component of a functional operating system.
 It runs on a **$129** small development board with a RISC-V processor.
+The vision of this project is to help **every** student from **any** college or university to read **all** the code of an operating system.
 
 | Lines of Code | What?                                  | Lines of Code | What?                     |
 |:-------------:|----------------------------------------|:-------------:|---------------------------|
