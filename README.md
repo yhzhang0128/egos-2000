@@ -1,29 +1,17 @@
 # A minimal operating system on a small RISC-V board
 
-With only **2000** lines of code, **egos-2000** implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.
-It runs on a **$129** small development board.
+With only **2000** lines of code, **egos-2000** implements every component of a functional operating system.
+It runs on a **$129** small development board with a RISC-V processor.
+
+| Lines of Code | What?                                  | Lines of Code | What?                     |
+|:-------------:|----------------------------------------|:-------------:|---------------------------|
+|      222      | SD card driver                         |      264      | 11 Applications           |
+|       48      | Exception handling                     |      262      | Library                   |
+|      106      | Memory management                      |       54      | Makefile                  |
+|      358      | Grass kernel (scheduler + system call) |      172      | FPGA board-specific tools |
+|      339      | File system                            |      175      | Other (boot loader, etc.) |
 
 ![This is an image](references/screenshots/egos-2000.jpg)
-
-```shell
-# Count lines of code excluding references and README.md
-> cloc egos-2000 --exclude-ext=md,pdf
-      62 text files.
-      61 unique files.
-      13 files ignored.
-
-github.com/AlDanial/cloc v 1.92  T=0.03 s (1668.0 files/s, 105414.7 lines/s)
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-C                               35            467            507           1563
-C/C++ Header                    11             74            105            315
-Assembly                         3              6             24             68
-make                             1             11              0             54
--------------------------------------------------------------------------------
-SUM:                            50            558            636           2000 << exactly 2000!
--------------------------------------------------------------------------------
-```
 
 ## Earth and Grass Operating System 2000
 
