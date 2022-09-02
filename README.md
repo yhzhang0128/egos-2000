@@ -16,7 +16,7 @@ The vision of this project is to help **every** student from **any** college or 
 
 ## Earth and Grass Operating System 2000
 
-**egos** and **egos-2000** are the teaching operating systems we use at Cornell. They have the same architecture.
+We use **egos-2000** as our teaching operating system at Cornell. It adopts a 3-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
