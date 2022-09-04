@@ -31,7 +31,7 @@
  * remaining slots point to free blocks, or 0 if the slot is empty.
  */
 #pragma once
-#include "block_store.h"
+#include "inode.h"
 
 #define INODES_PER_BLOCK  (BLOCK_SIZE / sizeof(struct treedisk_inode))
 #define REFS_PER_BLOCK    (BLOCK_SIZE / sizeof(block_no))

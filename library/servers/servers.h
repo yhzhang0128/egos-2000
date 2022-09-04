@@ -1,6 +1,6 @@
 #pragma once
 
-#include "block_store.h"
+#include "inode.h"
 #define SYSCALL_MSG_LEN    1024
 
 void exit(int status);

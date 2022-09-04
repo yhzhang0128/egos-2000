@@ -9,7 +9,7 @@
 
 #include "egos.h"
 #include "disk.h"
-#include "block_store.h"
+#include "inode.h"
 
 static int disk_getsize() { return FS_DISK_SIZE / BLOCK_SIZE; }
 
