@@ -62,7 +62,7 @@ char exec[GRASS_EXEC_SIZE];
 char paging[PAGING_DEV_SIZE];
 
 void mkfs();
-block_if ramdisk_init();
+inode_intf ramdisk_init();
 
 int main() {
     mkfs();
@@ -101,9 +101,9 @@ int main() {
 
 
 void mkfs() {
-    block_if ramdisk = ramdisk_init();
+    inode_intf ramdisk = ramdisk_init();
     assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
-    block_if treedisk = treedisk_init(ramdisk, 0);
+    inode_intf treedisk = treedisk_init(ramdisk, 0);
 
     char buf[GRASS_EXEC_SIZE / GRASS_NEXEC];
     for (int ino = 0; ino < NINODE; ino++) {
@@ -133,18 +133,18 @@ int getsize() { return FS_DISK_SIZE / BLOCK_SIZE; }
 
 int setsize() { assert(0); }
 
-int ramread(block_if bs, unsigned int ino, block_no offset, block_t *block) {
+int ramread(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
     memcpy(block, fs + offset * BLOCK_SIZE, BLOCK_SIZE);
     return 0;
 }
 
-int ramwrite(block_if bs, unsigned int ino, block_no offset, block_t *block) {
+int ramwrite(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
     memcpy(fs + offset * BLOCK_SIZE, block, BLOCK_SIZE);
     return 0;
 }
 
-block_if ramdisk_init() {
-    block_store_t *ramdisk = malloc(sizeof(*ramdisk));
+inode_intf ramdisk_init() {
+    inode_store_t *ramdisk = malloc(sizeof(*ramdisk));
 
     ramdisk->read = (void*)ramread;
     ramdisk->write = (void*)ramwrite;

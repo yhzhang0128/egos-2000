@@ -5,21 +5,21 @@
 
 /* Author: Robbert van Renesse, August 2015, updated November 2015
  *
- * This code implements a set of virtualized block stores on top of a single 
- * inode of another block store.  Each virtualized block store is identified by
+ * This code implements a set of virtualized inode stores on top of a single 
+ * inode of another inode store.  Each virtualized inode store is identified by
  * a so-called "inode number", which indexes into an array of inodes.  The 
  * interface is as follows:
  *
- *		void treedisk_create(block_store_t *below, unsigned int below_ino, unsigned int ninodes)
- *			Initializes the underlying block store "below" with a file system
+ *		void treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int ninodes)
+ *			Initializes the underlying inode store "below" with a file system
  *			stored within inode below_ino. If "below" is a simple
- * 			non-virtualized block store like the disk server, below_ino is
+ * 			non-virtualized inode store like the disk server, below_ino is
  * 			probably 0. The file system consists of one "superblock", a number
  * 			of blocks containing inodes, and the remaining blocks explained
  * 			below. The file system can support up to ninodes inodes.
  *
- *		block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino)
- *			Opens a virtual block store within inode below_ino of the block store below.
+ *		inode_store_t *treedisk_init(inode_store_t *below, unsigned int below_ino)
+ *			Opens a virtual inode store within inode below_ino of the inode store below.
  *
  * The layout of the file system is described in the file "file.h".
  */
@@ -44,11 +44,11 @@ struct treedisk_snapshot {
     struct treedisk_inode *inode;
 };
 
-/* The state of a virtual block store, which is identified by an inode number.
+/* The state of a virtual inode store, which is identified by an inode number.
  */
 struct treedisk_state {
-    block_store_t *below;			/* block store below */
-    unsigned int below_ino;			/* inode number to use for the block store below */
+    inode_store_t *below;			/* inode store below */
+    unsigned int below_ino;			/* inode number to use for the inode store below */
     unsigned int ninodes;			/* number of inodes in the treedisk */
 };
 
@@ -75,7 +75,7 @@ static block_no log_shift_r(block_no x, unsigned int nbits){
 }
 
 /* Get a snapshot of the file system, including the superblock and the block
- * containing the inode, from the block store below.
+ * containing the inode, from the inode store below.
  */
 static int treedisk_get_snapshot(struct treedisk_snapshot *snapshot,
                                  struct treedisk_state *ts, unsigned int inode_no){
@@ -109,7 +109,7 @@ static block_no treedisk_alloc_block(struct treedisk_state *ts, struct treedisk_
     count++;
 
     if ((b = snapshot->superblock.superblock.free_list) == 0)
-        panic("treedisk_alloc_block: block store is full\n");
+        panic("treedisk_alloc_block: inode store is full\n");
 
     /* Read the freelist block and scan for a free block reference.
      */
@@ -147,7 +147,7 @@ static block_no treedisk_alloc_block(struct treedisk_state *ts, struct treedisk_
 /* Retrieve the number of blocks in the file referenced by 'this_bs'.  This
  * information is maintained in the inode itself.
  */
-static int treedisk_getsize(block_store_t *this_bs, unsigned int ino){
+static int treedisk_getsize(inode_store_t *this_bs, unsigned int ino){
     struct treedisk_state *ts = this_bs->state;
     struct treedisk_snapshot snapshot;
     if (treedisk_get_snapshot(&snapshot, ts, ino) < 0)
@@ -158,13 +158,13 @@ static int treedisk_getsize(block_store_t *this_bs, unsigned int ino){
 
 /* Set the size of the file 'this_bs' to 'nblocks'.
  */
-static int treedisk_setsize(block_store_t *this_bs, unsigned int ino, block_no nblocks){
+static int treedisk_setsize(inode_store_t *this_bs, unsigned int ino, block_no nblocks){
     return -1;
 }
 
 /* Read a block at the given block number 'offset' and return in *block.
  */
-static int treedisk_read(block_store_t *this_bs, unsigned int ino, block_no offset, block_t *block){
+static int treedisk_read(inode_store_t *this_bs, unsigned int ino, block_no offset, block_t *block){
     struct treedisk_state *ts = this_bs->state;
 
     /* Get info from underlying file system.
@@ -220,7 +220,7 @@ static int treedisk_read(block_store_t *this_bs, unsigned int ino, block_no offs
 
 /* Write *block at the given block number 'offset'.
  */
-static int treedisk_write(block_store_t *this_bs, unsigned int ino, block_no offset, block_t *block){
+static int treedisk_write(inode_store_t *this_bs, unsigned int ino, block_no offset, block_t *block){
     struct treedisk_state *ts = this_bs->state;
     int dirty_inode = 0;
 
@@ -325,10 +325,10 @@ static int treedisk_write(block_store_t *this_bs, unsigned int ino, block_no off
     return 0;
 }
 
-/* Open a virtual block store on the specified inode of the block store below.
+/* Open a virtual inode store on the specified inode of the inode store below.
  */
 
-block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino){
+inode_store_t *treedisk_init(inode_store_t *below, unsigned int below_ino){
     /* Figure out the log of the number of references per block.
      */
     if (log_rpb == 0) {		/* first time only */
@@ -337,7 +337,7 @@ block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino){
         } while (((REFS_PER_BLOCK - 1) >> log_rpb) != 0);
     }
 
-    /* Create the block store state structure.
+    /* Create the inode store state structure.
      */
     struct treedisk_state *ts = malloc(sizeof(struct treedisk_state));
     memset(ts, 0, sizeof(struct treedisk_state));
@@ -346,8 +346,8 @@ block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino){
 
     /* Return a block interface to this inode.
      */
-    block_store_t *this_bs = malloc(sizeof(block_store_t));
-    memset(this_bs, 0, sizeof(block_store_t));
+    inode_store_t *this_bs = malloc(sizeof(inode_store_t));
+    memset(this_bs, 0, sizeof(inode_store_t));
     this_bs->state = ts;
     this_bs->getsize = treedisk_getsize;
     this_bs->setsize = treedisk_setsize;
@@ -358,13 +358,13 @@ block_store_t *treedisk_init(block_store_t *below, unsigned int below_ino){
 
 /*************************************************************************
  * The code below is for creating new tree file systems.  This should
- * only be invoked once per underlying block store.
+ * only be invoked once per underlying inode store.
  ************************************************************************/
 
 /* Create the free list and return the block number of the first
  * block on it.
  */
-block_no setup_freelist(block_store_t *below, unsigned int below_ino, block_no next_free, block_no nblocks){
+block_no setup_freelist(inode_store_t *below, unsigned int below_ino, block_no next_free, block_no nblocks){
     block_no freelist_data[REFS_PER_BLOCK];
     block_no freelist_block = 0;
     unsigned int i;
@@ -384,9 +384,9 @@ block_no setup_freelist(block_store_t *below, unsigned int below_ino, block_no n
     return freelist_block;
 }
 
-/* Create a new file system on the specified inode of the block store below.
+/* Create a new file system on the specified inode of the inode store below.
  */
-int treedisk_create(block_store_t *below, unsigned int below_ino, unsigned int ninodes){
+int treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int ninodes){
     if (sizeof(union treedisk_block) != BLOCK_SIZE)
         panic("treedisk_create: block has wrong size");
 

@@ -14,3 +14,9 @@
 #define SYS_SHELL_EXEC_START  GRASS_EXEC_START + GRASS_EXEC_SEGMENT * 4
 
 #define GRASS_FS_START        (PAGING_DEV_SIZE + GRASS_EXEC_SIZE) / BLOCK_SIZE
+
+typedef unsigned int block_no;      /* index of a block */
+
+typedef struct block {
+    char bytes[BLOCK_SIZE];
+} block_t;

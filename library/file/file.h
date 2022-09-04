@@ -6,7 +6,7 @@
 /* Author: Robbert van Renesse, August 2015
  *
  * This file describes the layout of a treedisk file system.  A file is
- * a virtualized block store.  Each virtualized file is identified by a
+ * a virtualized inode store.  Each virtualized file is identified by a
  * so-called "inode number", which indexes into an array of inodes.
  *
  * The superblock maintains the number of inode blocks and a pointer
@@ -16,7 +16,7 @@
  * inode is stored in a complete tree, with the branching vector determined
  * by the number of block indices that fit in a block (REFS_PER_BLOCK).
  * All data blocks are at the bottom level.  Each inode contains the number
- * of blocks in the virtual block store, and block index of the "root block".
+ * of blocks in the virtual inode store, and block index of the "root block".
  * If the number of blocks in the virtual store is exactly one, this root
  * block simply contains the data.  If larger than one, then the root
  * block is an "indirect block", filled with block indexes to other blocks.
@@ -33,8 +33,8 @@
 #pragma once
 #include "inode.h"
 
-#define INODES_PER_BLOCK  (BLOCK_SIZE / sizeof(struct treedisk_inode))
 #define REFS_PER_BLOCK    (BLOCK_SIZE / sizeof(block_no))
+#define INODES_PER_BLOCK  (BLOCK_SIZE / sizeof(struct treedisk_inode))
 
 /* Contents of the "superblock".  There is only one of these.
  */
@@ -43,7 +43,7 @@ struct treedisk_superblock {
     block_no free_list;			/* pointer to first block on free list */
 };
 
-/* An inode describes a file (= virtual block store).  "nblocks" contains
+/* An inode describes a file (= virtual inode store).  "nblocks" contains
  * the number of blocks in the file, while "root" is the top most block in
  * the tree of blocks.  Note that initially "all files exist" but are of
  * length 0.  It is intended that keeping track which files are free or
