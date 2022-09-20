@@ -4,6 +4,7 @@ With only **2000** lines of code, **egos-2000** implements every component of a 
 It runs on a **$129** small development board with a RISC-V processor.
 The vision of this project is to help **every** student from **any** college or university to read **all** the code of an operating system.
 
+<!---
 | Lines of Code | What?                                  | Lines of Code | What?                         |
 |:-------------:|----------------------------------------|:-------------:|-------------------------------|
 |      222      | SD card driver                         |      264      | 11 Applications (shell, etc.) |
@@ -11,6 +12,7 @@ The vision of this project is to help **every** student from **any** college or 
 |      106      | Memory management                      |       54      | Makefile                      |
 |      358      | Grass kernel (scheduler + system call) |      172      | FPGA board-specific tools     |
 |      339      | File system                            |      175      | Other (boot loader, etc.)     |
+-->
 
 ![This is an image](references/screenshots/egos-2000.jpg)
 
