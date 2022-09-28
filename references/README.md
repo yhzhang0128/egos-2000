@@ -5,19 +5,15 @@ This document describes the teaching plan, architecture and development history 
 We use **egos** and **egos-2000** to teach our Practicum in Operating Systems (CS4411) at Cornell.
 There are five mandatory projects:
 
-|    | Description                     | Concepts to teach                                           | Platform   |
-|----|---------------------------------|-------------------------------------------------------------|------------|
-| P0 | Queue                           | memory, pointer, instruction and stack pointers             | Linux/Mac  |
-| P1 | User-level threading            | thread, context switch, synchronization                     | Linux/Mac  |
-| P2 | Multi-level feedback queue      | timer and quantum, scheduling, priority                     | Linux/Mac  |
-| P3 | Memory protection and exception | control register, exception handling, privilege level       | Arty board |
-| P5 | File system                     | inode layer, directory layer, layered file system           | Arty board |
+|    | Description                       | Concepts to teach                                           | Platform   |
+|----|-----------------------------------|-------------------------------------------------------------|------------|
+| P0 | Queue in C                        | memory, pointers, basic RISC-V ISA                          | Linux/Mac  |
+| P1 | Non-preemptive Multi-threading    | context switch, multi-threading, synchronization            | Linux/Mac  |
+| P2 | Multi-level Feedback Queue        | timer, interrupt handling, scheduling                       | Linux/Mac  |
+| P3 | Memory Protection and System Call | exception, control and status register, privilege level     | Arty board |
+| P4 | SD Card Driver (optional)         | I/O device, bus controller, device driver                   | Arty board |
+| P5 | File System                       | inode layer, directory layer                                | Arty board |
 
-And some optional projects:
-|    | Description                     | Concepts to teach                                                  | Platform   |
-|----|---------------------------------|--------------------------------------------------------------------|------------|
-| P4 | SD card driver                  | I/O bus, memory-mapped bus controller, device driver               | Arty board |
-| P6 | Graphic user interface          | VGA driver with GPIO ([example](https://digilent.com/reference/learn/programmable-logic/tutorials/arty-pmod-vga-demo/start))                        | Arty board |
 
 ## Architecture
 
