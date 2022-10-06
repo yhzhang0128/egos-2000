@@ -33,7 +33,8 @@ program:
 
 qemu:
 	@echo "$(YELLOW)-------- Simulate on RISCV-QEMU --------$(END)"
-	cd $(TOOLS)/qemu; ./qemu.sh
+	cp build/release/earth.elf $(TOOLS)/qemu/earth.elf
+	cd $(TOOLS)/qemu; $(OBJCOPY) --update-section .image=../disk.img earth.elf; ./qemu.sh
 
 clean:
 	rm -rf build

@@ -6,6 +6,7 @@ MEMORY
 {
     ram (arw!xi) : ORIGIN = 0x08000000, LENGTH = 0x2000
     rom (irx!wa) : ORIGIN = 0x20400000, LENGTH = 0x400000
+    disk(irx!wa) : ORIGIN = 0x20800000, LENGTH = 0x400000
 }
 
 PHDRS
@@ -13,6 +14,7 @@ PHDRS
     rom PT_LOAD;
     ram_init PT_LOAD;
     ram PT_LOAD;
+    disk PT_LOAD;
 }
 
 SECTIONS
@@ -48,7 +50,12 @@ SECTIONS
 
     .heap (NOLOAD) : ALIGN(8) {
         PROVIDE( __heap_start = . );
-    } >ram :ram    
+    } >ram :ram
+
+    .image : {
+        *(.image.placeholder);
+        . += 0x3ffffc;
+    } >disk :disk
 
     PROVIDE( bss_start = ADDR(.bss) );
     PROVIDE( bss_end = ADDR(.bss) + SIZEOF(.bss) );

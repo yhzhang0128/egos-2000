@@ -17,3 +17,6 @@ _enter:
     /* Call main() of earth.c */
     li sp, 0x80003f80
     call main
+
+    .section .image.placeholder
+    li t0, 8
