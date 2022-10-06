@@ -72,7 +72,7 @@ I/O size (minimum/optimal): 512 bytes / 512 bytes
 4194304 bytes (4.2 MB, 4.0 MiB) copied, 0.377515 s, 11.1 MB/s
 ```
 
-You can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
+Instead of `dd`, you can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
 
 ## Step3: Program the Arty on-board ROM
 
