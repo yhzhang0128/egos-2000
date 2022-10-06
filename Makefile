@@ -35,8 +35,9 @@ program:
 
 qemu:
 	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
-	cp $(RELEASE)/earth.elf $(TOOLS)/qemu/qemu.elf
-	cd $(TOOLS)/qemu; $(OBJCOPY) --update-section .image=../disk.img qemu.elf || exit 1; ./qemu.sh
+	cp $(RELEASE)/earth.elf $(QEMU)/qemu.elf
+	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(QEMU)/qemu.elf
+	cd $(TOOLS)/qemu; ./qemu.sh
 
 clean:
 	rm -rf build
@@ -63,6 +64,7 @@ GRASS_LD = -Tgrass/grass.lds -lc -lgcc
 EARTH_LD = -Tearth/earth.lds -lc -lgcc
 
 TOOLS = tools
+QEMU = tools/qemu
 DEBUG = build/debug
 RELEASE = build/release
 OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
