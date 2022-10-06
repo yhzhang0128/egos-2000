@@ -1,4 +1,4 @@
-# A minimal operating system on QEMU and RISC-V board
+# Minimal operating system on RISC-V board and QEMU
 
 With only **2000** lines of code, **egos-2000** implements every component of a functional operating system.
 It can run on a small RISC-V board or a software emulator called QEMU.
