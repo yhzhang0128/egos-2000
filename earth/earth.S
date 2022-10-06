@@ -7,6 +7,7 @@
  * Description: boot loader
  * i.e., the first instructions executed by the CPU when boot up
  */
+    .section .image.placeholder
     .section .text.enter
     .global _enter
 _enter:
@@ -17,6 +18,3 @@ _enter:
     /* Call main() of earth.c */
     li sp, 0x80003f80
     call main
-
-    .section .image.placeholder
-    li t0, 8

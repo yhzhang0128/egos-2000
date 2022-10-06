@@ -54,7 +54,7 @@ SECTIONS
 
     .image : {
         *(.image.placeholder);
-        . += 0x3ffffc;
+        . += 0x400000;
     } >disk :disk
 
     PROVIDE( bss_start = ADDR(.bss) );
