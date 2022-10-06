@@ -23,21 +23,24 @@ install:
 	$(CC) $(TOOLS)/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs
 	cd $(TOOLS); ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	$(OBJCOPY) -O binary $(RELEASE)/earth.elf $(TOOLS)/earth.bin
+	cp $(RELEASE)/earth.elf $(TOOLS)/earth.elf
+	$(OBJCOPY) --remove-section=.image $(TOOLS)/earth.elf
+	$(OBJCOPY) -O binary $(TOOLS)/earth.elf $(TOOLS)/earth.bin
 	$(CC) $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
-	cd $(TOOLS); ./mkrom ; rm earth.bin
+	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
 
 program:
 	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
 	cd $(TOOLS)/openocd; time openocd -f 7series.txt
 
 qemu:
-	@echo "$(YELLOW)-------- Simulate on RISCV-QEMU --------$(END)"
-	cp build/release/earth.elf $(TOOLS)/qemu/earth.elf
-	cd $(TOOLS)/qemu; $(OBJCOPY) --update-section .image=../disk.img earth.elf; ./qemu.sh
+	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
+	cp $(RELEASE)/earth.elf $(TOOLS)/qemu/qemu.elf
+	cd $(TOOLS)/qemu; $(OBJCOPY) --update-section .image=../disk.img qemu.elf || exit 1; ./qemu.sh
 
 clean:
 	rm -rf build
+	rm -rf $(TOOLS)/qemu/qemu.elf
 	rm -rf $(TOOLS)/mkfs $(TOOLS)/mkrom
 	rm -rf $(TOOLS)/disk.img $(TOOLS)/bootROM.bin $(TOOLS)/bootROM.mcs
 
