@@ -17,7 +17,7 @@ We use **egos-2000** as our teaching operating system at Cornell. It adopts a 3-
     * processes, system calls and inter-process communication
 * The **application layer** implements file system, shell and user commands.
 
-The definitions of `struct earth` and `struct grass` in [**egos.h**](library/egos.h) specify the interfaces between these layers.
+The definitions of `struct earth` and `struct grass` in [**egos.h**](library/egos.h) specify the interfaces of these layers.
 
 ### Hardware Requirements
 * an Artix-7 35T [Arty FPGA development board](https://www.xilinx.com/products/boards-and-kits/arty.html)
