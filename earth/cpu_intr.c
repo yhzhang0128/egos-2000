@@ -10,14 +10,11 @@
 #include "egos.h"
 #include "earth.h"
 
-static handler_t intr_handler;
-static handler_t excp_handler;
+static handler_t intr_handler, excp_handler;
 static void trap_entry()  __attribute__((interrupt, aligned(128)));
 
 void intr_init() {
-    INFO("Use direct mode for CPU interrupt handling");
-    INFO("Put the address of trap_entry() to CSR register mtvec");
-
+    INFO("Use direct mode and put the address of trap_entry() to mtvec");
     __asm__ volatile("csrw mtvec, %0" ::"r"(trap_entry));
 }
 
@@ -28,34 +25,21 @@ static void trap_entry() {
 
     int id = mcause & 0x3FF;
     if (mcause & (1 << 31)) {
-        if (intr_handler != NULL)
-            intr_handler(id);
-        else
-            FATAL("trap_entry: handler not registered for interrupt %d", id);
+        (intr_handler != NULL)? intr_handler(id) :
+            FATAL("trap_entry: interrupt handler not registered");
     } else {
-        if (excp_handler != NULL)
-            excp_handler(id);
-        else
-            FATAL("trap_entry: handler not registered for exception %d (mepc=%x)", id, mepc);
+        (excp_handler != NULL)? excp_handler(id) :
+            FATAL("trap_entry: exception handler not registered");
     }
 }
 
 int intr_enable() {
-    int tmp;
-    /* Enable global interrupt */
-    __asm__ volatile("csrrs %0, mstatus, %1"
-                     : "=r"(tmp)
-                     : "r"(0x00000008UL));
-    /* Enable software interrupt */
-    __asm__ volatile("csrrs %0, mie, %1"
-                     : "=r"(tmp)
-                     : "r"(0x008));
-    /* Enable timer interrupt */
-    __asm__ volatile("csrrs %0, mie, %1"
-                     : "=r"(tmp)
-                     : "r"(0x080));
+    int mstatus, mie;
+    asm("csrr %0, mstatus" : "=r"(mstatus));
+    asm("csrw mstatus, %0" ::"r"(mstatus | 0x8));
+    asm("csrr %0, mie" : "=r"(mie));
+    asm("csrw mie, %0" ::"r"(mie | 0x88));
 
-    /* Note: intr_disable is similar by using csrrc instead of csrrs */
     return 0;
 }
 
