@@ -1,7 +1,10 @@
 # Compile and run egos-2000
 
-You can use MacOS, Linux or Windows. For Windows users, use WSL (Windows Subsystem for Linux) for step1 and step2.
-There are also tutorial videos for [MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
+You can use MacOS, Linux or Windows. 
+For MacOS on the Apple M1 chip, just download and run the `x86-64` version of the toolchain and MacOS will translate the binary with Rosetta.
+For Windows users, use WSL (Windows Subsystem for Linux) for step1 and step2.
+
+Here are the tutorial videos for [MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
 
 ## Step1: Setup the compiler and compile egos-2000
 
