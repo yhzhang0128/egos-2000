@@ -36,8 +36,8 @@ int disk_write(int block_no, int nblocks, char* src) {
 
 void disk_init() {
     CRITICAL("Choose a disk:");
-    printf("  Enter 0: use the microSD card\r\n");
-    printf("  Enter 1: use the on-board flash ROM @0x20800000\r\n");
+    printf("  Enter 0: microSD card (Arty board only)\r\n");
+    printf("  Enter 1: on-board flash ROM (Arty board or QEMU)\r\n");
 
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; tty_read(buf, 2));

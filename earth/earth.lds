@@ -10,10 +10,9 @@ MEMORY
 
 PHDRS
 {
-    ram PT_LOAD;
     rom PT_LOAD;
-    text PT_LOAD;
     ram_init PT_LOAD;
+    ram PT_LOAD;
 }
 
 SECTIONS
@@ -25,7 +24,7 @@ SECTIONS
 
     .text : {
         *(.text .text.*)
-    } >rom :text
+    } >rom :rom
 
     .rodata : {
         *(.rdata)
@@ -50,11 +49,11 @@ SECTIONS
     .heap (NOLOAD) : ALIGN(8) {
         PROVIDE( __heap_start = . );
     } >ram :ram    
-    PROVIDE( __heap_end = 0x08002800 );
 
     PROVIDE( bss_start = ADDR(.bss) );
     PROVIDE( bss_end = ADDR(.bss) + SIZEOF(.bss) );
     PROVIDE( data_rom = LOADADDR(.data) );
     PROVIDE( data_start = ADDR(.data) );
     PROVIDE( data_end = ADDR(.data) + SIZEOF(.data) );
+    PROVIDE( __heap_end = ADDR(.data) + 0x2800 );
 }
