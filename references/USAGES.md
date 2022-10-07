@@ -74,9 +74,31 @@ I/O size (minimum/optimal): 512 bytes / 512 bytes
 
 Instead of `dd`, you can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
 
-## Step3: Program the Arty on-board ROM
+## Step3: Run egos-2000 on QEMU
 
-### MacOS or Linux
+Download the [QEMU emulator for egos-2000](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2022.10.6) to the working directory `$EGOS`.
+
+```shell
+> cd $EGOS
+> tar -zxvf riscv-qemu-xxx.tar.gz
+> export PATH=$PATH:$EGOS/riscv-qemu-5.2.0-...../bin
+> cd $EGOS/egos-2000
+> make qemu
+-------- Simulate on QEMU-RISCV --------
+cp build/release/earth.elf tools/qemu/qemu.elf
+riscv64-unknown-elf-objcopy --update-section .image=tools/disk.img tools/qemu/qemu.elf
+qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qemu.elf -nographic
+[INFO] -----------------------------------
+[INFO] Start to initialize the earth layer
+......
+```
+
+
+## Step4: Run egos-2000 on the Arty board
+
+### Step4.1 Program the Arty on-board ROM
+
+#### MacOS or Linux
 
 Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to the working directory `$EGOS`.
 
@@ -101,7 +123,7 @@ sys     0m37.338s
 
 ```
 
-### Windows or Linux
+#### Windows or Linux
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
 
@@ -119,7 +141,7 @@ In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](http
 
 ![This is an image](screenshots/vivado.png)
 
-## Step4: Connect with egos-2000
+### Step4.2: Connect with egos-2000
 
 1. Press the `program` red button on the left-top corner of the Arty board
 2. To restart, press the `reset` red button on the right-top corner 
