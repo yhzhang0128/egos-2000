@@ -42,12 +42,12 @@ int main() {
     earth_init();
     elf_load(0, grass_read, 0, NULL);
 
-    earth->intr_enable();
-    int mstatus, mie;
-    asm("csrr %0, mstatus" : "=r"(mstatus));
-    asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
-
-    INFO("Entering the grass layer with the supervisor mode");
-    asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
-    asm("mret");
+    if (earth->platform == QEMU) {
+        earth->intr_enable();
+        asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
+        asm("mret");
+    } else {
+        void (*grass_entry)() = (void*)GRASS_ENTRY;
+        grass_entry();
+    }
 }

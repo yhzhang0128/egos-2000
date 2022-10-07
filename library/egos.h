@@ -1,6 +1,12 @@
 #pragma once
 
 struct earth {
+    /* QEMU or Arty */
+    enum {
+          QEMU,
+          ARTY
+    } platform;
+
     /* CPU interface */
     int (*intr_enable)();
     int (*intr_register)(void (*handler)(int));

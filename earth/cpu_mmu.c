@@ -13,12 +13,7 @@
 #include "earth.h"
 #include <stdlib.h>
 
-enum {
-      QEMU_PAGE_TABLE,
-      ARTY_SOFTWARE_TLB
-};
-
-/* Implementation of Software TLB Translation
+/* Implementation of Software TLB Translation for Arty
  *
  * There are 256 physical frames at the start of the SD card and 28 of
  * them are cached in the memory (more precisely, in the DTIM cache).
@@ -149,7 +144,7 @@ static int cache_write(int frame_no, char* src) {
 }
 
 
-/* Implementation of Page Table Translation
+/* Implementation of Page Table Translation for QEMU
  *
  *
  *
@@ -208,33 +203,39 @@ int qemu_switch(int pid) {
  * Choose the memory translation mechanism accordingly.
  */
 
-static int machine, tmp;
+static int mepc, mstatus;
 void machine_detect(int id) {
-    machine = ARTY_SOFTWARE_TLB;
+    earth->platform = ARTY;
     /* Skip the illegal store instruction */
-    asm("csrr %0, mepc" : "=r"(tmp));
-    asm("csrw mepc, %0" ::"r"(tmp + 4));
+    asm("csrr %0, mepc" : "=r"(mepc));
+    asm("csrw mepc, %0" ::"r"(mepc + 4));
 }
 
 void mmu_init(struct earth* _earth) {
     earth = _earth;
+    earth->platform = QEMU;
     earth->excp_register(machine_detect);
     /* This memory access triggers an exception on Arty, but not QEMU */
     *(int*)(0x1000) = 1;
     earth->excp_register(NULL);
 
-    if (machine == ARTY_SOFTWARE_TLB) {
+    if (earth->platform == ARTY) {
         earth->tty_info("Use software translation for Arty");
         earth->mmu_free = arty_free;
         earth->mmu_alloc = arty_alloc;
         earth->mmu_map = arty_map;
         earth->mmu_switch = arty_switch;
+        INFO("Will enter the grass layer with machine mode");
     } else {
         earth->tty_info("Use page table translation for QEMU");
         earth->mmu_free = qemu_free;
         earth->mmu_alloc = qemu_alloc;
         earth->mmu_map = qemu_map;
         earth->mmu_switch = qemu_switch;
+
+        INFO("Will enter the grass layer with supervisor mode");
+        asm("csrr %0, mstatus" : "=r"(mstatus));
+        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
     }
 
     curr_vm_pid = -1;
