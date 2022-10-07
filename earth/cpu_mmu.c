@@ -216,48 +216,6 @@ void machine_detect(int id) {
     asm("csrw mepc, %0" ::"r"(tmp + 4));
 }
 
-int qemu_intr_enable() {
-    int sstatus, sie;
-    asm("csrr %0, sstatus" : "=r"(sstatus));
-    asm("csrw sstatus, %0" ::"r"(sstatus | 0x2));
-    asm("csrr %0, sie" : "=r"(sie));
-    asm("csrw sie, %0" ::"r"(sie | 0x22));
-
-    return 0;
-}
-
-void enter_supervisor_mode() {
-    int ra, mstatus, mie;
-    /* Set the program counter for mret */
-    asm("mv %0, ra" :"=r"(ra));
-    asm("csrw mepc, %0" ::"r"(ra));
-
-    /* Set supervisor mode for mret and enable machine mode interrupts */
-    asm("csrr %0, mstatus" : "=r"(mstatus));
-    mstatus &= ~(3 << 11);
-    mstatus |= (1 << 11);  /* supervisor mode is mode #1 */
-    mstatus |= 0x8;        /* enable machine mode interrupt */
-    asm("csrw mstatus, %0" ::"r"(mstatus));
-
-    /* Delegate all exceptions/interrupts to the supervisor mode */
-    asm("csrw medeleg, %0" :: "r" (0xffff));
-    asm("csrw mideleg, %0" :: "r" (0xffff));
-    earth->intr_enable = qemu_intr_enable;
-    asm("csrw stvec, %0" ::"r"(supervisor_trap_entry));
-    /* Enable machine mode software and timer interrupts */
-    asm("csrr %0, mie" : "=r"(mie));
-    asm("csrw mie, %0" ::"r"(mie | 0x88));
-
-    /* Setup a PMP region allowing all memory access */
-    __asm__ volatile("csrw pmpaddr0, %0" :: "r" (0x3fffffffffffffull));
-    __asm__ volatile("csrw pmpcfg0, %0" :: "r" (0xf));
-    /* Disable page table translation for now */
-    asm("csrw satp, %0" :: "r" (0));
-
-    INFO("Entering the supervisor mode with program counter %x", ra);
-    asm("mret");
-}
-
 void mmu_init(struct earth* _earth) {
     earth = _earth;
     earth->excp_register(machine_detect);
@@ -277,10 +235,6 @@ void mmu_init(struct earth* _earth) {
         earth->mmu_alloc = qemu_alloc;
         earth->mmu_map = qemu_map;
         earth->mmu_switch = qemu_switch;
-
-        /* Page table translation requires the supervisor mode */
-        enter_supervisor_mode();
-        earth->tty_success("Entered supervisor mode");
     }
 
     curr_vm_pid = -1;

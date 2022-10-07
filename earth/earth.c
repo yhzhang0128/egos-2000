@@ -40,8 +40,14 @@ int main() {
         ((char*)&data_start)[i] = ((char*)&data_rom)[i];
 
     earth_init();
-    INFO("Start to load the grass layer");
     elf_load(0, grass_read, 0, NULL);
-    void (*grass_entry)() = (void*)GRASS_ENTRY;
-    grass_entry();
+
+    earth->intr_enable();
+    int mstatus, mie;
+    asm("csrr %0, mstatus" : "=r"(mstatus));
+    asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
+
+    INFO("Entering the grass layer with the supervisor mode");
+    asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
+    asm("mret");
 }

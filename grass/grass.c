@@ -38,7 +38,6 @@ int main() {
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
     earth->mmu_switch(GPID_PROCESS);
     timer_reset();
-    earth->intr_enable();
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     sys_proc_entry();
 }

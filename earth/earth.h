@@ -10,6 +10,4 @@ void disk_init(struct earth*);
 void intr_init(struct earth*);
 void mmu_init(struct earth*);
 
-void machine_trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));
-
-void supervisor_trap_entry()  __attribute__((interrupt ("supervisor"), aligned(128))); 
+void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));

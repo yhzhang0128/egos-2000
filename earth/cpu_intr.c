@@ -13,7 +13,7 @@
 static void (*intr_handler)(int);
 static void (*excp_handler)(int);
 
-static void trap_entry() {
+void trap_entry() {
     int mepc, mcause;
     asm("csrr %0, mepc" : "=r"(mepc));
     asm("csrr %0, mcause" : "=r"(mcause));
@@ -27,9 +27,6 @@ static void trap_entry() {
             FATAL("trap_entry: exception handler not registered");
     }
 }
-
-void machine_trap_entry() { trap_entry(); }
-void supervisor_trap_entry() { trap_entry(); }
 
 int intr_enable() {
     int mstatus, mie;
@@ -53,7 +50,7 @@ int excp_register(void (*_handler)(int)) {
 
 void intr_init(struct earth* earth) {
     INFO("Use direct mode and put the address of trap_entry() to mtvec");
-    asm("csrw mtvec, %0" ::"r"(machine_trap_entry));
+    asm("csrw mtvec, %0" ::"r"(trap_entry));
 
     earth->intr_enable = intr_enable;
     earth->intr_register = intr_register;
