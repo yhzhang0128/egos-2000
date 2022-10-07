@@ -13,6 +13,11 @@
 #include "earth.h"
 #include <stdlib.h>
 
+enum {
+      QEMU_PAGE_TABLE,  /* By default, QEMU uses page table translation */
+      ARTY_SOFTWARE_TLB  /* and the Arty board uses software translation */
+};
+
 #define NFRAMES             256
 #define CACHED_NFRAMES      28    /* 32 - 4 */
 
@@ -37,7 +42,7 @@ static struct earth* earth_local;
 static int cache_read(int frame_no);
 static int cache_write(int frame_no, char* src);
 
-int mmu_alloc(int* frame_no, int* cached_addr) {
+int arty_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
         if (!FRAME_INUSE(i)) {
             *frame_no = i;
@@ -48,7 +53,7 @@ int mmu_alloc(int* frame_no, int* cached_addr) {
     FATAL("mmu_alloc: no more available frames");
 }
 
-int mmu_free(int pid) {
+int arty_free(int pid) {
     for (int i = 0; i < NFRAMES; i++)
         if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
             /* remove the mapping */
@@ -63,7 +68,7 @@ int mmu_free(int pid) {
     return 0;
 }
 
-int mmu_map(int pid, int page_no, int frame_no) {
+int arty_map(int pid, int page_no, int frame_no) {
     if (!FRAME_INUSE(frame_no)) FATAL("mmu_map: bad frame_no");
 
     translate_table.frame[frame_no].pid = pid;
@@ -71,7 +76,7 @@ int mmu_map(int pid, int page_no, int frame_no) {
     return 0;
 }
 
-int mmu_switch(int pid) {
+int arty_switch(int pid) {
     char *dst, *src;
     int code_top = APPS_SIZE / PAGE_SIZE;
     if (pid == curr_vm_pid) return 0;
@@ -145,13 +150,44 @@ static int cache_write(int frame_no, char* src) {
     return 0;
 }
 
+int qemu_alloc(int* frame_no, int* cached_addr) {
+    arty_alloc(frame_no, cached_addr);
+}
+int qemu_free(int pid) { arty_free(pid); }
+int qemu_map(int pid, int page_no, int frame_no) {
+    arty_map(pid, page_no, frame_no);
+}
+int qemu_switch(int pid) { arty_switch(pid); }
+
+static int machine, tmp;
+void machine_detect(int id) {
+    machine = ARTY_SOFTWARE_TLB;
+    /* Skip the illegal store instruction */
+    asm("csrr %0, mepc" : "=r"(tmp));
+    asm("csrw mepc, %0" ::"r"(tmp + 4));
+}
+
 void mmu_init(struct earth* _earth) {
+    earth = _earth;
+    earth->excp_register(machine_detect);
+    /* This memory access triggers an exception on Arty, but not QEMU */
+    *(int*)(0x1000) = 1;
+    earth->excp_register(NULL);
+
+    if (machine == ARTY_SOFTWARE_TLB) {
+        earth->tty_info("Use software translation for Arty");
+        earth->mmu_free = arty_free;
+        earth->mmu_alloc = arty_alloc;
+        earth->mmu_map = arty_map;
+        earth->mmu_switch = arty_switch;
+    } else {
+        earth->tty_info("Use page table translation for QEMU");
+        earth->mmu_free = qemu_free;
+        earth->mmu_alloc = qemu_alloc;
+        earth->mmu_map = qemu_map;
+        earth->mmu_switch = qemu_switch;
+    }
+
     curr_vm_pid = -1;
     memset(lookup_table, 0xFF, sizeof(lookup_table));
-
-    earth = _earth;
-    earth->mmu_free = mmu_free;
-    earth->mmu_alloc = mmu_alloc;
-    earth->mmu_map = mmu_map;
-    earth->mmu_switch = mmu_switch;
 }
