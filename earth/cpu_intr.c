@@ -10,13 +10,9 @@
 #include "egos.h"
 #include "earth.h"
 
-static handler_t intr_handler, excp_handler;
+static void (*intr_handler)(int);
+static void (*excp_handler)(int);
 static void trap_entry()  __attribute__((interrupt, aligned(128)));
-
-void intr_init() {
-    INFO("Use direct mode and put the address of trap_entry() to mtvec");
-    __asm__ volatile("csrw mtvec, %0" ::"r"(trap_entry));
-}
 
 static void trap_entry() {
     int mepc, mcause;
@@ -43,12 +39,21 @@ int intr_enable() {
     return 0;
 }
 
-int intr_register(handler_t _handler) {
+int intr_register(void (*_handler)(int)) {
     intr_handler = _handler;
     return 0;
 }
 
-int excp_register(handler_t _handler) {
+int excp_register(void (*_handler)(int)) {
     excp_handler = _handler;
     return 0;
+}
+
+void intr_init(struct earth* earth) {
+    INFO("Use direct mode and put the address of trap_entry() to mtvec");
+    __asm__ volatile("csrw mtvec, %0" ::"r"(trap_entry));
+
+    earth->intr_enable = intr_enable;
+    earth->intr_register = intr_register;
+    earth->excp_register = excp_register;
 }

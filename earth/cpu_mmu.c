@@ -33,13 +33,9 @@ int curr_vm_pid;
 int lookup_table[CACHED_NFRAMES];
 char *cache = (void*)FRAME_CACHE_START;
 
+static struct earth* earth_local;
 static int cache_read(int frame_no);
 static int cache_write(int frame_no, char* src);
-
-void mmu_init() {
-    curr_vm_pid = -1;
-    memset(lookup_table, 0xFF, sizeof(lookup_table));
-}
 
 int mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
@@ -109,7 +105,7 @@ static int cache_evict() {
 
     if (FRAME_INUSE(frame_no)) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * idx);
+        earth->disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * idx);
     }
 
     return idx;
@@ -129,7 +125,7 @@ static int cache_read(int frame_no) {
 
     if (FRAME_INUSE(frame_no)) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        disk_read(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
+        earth->disk_read(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
     }
 
     return (int)(cache + PAGE_SIZE * free_idx);
@@ -147,4 +143,15 @@ static int cache_write(int frame_no, char* src) {
     memcpy(cache + PAGE_SIZE * free_idx, src, PAGE_SIZE);
 
     return 0;
+}
+
+void mmu_init(struct earth* _earth) {
+    curr_vm_pid = -1;
+    memset(lookup_table, 0xFF, sizeof(lookup_table));
+
+    earth = _earth;
+    earth->mmu_free = mmu_free;
+    earth->mmu_alloc = mmu_alloc;
+    earth->mmu_map = mmu_map;
+    earth->mmu_switch = mmu_switch;
 }

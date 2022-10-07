@@ -9,20 +9,14 @@
  * printf() is implemented in the C library, see library/libc/print.c
  */
 
+#define LIBC_STDIO
+#include "egos.h"
 #include <stdio.h>
 #include <stdarg.h>
 
 int uart_getc(int* c);
 void uart_putc(int c);
 void uart_init(long baud_rate);
-
-void tty_init() {
-    uart_init(115200);
-
-    /* Wait for the tty device to be ready */
-    for (int i = 0; i < 2000000; i++);
-    for (int c = 0; c != -1; uart_getc(&c));
-}
 
 static int c, is_reading;
 int tty_intr() {
@@ -92,4 +86,22 @@ int tty_success(const char *format, ...)
 int tty_critical(const char *format, ...)
 {
     LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n")
+}
+
+void tty_init(struct earth* earth) {
+    uart_init(115200);
+
+    /* Wait for the tty device to be ready */
+    for (int i = 0; i < 2000000; i++);
+    for (int c = 0; c != -1; uart_getc(&c));
+
+    earth->tty_intr = tty_intr;
+    earth->tty_read = tty_read;
+    earth->tty_write = tty_write;
+    
+    earth->tty_printf = tty_printf;
+    earth->tty_info = tty_info;
+    earth->tty_fatal = tty_fatal;
+    earth->tty_success = tty_success;
+    earth->tty_critical = tty_critical;
 }

@@ -45,11 +45,13 @@ struct grass {
 extern struct earth *earth;
 extern struct grass *grass;
 
+#ifndef LIBC_STDIO
 #define printf             earth->tty_printf
 #define INFO               earth->tty_info
 #define FATAL              earth->tty_fatal
 #define SUCCESS            earth->tty_success
 #define CRITICAL           earth->tty_critical
+#endif
 
 /* memory layout */
 #define PAGE_SIZE          4096

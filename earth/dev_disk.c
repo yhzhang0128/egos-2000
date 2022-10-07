@@ -34,13 +34,13 @@ int disk_write(int block_no, int nblocks, char* src) {
     return 0;
 }
 
-void disk_init() {
+void disk_init(struct earth* earth) {
     CRITICAL("Choose a disk:");
     printf("  Enter 0: microSD card (Arty board only)\r\n");
     printf("  Enter 1: on-board flash ROM (Arty board or QEMU)\r\n");
 
     char buf[2];
-    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; tty_read(buf, 2));
+    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
 
     if (buf[0] == '0') {
         type = SD_CARD;
@@ -50,4 +50,7 @@ void disk_init() {
         type = FLASH_ROM;
         INFO("on-board flash ROM is chosen");
     }
+
+    earth->disk_read = disk_read;
+    earth->disk_write = disk_write;
 }
