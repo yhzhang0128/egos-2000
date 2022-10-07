@@ -29,7 +29,7 @@ int disk_read(int block_no, int nblocks, char* dst) {
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
-    if (type == FLASH_ROM) FATAL("disk_write: attempt to write the ROM");
+    if (type == FLASH_ROM) FATAL("Attempt to write the on-board ROM");
     sdwrite(block_no, nblocks, src);
     return 0;
 }
@@ -42,14 +42,9 @@ void disk_init(struct earth* earth) {
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
 
-    if (buf[0] == '0') {
-        type = SD_CARD;
-        INFO("microSD card is chosen");
-        sdinit();
-    } else {
-        type = FLASH_ROM;
-        INFO("on-board flash ROM is chosen");
-    }
+    type = (buf[0] == '0')? SD_CARD : FLASH_ROM;
+    if (type == SD_CARD) sdinit();
+    INFO("%s is chosen", type == SD_CARD? "microSD" : "on-board ROM");
 
     earth->disk_read = disk_read;
     earth->disk_write = disk_write;

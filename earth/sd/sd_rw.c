@@ -23,8 +23,7 @@ static void single_read(int offset, char* dst) {
  
     /* wait for the data packet and ignore the 2-byte checksum */
     while (recv_data_byte() != 0xFE);
-    for (int i = 0; i < BLOCK_SIZE; i++)
-        dst[i] = recv_data_byte();
+    for (int i = 0; i < BLOCK_SIZE; i++) dst[i] = recv_data_byte();
     recv_data_byte();
     recv_data_byte();
 }
@@ -41,8 +40,7 @@ static void single_write(int offset, char* src) {
 
     /* send data packet: token + block + dummy 2-byte checksum */
     send_data_byte(0xFE);
-    for (int i = 0; i < BLOCK_SIZE; i++)
-        send_data_byte(src[i]);
+    for (int i = 0; i < BLOCK_SIZE; i++) send_data_byte(src[i]);
     send_data_byte(0xFF);
     send_data_byte(0xFF);
 

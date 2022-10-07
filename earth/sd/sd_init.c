@@ -39,8 +39,7 @@ void sdinit() {
     char reply = sd_exec_cmd(cmd16);
     while (recv_data_byte() != 0xFF);
 
-    if (SD_CARD_TYPE == SD_CARD_TYPE_SD2)
-        sd_check_capacity();
+    if (SD_CARD_TYPE == SD_CARD_TYPE_SD2) sd_check_capacity();
 
     if (SD_CARD_TYPE != SD_CARD_TYPE_SDHC)
         FATAL("Only SDHC/SDXC cards are supported");

@@ -24,9 +24,7 @@ enum {
 /* definitions for translation table */
 struct translation_table_t {
     struct {
-        int pid;
-        int page_no;
-        int flag;
+        int pid, page_no, flag;
     } frame[NFRAMES];
 } translate_table;
 
@@ -57,10 +55,7 @@ int arty_free(int pid) {
     for (int i = 0; i < NFRAMES; i++)
         if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
             /* remove the mapping */
-            translate_table.frame[i].pid = 0;
-            translate_table.frame[i].page_no = 0;
-            translate_table.frame[i].flag = 0;
-
+            memset(&translate_table.frame[i], 0, sizeof(int) * 3);
             /* invalidate the cache */
             for (int j = 0; j < CACHED_NFRAMES; j++)
                 if (lookup_table[j] == i) lookup_table[j] = -1;
@@ -121,8 +116,7 @@ static int cache_read(int frame_no) {
     for (int i = 0; i < CACHED_NFRAMES; i++) {
         if (lookup_table[i] == frame_no)
             return (int)(cache + PAGE_SIZE * i);
-        if (lookup_table[i] == -1 && free_idx == -1)
-            free_idx = i;
+        if (lookup_table[i] == -1 && free_idx == -1) free_idx = i;
     }
 
     if (free_idx == -1) free_idx = cache_evict();
@@ -138,10 +132,8 @@ static int cache_read(int frame_no) {
 
 static int cache_write(int frame_no, char* src) {
     for (int i = 0; i < CACHED_NFRAMES; i++)
-        if (lookup_table[i] == frame_no) {
-            memcpy(cache + PAGE_SIZE * i, src, PAGE_SIZE);
-            return 0;
-        }
+        if (lookup_table[i] == frame_no)
+            return memcpy(cache + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
 
     int free_idx = cache_evict();
     lookup_table[free_idx] = frame_no;

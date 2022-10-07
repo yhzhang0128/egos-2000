@@ -17,7 +17,6 @@ extern char bss_start, bss_end, data_rom, data_start, data_end;
 static void earth_init() {
     tty_init(earth);
     INFO("-----------------------------------");
-    INFO("Start to initialize the earth layer");
     SUCCESS("Finished initializing the tty device");
     
     disk_init(earth);
