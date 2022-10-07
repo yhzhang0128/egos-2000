@@ -31,7 +31,7 @@ install:
 
 program:
 	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
-	cd $(TOOLS)/openocd; time openocd -f 7series.txt
+	cd $(TOOLS)/fpga/openocd; time openocd -f 7series.txt
 
 qemu:
 	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"

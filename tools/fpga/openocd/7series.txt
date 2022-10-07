@@ -28,6 +28,6 @@ puts [drscan xc7.tap 32 0]
 puts "Programming FPGA..."
 
 jtagspi_init 0 bscan_spi_xc7a35t.bit
-jtagspi_program ../bootROM.bin 0 
+jtagspi_program ../../bootROM.bin 0 
 
 exit
