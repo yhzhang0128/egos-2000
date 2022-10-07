@@ -156,12 +156,13 @@ static int cache_write(int frame_no, char* src) {
  */
 
 int next_free_page_no;
+#define QEMU_NPAGES 1024
 char *first_page = (void*)FRAME_CACHE_START;
 
 int qemu_alloc(int* frame_no, int* cached_addr) {
     *frame_no = next_free_page_no++;
     *cached_addr = (int)(first_page + PAGE_SIZE * (*frame_no));
-    if (*frame_no == NFRAMES) FATAL("qemu_alloc: no more free pages");
+    if (*frame_no == QEMU_NPAGES) FATAL("qemu_alloc: no more free pages");
     translate_table.frame[*frame_no].flag |= F_INUSE;
 }
 
@@ -201,12 +202,57 @@ int qemu_switch(int pid) {
     return 0;
 }
 
+/* Implementation of MMU Initialization
+ *
+ * Detect whether egos-2000 is running on QEMU or the Arty board.
+ * Choose the memory translation mechanism accordingly.
+ */
+
 static int machine, tmp;
 void machine_detect(int id) {
     machine = ARTY_SOFTWARE_TLB;
     /* Skip the illegal store instruction */
     asm("csrr %0, mepc" : "=r"(tmp));
     asm("csrw mepc, %0" ::"r"(tmp + 4));
+}
+
+int qemu_intr_enable() {
+    int sstatus, sie;
+    asm("csrr %0, sstatus" : "=r"(sstatus));
+    asm("csrw sstatus, %0" ::"r"(sstatus | 0x2));
+    asm("csrr %0, sie" : "=r"(sie));
+    asm("csrw sie, %0" ::"r"(sie | 0x22));
+
+    return 0;
+}
+
+void enter_supervisor_mode() {
+    int ra, mstatus, mie;
+    /* Set the program counter for mret */
+    asm("mv %0, ra" :"=r"(ra));
+    asm("csrw mepc, %0" ::"r"(ra));
+
+    /* Set supervisor mode for mret and enable machine mode interrupts */
+    asm("csrr %0, mstatus" : "=r"(mstatus));
+    mstatus &= ~(3 << 11);
+    mstatus |= (1 << 11);  /* supervisor mode is mode #1 */
+    mstatus |= 0x8;        /* enable machine mode interrupt */
+    asm("csrw mstatus, %0" ::"r"(mstatus));
+
+    /* Delegate all exceptions/interrupts to the supervisor mode */
+    asm("csrw medeleg, %0" :: "r" (0xffff));
+    asm("csrw mideleg, %0" :: "r" (0xffff));
+    earth->intr_enable = qemu_intr_enable;
+    /* Enable machine mode software and timer interrupts */
+    asm("csrr %0, mie" : "=r"(mie));
+    asm("csrw mie, %0" ::"r"(mie | 0x88));
+
+    /* Setup a PMP region allowing all memory access */
+    __asm__ volatile("csrw pmpaddr0, %0" :: "r" (0x3fffffffffffffull));
+    __asm__ volatile("csrw pmpcfg0, %0" :: "r" (0xf));
+
+    INFO("Entering the supervisor mode with program counter %x", ra);
+    asm("mret");
 }
 
 void mmu_init(struct earth* _earth) {
@@ -228,6 +274,13 @@ void mmu_init(struct earth* _earth) {
         earth->mmu_alloc = qemu_alloc;
         earth->mmu_map = qemu_map;
         earth->mmu_switch = qemu_switch;
+
+        /* Page table translation requires the supervisor mode */
+        enter_supervisor_mode();
+        earth->tty_info("Entered the supervisor mode");
+        //asm("csrw stvec, %0" ::"r"(supervisor_trap_entry));
+        asm("csrw satp, %0" :: "r" (0));
+        earth->tty_info("Finished initializing mmu for QEMU");
     }
 
     curr_vm_pid = -1;
