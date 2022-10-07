@@ -46,8 +46,7 @@ void proc_init() {
 
 static void proc_set_status(int pid, int status) {
     for (int i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == pid)
-            proc_set[i].status = status;
+        if (proc_set[i].pid == pid) proc_set[i].status = status;
 }
 
 int proc_alloc() {

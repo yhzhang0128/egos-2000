@@ -16,7 +16,7 @@ static struct syscall *sc = (struct syscall*)SYSCALL_ARG;
 static void sys_invoke() {
     /* The standard way of system call is using the `ecall` instruction; 
      * Here uses software interrupt for simplicity. */
-    *((int*)RISCV_CLINT0_MSIP_BASE) = 1;
+    *((int*)0x2000000) = 1;
     while (sc->type != SYS_UNUSED);
 }
 

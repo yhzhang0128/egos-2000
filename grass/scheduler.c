@@ -67,6 +67,7 @@ void ctx_entry() {
 }
 
 static void proc_yield() {
+    /* Find the next runnable process */
     int next_idx = -1;
     for (int i = 1; i <= MAX_NPROCESS; i++) {
         int s = proc_set[(proc_curr_idx + i) % MAX_NPROCESS].status;
@@ -79,6 +80,7 @@ static void proc_yield() {
     if (next_idx == -1) FATAL("proc_yield: no runnable process");
     if (curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
+    /* Switch to the next runnable process and reset timer */
     proc_curr_idx = next_idx;
     earth->mmu_switch(curr_pid);
     timer_reset();
@@ -91,6 +93,7 @@ static void proc_yield() {
 
     /* Student's code ends here. */
 
+    /* Call the entry point for newly created process */
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
         /* Prepare argc and argv */
@@ -102,29 +105,6 @@ static void proc_yield() {
     }
 
     proc_set_running(curr_pid);
-}
-
-static void proc_send(struct syscall *sc);
-static void proc_recv(struct syscall *sc);
-
-static void proc_syscall() {
-    struct syscall *sc = (struct syscall*)SYSCALL_ARG;
-
-    int type = sc->type;
-    sc->retval = 0;
-    sc->type = SYS_UNUSED;
-    *((int*)RISCV_CLINT0_MSIP_BASE) = 0;
-
-    switch (type) {
-    case SYS_RECV:
-        proc_recv(sc);
-        break;
-    case SYS_SEND:
-        proc_send(sc);
-        break;
-    default:
-        FATAL("proc_syscall: got unknown syscall type=%d", type);
-    }
 }
 
 static void proc_send(struct syscall *sc) {
@@ -181,4 +161,24 @@ static void proc_recv(struct syscall *sc) {
     }
 
     proc_yield();
+}
+
+static void proc_syscall() {
+    struct syscall *sc = (struct syscall*)SYSCALL_ARG;
+
+    int type = sc->type;
+    sc->retval = 0;
+    sc->type = SYS_UNUSED;
+    *((int*)0x2000000) = 0;
+
+    switch (type) {
+    case SYS_RECV:
+        proc_recv(sc);
+        break;
+    case SYS_SEND:
+        proc_send(sc);
+        break;
+    default:
+        FATAL("proc_syscall: got unknown syscall type=%d", type);
+    }
 }

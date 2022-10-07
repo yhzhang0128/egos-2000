@@ -10,8 +10,6 @@
  * and section 9.1, 9.3 of the Sifive FE310 manual, v19p04
  */
 
-#include "egos.h"
-
 #define QUANTUM  5000
 
 static long long mtime_get() {

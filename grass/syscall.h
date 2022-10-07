@@ -2,8 +2,6 @@
 
 #include "servers.h"
 
-#define RISCV_CLINT0_MSIP_BASE 0x2000000
-
 enum syscall_type {
 	SYS_UNUSED,
 	SYS_RECV,
