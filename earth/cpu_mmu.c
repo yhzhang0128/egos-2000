@@ -15,13 +15,13 @@
 
 enum {
       QEMU_PAGE_TABLE,  /* By default, QEMU uses page table translation */
-      ARTY_SOFTWARE_TLB  /* and the Arty board uses software translation */
+      ARTY_SOFTWARE_TLB /* and the Arty board uses software translation */
 };
 
 #define NFRAMES             256
 #define CACHED_NFRAMES      28    /* 32 - 4 */
 
-/* definitions for translation table */
+/* definition of the software translation table */
 struct translation_table_t {
     struct {
         int pid, page_no, flag;
@@ -31,7 +31,7 @@ struct translation_table_t {
 #define F_INUSE        0x1
 #define FRAME_INUSE(x) (translate_table.frame[x].flag & F_INUSE)
 
-/* definitions for frame cache */
+/* definitions of the frame cache (for paging to disk) */
 int curr_vm_pid;
 int lookup_table[CACHED_NFRAMES];
 char *cache = (void*)FRAME_CACHE_START;
