@@ -16,8 +16,8 @@ static void trap_entry()  __attribute__((interrupt, aligned(128)));
 
 static void trap_entry() {
     int mepc, mcause;
-    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
-    __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
+    asm("csrr %0, mepc" : "=r"(mepc));
+    asm("csrr %0, mcause" : "=r"(mcause));
 
     int id = mcause & 0x3FF;
     if (mcause & (1 << 31)) {
@@ -51,7 +51,7 @@ int excp_register(void (*_handler)(int)) {
 
 void intr_init(struct earth* earth) {
     INFO("Use direct mode and put the address of trap_entry() to mtvec");
-    __asm__ volatile("csrw mtvec, %0" ::"r"(trap_entry));
+    asm("csrw mtvec, %0" ::"r"(trap_entry));
 
     earth->intr_enable = intr_enable;
     earth->intr_register = intr_register;

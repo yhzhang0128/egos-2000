@@ -33,7 +33,7 @@ void intr_entry(int id) {
     if (curr_pid >= GPID_USER_START && earth->tty_intr()) {
         /* User process killed by ctrl+c interrupt */
         INFO("process %d killed by interrupt", curr_pid);
-        __asm__ volatile("csrw mepc, %0" ::"r"(0x8005008));
+        asm("csrw mepc, %0" ::"r"(0x8005008));
         return;
     }
 
@@ -54,7 +54,7 @@ void intr_entry(int id) {
 
 void ctx_entry() {
     int mepc, tmp;
-    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
+    asm("csrr %0, mepc" : "=r"(mepc));
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
     /* kernel_entry() is either proc_yield() or proc_syscall() */
@@ -62,7 +62,7 @@ void ctx_entry() {
 
     /* Switch back to the user application stack */
     mepc = (int)proc_set[proc_curr_idx].mepc;
-    __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
+    asm("csrw mepc, %0" ::"r"(mepc));
     ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
 }
 
@@ -94,11 +94,11 @@ static void proc_yield() {
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
         /* Prepare argc and argv */
-        __asm__ volatile("mv a0, %0" ::"r"(*((int*)APPS_ARG)));
-        __asm__ volatile("mv a1, %0" ::"r"(APPS_ARG + 4));
+        asm("mv a0, %0" ::"r"(*((int*)APPS_ARG)));
+        asm("mv a1, %0" ::"r"(APPS_ARG + 4));
         /* Enter application code directly by mret */
-        __asm__ volatile("csrw mepc, %0" ::"r"(APPS_ENTRY));
-        __asm__ volatile("mret");
+        asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
+        asm("mret");
     }
 
     proc_set_running(curr_pid);
