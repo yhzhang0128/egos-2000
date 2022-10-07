@@ -243,6 +243,7 @@ void enter_supervisor_mode() {
     asm("csrw medeleg, %0" :: "r" (0xffff));
     asm("csrw mideleg, %0" :: "r" (0xffff));
     earth->intr_enable = qemu_intr_enable;
+    asm("csrw stvec, %0" ::"r"(supervisor_trap_entry));
     /* Enable machine mode software and timer interrupts */
     asm("csrr %0, mie" : "=r"(mie));
     asm("csrw mie, %0" ::"r"(mie | 0x88));
@@ -250,6 +251,8 @@ void enter_supervisor_mode() {
     /* Setup a PMP region allowing all memory access */
     __asm__ volatile("csrw pmpaddr0, %0" :: "r" (0x3fffffffffffffull));
     __asm__ volatile("csrw pmpcfg0, %0" :: "r" (0xf));
+    /* Disable page table translation for now */
+    asm("csrw satp, %0" :: "r" (0));
 
     INFO("Entering the supervisor mode with program counter %x", ra);
     asm("mret");
@@ -277,10 +280,7 @@ void mmu_init(struct earth* _earth) {
 
         /* Page table translation requires the supervisor mode */
         enter_supervisor_mode();
-        earth->tty_info("Entered the supervisor mode");
-        //asm("csrw stvec, %0" ::"r"(supervisor_trap_entry));
-        asm("csrw satp, %0" :: "r" (0));
-        earth->tty_info("Finished initializing mmu for QEMU");
+        earth->tty_success("Entered supervisor mode");
     }
 
     curr_vm_pid = -1;
