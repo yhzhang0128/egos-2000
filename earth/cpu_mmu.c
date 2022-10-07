@@ -5,8 +5,8 @@
 
 /* Author: Yunhao Zhang
  * Description: abstractions of the memory management unit (MMU);
- * there are 256 physical frames at the start of the SD card and 28 of
- * them are cached in the memory (more precisely, in the DTIM cache)
+ * By default, QEMU uses page table translation and the Arty board
+ * uses software TLB translation.
  */
 
 #include "egos.h"
@@ -14,9 +14,15 @@
 #include <stdlib.h>
 
 enum {
-      QEMU_PAGE_TABLE,  /* By default, QEMU uses page table translation */
-      ARTY_SOFTWARE_TLB /* and the Arty board uses software translation */
+      QEMU_PAGE_TABLE,
+      ARTY_SOFTWARE_TLB
 };
+
+/* Implementation of Software TLB Translation
+ *
+ * There are 256 physical frames at the start of the SD card and 28 of
+ * them are cached in the memory (more precisely, in the DTIM cache).
+ */
 
 #define NFRAMES             256
 #define CACHED_NFRAMES      28    /* 32 - 4 */
@@ -142,14 +148,58 @@ static int cache_write(int frame_no, char* src) {
     return 0;
 }
 
+
+/* Implementation of Page Table Translation
+ *
+ *
+ *
+ */
+
+int next_free_page_no;
+char *first_page = (void*)FRAME_CACHE_START;
+
 int qemu_alloc(int* frame_no, int* cached_addr) {
-    arty_alloc(frame_no, cached_addr);
+    *frame_no = next_free_page_no++;
+    *cached_addr = (int)(first_page + PAGE_SIZE * (*frame_no));
+    if (*frame_no == NFRAMES) FATAL("qemu_alloc: no more free pages");
+    translate_table.frame[*frame_no].flag |= F_INUSE;
 }
-int qemu_free(int pid) { arty_free(pid); }
+
+int qemu_free(int pid) { /* Ommitted for simplicity */ }
+
 int qemu_map(int pid, int page_no, int frame_no) {
-    arty_map(pid, page_no, frame_no);
+    translate_table.frame[frame_no].pid = pid;
+    translate_table.frame[frame_no].page_no = page_no;
+    return 0;
 }
-int qemu_switch(int pid) { arty_switch(pid); }
+
+int qemu_switch(int pid) {
+    char *dst, *src;
+    int code_top = APPS_SIZE / PAGE_SIZE;
+    if (pid == curr_vm_pid) return 0;
+
+    /* unmap curr_vm_pid from virtual address space */
+    for (int i = 0; i < NFRAMES; i++)
+        if (FRAME_INUSE(i) && translate_table.frame[i].pid == curr_vm_pid) {
+            int page_no = translate_table.frame[i].page_no;
+            src = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
+            dst = first_page + PAGE_SIZE * i;
+            memcpy(dst, src + (page_no % code_top) * PAGE_SIZE, PAGE_SIZE);
+            //cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
+        }
+
+    /* map pid to virtual address space */
+    for (int i = 0; i < NFRAMES; i++)
+        if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
+            src = first_page + i * PAGE_SIZE;
+            int page_no = translate_table.frame[i].page_no;
+            dst = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
+            memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
+        }
+
+    curr_vm_pid = pid;
+    return 0;
+}
 
 static int machine, tmp;
 void machine_detect(int id) {
