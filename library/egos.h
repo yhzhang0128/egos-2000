@@ -1,12 +1,6 @@
 #pragma once
 
 struct earth {
-    /* QEMU or Arty */
-    enum {
-          QEMU,
-          ARTY
-    } platform;
-
     /* CPU interface */
     int (*intr_enable)();
     int (*intr_register)(void (*handler)(int));
@@ -30,6 +24,9 @@ struct earth {
     int (*tty_fatal)(const char *format, ...);
     int (*tty_success)(const char *format, ...);
     int (*tty_critical)(const char *format, ...);
+
+    /* QEMU or Arty, detected in mmu_init() */
+    enum { QEMU, ARTY } platform;
 };
 
 struct grass {
