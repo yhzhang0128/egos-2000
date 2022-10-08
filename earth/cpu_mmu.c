@@ -25,13 +25,13 @@
 /* the software translation table */
 struct {
     int pid, page_no, use;
-} frame[NFRAMES];
+} table[NFRAMES];
 
 int soft_mmu_map(int pid, int page_no, int frame_no) {
-    if (!frame[frame_no].use) FATAL("mmu_map: bad frame_no");
+    if (!table[frame_no].use) FATAL("mmu_map: bad frame_no");
     
-    frame[frame_no].pid = pid;
-    frame[frame_no].page_no = page_no;
+    table[frame_no].pid = pid;
+    table[frame_no].page_no = page_no;
 }
 
 int curr_vm_pid;
@@ -46,17 +46,17 @@ int soft_mmu_switch(int pid) {
     int code_top = APPS_SIZE / PAGE_SIZE;
     /* unmap curr_vm_pid from virtual address space */
     for (int i = 0; i < NFRAMES; i++)
-        if (frame[i].use && frame[i].pid == curr_vm_pid) {
-            int page_no = frame[i].page_no;
+        if (table[i].use && table[i].pid == curr_vm_pid) {
+            int page_no = table[i].page_no;
             src = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
             cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
         }
 
     /* map pid to virtual address space */
     for (int i = 0; i < NFRAMES; i++)
-        if (frame[i].use && frame[i].pid == pid) {
+        if (table[i].use && table[i].pid == pid) {
             src = (char*)cache_read(i);
-            int page_no = frame[i].page_no;
+            int page_no = table[i].page_no;
             dst = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
             memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
         }
@@ -66,9 +66,9 @@ int soft_mmu_switch(int pid) {
 
 int soft_mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
-        if (!frame[i].use) {
+        if (!table[i].use) {
             *frame_no = i;
-            frame[i].use = 1;
+            table[i].use = 1;
             *cached_addr = cache_read(i);
             return 0;
         }
@@ -77,8 +77,8 @@ int soft_mmu_alloc(int* frame_no, int* cached_addr) {
 
 int soft_mmu_free(int pid) {
     for (int i = 0; i < NFRAMES; i++)
-        if (frame[i].use && frame[i].pid == pid) {
-            memset(&frame[i], 0, sizeof(int) * 3);
+        if (table[i].use && table[i].pid == pid) {
+            memset(&table[i], 0, sizeof(int) * 3);
             cache_invalidate(i);
         }
 }
@@ -172,7 +172,7 @@ static int cache_evict() {
     int idx = rand() % ARTY_CACHED_NFRAMES;
     int frame_no = lookup_table[idx];
 
-    if (frame[frame_no].use) {
+    if (table[frame_no].use) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
         earth->disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * idx);
     }
@@ -194,7 +194,7 @@ static int cache_read(int frame_no) {
     if (free_idx == -1) free_idx = cache_evict();
     lookup_table[free_idx] = frame_no;
 
-    if (frame[frame_no].use) {
+    if (table[frame_no].use) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
         earth->disk_read(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
     }
