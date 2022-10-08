@@ -37,13 +37,15 @@ static void load_app(int pid, elf_reader reader,
         INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
     }
 
-    /* load the app code & data */
-    int base, frame_no, page_no = 0;
+    int base, frame_no;
     int block_offset = pheader->p_offset / BLOCK_SIZE;
+    unsigned int code_start = APPS_ENTRY >> 12, stack_start = APPS_ARG >> 12;
+
+    /* Load the text, rodata, data and bss sections */
     for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
         if (off % PAGE_SIZE == 0) {
             earth->mmu_alloc(&frame_no, &base);
-            earth->mmu_map(pid, page_no++, frame_no);
+            earth->mmu_map(pid, code_start++, frame_no);
         }
         reader(block_offset++, ((char*)base) + (off % PAGE_SIZE));
     }
@@ -52,17 +54,16 @@ static void load_app(int pid, elf_reader reader,
     if (last_page_filled)
         memset(((char*)base) + last_page_filled, 0, last_page_nzeros);
 
-    while (page_no < APPS_SIZE / PAGE_SIZE) {
+    while (code_start < ((APPS_ENTRY + APPS_SIZE) >> 12)) {
         earth->mmu_alloc(&frame_no, &base);
-        earth->mmu_map(pid, page_no++, frame_no);
+        earth->mmu_map(pid, code_start++, frame_no);
         memset((char*)base, 0, PAGE_SIZE);
     }
 
-    /* allocate two pages for argc, argv and stack */
+    /* Allocate two pages for argc, argv and stack */
     earth->mmu_alloc(&frame_no, &base);
-    earth->mmu_map(pid, page_no++, frame_no);
+    earth->mmu_map(pid, stack_start++, frame_no);
 
-    /* base is at virtual address APPS_ARG */
     int* argc_addr = (int*)base;
     int* argv_addr = argc_addr + 1;
     int* args_addr = argv_addr + CMD_NARGS;
@@ -73,7 +74,7 @@ static void load_app(int pid, elf_reader reader,
         argv_addr[i] = APPS_ARG + 4 + 4 * CMD_NARGS + i * CMD_ARG_LEN;
 
     earth->mmu_alloc(&frame_no, &base);
-    earth->mmu_map(pid, page_no++, frame_no);
+    earth->mmu_map(pid, stack_start++, frame_no);
 }
 
 void elf_load(int pid, elf_reader reader, int argc, void** argv) {
