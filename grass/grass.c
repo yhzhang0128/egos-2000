@@ -20,11 +20,12 @@ static int sys_proc_read(int block_no, char* dst) {
 }
 
 int main() {
-    SUCCESS("Enter the grass layer");
+    CRITICAL("Enter the grass layer");
 
     /* Initialize the grass interface for applications */
     proc_init();
     timer_init();
+
     grass->proc_alloc = proc_alloc;
     grass->proc_free = proc_free;
     grass->proc_set_ready = proc_set_ready;
@@ -37,8 +38,10 @@ int main() {
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
     earth->mmu_switch(GPID_PROCESS);
+
     timer_reset();
     if (earth->platform == ARTY) earth->intr_enable();
+
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     sys_proc_entry();
 }

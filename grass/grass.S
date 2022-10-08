@@ -6,7 +6,7 @@
 /* Author: Yunhao Zhang
  * Description: _enter, context switch and context start
  */
-	.section .text
+    .section .text
     .global _enter, ctx_start, ctx_switch
 _enter:
     li sp,0x80003f80

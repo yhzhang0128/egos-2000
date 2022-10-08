@@ -16,16 +16,17 @@ extern char bss_start, bss_end, data_rom, data_start, data_end;
 
 static void earth_init() {
     tty_init(earth);
-    INFO("-----------------------------------");
+    CRITICAL("-----------------------------------");
+    CRITICAL("Start to initialize the earth layer");
     SUCCESS("Finished initializing the tty device");
     
     disk_init(earth);
     SUCCESS("Finished initializing the disk device");
 
-    intr_init(earth);
+    intr_init();
     SUCCESS("Finished initializing the CPU interrupts");
 
-    mmu_init(earth);
+    mmu_init();
     SUCCESS("Finished initializing the CPU memory management unit");
 }
 
@@ -42,16 +43,18 @@ int main() {
     earth_init();
     elf_load(0, grass_read, 0, NULL);
 
-    if (earth->platform == QEMU) {
+    if (earth->platform == ARTY){
+        void (*grass_entry)() = (void*)GRASS_ENTRY;
+        grass_entry();
+    } else {
         earth->intr_enable();
 
         int mstatus;
+        /* Enter supervisor mode after mret */
         asm("csrr %0, mstatus" : "=r"(mstatus));
         asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
+        /* Enter the grass layer after mret */
         asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
         asm("mret");
-    } else {
-        void (*grass_entry)() = (void*)GRASS_ENTRY;
-        grass_entry();
     }
 }

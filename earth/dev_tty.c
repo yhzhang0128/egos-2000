@@ -88,7 +88,7 @@ int tty_critical(const char *format, ...)
     LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n")
 }
 
-void tty_init(struct earth* earth) {
+void tty_init() {
     uart_init(115200);
 
     /* Wait for the tty device to be ready */

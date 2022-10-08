@@ -5,9 +5,7 @@
 #include "disk.h"
 #include <string.h>
 
-void tty_init(struct earth*);
-void disk_init(struct earth*);
-void intr_init(struct earth*);
-void mmu_init(struct earth*);
-
-void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));
+void tty_init();
+void disk_init();
+void intr_init();
+void mmu_init();

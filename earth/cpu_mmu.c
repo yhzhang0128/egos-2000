@@ -10,7 +10,6 @@
  * The Arty board uses software TLB translation and QEMU uses both.
  */
 
-#include "egos.h"
 #include "earth.h"
 #include <stdlib.h>
 
@@ -29,6 +28,8 @@ struct {
 } frame[NFRAMES];
 
 int soft_mmu_map(int pid, int page_no, int frame_no) {
+    if (!frame[frame_no].use) FATAL("mmu_map: bad frame_no");
+    
     frame[frame_no].pid = pid;
     frame[frame_no].page_no = page_no;
 }
@@ -77,7 +78,6 @@ int soft_mmu_alloc(int* frame_no, int* cached_addr) {
 int soft_mmu_free(int pid) {
     for (int i = 0; i < NFRAMES; i++)
         if (frame[i].use && frame[i].pid == pid) {
-            /* remove the mapping */
             memset(&frame[i], 0, sizeof(int) * 3);
             cache_invalidate(i);
         }
@@ -92,10 +92,9 @@ int soft_mmu_free(int pid) {
  * as a course project.
  */
 
-unsigned int frame_no, root;
+unsigned int frame_no, root, leaf;
 void setup_identity_region(unsigned int addr, int npages) {
     /* Allocate leaf page table */
-    unsigned int leaf;
     earth->mmu_alloc(&frame_no, &leaf);
     memset((void*)leaf, 0, PAGE_SIZE);
 
@@ -105,9 +104,8 @@ void setup_identity_region(unsigned int addr, int npages) {
 
     /* Setup the mapping in the leaf page table */
     int vpn0 = (addr >> 12) & 0x3FF;
-    for (int i = 0; i < npages; i++) {
+    for (int i = 0; i < npages; i++)
         ((int*)leaf)[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | 0xF;
-    }
 }
 
 void pagetable_identity_mapping() {
@@ -142,8 +140,7 @@ void machine_detect(int id) {
 int lookup_table[ARTY_CACHED_NFRAMES];
 char *cache = (void*)FRAME_CACHE_START;
 
-void mmu_init(struct earth* _earth) {
-    earth = _earth;
+void mmu_init() {
     earth->platform = QEMU;
     earth->excp_register(machine_detect);
     /* This memory access triggers an exception on Arty, but not QEMU */

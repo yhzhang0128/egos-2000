@@ -34,8 +34,8 @@ int disk_write(int block_no, int nblocks, char* src) {
     return 0;
 }
 
-void disk_init(struct earth* earth) {
-    CRITICAL("Choose a disk:");
+void disk_init() {
+    INFO("Choose a disk:");
     printf("  Enter 0: microSD card (Arty board only)\r\n");
     printf("  Enter 1: on-board flash ROM (Arty board or QEMU)\r\n");
 
