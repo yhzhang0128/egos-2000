@@ -16,9 +16,8 @@
 
 /* Implementation of Software TLB Translation
  *
- * For the Arty board, there are 256 physical frames at the start of
- * the SD card and 28 are cached in memory (i.e., the DTIM cache).
- * For QEMU, the 256 physical frames are all in memory.
+ * There are 256 physical frames at the start of the disk (e.g., SD
+ * card for Arty) and 28 are cached in memory (i.e., the DTIM cache).
  */
 
 #define NFRAMES             256
@@ -29,17 +28,47 @@ struct {
     int pid, page_no, use;
 } frame[NFRAMES];
 
+int soft_mmu_map(int pid, int page_no, int frame_no) {
+    frame[frame_no].pid = pid;
+    frame[frame_no].page_no = page_no;
+}
+
 int curr_vm_pid;
 static int cache_read(int frame_no);
 static int cache_write(int frame_no, char* src);
 static int cache_invalidate(int frame_no);
 
+int soft_mmu_switch(int pid) {
+    if (pid == curr_vm_pid) return 0;
+
+    char *dst, *src;
+    int code_top = APPS_SIZE / PAGE_SIZE;
+    /* unmap curr_vm_pid from virtual address space */
+    for (int i = 0; i < NFRAMES; i++)
+        if (frame[i].use && frame[i].pid == curr_vm_pid) {
+            int page_no = frame[i].page_no;
+            src = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
+            cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
+        }
+
+    /* map pid to virtual address space */
+    for (int i = 0; i < NFRAMES; i++)
+        if (frame[i].use && frame[i].pid == pid) {
+            src = (char*)cache_read(i);
+            int page_no = frame[i].page_no;
+            dst = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
+            memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
+        }
+
+    curr_vm_pid = pid;
+}
+
 int soft_mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
         if (!frame[i].use) {
             *frame_no = i;
-            *cached_addr = cache_read(i);
             frame[i].use = 1;
+            *cached_addr = cache_read(i);
             return 0;
         }
     FATAL("mmu_alloc: no more available frames");
@@ -52,43 +81,6 @@ int soft_mmu_free(int pid) {
             memset(&frame[i], 0, sizeof(int) * 3);
             cache_invalidate(i);
         }
-    return 0;
-}
-
-int soft_mmu_map(int pid, int page_no, int frame_no) {
-    if (!frame[frame_no].use) FATAL("mmu_map: bad frame_no");
-
-    frame[frame_no].pid = pid;
-    frame[frame_no].page_no = page_no;
-    return 0;
-}
-
-int soft_mmu_switch(int pid) {
-    char *dst, *src;
-    int code_top = APPS_SIZE / PAGE_SIZE;
-    if (pid == curr_vm_pid) return 0;
-    
-    /* unmap curr_vm_pid from virtual address space */
-    for (int i = 0; i < NFRAMES; i++)
-        if (frame[i].use && frame[i].pid == curr_vm_pid) {
-            int page_no = frame[i].page_no;
-            src = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
-            cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
-            /* INFO("Unmap(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", curr_vm_pid, i, page_no, src + (page_no % code_top) * PAGE_SIZE, cache + i * PAGE_SIZE); */
-        }
-
-    /* map pid to virtual address space */
-    for (int i = 0; i < NFRAMES; i++)
-        if (frame[i].use && frame[i].pid == pid) {
-            src = (char*)cache_read(i);
-            int page_no = frame[i].page_no;
-            dst = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
-            memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
-            /* INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst + (page_no % code_top) * PAGE_SIZE, src); */
-        }
-
-    curr_vm_pid = pid;
-    return 0;
 }
 
 /* Implementation of Page Table Translation
@@ -118,12 +110,13 @@ void setup_identity_region(unsigned int addr, int npages) {
     }
 }
 
-void create_identity_mapping() {
+void pagetable_identity_mapping() {
     /* Allocate the root page table and set the page table base */
     earth->mmu_alloc(&frame_no, &root);
     memset((void*)root, 0, PAGE_SIZE);
     asm("csrw satp, %0" ::"r"(((root >> 12) & 0xFFFFF) | (1 << 31)));
 
+    /* Allocate the leaf page tables */
     setup_identity_region(0x02000000, 16);   /* CLINT */
     setup_identity_region(0x10013000, 1);    /* UART0 */
     setup_identity_region(0x20400000, 1024); /* boot ROM */
@@ -132,22 +125,22 @@ void create_identity_mapping() {
     setup_identity_region(0x80000000, 1024); /* DTIM memory */
 }
 
-/* Implementation of MMU Initialization and a Cache
+/* Implementation of MMU Initialization and a Paging Cache
  *
  * Detect whether egos-2000 is running on QEMU or the Arty board.
- * Choose the memory translation mechanism accordingly.
+ * And choose the memory translation mechanism accordingly.
  */
 
-int lookup_table[ARTY_CACHED_NFRAMES];
-char *cache = (void*)FRAME_CACHE_START;
-
-static int mepc, mstatus;
 void machine_detect(int id) {
     earth->platform = ARTY;
     /* Skip the illegal store instruction */
+    int mepc;
     asm("csrr %0, mepc" : "=r"(mepc));
     asm("csrw mepc, %0" ::"r"(mepc + 4));
 }
+
+int lookup_table[ARTY_CACHED_NFRAMES];
+char *cache = (void*)FRAME_CACHE_START;
 
 void mmu_init(struct earth* _earth) {
     earth = _earth;
@@ -165,12 +158,8 @@ void mmu_init(struct earth* _earth) {
     if (earth->platform == ARTY) {
         earth->tty_info("Use software translation for Arty");
     } else {
+        pagetable_identity_mapping();
         earth->tty_info("Use software + page-table translation for QEMU");
-
-        create_identity_mapping();
-        /* Later enter the grass layer in supervisor mode */
-        asm("csrr %0, mstatus" : "=r"(mstatus));
-        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
     }
 
     curr_vm_pid = -1;
@@ -229,6 +218,4 @@ static int cache_write(int frame_no, char* src) {
     int free_idx = cache_evict();
     lookup_table[free_idx] = frame_no;
     memcpy(cache + PAGE_SIZE * free_idx, src, PAGE_SIZE);
-
-    return 0;
 }

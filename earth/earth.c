@@ -44,6 +44,10 @@ int main() {
 
     if (earth->platform == QEMU) {
         earth->intr_enable();
+
+        int mstatus;
+        asm("csrr %0, mstatus" : "=r"(mstatus));
+        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
         asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
         asm("mret");
     } else {
