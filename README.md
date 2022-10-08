@@ -5,7 +5,7 @@ It can run on a RISC-V board or a software emulator called QEMU.
 The vision of this project is to help **every** student from **any** college or university to read **all** the code of an operating system.
 
 ![This is an image](references/screenshots/egos-2000.jpg)
-Note: `cloc` is used to [count lines of code](https://github.com/AlDanial/cloc). Try `cloc egos-2000 --exclude-ext=md`.
+Note: `cloc` is used to [count lines of code](https://github.com/AlDanial/cloc) here. Try `cloc egos-2000 --exclude-ext=md` which excludes the markdown documents.
 
 ## Earth and Grass Operating System 2000
 
