@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: abstractions of the memory management unit (MMU);
+ * Description: memory management unit (MMU)
  * This file implements 2 translation mechanisms:
  *     page table translation and software TLB translation.
  * The Arty board uses software TLB translation and QEMU uses both.
@@ -105,21 +105,11 @@ int soft_mmu_switch(int pid) {
  * as a course project.
  */
 
-int pagetable_mmu_alloc(int* frame_no, int* cached_addr) {
-    return soft_mmu_alloc(frame_no, cached_addr);
-}
-int pagetable_mmu_map(int pid, int page_no, int frame_no) {
-    return soft_mmu_map(pid, page_no, frame_no);
-}
-int pagetable_mmu_switch(int pid) { return soft_mmu_switch(pid); }
-int pagetable_mmu_free(int pid) { return soft_mmu_free(pid); }
-
-
 unsigned int frame_no, root;
 void setup_identity_region(unsigned int addr, int npages) {
     /* Allocate leaf page table */
     unsigned int leaf;
-    pagetable_mmu_alloc(&frame_no, &leaf);
+    earth->mmu_alloc(&frame_no, &leaf);
     memset((void*)leaf, 0, PAGE_SIZE);
 
     /* Setup the mapping in the root page table */
@@ -135,7 +125,7 @@ void setup_identity_region(unsigned int addr, int npages) {
 
 void create_identity_mapping() {
     /* Allocate the root page table and set the page table base */
-    pagetable_mmu_alloc(&frame_no, &root);
+    earth->mmu_alloc(&frame_no, &root);
     memset((void*)root, 0, PAGE_SIZE);
     asm("csrw satp, %0" ::"r"(((root >> 12) & 0xFFFFF) | (1 << 31)));
 
@@ -172,18 +162,15 @@ void mmu_init(struct earth* _earth) {
     *(int*)(0x1000) = 1;
     earth->excp_register(NULL);
 
+    earth->mmu_alloc = soft_mmu_alloc;
+    earth->mmu_map = soft_mmu_map;
+    earth->mmu_switch = soft_mmu_switch;
+    earth->mmu_free = soft_mmu_free;
+
     if (earth->platform == ARTY) {
         earth->tty_info("Use software translation for Arty");
-        earth->mmu_alloc = soft_mmu_alloc;
-        earth->mmu_map = soft_mmu_map;
-        earth->mmu_switch = soft_mmu_switch;
-        earth->mmu_free = soft_mmu_free;
     } else {
         earth->tty_info("Use software + page-table translation for QEMU");
-        earth->mmu_alloc = pagetable_mmu_alloc;
-        earth->mmu_map = pagetable_mmu_map;
-        earth->mmu_switch = pagetable_mmu_switch;
-        earth->mmu_free = pagetable_mmu_free;
 
         create_identity_mapping();
         /* Later enter the grass layer in supervisor mode */
