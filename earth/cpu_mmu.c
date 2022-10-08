@@ -21,9 +21,9 @@
 
 /* the paging device */
 #define NFRAMES 256
-static int paging_read(int frame_no);
-static int paging_write(int frame_no, char* src);
-static int paging_invalidate_cache(int frame_no);
+int paging_read(int frame_no);
+int paging_write(int frame_no, char* src);
+int paging_invalidate_cache(int frame_no);
 
 /* the software translation table */
 struct frame_mapping {
@@ -120,6 +120,73 @@ void pagetable_identity_mapping() {
     setup_identity_region(0x80000000, 1024); /* DTIM memory */
 }
 
+/* Implementation of a Paging Device
+ *
+ * For QEMU, there are 256 frames starting at address FRAME_CACHE_START.
+ * For Arty, there are 28 frames cached at address FRAME_CACHE_START 
+ * and 256 frames at the beginning of the disk, i.e., the microSD card.
+ */
+
+#define ARTY_CACHED_NFRAMES 28  /* 32 - 4, 4 pages for 2 stacks */
+int cache_slot[ARTY_CACHED_NFRAMES];
+char *page_start = (void*)FRAME_CACHE_START;
+
+int paging_evict_cache() {
+    int idx = rand() % ARTY_CACHED_NFRAMES;
+    int frame_no = cache_slot[idx];
+
+    if (table[frame_no].use) {
+        int nblocks = PAGE_SIZE / BLOCK_SIZE;
+        earth->disk_write(frame_no * nblocks, nblocks, page_start + PAGE_SIZE * idx);
+    }
+
+    return idx;
+}
+
+int paging_invalidate_cache(int frame_no) {
+    for (int j = 0; j < ARTY_CACHED_NFRAMES; j++)
+        if (cache_slot[j] == frame_no) cache_slot[j] = -1;
+}
+
+void paging_init() { memset(cache_slot, 0xFF, sizeof(cache_slot)); }
+
+int paging_read(int frame_no) {
+    if (earth->platform == QEMU)
+        return (int)(page_start + frame_no * PAGE_SIZE);
+
+    int free_idx = -1;
+    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++) {
+        if (cache_slot[i] == frame_no)
+            return (int)(page_start + PAGE_SIZE * i);
+        if (cache_slot[i] == -1 && free_idx == -1) free_idx = i;
+    }
+
+    if (free_idx == -1) free_idx = paging_evict_cache();
+    cache_slot[free_idx] = frame_no;
+
+    if (table[frame_no].use) {
+        int nblocks = PAGE_SIZE / BLOCK_SIZE;
+        earth->disk_read(frame_no * nblocks, nblocks, page_start + PAGE_SIZE * free_idx);
+    }
+
+    return (int)(page_start + PAGE_SIZE * free_idx);
+}
+
+int paging_write(int frame_no, char* src) {
+    if (earth->platform == QEMU) {
+        memcpy(page_start + frame_no * PAGE_SIZE, src, PAGE_SIZE);
+        return 0;
+    }
+
+    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++)
+        if (cache_slot[i] == frame_no)
+            return memcpy(page_start + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
+
+    int free_idx = paging_evict_cache();
+    cache_slot[free_idx] = frame_no;
+    memcpy(page_start + PAGE_SIZE * free_idx, src, PAGE_SIZE);
+}
+
 /* Implementation of MMU Initialization
  *
  * Detect whether egos-2000 is running on QEMU or the Arty board.
@@ -134,7 +201,6 @@ void machine_detect(int id) {
     asm("csrw mepc, %0" ::"r"(mepc + 4));
 }
 
-static void paging_init();
 void mmu_init() {
     earth->platform = QEMU;
     earth->excp_register(machine_detect);
@@ -154,71 +220,4 @@ void mmu_init() {
         pagetable_identity_mapping();
         earth->tty_info("Use software + page-table translation for QEMU");
     }
-}
-
-/* Implementation of a Paging Device
- *
- * For QEMU, there are 256 frames starting from address FRAME_CACHE_START.
- * For Arty, there are 28 frames cached at FRAME_CACHE_START 
- * and 256 frames at the beginning of the disk, i.e., SD card.
- */
-
-#define ARTY_CACHED_NFRAMES 28  /* 32 - 4, 4 pages for 2 stacks */
-int cache_slot[ARTY_CACHED_NFRAMES];
-char *page_start = (void*)FRAME_CACHE_START;
-
-static int cache_evict() {
-    int idx = rand() % ARTY_CACHED_NFRAMES;
-    int frame_no = cache_slot[idx];
-
-    if (table[frame_no].use) {
-        int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        earth->disk_write(frame_no * nblocks, nblocks, page_start + PAGE_SIZE * idx);
-    }
-
-    return idx;
-}
-
-static void paging_init() { memset(cache_slot, 0xFF, sizeof(cache_slot)); }
-
-static int paging_invalidate_cache(int frame_no) {
-    for (int j = 0; j < ARTY_CACHED_NFRAMES; j++)
-        if (cache_slot[j] == frame_no) cache_slot[j] = -1;
-}
-
-static int paging_read(int frame_no) {
-    if (earth->platform == QEMU)
-        return (int)(page_start + frame_no * PAGE_SIZE);
-
-    int free_idx = -1;
-    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++) {
-        if (cache_slot[i] == frame_no)
-            return (int)(page_start + PAGE_SIZE * i);
-        if (cache_slot[i] == -1 && free_idx == -1) free_idx = i;
-    }
-
-    if (free_idx == -1) free_idx = cache_evict();
-    cache_slot[free_idx] = frame_no;
-
-    if (table[frame_no].use) {
-        int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        earth->disk_read(frame_no * nblocks, nblocks, page_start + PAGE_SIZE * free_idx);
-    }
-
-    return (int)(page_start + PAGE_SIZE * free_idx);
-}
-
-static int paging_write(int frame_no, char* src) {
-    if (earth->platform == QEMU) {
-        memcpy(page_start + frame_no * PAGE_SIZE, src, PAGE_SIZE);
-        return 0;
-    }
-
-    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++)
-        if (cache_slot[i] == frame_no)
-            return memcpy(page_start + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
-
-    int free_idx = cache_evict();
-    cache_slot[free_idx] = frame_no;
-    memcpy(page_start + PAGE_SIZE * free_idx, src, PAGE_SIZE);
 }
