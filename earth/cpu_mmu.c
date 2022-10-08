@@ -24,15 +24,10 @@
 #define NFRAMES             256
 #define ARTY_CACHED_NFRAMES 28  /* 32 - 4, 4 pages for 2 stacks */
 
-/* definition of the software translation table */
-struct translation_table_t {
-    struct {
-        int pid, page_no, flag;
-    } frame[NFRAMES];
-} translate_table;
-
-#define F_INUSE        0x1
-#define FRAME_INUSE(x) (translate_table.frame[x].flag & F_INUSE)
+/* the software translation table */
+struct {
+    int pid, page_no, use;
+} frame[NFRAMES];
 
 int curr_vm_pid;
 static int cache_read(int frame_no);
@@ -41,10 +36,10 @@ static int cache_invalidate(int frame_no);
 
 int soft_mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
-        if (!FRAME_INUSE(i)) {
+        if (!frame[i].use) {
             *frame_no = i;
             *cached_addr = cache_read(i);
-            translate_table.frame[i].flag |= F_INUSE;
+            frame[i].use = 1;
             return 0;
         }
     FATAL("mmu_alloc: no more available frames");
@@ -52,19 +47,19 @@ int soft_mmu_alloc(int* frame_no, int* cached_addr) {
 
 int soft_mmu_free(int pid) {
     for (int i = 0; i < NFRAMES; i++)
-        if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
+        if (frame[i].use && frame[i].pid == pid) {
             /* remove the mapping */
-            memset(&translate_table.frame[i], 0, sizeof(int) * 3);
+            memset(&frame[i], 0, sizeof(int) * 3);
             cache_invalidate(i);
         }
     return 0;
 }
 
 int soft_mmu_map(int pid, int page_no, int frame_no) {
-    if (!FRAME_INUSE(frame_no)) FATAL("mmu_map: bad frame_no");
+    if (!frame[frame_no].use) FATAL("mmu_map: bad frame_no");
 
-    translate_table.frame[frame_no].pid = pid;
-    translate_table.frame[frame_no].page_no = page_no;
+    frame[frame_no].pid = pid;
+    frame[frame_no].page_no = page_no;
     return 0;
 }
 
@@ -75,8 +70,8 @@ int soft_mmu_switch(int pid) {
     
     /* unmap curr_vm_pid from virtual address space */
     for (int i = 0; i < NFRAMES; i++)
-        if (FRAME_INUSE(i) && translate_table.frame[i].pid == curr_vm_pid) {
-            int page_no = translate_table.frame[i].page_no;
+        if (frame[i].use && frame[i].pid == curr_vm_pid) {
+            int page_no = frame[i].page_no;
             src = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
             cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
             /* INFO("Unmap(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", curr_vm_pid, i, page_no, src + (page_no % code_top) * PAGE_SIZE, cache + i * PAGE_SIZE); */
@@ -84,9 +79,9 @@ int soft_mmu_switch(int pid) {
 
     /* map pid to virtual address space */
     for (int i = 0; i < NFRAMES; i++)
-        if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
+        if (frame[i].use && frame[i].pid == pid) {
             src = (char*)cache_read(i);
-            int page_no = translate_table.frame[i].page_no;
+            int page_no = frame[i].page_no;
             dst = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
             memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
             /* INFO("Map(pid=%d, frame=%d, page=%d, vaddr=%.8x, paddr=%.8x)", pid, i, page_no, dst + (page_no % code_top) * PAGE_SIZE, src); */
@@ -191,7 +186,7 @@ static int cache_evict() {
     int idx = rand() % ARTY_CACHED_NFRAMES;
     int frame_no = lookup_table[idx];
 
-    if (FRAME_INUSE(frame_no)) {
+    if (frame[frame_no].use) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
         earth->disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * idx);
     }
@@ -213,7 +208,7 @@ static int cache_read(int frame_no) {
     if (free_idx == -1) free_idx = cache_evict();
     lookup_table[free_idx] = frame_no;
 
-    if (FRAME_INUSE(frame_no)) {
+    if (frame[frame_no].use) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
         earth->disk_read(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
     }
