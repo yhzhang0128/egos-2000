@@ -62,8 +62,8 @@ int soft_mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
         if (!table[i].use) {
             *frame_no = i;
-            table[i].use = 1;
             *cached_addr = paging_read(i);
+            table[i].use = 1;
             return 0;
         }
     FATAL("mmu_alloc: no more available frames");
