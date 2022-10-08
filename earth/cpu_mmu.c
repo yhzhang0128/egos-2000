@@ -5,22 +5,24 @@
 
 /* Author: Yunhao Zhang
  * Description: abstractions of the memory management unit (MMU);
- * By default, QEMU uses page table translation and the Arty board
- * uses software TLB translation.
+ * This file implements 2 translation mechanisms:
+ *     page table translation and software TLB translation.
+ * The Arty board uses software TLB translation and QEMU uses both.
  */
 
 #include "egos.h"
 #include "earth.h"
 #include <stdlib.h>
 
-/* Implementation of Software TLB Translation for Arty
+/* Implementation of Software TLB Translation
  *
- * There are 256 physical frames at the start of the SD card and 28 of
- * them are cached in the memory (more precisely, in the DTIM cache).
+ * For the Arty board, there are 256 physical frames at the start of
+ * the SD card and 28 are cached in memory (i.e., the DTIM cache).
+ * For QEMU, the 256 physical frames are all in memory.
  */
 
 #define NFRAMES             256
-#define CACHED_NFRAMES      28    /* 32 - 4 */
+#define ARTY_CACHED_NFRAMES 28  /* 32 - 4, 4 pages for 2 stacks */
 
 /* definition of the software translation table */
 struct translation_table_t {
@@ -32,14 +34,10 @@ struct translation_table_t {
 #define F_INUSE        0x1
 #define FRAME_INUSE(x) (translate_table.frame[x].flag & F_INUSE)
 
-/* definitions of the frame cache (for paging to disk) */
 int curr_vm_pid;
-int lookup_table[CACHED_NFRAMES];
-char *cache = (void*)FRAME_CACHE_START;
-
-static struct earth* earth_local;
 static int cache_read(int frame_no);
 static int cache_write(int frame_no, char* src);
+static int cache_invalidate(int frame_no);
 
 int soft_mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
@@ -57,9 +55,7 @@ int soft_mmu_free(int pid) {
         if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
             /* remove the mapping */
             memset(&translate_table.frame[i], 0, sizeof(int) * 3);
-            /* invalidate the cache */
-            for (int j = 0; j < CACHED_NFRAMES; j++)
-                if (lookup_table[j] == i) lookup_table[j] = -1;
+            cache_invalidate(i);
         }
     return 0;
 }
@@ -100,33 +96,23 @@ int soft_mmu_switch(int pid) {
     return 0;
 }
 
-/* Implementation of Page Table Translation for QEMU
+/* Implementation of Page Table Translation
  *
  * The code below creates a simple identity mapping using page tables.
  * mmu_map() and mmu_switch() are still implemented by software TLB.
+ *
  * Using page tables for mmu_map() and mmu_switch() is left to students
  * as a course project.
  */
 
-int next_free_page_no;
-#define QEMU_NPAGES 1024
-char *first_page = (void*)FRAME_CACHE_START;
-
 int pagetable_mmu_alloc(int* frame_no, int* cached_addr) {
-    *frame_no = next_free_page_no++;
-    *cached_addr = (int)(first_page + PAGE_SIZE * (*frame_no));
-    if (*frame_no == QEMU_NPAGES) FATAL("mmu_alloc: no more free pages");
-    translate_table.frame[*frame_no].flag |= F_INUSE;
+    return soft_mmu_alloc(frame_no, cached_addr);
 }
-
 int pagetable_mmu_map(int pid, int page_no, int frame_no) {
-    translate_table.frame[frame_no].pid = pid;
-    translate_table.frame[frame_no].page_no = page_no;
-    return 0;
+    return soft_mmu_map(pid, page_no, frame_no);
 }
-
-int pagetable_mmu_switch(int pid) { soft_mmu_switch(pid); }
-int pagetable_mmu_free(int pid) { /* Ommitted for simplicity */ }
+int pagetable_mmu_switch(int pid) { return soft_mmu_switch(pid); }
+int pagetable_mmu_free(int pid) { return soft_mmu_free(pid); }
 
 
 unsigned int frame_no, root;
@@ -161,11 +147,14 @@ void create_identity_mapping() {
     setup_identity_region(0x80000000, 1024); /* DTIM memory */
 }
 
-/* Implementation of MMU Initialization
+/* Implementation of MMU Initialization and a Cache
  *
  * Detect whether egos-2000 is running on QEMU or the Arty board.
  * Choose the memory translation mechanism accordingly.
  */
+
+int lookup_table[ARTY_CACHED_NFRAMES];
+char *cache = (void*)FRAME_CACHE_START;
 
 static int mepc, mstatus;
 void machine_detect(int id) {
@@ -189,16 +178,15 @@ void mmu_init(struct earth* _earth) {
         earth->mmu_map = soft_mmu_map;
         earth->mmu_switch = soft_mmu_switch;
         earth->mmu_free = soft_mmu_free;
-        INFO("Will enter the grass layer with machine mode");
     } else {
-        earth->tty_info("Use page table translation for QEMU");
+        earth->tty_info("Use software + page-table translation for QEMU");
         earth->mmu_alloc = pagetable_mmu_alloc;
         earth->mmu_map = pagetable_mmu_map;
         earth->mmu_switch = pagetable_mmu_switch;
         earth->mmu_free = pagetable_mmu_free;
 
         create_identity_mapping();
-        INFO("Will enter the grass layer with supervisor mode");
+        /* Later enter the grass layer in supervisor mode */
         asm("csrr %0, mstatus" : "=r"(mstatus));
         asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
     }
@@ -207,9 +195,13 @@ void mmu_init(struct earth* _earth) {
     memset(lookup_table, 0xFF, sizeof(lookup_table));
 }
 
+static int cache_invalidate(int frame_no) {
+    for (int j = 0; j < ARTY_CACHED_NFRAMES; j++)
+        if (lookup_table[j] == frame_no) lookup_table[j] = -1;
+}
 
 static int cache_evict() {
-    int idx = rand() % CACHED_NFRAMES;
+    int idx = rand() % ARTY_CACHED_NFRAMES;
     int frame_no = lookup_table[idx];
 
     if (FRAME_INUSE(frame_no)) {
@@ -222,10 +214,10 @@ static int cache_evict() {
 
 static int cache_read(int frame_no) {
     if (earth->platform == QEMU)
-        return (int)(first_page + frame_no * PAGE_SIZE);
+        return (int)(cache + frame_no * PAGE_SIZE);
 
     int free_idx = -1;
-    for (int i = 0; i < CACHED_NFRAMES; i++) {
+    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++) {
         if (lookup_table[i] == frame_no)
             return (int)(cache + PAGE_SIZE * i);
         if (lookup_table[i] == -1 && free_idx == -1) free_idx = i;
@@ -244,11 +236,11 @@ static int cache_read(int frame_no) {
 
 static int cache_write(int frame_no, char* src) {
     if (earth->platform == QEMU) {
-        memcpy(first_page + frame_no * PAGE_SIZE, src, PAGE_SIZE);
+        memcpy(cache + frame_no * PAGE_SIZE, src, PAGE_SIZE);
         return 0;
     }
 
-    for (int i = 0; i < CACHED_NFRAMES; i++)
+    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++)
         if (lookup_table[i] == frame_no)
             return memcpy(cache + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
 
