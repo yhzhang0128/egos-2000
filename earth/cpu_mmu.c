@@ -197,99 +197,37 @@ int qemu_switch(int pid) {
     return 0;
 }
 
-void setup_identity_mapping() {
-    /* In PMP, allow access to all physical memory */
-    //asm("csrw pmpaddr0, %0" :: "r" (0x08008000));
-    asm("csrw pmpaddr0, %0" :: "r" (0x3FFFFFFFFFFFFFULL));
-    asm("csrw pmpcfg0, %0" :: "r" (0XF));
 
-    /* int mstatus; */
-    /* asm("csrr %0, mstatus" : "=r"(mstatus)); */
-    /* asm("csrw mstatus, %0" ::"r"(mstatus | (3 << 18))); */
-    
-    int frame_no, vpn0, vpn1, root, leaf1, leaf2, leaf3, leaf4, leaf5, leaf6;
+unsigned int frame_no, root;
+void setup_identity_region(unsigned int region_addr, int npages) {
     int pde_flag = 0x1 | (1 << 6);  /* valid, point to next level */
     int pte_flag = 0xF | (1 << 6);  /* valid, readable, writable, executable */
+    unsigned int leaf, mask = 0x3FFFFFFF;
+    qemu_alloc(&frame_no, &leaf);
+    memset((void*)leaf, 0, PAGE_SIZE);
 
-    /* Allocate and empty the root page table */
+    int vpn0 = (region_addr >> 12) & 0x3FF;  /* 10-bit */
+    int vpn1 = (region_addr >> 22) & 0x3FF;  /* 10-bit */
+    ((int*)root)[vpn1] = ((leaf >> 2) & mask) | pde_flag;
+    for (int i = 0; i < npages; i++) {
+        ((int*)leaf)[vpn0 + i] = (((region_addr + i * PAGE_SIZE) >> 2) & mask) | pte_flag;
+    }
+
+}
+
+void create_identity_mapping() {
+    /* Allocate the root page table and set the page table base */
     qemu_alloc(&frame_no, &root);
     memset((void*)root, 0, PAGE_SIZE);
-
-    /* Set the page table base */
-    int satp, root_ppn = (root >> 12) & 0xFFFFF;
-    asm("csrw satp, %0" ::"r"(root_ppn | (1 << 31)));
-    asm("csrr %0, satp" : "=r"(satp));
-    INFO("Set satp as 0x%x", satp);
+    asm("csrw satp, %0" ::"r"(((root >> 12) & 0xFFFFF) | (1 << 31)));
 
     /* Allow all access to ITIM memory: 0800_0000 -> 0800_8000 */
-    unsigned int region1_addr = 0x08000000, region1_npages = 8;
-    qemu_alloc(&frame_no, &leaf1);
-    memset((void*)leaf1, 0, PAGE_SIZE);
-
-    vpn0 = (region1_addr >> 12) & 0x3FF;  /* 10-bit */
-    vpn1 = (region1_addr >> 22) & 0x3FF;  /* 10-bit */
-    ((int*)root)[vpn1] = ((leaf1 >> 2) & 0x3FFFFFFF) | pde_flag;
-    for (int i = 0; i < region1_npages; i++) {
-        ((int*)leaf1)[vpn0 + i] = (((region1_addr + i * PAGE_SIZE) >> 2) & 0x3FFFFFFFF) | pte_flag;
-    }
-
-    /* Allow all access to DTIM memory: 8000_0000 -> 8040_0000 */
-    unsigned int region2_addr = 0x80000000, region2_npages = 1024;
-    qemu_alloc(&frame_no, &leaf2);
-    memset((void*)leaf2, 0, PAGE_SIZE);
-
-    vpn0 = (region2_addr >> 12) & 0x3FF;  /* 10-bit */
-    vpn1 = (region2_addr >> 22) & 0x3FF;  /* 10-bit */
-    ((int*)root)[vpn1] = ((leaf2 >> 2) & 0x3FFFFFFF) | pde_flag;
-    for (int i = 0; i < region2_npages; i++) {
-        ((int*)leaf2)[vpn0 + i] = (((region2_addr + i * PAGE_SIZE) >> 2) & 0x3FFFFFFFF) | pte_flag;
-    }
-
-    /* Allow all access to ROM: 2040_0000 -> 2080_0000 */
-    unsigned int region3_addr = 0x20400000, region3_npages = 1024;
-    qemu_alloc(&frame_no, &leaf3);
-    memset((void*)leaf3, 0, PAGE_SIZE);
-
-    vpn0 = (region3_addr >> 12) & 0x3FF;  /* 10-bit */
-    vpn1 = (region3_addr >> 22) & 0x3FF;  /* 10-bit */
-    ((int*)root)[vpn1] = ((leaf3 >> 2) & 0x3FFFFFFF) | pde_flag;
-    for (int i = 0; i < region3_npages; i++) {
-        ((int*)leaf3)[vpn0 + i] = (((region3_addr + i * PAGE_SIZE) >> 2) & 0x3FFFFFFFF) | pte_flag;
-    }
-
-    /* Allow all access to UART0: 1001_3000 -> 1014_0000 */
-    unsigned int region4_addr = 0x10013000;
-    qemu_alloc(&frame_no, &leaf4);
-    memset((void*)leaf4, 0, PAGE_SIZE);
-
-    vpn0 = (region4_addr >> 12) & 0x3FF;  /* 10-bit */
-    vpn1 = (region4_addr >> 22) & 0x3FF;  /* 10-bit */
-    ((int*)root)[vpn1] = ((leaf4 >> 2) & 0x3FFFFFFF) | pde_flag;
-    ((int*)leaf4)[vpn0] = (((region4_addr) >> 2) & 0x3FFFFFFFF) | pte_flag;
-
-    /* Allow all access to CLINT: 0200_0000 -> 0201_0000 */
-    unsigned int region5_addr = 0x02000000, region5_npages = 16;
-    qemu_alloc(&frame_no, &leaf5);
-    memset((void*)leaf5, 0, PAGE_SIZE);
-
-    vpn0 = (region5_addr >> 12) & 0x3FF;  /* 10-bit */
-    vpn1 = (region5_addr >> 22) & 0x3FF;  /* 10-bit */
-    ((int*)root)[vpn1] = ((leaf5 >> 2) & 0x3FFFFFFF) | pde_flag;
-    for (int i = 0; i < region5_npages; i++) {
-        ((int*)leaf5)[vpn0 + i] = (((region5_addr + i * PAGE_SIZE) >> 2) & 0x3FFFFFFFF) | pte_flag;
-    }
-
-    /* Allow all access to Disk: 2080_0000 -> 20c0_0000 */
-    unsigned int region6_addr = 0x20800000, region6_npages = 1024;
-    qemu_alloc(&frame_no, &leaf6);
-    memset((void*)leaf6, 0, PAGE_SIZE);
-
-    vpn0 = (region6_addr >> 12) & 0x3FF;  /* 10-bit */
-    vpn1 = (region6_addr >> 22) & 0x3FF;  /* 10-bit */
-    ((int*)root)[vpn1] = ((leaf6 >> 2) & 0x3FFFFFFF) | pde_flag;
-    for (int i = 0; i < region6_npages; i++) {
-        ((int*)leaf6)[vpn0 + i] = (((region6_addr + i * PAGE_SIZE) >> 2) & 0x3FFFFFFFF) | pte_flag;
-    }
+    setup_identity_region(0x08000000, 8);    /* ITIM memory */
+    setup_identity_region(0x80000000, 1024); /* DTIM memory */
+    setup_identity_region(0x20400000, 1024); /* boot ROM */
+    setup_identity_region(0x10013000, 1);    /* UART0 */
+    setup_identity_region(0x02000000, 16);   /* UART0 */
+    setup_identity_region(0x20800000, 1024); /* UART0 */
 }
 
 /* Implementation of MMU Initialization
@@ -328,7 +266,7 @@ void mmu_init(struct earth* _earth) {
         earth->mmu_map = qemu_map;
         earth->mmu_switch = qemu_switch;
 
-        setup_identity_mapping();
+        create_identity_mapping();
         INFO("Will enter the grass layer with supervisor mode");
         asm("csrr %0, mstatus" : "=r"(mstatus));
         asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
