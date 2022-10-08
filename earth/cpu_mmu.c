@@ -41,7 +41,7 @@ static struct earth* earth_local;
 static int cache_read(int frame_no);
 static int cache_write(int frame_no, char* src);
 
-int arty_alloc(int* frame_no, int* cached_addr) {
+int soft_mmu_alloc(int* frame_no, int* cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
         if (!FRAME_INUSE(i)) {
             *frame_no = i;
@@ -52,7 +52,7 @@ int arty_alloc(int* frame_no, int* cached_addr) {
     FATAL("mmu_alloc: no more available frames");
 }
 
-int arty_free(int pid) {
+int soft_mmu_free(int pid) {
     for (int i = 0; i < NFRAMES; i++)
         if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
             /* remove the mapping */
@@ -64,7 +64,7 @@ int arty_free(int pid) {
     return 0;
 }
 
-int arty_map(int pid, int page_no, int frame_no) {
+int soft_mmu_map(int pid, int page_no, int frame_no) {
     if (!FRAME_INUSE(frame_no)) FATAL("mmu_map: bad frame_no");
 
     translate_table.frame[frame_no].pid = pid;
@@ -72,7 +72,7 @@ int arty_map(int pid, int page_no, int frame_no) {
     return 0;
 }
 
-int arty_switch(int pid) {
+int soft_mmu_switch(int pid) {
     char *dst, *src;
     int code_top = APPS_SIZE / PAGE_SIZE;
     if (pid == curr_vm_pid) return 0;
@@ -100,109 +100,40 @@ int arty_switch(int pid) {
     return 0;
 }
 
-static int cache_evict() {
-    int idx = rand() % CACHED_NFRAMES;
-    int frame_no = lookup_table[idx];
-
-    if (FRAME_INUSE(frame_no)) {
-        int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        earth->disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * idx);
-    }
-
-    return idx;
-}
-
-static int cache_read(int frame_no) {
-    int free_idx = -1;
-    for (int i = 0; i < CACHED_NFRAMES; i++) {
-        if (lookup_table[i] == frame_no)
-            return (int)(cache + PAGE_SIZE * i);
-        if (lookup_table[i] == -1 && free_idx == -1) free_idx = i;
-    }
-
-    if (free_idx == -1) free_idx = cache_evict();
-    lookup_table[free_idx] = frame_no;
-
-    if (FRAME_INUSE(frame_no)) {
-        int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        earth->disk_read(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
-    }
-
-    return (int)(cache + PAGE_SIZE * free_idx);
-}
-
-static int cache_write(int frame_no, char* src) {
-    for (int i = 0; i < CACHED_NFRAMES; i++)
-        if (lookup_table[i] == frame_no)
-            return memcpy(cache + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
-
-    int free_idx = cache_evict();
-    lookup_table[free_idx] = frame_no;
-    memcpy(cache + PAGE_SIZE * free_idx, src, PAGE_SIZE);
-
-    return 0;
-}
-
-
 /* Implementation of Page Table Translation for QEMU
  *
- *
- *
+ * The code below creates a simple identity mapping using page tables.
+ * mmu_map() and mmu_switch() are still implemented by software TLB.
+ * Using page tables for mmu_map() and mmu_switch() is left to students
+ * as a course project.
  */
 
 int next_free_page_no;
 #define QEMU_NPAGES 1024
 char *first_page = (void*)FRAME_CACHE_START;
 
-int qemu_alloc(int* frame_no, int* cached_addr) {
+int pagetable_mmu_alloc(int* frame_no, int* cached_addr) {
     *frame_no = next_free_page_no++;
     *cached_addr = (int)(first_page + PAGE_SIZE * (*frame_no));
-    if (*frame_no == QEMU_NPAGES) FATAL("qemu_alloc: no more free pages");
+    if (*frame_no == QEMU_NPAGES) FATAL("mmu_alloc: no more free pages");
     translate_table.frame[*frame_no].flag |= F_INUSE;
 }
 
-int qemu_free(int pid) { /* Ommitted for simplicity */ }
-
-int qemu_map(int pid, int page_no, int frame_no) {
+int pagetable_mmu_map(int pid, int page_no, int frame_no) {
     translate_table.frame[frame_no].pid = pid;
     translate_table.frame[frame_no].page_no = page_no;
     return 0;
 }
 
-int qemu_switch(int pid) {
-    char *dst, *src;
-    int code_top = APPS_SIZE / PAGE_SIZE;
-    if (pid == curr_vm_pid) return 0;
-
-    /* unmap curr_vm_pid from virtual address space */
-    for (int i = 0; i < NFRAMES; i++)
-        if (FRAME_INUSE(i) && translate_table.frame[i].pid == curr_vm_pid) {
-            int page_no = translate_table.frame[i].page_no;
-            src = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
-            dst = first_page + PAGE_SIZE * i;
-            memcpy(dst, src + (page_no % code_top) * PAGE_SIZE, PAGE_SIZE);
-            //cache_write(i, src + (page_no % code_top) * PAGE_SIZE);
-        }
-
-    /* map pid to virtual address space */
-    for (int i = 0; i < NFRAMES; i++)
-        if (FRAME_INUSE(i) && translate_table.frame[i].pid == pid) {
-            src = first_page + i * PAGE_SIZE;
-            int page_no = translate_table.frame[i].page_no;
-            dst = (char*) ((page_no < code_top)? APPS_ENTRY : APPS_ARG);
-            memcpy(dst + (page_no % code_top) * PAGE_SIZE, src, PAGE_SIZE);
-        }
-
-    curr_vm_pid = pid;
-    return 0;
-}
+int pagetable_mmu_switch(int pid) { soft_mmu_switch(pid); }
+int pagetable_mmu_free(int pid) { /* Ommitted for simplicity */ }
 
 
 unsigned int frame_no, root;
 void setup_identity_region(unsigned int addr, int npages) {
     /* Allocate leaf page table */
     unsigned int leaf;
-    qemu_alloc(&frame_no, &leaf);
+    pagetable_mmu_alloc(&frame_no, &leaf);
     memset((void*)leaf, 0, PAGE_SIZE);
 
     /* Setup the mapping in the root page table */
@@ -218,7 +149,7 @@ void setup_identity_region(unsigned int addr, int npages) {
 
 void create_identity_mapping() {
     /* Allocate the root page table and set the page table base */
-    qemu_alloc(&frame_no, &root);
+    pagetable_mmu_alloc(&frame_no, &root);
     memset((void*)root, 0, PAGE_SIZE);
     asm("csrw satp, %0" ::"r"(((root >> 12) & 0xFFFFF) | (1 << 31)));
 
@@ -254,17 +185,17 @@ void mmu_init(struct earth* _earth) {
 
     if (earth->platform == ARTY) {
         earth->tty_info("Use software translation for Arty");
-        earth->mmu_free = arty_free;
-        earth->mmu_alloc = arty_alloc;
-        earth->mmu_map = arty_map;
-        earth->mmu_switch = arty_switch;
+        earth->mmu_alloc = soft_mmu_alloc;
+        earth->mmu_map = soft_mmu_map;
+        earth->mmu_switch = soft_mmu_switch;
+        earth->mmu_free = soft_mmu_free;
         INFO("Will enter the grass layer with machine mode");
     } else {
         earth->tty_info("Use page table translation for QEMU");
-        earth->mmu_free = qemu_free;
-        earth->mmu_alloc = qemu_alloc;
-        earth->mmu_map = qemu_map;
-        earth->mmu_switch = qemu_switch;
+        earth->mmu_alloc = pagetable_mmu_alloc;
+        earth->mmu_map = pagetable_mmu_map;
+        earth->mmu_switch = pagetable_mmu_switch;
+        earth->mmu_free = pagetable_mmu_free;
 
         create_identity_mapping();
         INFO("Will enter the grass layer with supervisor mode");
@@ -274,4 +205,56 @@ void mmu_init(struct earth* _earth) {
 
     curr_vm_pid = -1;
     memset(lookup_table, 0xFF, sizeof(lookup_table));
+}
+
+
+static int cache_evict() {
+    int idx = rand() % CACHED_NFRAMES;
+    int frame_no = lookup_table[idx];
+
+    if (FRAME_INUSE(frame_no)) {
+        int nblocks = PAGE_SIZE / BLOCK_SIZE;
+        earth->disk_write(frame_no * nblocks, nblocks, cache + PAGE_SIZE * idx);
+    }
+
+    return idx;
+}
+
+static int cache_read(int frame_no) {
+    if (earth->platform == QEMU)
+        return (int)(first_page + frame_no * PAGE_SIZE);
+
+    int free_idx = -1;
+    for (int i = 0; i < CACHED_NFRAMES; i++) {
+        if (lookup_table[i] == frame_no)
+            return (int)(cache + PAGE_SIZE * i);
+        if (lookup_table[i] == -1 && free_idx == -1) free_idx = i;
+    }
+
+    if (free_idx == -1) free_idx = cache_evict();
+    lookup_table[free_idx] = frame_no;
+
+    if (FRAME_INUSE(frame_no)) {
+        int nblocks = PAGE_SIZE / BLOCK_SIZE;
+        earth->disk_read(frame_no * nblocks, nblocks, cache + PAGE_SIZE * free_idx);
+    }
+
+    return (int)(cache + PAGE_SIZE * free_idx);
+}
+
+static int cache_write(int frame_no, char* src) {
+    if (earth->platform == QEMU) {
+        memcpy(first_page + frame_no * PAGE_SIZE, src, PAGE_SIZE);
+        return 0;
+    }
+
+    for (int i = 0; i < CACHED_NFRAMES; i++)
+        if (lookup_table[i] == frame_no)
+            return memcpy(cache + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
+
+    int free_idx = cache_evict();
+    lookup_table[free_idx] = frame_no;
+    memcpy(cache + PAGE_SIZE * free_idx, src, PAGE_SIZE);
+
+    return 0;
 }
