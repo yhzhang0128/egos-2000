@@ -8,6 +8,7 @@
  * This file implements 2 translation mechanisms:
  *     page table translation and software TLB translation.
  * The Arty board uses software TLB translation and QEMU uses both.
+ * This file also implements a paging device and initialization of MMU.
  */
 
 #include "earth.h"
@@ -218,6 +219,6 @@ void mmu_init() {
         earth->tty_info("Use software translation for Arty");
     } else {
         pagetable_identity_mapping();
-        earth->tty_info("Use software + page-table translation for QEMU");
+        earth->tty_info("Use software + page table translation for QEMU");
     }
 }

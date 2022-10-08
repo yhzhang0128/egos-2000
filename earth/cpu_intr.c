@@ -35,13 +35,8 @@ int intr_enable() {
     asm("csrw mie, %0" ::"r"(mie | 0x88));
 }
 
-int intr_register(void (*_handler)(int)) {
-    intr_handler = _handler;
-}
-
-int excp_register(void (*_handler)(int)) {
-    excp_handler = _handler;
-}
+int intr_register(void (*_handler)(int)) { intr_handler = _handler; }
+int excp_register(void (*_handler)(int)) { excp_handler = _handler; }
 
 void intr_init() {
     INFO("Use direct mode and put the address of trap_entry() to mtvec");
