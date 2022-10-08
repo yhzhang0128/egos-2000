@@ -199,20 +199,21 @@ int qemu_switch(int pid) {
 
 
 unsigned int frame_no, root;
-void setup_identity_region(unsigned int region_addr, int npages) {
-    int pde_flag = 0x1 | (1 << 6);  /* valid, point to next level */
-    int pte_flag = 0xF | (1 << 6);  /* valid, readable, writable, executable */
-    unsigned int leaf, mask = 0x3FFFFFFF;
+void setup_identity_region(unsigned int addr, int npages) {
+    /* Allocate leaf page table */
+    unsigned int leaf;
     qemu_alloc(&frame_no, &leaf);
     memset((void*)leaf, 0, PAGE_SIZE);
 
-    int vpn0 = (region_addr >> 12) & 0x3FF;  /* 10-bit */
-    int vpn1 = (region_addr >> 22) & 0x3FF;  /* 10-bit */
-    ((int*)root)[vpn1] = ((leaf >> 2) & mask) | pde_flag;
-    for (int i = 0; i < npages; i++) {
-        ((int*)leaf)[vpn0 + i] = (((region_addr + i * PAGE_SIZE) >> 2) & mask) | pte_flag;
-    }
+    /* Setup the mapping in the root page table */
+    int vpn1 = addr >> 22;
+    ((int*)root)[vpn1] = (leaf >> 2) | 0x1;
 
+    /* Setup the mapping in the leaf page table */
+    int vpn0 = (addr >> 12) & 0x3FF;
+    for (int i = 0; i < npages; i++) {
+        ((int*)leaf)[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | 0xF;
+    }
 }
 
 void create_identity_mapping() {
@@ -221,13 +222,12 @@ void create_identity_mapping() {
     memset((void*)root, 0, PAGE_SIZE);
     asm("csrw satp, %0" ::"r"(((root >> 12) & 0xFFFFF) | (1 << 31)));
 
-    /* Allow all access to ITIM memory: 0800_0000 -> 0800_8000 */
+    setup_identity_region(0x02000000, 16);   /* CLINT */
+    setup_identity_region(0x10013000, 1);    /* UART0 */
+    setup_identity_region(0x20400000, 1024); /* boot ROM */
+    setup_identity_region(0x20800000, 1024); /* disk image */
     setup_identity_region(0x08000000, 8);    /* ITIM memory */
     setup_identity_region(0x80000000, 1024); /* DTIM memory */
-    setup_identity_region(0x20400000, 1024); /* boot ROM */
-    setup_identity_region(0x10013000, 1);    /* UART0 */
-    setup_identity_region(0x02000000, 16);   /* UART0 */
-    setup_identity_region(0x20800000, 1024); /* UART0 */
 }
 
 /* Implementation of MMU Initialization
