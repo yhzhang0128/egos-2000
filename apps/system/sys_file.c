@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: file server, 
+ * Description: the file system process
  * handling requests to the inode layer of the file system
  */
 

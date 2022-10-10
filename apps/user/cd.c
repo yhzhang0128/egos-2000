@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    /* Get the inode number of the new working directory */
+    /* Set the inode number to the new working directory */
     strcat(argv[1], "/");
     int dir_ino = dir_lookup(grass->workdir_ino, argv[1]);
     if (dir_ino == -1) {
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     }
     grass->workdir_ino = dir_ino;
 
-    /* Get the path name of the new working directory */
+    /* Set the path name to the new working directory */
     if (!strcmp("./", argv[1])) return 0;
 
     int len = strlen(grass->workdir);

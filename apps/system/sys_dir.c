@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: directory server,
+ * Description: the directory system process
  * handling requests to the directory layer of the file system
  */
 
