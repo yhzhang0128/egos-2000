@@ -5,12 +5,12 @@
 
 /* Author: Yunhao Zhang
  * Description: create the bootROM image files
- * the ROM on the Arty board has 16MB
- *     the first 4MB holds the FE310 processor
- *     the next  4MB holds the earth layer binary executable
- *     the next  4MB holds the disk image produced by mkfs
- *     the last  4MB is currently unused
- * the output is in binary (bootROM.bin) and Intel MCS-86 (bootROM.mcs) format
+ * The ROM on the Arty board has 16MB:
+ *     the first 4MB holds the FE310 processor;
+ *     the next  4MB holds the earth layer binary executable;
+ *     the next  4MB holds the disk image produced by mkfs;
+ *     the last  4MB is currently unused.
+ * The output is in binary (bootROM.bin) and Intel MCS-86 (bootROM.mcs) format.
  */
 
 #include <stdio.h>
@@ -73,13 +73,13 @@ void write_intel_mcs() {
 }
 
 void write_mcs_section(char* mem, int base, int size) {
-    /* using a dummy checksum */
     for (int i = 0; i < (size >> 16) + 1; i++) {
         printf(":02000004%.4X%.2X\n", i + base, 0xFF);
         for (int j = 0; j < 0x10000; j += 16) {
             printf(":10%.4X00", j);
             for (int k = 0; k < 16; k++)
                 printf("%.2X", mem[i * 0x10000 + j + k] & 0xFF);
+            /* Use a dummy checksum */
             printf("%.2X\n", 0xFF);
             if (i * 0x10000 + j + 16 >= size) return;
         }

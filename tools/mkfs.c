@@ -5,11 +5,11 @@
 
 /* Author: Yunhao Zhang
  * Description: create the disk image file (disk.img)
- * The disk image should be exactly 4MB
- *     the first 1MB is reserved as 256 frames for memory paging
- *     the next  1MB contains some ELF binary executables for booting
- *     the last  2MB is managed by a file system
- * the output is in binary format (disk.img)
+ * The disk image should be exactly 4MB:
+ *     the first 1MB is reserved as 256 frames for memory paging;
+ *     the next  1MB contains some ELF binary executables for booting;
+ *     the last  2MB is managed by a file system.
+ * The output is in binary format (disk.img).
  */
 
 #include <stdio.h>
@@ -31,7 +31,7 @@ char* kernel_processes[] = {
                             "../build/release/sys_shell.elf",
 };
 
-/* inode mappings:
+/* Inode mappings:
 #0: /           #1: /home          #2: /home/yunhao
 #3: /home/rvr   #4: /home/lorenzo  #5: /home/yunhao/README 
 #6: /bin        #7: /bin/echo      #8: /bin/cat
@@ -67,11 +67,11 @@ inode_intf ramdisk_init();
 int main() {
     mkfs();
 
-    /* paging area */
+    /* Paging area */
     freopen("disk.img", "w", stdout);
     write(1, exec, PAGING_DEV_SIZE);
 
-    /* grass kernel processes */
+    /* Grass kernel processes */
     int exec_size = GRASS_EXEC_SIZE / GRASS_NEXEC;
     fprintf(stderr, "[INFO] Loading %d kernel binary files\n", NKERNEL_PROC);
 
@@ -91,7 +91,7 @@ int main() {
     }
     write(1, exec, (GRASS_NEXEC - NKERNEL_PROC) * exec_size);
         
-    /* file system */
+    /* File system */
     write(1, fs, FS_DISK_SIZE);
     fclose(stdout);
 
