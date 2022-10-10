@@ -20,11 +20,11 @@
  * The paging device provides read, write and cache_invalidate interfaces.
  */
 
-/* the paging device */
+/* the paging device interface */
 #define NFRAMES 256
-int paging_read(int frame_no);
-int paging_write(int frame_no, char* src);
-int paging_invalidate_cache(int frame_no);
+char* paging_read(int frame_id);
+int paging_write(int frame_id, char* src);
+int paging_invalidate_cache(int frame_id);
 
 /* the software translation table */
 struct frame_mapping {
@@ -34,11 +34,11 @@ struct frame_mapping {
 } table[NFRAMES];
 #define PAGENO_TO_ADDR(x) (void*)(table[x].page_no << 12)
 
-int soft_mmu_map(int pid, int page_no, int frame_no) {
-    if (!table[frame_no].use) FATAL("mmu_map: bad frame_no");
+int soft_mmu_map(int pid, int page_no, int frame_id) {
+    if (!table[frame_id].use) FATAL("mmu_map: bad frame_id");
     
-    table[frame_no].pid = pid;
-    table[frame_no].page_no = page_no;
+    table[frame_id].pid = pid;
+    table[frame_id].page_no = page_no;
 }
 
 int soft_mmu_switch(int pid) {
@@ -53,15 +53,15 @@ int soft_mmu_switch(int pid) {
     /* Map pid to the user address space */
     for (int i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == pid)
-            memcpy(PAGENO_TO_ADDR(i), (void*)paging_read(i), PAGE_SIZE);
+            memcpy(PAGENO_TO_ADDR(i), paging_read(i), PAGE_SIZE);
 
     curr_vm_pid = pid;
 }
 
-int soft_mmu_alloc(int* frame_no, int* cached_addr) {
+int soft_mmu_alloc(int* frame_id, void** cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
         if (!table[i].use) {
-            *frame_no = i;
+            *frame_id = i;
             *cached_addr = paging_read(i);
             table[i].use = 1;
             return 0;
@@ -89,28 +89,28 @@ int soft_mmu_free(int pid) {
 
 #define FLAG_VALID_RWX 0xF
 #define FLAG_NEXT_LEVEL 0x1
-static unsigned int frame_no, root, leaf;
+static unsigned int frame_id, *root, *leaf;
 
 void setup_identity_region(unsigned int addr, int npages) {
     /* Allocate the leaf page table */
-    earth->mmu_alloc(&frame_no, &leaf);
-    memset((void*)leaf, 0, PAGE_SIZE);
+    earth->mmu_alloc(&frame_id, (void**)&leaf);
+    memset(leaf, 0, PAGE_SIZE);
 
     /* Setup the entry in the root page table */
     int vpn1 = addr >> 22;
-    ((int*)root)[vpn1] = (leaf >> 2) | FLAG_NEXT_LEVEL;
+    root[vpn1] = ((unsigned int)leaf >> 2) | FLAG_NEXT_LEVEL;
 
     /* Setup the entries in the leaf page table */
     int vpn0 = (addr >> 12) & 0x3FF;
     for (int i = 0; i < npages; i++)
-        ((int*)leaf)[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | FLAG_VALID_RWX;
+        leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | FLAG_VALID_RWX;
 }
 
 void pagetable_identity_mapping() {
     /* Allocate the root page table and set the page table base CSR */
-    earth->mmu_alloc(&frame_no, &root);
-    memset((void*)root, 0, PAGE_SIZE);
-    asm("csrw satp, %0" ::"r"(((root >> 12) & 0xFFFFF) | (1 << 31)));
+    earth->mmu_alloc(&frame_id, (void**)&root);
+    memset(root, 0, PAGE_SIZE);
+    asm("csrw satp, %0" ::"r"((((unsigned int)root >> 12) & 0xFFFFF) | (1 << 31)));
 
     /* Allocate the leaf page tables */
     setup_identity_region(0x02000000, 16);   /* CLINT */
@@ -134,57 +134,57 @@ char *page_start = (void*)FRAME_CACHE_START;
 
 int paging_evict_cache() {
     int idx = rand() % ARTY_CACHED_NFRAMES;
-    int frame_no = cache_slot[idx];
+    int frame_id = cache_slot[idx];
 
-    if (table[frame_no].use) {
+    if (table[frame_id].use) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        earth->disk_write(frame_no * nblocks, nblocks, page_start + PAGE_SIZE * idx);
+        earth->disk_write(frame_id * nblocks, nblocks, page_start + PAGE_SIZE * idx);
     }
 
     return idx;
 }
 
-int paging_invalidate_cache(int frame_no) {
+int paging_invalidate_cache(int frame_id) {
     for (int j = 0; j < ARTY_CACHED_NFRAMES; j++)
-        if (cache_slot[j] == frame_no) cache_slot[j] = -1;
+        if (cache_slot[j] == frame_id) cache_slot[j] = -1;
 }
 
 void paging_init() { memset(cache_slot, 0xFF, sizeof(cache_slot)); }
 
-int paging_read(int frame_no) {
+char* paging_read(int frame_id) {
     if (earth->platform == QEMU)
-        return (int)(page_start + frame_no * PAGE_SIZE);
+        return page_start + frame_id * PAGE_SIZE;
 
     int free_idx = -1;
     for (int i = 0; i < ARTY_CACHED_NFRAMES; i++) {
-        if (cache_slot[i] == frame_no)
-            return (int)(page_start + PAGE_SIZE * i);
+        if (cache_slot[i] == frame_id)
+            return page_start + PAGE_SIZE * i;
         if (cache_slot[i] == -1 && free_idx == -1) free_idx = i;
     }
 
     if (free_idx == -1) free_idx = paging_evict_cache();
-    cache_slot[free_idx] = frame_no;
+    cache_slot[free_idx] = frame_id;
 
-    if (table[frame_no].use) {
+    if (table[frame_id].use) {
         int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        earth->disk_read(frame_no * nblocks, nblocks, page_start + PAGE_SIZE * free_idx);
+        earth->disk_read(frame_id * nblocks, nblocks, page_start + PAGE_SIZE * free_idx);
     }
 
-    return (int)(page_start + PAGE_SIZE * free_idx);
+    return page_start + PAGE_SIZE * free_idx;
 }
 
-int paging_write(int frame_no, char* src) {
+int paging_write(int frame_id, char* src) {
     if (earth->platform == QEMU) {
-        memcpy(page_start + frame_no * PAGE_SIZE, src, PAGE_SIZE);
+        memcpy(page_start + frame_id * PAGE_SIZE, src, PAGE_SIZE);
         return 0;
     }
 
     for (int i = 0; i < ARTY_CACHED_NFRAMES; i++)
-        if (cache_slot[i] == frame_no)
+        if (cache_slot[i] == frame_id)
             return memcpy(page_start + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
 
     int free_idx = paging_evict_cache();
-    cache_slot[free_idx] = frame_no;
+    cache_slot[free_idx] = frame_id;
     memcpy(page_start + PAGE_SIZE * free_idx, src, PAGE_SIZE);
 }
 
