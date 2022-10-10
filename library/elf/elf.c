@@ -4,8 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: Load an ELF-format executable file into memory;
- * Only using the program header instead of the multiple section headers.
+ * Description: load an ELF-format executable file into memory
+ * Only use the program header instead of the multiple section headers.
  */
 
 #include "egos.h"
@@ -41,7 +41,7 @@ static void load_app(int pid, elf_reader reader,
     int frame_no, block_offset = pheader->p_offset / BLOCK_SIZE;
     unsigned int code_start = APPS_ENTRY >> 12, stack_start = APPS_ARG >> 12;
 
-    /* Load the text, rodata, data and bss sections */
+    /* Setup the text, rodata, data and bss sections */
     for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
         if (off % PAGE_SIZE == 0) {
             earth->mmu_alloc(&frame_no, &base);
@@ -60,7 +60,7 @@ static void load_app(int pid, elf_reader reader,
         memset((char*)base, 0, PAGE_SIZE);
     }
 
-    /* Allocate two pages for argc, argv and stack */
+    /* Setup two pages for argc, argv and stack */
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, stack_start++, frame_no);
 

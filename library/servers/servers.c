@@ -4,7 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: user friendly interfaces of the system servers
+ * Description: user friendly interfaces of system processes
+ * including GPID_PROCESS, GPID_FILE and GPID_DIR
  */
 
 #include "egos.h"

@@ -10,8 +10,9 @@
 #include "egos.h"
 #include <unistd.h>
 
-/* printf() constructs a string based on its arguments 
- * and then print the string to tty by calling _write() 
+/* printf() is linked from the compiler's C library;
+ * printf() constructs a string based on its arguments
+ * and prints the string to the tty device by calling _write().
  */
 
 int _write(int file, char *ptr, int len) {

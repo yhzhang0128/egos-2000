@@ -56,7 +56,7 @@ extern struct grass *grass;
 #define CRITICAL           earth->tty_critical
 #endif
 
-/* memory layout */
+/* Memory layout */
 #define PAGE_SIZE          4096
 #define FRAME_CACHE_END    0x80020000
 #define FRAME_CACHE_START  0x80004000  /* 112KB  frame cache          */
@@ -73,7 +73,7 @@ extern struct grass *grass;
                                        /* 12KB   earth data           */
                                        /* earth code is in QSPI flash */
 
-/* memory-mapped I/O register access macros */
+/* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
 #define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
 #define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))

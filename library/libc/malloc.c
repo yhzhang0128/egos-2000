@@ -12,8 +12,9 @@
 extern char __heap_start, __heap_end;
 static char* brk = &__heap_start;
 
-/* malloc() and free() manage the memory region [&__heap_start, brk]
- * if malloc() finds this region to be too small, it will call _sbrk()
+/* malloc() and free() are linked from the compiler's C library;
+ * malloc() and free() manage the memory region [&__heap_start, brk).
+ * If malloc() finds this region to be too small, it will call _sbrk().
  */
 
 char *_sbrk(int size) {
