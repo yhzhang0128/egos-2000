@@ -1,7 +1,7 @@
 # Compile and run egos-2000
 
 You can use MacOS, Linux or Windows. 
-For MacOS on the Apple M1 chip, just download and run the `x86-64` version of the toolchain and MacOS will translate the binary with Rosetta.
+For MacOS on the Apple M1 chip, just download and run the `x86-64` version of the toolchain and MacOS will transparently translate the binary with Rosetta.
 For Windows users, use WSL (Windows Subsystem for Linux) in step1-3.
 
 Here are the tutorial videos for [MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
@@ -74,7 +74,7 @@ I/O size (minimum/optimal): 512 bytes / 512 bytes
 
 Instead of `dd`, you can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
 
-## Step3: Run egos-2000 on QEMU
+## Step3: Run egos-2000 on the QEMU emulator
 
 Download the [QEMU emulator for egos-2000](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2022.10.6) to the working directory `$EGOS`.
 
