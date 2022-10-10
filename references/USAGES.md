@@ -1,7 +1,7 @@
 # Compile and run egos-2000
 
 You can use MacOS, Linux or Windows. 
-For MacOS on the Apple M1 chip, just download and run the `x86-64` version of the toolchain and MacOS will transparently translate the toolchain for M1.
+For MacOS on the Apple M1 chip, just download and run the `x86-64` version of the toolchain and MacOS will transparently translate the toolchain to M1.
 For Windows users, use WSL (Windows Subsystem for Linux) in step1-3.
 
 Here are the tutorial videos for [MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
@@ -99,7 +99,7 @@ sys     0m37.338s
 
 ```
 
-#### Step4.1.2 Windows or Linux users
+#### Step4.1.2 Windows or Linux
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
 
@@ -119,7 +119,7 @@ In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](http
 
 ### Step4.2: Connect to egos-2000 on the Arty board
 
-1. Press the `PROG` red button on the left-top corner of the Arty board
+1. After step4.1, Press the `PROG` red button on the left-top corner of the Arty board
 2. To restart, press the `RESET` red button on the right-top corner
 3. For Linux users, type in your shell
 ```shell
@@ -134,6 +134,6 @@ In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](http
 ......
 ```
 4. For MacOS users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-xxxxxx`)
-5. For Windows users, find the board in your "Device Manager" (e.g., COM4) and use `PuTTY` to connect with the board:
+5. For Windows users, find the board in your "Device Manager" (e.g., COM4) and use `PuTTY` to connect with the board with the following configuration:
 
 ![This is an image](screenshots/putty.png)

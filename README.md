@@ -29,11 +29,11 @@ Don't worry if the hardware is not available to you. You can also use the softwa
 
 ### Usages and Documentation
 
-For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md) or watch the tutorial videos ([MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) or [Windows](https://youtu.be/VTTynr9MZRg)).
-[This document](references/README.md) further introduces the teaching plans, architecture and development history.
+For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md).
 
 The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged ISA.
 The [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduces the memory map, especially the GPIO, UART and SPI bus controllers.
+[This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
 
