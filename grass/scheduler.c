@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: process scheduling and communication
+ * Description: scheduler and inter-process communication
  */
 
 
@@ -99,7 +99,7 @@ static void proc_yield() {
         /* Prepare argc and argv */
         asm("mv a0, %0" ::"r"(*((int*)APPS_ARG)));
         asm("mv a1, %0" ::"r"(APPS_ARG + 4));
-        /* Enter application code directly by mret */
+        /* Enter application code entry using mret */
         asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
         asm("mret");
     }

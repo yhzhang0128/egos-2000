@@ -18,8 +18,8 @@ extern struct process proc_set[MAX_NPROCESS];
 
 enum {
     PROC_UNUSED,
-    PROC_LOADING,     /* allocated but waiting to load elf binary   */
-    PROC_READY,       /* finish loading but haven't started running */
+    PROC_LOADING, /* allocated and wait for loading elf binary */
+    PROC_READY,   /* finished loading elf and wait for first running */
     PROC_RUNNING,
     PROC_RUNNABLE,
     PROC_WAIT_TO_SEND,
