@@ -1,7 +1,7 @@
 # Compile and run egos-2000
 
 You can use MacOS, Linux or Windows. 
-For MacOS on the Apple M1 chip, just download and run the `x86-64` version of the toolchain and MacOS will transparently translate the binary with Rosetta.
+For MacOS on the Apple M1 chip, just download and run the `x86-64` version of the toolchain and MacOS will transparently translate the toolchain for M1.
 For Windows users, use WSL (Windows Subsystem for Linux) in step1-3.
 
 Here are the tutorial videos for [MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
@@ -26,16 +26,10 @@ Download the [SiFive riscv-gcc compiler](https://github.com/sifive/freedom-tools
 > cd $EGOS/egos-2000
 > make
 mkdir -p build/debug build/release
--------- Compile the Apps Layer --------
-......
--------- Compile the Grass Layer --------
-......
--------- Compile the Earth Layer --------
 ......
 ```
 
-
-`build/release` holds the ELF format binary executables and `build/debug` holds the human readable assembly files.
+After this step, `build/release` holds the ELF format binary executables and `build/debug` holds the human readable assembly files.
 
 ## Step2: Create the disk and bootROM images
 
@@ -54,25 +48,7 @@ Make sure you have a C compiler (i.e., the `cc` command) in your shell environme
 ```
 
 This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `tools` directory.
-To program `disk.img` to a microSD card:
-
-```shell
-# Find your microSD card in /dev
-> sudo fdisk -l
-......
-Disk /dev/sdb: 117.8 GiB, 126437294080 bytes, 246947840 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-...
-# Say it is /dev/sdb as shown above
-> sudo dd if=$EGOS/egos-2000/tools/disk.img of=/dev/sdb
-8192+0 records in
-8192+0 records out
-4194304 bytes (4.2 MB, 4.0 MiB) copied, 0.377515 s, 11.1 MB/s
-```
-
-Instead of `dd`, you can also use GUI softwares like [balena Etcher](https://www.balena.io/etcher/) to program `disk.img` to your microSD card.
+You can use [balena Etcher](https://www.balena.io/etcher/) or the `dd` shell command to program `disk.img` to your microSD card.
 
 ## Step3: Run egos-2000 on the QEMU emulator
 
@@ -98,7 +74,7 @@ qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qem
 
 ### Step4.1 Program the Arty on-board ROM
 
-#### MacOS or Linux
+#### Step4.1.1 MacOS or Linux
 
 Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to the working directory `$EGOS`.
 
@@ -123,7 +99,7 @@ sys     0m37.338s
 
 ```
 
-#### Windows or Linux
+#### Step4.1.2 Windows or Linux users
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
 
@@ -141,10 +117,10 @@ In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](http
 
 ![This is an image](screenshots/vivado.png)
 
-### Step4.2: Connect with egos-2000
+### Step4.2: Connect to egos-2000 on the Arty board
 
-1. Press the `program` red button on the left-top corner of the Arty board
-2. To restart, press the `reset` red button on the right-top corner 
+1. Press the `PROG` red button on the left-top corner of the Arty board
+2. To restart, press the `RESET` red button on the right-top corner
 3. For Linux users, type in your shell
 ```shell
 > sudo chmod 666 /dev/ttyUSB1
@@ -157,7 +133,7 @@ In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](http
   Enter 1: use the on-board flash ROM @0x20800000
 ......
 ```
-4. For Mac users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-xxxxxx`)
+4. For MacOS users, use the same commands but check your `/dev` directory for the  device name (e.g., `/dev/tty.usbserial-xxxxxx`)
 5. For Windows users, find the board in your "Device Manager" (e.g., COM4) and use `PuTTY` to connect with the board:
 
 ![This is an image](screenshots/putty.png)

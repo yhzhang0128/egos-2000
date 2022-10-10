@@ -1,11 +1,11 @@
 ## A Minimal Operating System on a RISC-V Board and the QEMU Emulator
 
-With only **2000** lines of code, **egos-2000** implements every component of a functional operating system.
-It can run on a RISC-V board or a software emulator called QEMU.
+With only **2000** lines of code, **egos-2000** implements every component of an operating system for education.
+It can run on a RISC-V board or the QEMU software emulator.
 The vision of this project is to help **every** college student read **all** the code of an operating system within **one** semester.
 
 ![This is an image](references/screenshots/egos-2000.jpg)
-Note: `cloc` is used to [count lines of code](https://github.com/AlDanial/cloc) above. Try `cloc egos-2000 --exclude-ext=md` which excludes the markdown documents in the count.
+Note: [**cloc**](https://github.com/AlDanial/cloc) is used to count the lines of code above. Try `cloc egos-2000 --exclude-ext=md` which excludes the markdown documents in the count.
 
 ## Earth and Grass Operating System 2000
 
@@ -13,9 +13,9 @@ We use **egos-2000** as our teaching operating system at Cornell. It adopts a 3-
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
-    * cpu interrupt and memory management interfaces
+    * interrupt and memory management interfaces
 * The **grass layer** implements hardware-independent abstractions.
-    * processes, system calls and inter-process communication
+    * processes, system calls and inter-process communications
 * The **application layer** implements file system, shell and user commands.
 
 The definitions of `struct earth` and `struct grass` in [**egos.h**](library/egos.h) specify the interfaces of these layers.
@@ -32,7 +32,7 @@ Don't worry if the hardware is not available to you. You can also use the softwa
 For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md) or watch the tutorial videos ([MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) or [Windows](https://youtu.be/VTTynr9MZRg)).
 [This document](references/README.md) further introduces the teaching plans, architecture and development history.
 
-The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged registers used by egos-2000.
+The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged ISA.
 The [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduces the memory map, especially the GPIO, UART and SPI bus controllers.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).

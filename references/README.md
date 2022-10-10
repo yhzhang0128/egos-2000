@@ -1,9 +1,9 @@
 This document describes the teaching plan, architecture and development history of egos-2000.
 
-## Teaching plan (egos + egos-2000)
+## Teaching plan
 
 We use **egos** and **egos-2000** to teach our Practicum in Operating Systems (CS4411) at Cornell.
-There are five mandatory projects:
+There are six projects and one is optional.
 
 |    | Description                       | Concepts to teach                                           | Platform   |
 |----|-----------------------------------|-------------------------------------------------------------|------------|
@@ -34,7 +34,7 @@ There are five mandatory projects:
 * `app/system/sys_file`: the inode layer over the SD card (touched by P5)
 * `app/system/sys_dir`: the directory layer over the inode layer (touched by P5)
 * `app/system/sys_shell`: interactive user interface
-* user commands: `pwd`, `cd`, `ls`, `cat`, `echo`, `clock`, `killall`
+* shell commands: `pwd`, `cd`, `ls`, `cat`, `echo`, `clock`, `killall`
 
 Every layer has dedicated memory regions as described below (and in `library/egos.h`).
 The complete memory layout is described in Chapter 4 of the [FE310 manual](sifive-fe310-v19p04.pdf).
@@ -55,7 +55,7 @@ The complete memory layout is described in Chapter 4 of the [FE310 manual](sifiv
 | 0x8000_2000 | 0x8000_3FFF | RW- A      | DTIM, 8KB         | Earth layer and grass layer stack                          |
 | 0x8000_4000 | 0x8001_FFFF | RW- A      | DTIM, 112KB       | MMU cache of physical frames for suspended grass processes |
 
-The first 1MB of the microSD card is used as 256 physical frames by the MMU for paging (see `earth/cpu_mmu.c`).
+On the Arty board, the first 1MB of the microSD card is used as 256 physical frames by the MMU for paging (see `earth/cpu_mmu.c`).
 
 **Selected memory-mapped I/O regions**
 
@@ -65,6 +65,12 @@ The first 1MB of the microSD card is used as 256 physical frames by the MMU for 
 | 0x1002_4000 | 0x1002_4FFF | RW A       | SPI 1         | Control the Pmod1 (microSD card) |
 
 ## Software development history
+
+**Iteration #7**
+
+* [2022.09] Add support to the QEMU emulator
+* [2022.09] Enable the supervisor mode in the QEMU emulator
+* [2022.09] With the modified QEMU, add page table translation in `earth/cpu_mmu.c`.
 
 **Iteration #6**
 
