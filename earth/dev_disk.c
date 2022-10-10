@@ -7,9 +7,11 @@
  * Description: a simple disk device driver
  */
 
-#include "earth.h"
+#include "egos.h"
+#include "disk.h"
 #include "sd/sd.h"
 #include "bus_gpio.c"
+#include <string.h>
 
 enum {
       SD_CARD,

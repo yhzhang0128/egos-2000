@@ -11,8 +11,10 @@
  * This file also implements a paging device and MMU initialization.
  */
 
-#include "earth.h"
+#include "egos.h"
+#include "disk.h"
 #include <stdlib.h>
+#include <string.h>
 
 /* Implementation of Software TLB Translation
  *

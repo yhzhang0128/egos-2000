@@ -9,8 +9,14 @@
  * Load the grass layer binary from disk and run it.
  */
 
-#include "earth.h"
+#include "elf.h"
+#include "disk.h"
+#include "egos.h"
 
+void tty_init();
+void disk_init();
+void intr_init();
+void mmu_init();
 struct earth *earth = (void*)GRASS_STACK_TOP;
 extern char bss_start, bss_end, data_rom, data_start, data_end;
 
@@ -41,7 +47,7 @@ int main() {
         ((char*)&data_start)[i] = ((char*)&data_rom)[i];
 
     earth_init();
-    elf_load(0, grass_read, 0, NULL);
+    elf_load(0, grass_read, 0, 0);
 
     if (earth->platform == ARTY){
         /* Arty board does not support supervisor mode */

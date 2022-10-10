@@ -7,7 +7,7 @@
  * Description: RISC-V interrupt and exception handling
  */
 
-#include "earth.h"
+#include "egos.h"
 
 static void (*intr_handler)(int);
 static void (*excp_handler)(int);
@@ -19,10 +19,10 @@ void trap_entry() {
 
     int id = mcause & 0x3FF;
     if (mcause & (1 << 31)) {
-        (intr_handler != NULL)? intr_handler(id) :
+        (intr_handler != 0)? intr_handler(id) :
             FATAL("trap_entry: interrupt handler not registered");
     } else {
-        (excp_handler != NULL)? excp_handler(id) :
+        (excp_handler != 0)? excp_handler(id) :
             FATAL("trap_entry: exception handler not registered");
     }
 }

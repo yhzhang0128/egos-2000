@@ -8,6 +8,7 @@
  * see chapter18 of the SiFive FE310-G002 Manual
  */
 
+#include "egos.h"
 #include "bus_gpio.c"
 
 #define UART0_BASE    0x10013000UL
