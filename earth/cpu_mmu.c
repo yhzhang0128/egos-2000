@@ -6,9 +6,9 @@
 /* Author: Yunhao Zhang
  * Description: memory management unit (MMU)
  * This file implements 2 translation mechanisms:
- *     page table translation and software TLB translation.
- * The Arty board uses software TLB translation and QEMU uses both.
- * This file also implements a paging device and initialization of MMU.
+ *     page table and software TLB.
+ * The Arty board uses software TLB and QEMU uses both.
+ * This file also implements a paging device and MMU initialization.
  */
 
 #include "earth.h"
@@ -17,20 +17,19 @@
 /* Implementation of Software TLB Translation
  *
  * There are 256 physical frames (i.e., pages) in a paging device. 
- * The paging device provides read, write and cache_invalidate interfaces.
+ * And here is the paging device interface.
  */
 
-/* the paging device interface */
 #define NFRAMES 256
 char* paging_read(int frame_id);
 int paging_write(int frame_id, char* src);
 int paging_invalidate_cache(int frame_id);
 
-/* the software translation table */
+/* software translation table */
 struct frame_mapping {
-    int pid;
-    int page_no;
-    int use;
+    int use;      /* Is this physical frame allocated? */
+    int pid;      /* Which process owns this physical frame? */
+    int page_no;  /* Which virtual page does this frame map to? */
 } table[NFRAMES];
 #define PAGENO_TO_ADDR(x) (void*)(table[x].page_no << 12)
 
@@ -83,8 +82,8 @@ int soft_mmu_free(int pid) {
  * mmu_map() and mmu_switch() are still implemented by software TLB.
  *
  * Using page tables for mmu_map() and mmu_switch() is left to students
- * as a course project. After this project, each process in the grass
- * kernel should have its own set of page tables.
+ * as a course project. After this project, every process should have
+ * its own set of page tables for translation.
  */
 
 #define FLAG_VALID_RWX 0xF
@@ -107,10 +106,11 @@ void setup_identity_region(unsigned int addr, int npages) {
 }
 
 void pagetable_identity_mapping() {
-    /* Allocate the root page table and set the page table base CSR */
+    /* Allocate the root page table and set the page table base (satp) */
     earth->mmu_alloc(&frame_id, (void**)&root);
     memset(root, 0, PAGE_SIZE);
-    asm("csrw satp, %0" ::"r"((((unsigned int)root >> 12) & 0xFFFFF) | (1 << 31)));
+    /* Set the (1 << 31) bit of satp to enable Sv32 translation */
+    asm("csrw satp, %0" ::"r"(((unsigned int)root >> 12) | (1 << 31)));
 
     /* Allocate the leaf page tables */
     setup_identity_region(0x02000000, 16);   /* CLINT */
@@ -119,16 +119,18 @@ void pagetable_identity_mapping() {
     setup_identity_region(0x20800000, 1024); /* disk image */
     setup_identity_region(0x08000000, 8);    /* ITIM memory */
     setup_identity_region(0x80000000, 1024); /* DTIM memory */
+
+    /* Translation will start when the earth main() invokes mret */
 }
 
 /* Implementation of a Paging Device
  *
- * For QEMU, there are 256 frames starting at address FRAME_CACHE_START.
- * For Arty, there are 28 frames cached at address FRAME_CACHE_START 
- * and 256 frames at the beginning of the disk, i.e., the microSD card.
+ * For QEMU, 256 physical frames start at address FRAME_CACHE_START.
+ * For Arty, 28 physical frames are cached at address FRAME_CACHE_START
+ * and 256 frames start at the beginning of the microSD card.
  */
 
-#define ARTY_CACHED_NFRAMES 28  /* 32 - 4, 4 pages for 2 stacks */
+#define ARTY_CACHED_NFRAMES 28  /* 32-4, 4 pages reserved for 2 stacks */
 int cache_slot[ARTY_CACHED_NFRAMES];
 char *page_start = (void*)FRAME_CACHE_START;
 
@@ -191,10 +193,11 @@ int paging_write(int frame_id, char* src) {
 /* Implementation of MMU Initialization
  *
  * Detect whether egos-2000 is running on QEMU or the Arty board.
- * And choose the memory translation mechanism accordingly.
+ * Setup page table translation if on QEMU. The Arty board doesn't
+ * support supervisor mode which is why it doesn't support page tables.
  */
 
-void machine_detect(int id) {
+void platform_detect(int id) {
     earth->platform = ARTY;
     /* Skip the illegal store instruction */
     int mepc;
@@ -204,7 +207,7 @@ void machine_detect(int id) {
 
 void mmu_init() {
     earth->platform = QEMU;
-    earth->excp_register(machine_detect);
+    earth->excp_register(platform_detect);
     /* This memory access triggers an exception on Arty, but not QEMU */
     *(int*)(0x1000) = 1;
     earth->excp_register(NULL);
@@ -216,9 +219,9 @@ void mmu_init() {
 
     if (earth->platform == ARTY) {
         paging_init();
-        earth->tty_info("Use software translation for Arty");
+        earth->tty_info("Arty detected: Use software translation");
     } else {
         pagetable_identity_mapping();
-        earth->tty_info("Use software + page table translation for QEMU");
+        earth->tty_info("QEMU detected: Use software + page table translation");
     }
 }

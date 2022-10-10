@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: abstractions of CPU interrupt and exception handling
+ * Description: RISC-V interrupt and exception handling
  */
 
 #include "earth.h"
@@ -32,6 +32,7 @@ int intr_enable() {
     asm("csrr %0, mstatus" : "=r"(mstatus));
     asm("csrw mstatus, %0" ::"r"(mstatus | 0x8));
     asm("csrr %0, mie" : "=r"(mie));
+    /* For now, egos-2000 only uses timer and software interrupts */
     asm("csrw mie, %0" ::"r"(mie | 0x88));
 }
 

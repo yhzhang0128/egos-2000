@@ -7,7 +7,6 @@
  * Description: a simple disk device driver
  */
 
-
 #include "earth.h"
 #include "sd/sd.h"
 #include "bus_gpio.c"

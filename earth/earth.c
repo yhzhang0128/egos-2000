@@ -15,12 +15,12 @@ struct earth *earth = (void*)GRASS_STACK_TOP;
 extern char bss_start, bss_end, data_rom, data_start, data_end;
 
 static void earth_init() {
-    tty_init(earth);
+    tty_init();
     CRITICAL("-----------------------------------");
     CRITICAL("Start to initialize the earth layer");
     SUCCESS("Finished initializing the tty device");
     
-    disk_init(earth);
+    disk_init();
     SUCCESS("Finished initializing the disk device");
 
     intr_init();
@@ -44,9 +44,11 @@ int main() {
     elf_load(0, grass_read, 0, NULL);
 
     if (earth->platform == ARTY){
+        /* Arty board does not support supervisor mode */
         void (*grass_entry)() = (void*)GRASS_ENTRY;
         grass_entry();
     } else {
+        /* QEMU supports supervisor mode */
         earth->intr_enable();
 
         int mstatus;

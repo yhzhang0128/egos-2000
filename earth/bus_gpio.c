@@ -4,8 +4,10 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: definitions for controlling GPIO0 in FE310;
+ * Description: definitions for GPIO0 in FE310
  * see chapter17 of the SiFive FE310-G002 Manual
+ *
+ * The commented functions can control the LED lights on the Arty board.
  */
 
 #include "egos.h"

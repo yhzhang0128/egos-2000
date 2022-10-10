@@ -6,7 +6,7 @@
 /* Author: Yunhao Zhang
  * Description: a simple tty device driver
  * uart_getc() and uart_putc() are implemented in bus_uart.c
- * printf() is implemented in the C library, see library/libc/print.c
+ * printf-related functions are linked from the compiler's C library
  */
 
 #define LIBC_STDIO
@@ -74,18 +74,18 @@ int tty_info(const char *format, ...)
 
 int tty_fatal(const char *format, ...)
 {
-    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n")
+    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n") /* red color */
     while(1);
 }
 
 int tty_success(const char *format, ...)
 {
-    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n")
+    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n") /* green color */
 }
 
 int tty_critical(const char *format, ...)
 {
-    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n")
+    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n") /* yellow color */
 }
 
 void tty_init() {
