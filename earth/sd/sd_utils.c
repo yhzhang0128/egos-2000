@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: helper functions for communicating with the SD card
+ * Description: helper functions for communication with the SD card
  */
 
 #include "sd.h"
