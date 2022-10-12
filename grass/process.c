@@ -17,6 +17,8 @@ void intr_entry(int id);
 void excp_entry(int id) {
     /* Student's code goes here: */
 
+    /* If the exception is a system call, handle the system call and return */
+
     /* Kill the process if curr_pid is a user app instead of a grass server */
 
     /* Student's code ends here. */
