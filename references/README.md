@@ -68,9 +68,9 @@ On the Arty board, the first 1MB of the microSD card is used as 256 physical fra
 
 **Iteration #7**
 
-* [2022.09] Add support to the QEMU emulator
-* [2022.09] Enable the supervisor mode in the QEMU emulator
-* [2022.09] With the modified QEMU, add page table translation in `earth/cpu_mmu.c`.
+* [2022.10] Add support to the QEMU emulator
+* [2022.10] Enable the supervisor mode in the QEMU emulator
+* [2022.10] With the modified QEMU, add page table translation in `earth/cpu_mmu.c`.
 
 **Iteration #6**
 
