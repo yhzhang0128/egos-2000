@@ -32,7 +32,7 @@ void proc_init() {
 
     /* Student's code goes here: */
 
-    /* Setup PMP TOR region 0x00000000 - 0x08008000 as r/w/x */
+    /* Setup PMP TOR region 0x00000000 - 0x20000000 as r/w/x */
 
     /* Setup PMP NAPOT region 0x20400000 - 0x20800000 as r/-/x */
 
