@@ -20,7 +20,7 @@ static char* brk = &__heap_start;
 char *_sbrk(int size) {
     if ((brk + size) > (&__heap_end)) {
         earth->tty_write("_sbrk: heap grows too large\r\n", 29);
-        *(int*)(0x1000) = 1;    /* Trigger a memory exception */
+        *(int*)(0xFFFFFFF0) = 1; /* Trigger a memory exception */
     }
 
     char *old_brk = brk;
