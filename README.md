@@ -21,13 +21,6 @@ We use **egos-2000** as our teaching operating system at Cornell. It adopts a 3-
 
 The definitions of `struct earth` and `struct grass` in [**egos.h**](library/egos.h) specify the interfaces of these layers.
 
-### Hardware Requirements
-* an Artix-7 35T [Arty FPGA development board](https://www.xilinx.com/products/boards-and-kits/arty.html)
-* a microUSB cable (e.g., [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
-* [optional] a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card (e.g., [Sandisk](https://www.amazon.com/dp/B073K14CVB?ref=ppx_yo2_dt_b_product_details&th=1))
-
-Don't worry if the hardware is not available to you. You can also use the software emulator QEMU.
-
 ### Usages and Documentation
 
 For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md).
