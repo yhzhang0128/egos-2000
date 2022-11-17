@@ -1,3 +1,5 @@
+## Vision
+
 With only **2000** lines of code, **egos-2000** implements every component of an operating system for education.
 
 **egos-2000** can run on a RISC-V board and the QEMU software emulator.
