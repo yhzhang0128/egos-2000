@@ -3,7 +3,7 @@
 The vision is to help **every** college student read **all** the code of an operating system within **one** semester.
 
 With only **2000** lines of code, **egos-2000** implements every component of an operating system for education. 
-**egos-2000** can run on a RISC-V board and the QEMU software emulator.
+It can run on a RISC-V board and also the QEMU software emulator.
 
 ![This is an image](references/screenshots/egos-2000.jpg)
 Note: [**cloc**](https://github.com/AlDanial/cloc) is used to count the lines of code above. Try `cloc egos-2000 --exclude-ext=md` which excludes the markdown documents in the count.
