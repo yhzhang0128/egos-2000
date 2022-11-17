@@ -1,6 +1,6 @@
 ## Vision Statement
 
-The vision of this project is to help **every** college student read **all** the code of an operating system within **one** semester.
+The vision is to help **every** college student read **all** the code of an operating system within **one** semester.
 
 With only **2000** lines of code, **egos-2000** implements every component of an operating system for education. 
 **egos-2000** can run on a RISC-V board and the QEMU software emulator.
