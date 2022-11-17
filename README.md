@@ -1,4 +1,4 @@
-## Vision
+## Vision Statement
 
 With only **2000** lines of code, **egos-2000** implements every component of an operating system for education.
 
