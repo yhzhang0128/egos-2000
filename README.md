@@ -6,7 +6,8 @@ With only **2000** lines of code, **egos-2000** implements every component of an
 It can run on a RISC-V board and also the QEMU software emulator.
 
 ![This is an image](references/screenshots/egos-2000.jpg)
-Note: [**cloc**](https://github.com/AlDanial/cloc) was used to count the lines of code. `cloc egos-2000 --exclude-ext=md` which excludes the markdown documents when counting code lines.
+Note: [**cloc**](https://github.com/AlDanial/cloc) was used to count the lines of code.
+Try `cloc egos-2000 --exclude-ext=md` which excludes the markdown documents when counting code lines.
 
 ## Earth and Grass Operating System 2000
 
