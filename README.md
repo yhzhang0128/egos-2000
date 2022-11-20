@@ -9,9 +9,9 @@ It can run on a RISC-V board and also the QEMU software emulator.
 Note: [**cloc**](https://github.com/AlDanial/cloc) was used to count the lines of code.
 Try `cloc egos-2000 --exclude-ext=md` which excludes the markdown documents when counting code lines.
 
-## Earth and Grass Operating System 2000
+## Earth and Grass Operating System
 
-We use **egos-2000** as our teaching operating system at Cornell. It adopts a 3-layer architecture.
+We use **egos-classic** and **egos-2000** as our teaching operating system at Cornell. They both adopt a 3-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
