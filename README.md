@@ -1,4 +1,4 @@
-## Vision Statement
+## Our Vision
 
 Our vision is to help **every** college student read **all** the code of an operating system within **one** semester.
 
