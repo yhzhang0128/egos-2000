@@ -11,7 +11,7 @@ Try `cloc egos-2000 --exclude-ext=md` which excludes the markdown documents when
 
 ## Earth and Grass Operating System
 
-We use **egos-classic** and **egos-2000** as our teaching operating system at Cornell. They both adopt a 3-layer architecture.
+We use **egos-classic** and **egos-2000** as our teaching OS at Cornell. They both adopt a 3-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
