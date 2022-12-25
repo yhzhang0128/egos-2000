@@ -117,13 +117,13 @@ void pagetable_identity_mapping(int pid) {
 }
 
 int pagetable_mmu_map(int pid, int page_no, int frame_id) {
-    /* Student's code goes here: */
+    /* Student's code goes here (page table translation). */
     FATAL("mmu_map() using page table translation not implemented");
     /* Student's code ends here. */
 }
 
 int pagetable_mmu_switch(int pid) {
-    /* Student's code goes here: */
+    /* Student's code goes here (page table translation). */
     FATAL("mmu_switch() using page table translation not implemented");
     /* Student's code ends here. */
 }

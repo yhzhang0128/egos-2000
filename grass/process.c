@@ -15,7 +15,7 @@
 void intr_entry(int id);
 
 void excp_entry(int id) {
-    /* Student's code goes here: */
+    /* Student's code goes here (handle memory exception). */
 
     /* If the exception is a system call, handle the system call and return */
 
@@ -30,7 +30,7 @@ void proc_init() {
     earth->intr_register(intr_entry);
     earth->excp_register(excp_entry);
 
-    /* Student's code goes here: */
+    /* Student's code goes here (PMP memory protection). */
 
     /* Setup PMP TOR region 0x00000000 - 0x20000000 as r/w/x */
 

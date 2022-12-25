@@ -58,14 +58,14 @@ void ctx_entry() {
     asm("csrr %0, mepc" : "=r"(mepc));
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
-    /* Student's code goes here: */
+    /* Student's code goes here (page table translation). */
     /* Save the interrupt stack */
     /* Student's code ends here. */
 
     /* kernel_entry() is either proc_yield() or proc_syscall() */
     kernel_entry();
 
-    /* Student's code goes here: */
+    /* Student's code goes here (page table translation). */
     /* Restore the interrupt stack */
     /* Student's code ends here. */
 
@@ -94,7 +94,7 @@ static void proc_yield() {
     earth->mmu_switch(curr_pid);
     timer_reset();
 
-    /* Student's code goes here: */
+    /* Student's code goes here (switch privilege level). */
 
     /* Modify mstatus.MPP to enter machine or user mode during mret
      * depending on whether curr_pid is a grass server or a user app
