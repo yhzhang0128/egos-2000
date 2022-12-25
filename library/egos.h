@@ -29,6 +29,7 @@ struct earth {
     enum { QEMU, ARTY } platform;
 };
 
+#define MAX_NPROCESS     16
 struct grass {
     /* Process control interface */
     int  (*proc_alloc)();
@@ -43,11 +44,13 @@ struct grass {
     /* Shell environment variables */
     int workdir_ino;
     char workdir[128];
+
+    /* Physical address of process stack, used in the page table project */
+    void* stack_paddr[MAX_NPROCESS];
 };
 
 extern struct earth *earth;
 extern struct grass *grass;
-#define MAX_NPROCESS     16
 
 #ifndef LIBC_STDIO
 #define printf             earth->tty_printf
@@ -62,11 +65,11 @@ extern struct grass *grass;
 #define FRAME_CACHE_END    0x80020000
 #define FRAME_CACHE_START  0x80004000  /* 112KB  frame cache           */
                                        /*        earth interface       */
-#define GRASS_STACK_TOP    0x80003f80  /* 7KB    earth/grass stack     */
+#define GRASS_STACK_TOP    0x80003f80  /* 6KB    earth/grass stack     */
 #define SYSCALL_ARG        0x80002400  /* 1KB    system call args      */
-                                       /*        grass interface       */
+                                       /* 1KB    grass interface       */
 #define APPS_STACK_TOP     0x80002000  /* 6KB    app stack             */
-#define SAVED_INTR_STACK   0x80000400  /* 1KB    saved interrupt stack */
+#define EXCP_STACK_OFFSET  0x00000400  /* 1KB    saved exception stack */
 #define APPS_ARG           0x80000000  /* 1KB    app main() argc, argv */
 #define APPS_SIZE          0x00003000  
 #define APPS_ENTRY         0x08005000  /* 12KB   app code+data         */

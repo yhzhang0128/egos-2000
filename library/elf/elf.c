@@ -63,6 +63,7 @@ static void load_app(int pid, elf_reader reader,
     /* Setup two pages for argc, argv and stack */
     earth->mmu_alloc(&frame_no, &base);
     earth->mmu_map(pid, stack_start++, frame_no);
+    grass->stack_paddr[pid] = (void*)(FRAME_CACHE_START + frame_no * PAGE_SIZE);
 
     int* argc_addr = (int*)base;
     int* argv_addr = argc_addr + 1;

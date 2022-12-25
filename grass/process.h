@@ -6,9 +6,12 @@
 struct process{
     int pid;
     int status;
-    void *sp, *mepc;
-    int receiver_pid; /* used when status is PROC_WAIT_TO_SEND */
+    int receiver_pid; /* used when process is waiting to send a message */
+
+    void *mepc;       /* machine exception program counter (mepc) */
+    void *sp_vaddr;   /* used for switching stack between user / kernel */
 };
+
 extern int proc_curr_idx;
 extern struct process proc_set[MAX_NPROCESS];
 #define curr_pid      proc_set[proc_curr_idx].pid

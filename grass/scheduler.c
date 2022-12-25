@@ -48,22 +48,31 @@ void intr_entry(int id) {
         FATAL("intr_entry: got unknown interrupt #%d", id);
     }
 
-    /* Switch to the grass kernel stack */
-    ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
+    /* Switch to the kernel stack */
+    ctx_start(&proc_set[proc_curr_idx].sp_vaddr, (void*)GRASS_STACK_TOP);
 }
 
 void ctx_entry() {
+    /* Switched to the kernel stack */
     int mepc, tmp;
     asm("csrr %0, mepc" : "=r"(mepc));
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
+    /* Student's code goes here: */
+    /* Save the interrupt stack */
+    /* Student's code ends here. */
+
     /* kernel_entry() is either proc_yield() or proc_syscall() */
     kernel_entry();
+
+    /* Student's code goes here: */
+    /* Restore the interrupt stack */
+    /* Student's code ends here. */
 
     /* Switch back to the user application stack */
     mepc = (int)proc_set[proc_curr_idx].mepc;
     asm("csrw mepc, %0" ::"r"(mepc));
-    ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
+    ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp_vaddr);
 }
 
 static void proc_yield() {
@@ -97,7 +106,7 @@ static void proc_yield() {
     if (curr_status == PROC_READY) {
         proc_set_running(curr_pid);
         /* Prepare argc and argv */
-        asm("mv a0, %0" ::"r"(*((int*)APPS_ARG)));
+        asm("mv a0, %0" ::"r"(APPS_ARG));
         asm("mv a1, %0" ::"r"(APPS_ARG + 4));
         /* Enter application code entry using mret */
         asm("csrw mepc, %0" ::"r"(APPS_ENTRY));

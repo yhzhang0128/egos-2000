@@ -44,5 +44,7 @@ int main() {
     if (earth->platform == ARTY) earth->intr_enable();
 
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
+    asm("mv a0, %0" ::"r"(APPS_ARG));
+    asm("mv a1, %0" ::"r"(APPS_ARG + 4));
     sys_proc_entry();
 }
