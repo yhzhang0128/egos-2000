@@ -41,6 +41,7 @@ int main() {
     earth->mmu_switch(GPID_PROCESS);
 
     timer_reset();
+    /* For QEMU, interrupt has been enabled in machine-mode earth layer */
     if (earth->platform == ARTY) earth->intr_enable();
 
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;

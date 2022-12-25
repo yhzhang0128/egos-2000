@@ -57,6 +57,8 @@ int main() {
         grass_entry();
     } else {
         /* QEMU supports supervisor mode */
+
+        /* Enable machine-mode interrupt before entering supervisor mode */
         earth->intr_enable();
 
         int mstatus;
