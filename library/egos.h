@@ -29,7 +29,7 @@ struct earth {
     enum { QEMU, ARTY } platform;
 };
 
-#define MAX_NPROCESS     16
+#define MAX_NPROCESS     32
 struct grass {
     /* Process control interface */
     int  (*proc_alloc)();

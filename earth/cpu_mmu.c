@@ -26,7 +26,6 @@ struct frame_mapping {
     int pid;     /* Which process owns the frame? */
     int page_no; /* Which virtual page is the frame mapped to? */
 } table[NFRAMES];
-unsigned int* pid_to_pagetable_base[MAX_NPROCESS];
 
 int mmu_alloc(int* frame_id, void** cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
@@ -45,7 +44,6 @@ int mmu_free(int pid) {
             paging_invalidate_cache(i);
             memset(&table[i], 0, sizeof(struct frame_mapping));
         }
-    pid_to_pagetable_base[pid] = 0;
 }
 
 /* Software TLB Translation */
@@ -84,10 +82,12 @@ int soft_mmu_switch(int pid) {
 #define FLAG_VALID_RWX 0xF
 #define FLAG_NEXT_LEVEL 0x1
 static unsigned int frame_id, *root, *leaf;
+static unsigned int* pid_to_pagetable_base[MAX_NPROCESS];
 
-void setup_identity_region(unsigned int addr, int npages) {
+void setup_identity_region(int pid, unsigned int addr, int npages) {
     /* Allocate the leaf page table */
     earth->mmu_alloc(&frame_id, (void**)&leaf);
+    table[frame_id].pid = pid;
     memset(leaf, 0, PAGE_SIZE);
 
     /* Setup the entry in the root page table */
@@ -103,16 +103,18 @@ void setup_identity_region(unsigned int addr, int npages) {
 void pagetable_identity_mapping(int pid) {
     /* Allocate the root page table and set the page table base (satp) */
     earth->mmu_alloc(&frame_id, (void**)&root);
+    table[frame_id].pid = pid;
     memset(root, 0, PAGE_SIZE);
 
+    if (pid >= MAX_NPROCESS) FATAL("pagetable_mmu_map: too many processes");
     pid_to_pagetable_base[pid] = root;
     /* Allocate the leaf page tables */
-    setup_identity_region(0x02000000, 16);   /* CLINT */
-    setup_identity_region(0x10013000, 1);    /* UART0 */
-    setup_identity_region(0x20400000, 1024); /* boot ROM */
-    setup_identity_region(0x20800000, 1024); /* disk image */
-    setup_identity_region(0x08000000, 8);    /* ITIM memory */
-    setup_identity_region(0x80000000, 1024); /* DTIM memory */
+    setup_identity_region(pid, 0x02000000, 16);   /* CLINT */
+    setup_identity_region(pid, 0x10013000, 1);    /* UART0 */
+    setup_identity_region(pid, 0x20400000, 1024); /* boot ROM */
+    setup_identity_region(pid, 0x20800000, 1024); /* disk image */
+    setup_identity_region(pid, 0x08000000, 8);    /* ITIM memory */
+    setup_identity_region(pid, 0x80000000, 1024); /* DTIM memory */
 
     /* Translation will start when the earth main() invokes mret so that the processor enters supervisor mode from machine mode */
 }
