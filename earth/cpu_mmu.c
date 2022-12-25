@@ -5,28 +5,22 @@
 
 /* Author: Yunhao Zhang
  * Description: memory management unit (MMU)
- * This file implements 2 translation mechanisms:
- *     page table and software TLB.
- * The Arty board uses software TLB and QEMU uses both.
- * This file also implements a paging device and MMU initialization.
+ * 
+ * Implementation of 2 translation mechanisms: page table and software TLB.
  */
 
 #include "egos.h"
 #include "disk.h"
-#include <stdlib.h>
 #include <string.h>
 
-/* Interface of a 1MB (256*4KB) paging device
- * On QEMU, it is simply the first 1MB of the memory
- * On Arty board, it is the first 1MB of the microSD card
- *   and some frames in the paging device are cached in memory
- */
-#define NFRAMES 256
-char* paging_read(int frame_id);
-int paging_write(int frame_id, int page_no);
+/* Interface of the paging device, see earth/dev_page.c */
+void paging_init();
 int paging_invalidate_cache(int frame_id);
+int paging_write(int frame_id, int page_no);
+char* paging_read(int frame_id, int alloc_only);
 
 /* Allocation and free of physical frames */
+#define NFRAMES 256
 struct frame_mapping {
     int use;     /* Is the frame allocated? */
     int pid;     /* Which process owns the frame? */
@@ -37,7 +31,7 @@ int mmu_alloc(int* frame_id, void** cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
         if (!table[i].use) {
             *frame_id = i;
-            *cached_addr = paging_read(i);
+            *cached_addr = paging_read(i, 1);
             table[i].use = 1;
             return 0;
         }
@@ -72,7 +66,7 @@ int soft_mmu_switch(int pid) {
     /* Map pid to the user address space */
     for (int i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == pid)
-            memcpy((void*)(table[i].page_no << 12), paging_read(i), PAGE_SIZE);
+            memcpy((void*)(table[i].page_no << 12), paging_read(i, 0), PAGE_SIZE);
 
     curr_vm_pid = pid;
 }
@@ -126,71 +120,6 @@ void pagetable_identity_mapping() {
     /* Translation will start when the earth main() invokes mret so that the processor enters supervisor mode from machine mode */
 }
 
-/* A paging device with in-memory caching
- *
- * For QEMU, 256 physical frames start at address FRAME_CACHE_START.
- * For Arty, 28 physical frames are cached at address FRAME_CACHE_START
- * and 256 frames start at the beginning of the microSD card.
- */
-
-#define ARTY_CACHED_NFRAMES 28
-#define NBLOCKS_PER_PAGE PAGE_SIZE / BLOCK_SIZE  /* 4KB / 512B == 8 */
-
-int cache_slots[ARTY_CACHED_NFRAMES];
-char *pages_start = (void*)FRAME_CACHE_START;
-
-int paging_evict_cache() {
-    /* Randomly select a cache slot to evict */
-    int idx = rand() % ARTY_CACHED_NFRAMES;
-    int frame_id = cache_slots[idx];
-
-    if (table[frame_id].use)
-        earth->disk_write(frame_id * NBLOCKS_PER_PAGE, NBLOCKS_PER_PAGE, pages_start + PAGE_SIZE * idx);
-
-    return idx;
-}
-
-int paging_invalidate_cache(int frame_id) {
-    for (int j = 0; j < ARTY_CACHED_NFRAMES; j++)
-        if (cache_slots[j] == frame_id) cache_slots[j] = -1;
-}
-
-char* paging_read(int frame_id) {
-    if (earth->platform == QEMU) return pages_start + frame_id * PAGE_SIZE;
-
-    int free_idx = -1;
-    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++) {
-        if (cache_slots[i] == -1 && free_idx == -1) free_idx = i;
-        if (cache_slots[i] == frame_id) return pages_start + PAGE_SIZE * i;
-    }
-
-    if (free_idx == -1) free_idx = paging_evict_cache();
-    cache_slots[free_idx] = frame_id;
-
-    if (table[frame_id].use)
-        earth->disk_read(frame_id * NBLOCKS_PER_PAGE, NBLOCKS_PER_PAGE, pages_start + PAGE_SIZE * free_idx);
-
-    return pages_start + PAGE_SIZE * free_idx;
-}
-
-int paging_write(int frame_id, int page_no) {
-    char* src = (void*)(page_no << 12);
-    if (earth->platform == QEMU) {
-        memcpy(pages_start + frame_id * PAGE_SIZE, src, PAGE_SIZE);
-        return 0;
-    }
-
-    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++)
-        if (cache_slots[i] == frame_id) {
-            memcpy(pages_start + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
-            return 0;
-        }
-
-    int free_idx = paging_evict_cache();
-    cache_slots[free_idx] = frame_id;
-    memcpy(pages_start + PAGE_SIZE * free_idx, src, PAGE_SIZE);
-}
-
 /* MMU Initialization */
 void platform_detect(int id) {
     earth->platform = ARTY;
@@ -225,6 +154,8 @@ void mmu_init() {
     earth->mmu_map = soft_mmu_map;
     earth->mmu_switch = soft_mmu_switch;
 
-    memset(cache_slots, 0xFF, sizeof(cache_slots));
-    if (buf[0] == '0') pagetable_identity_mapping();
+    paging_init();
+    if (buf[0] == '0') {
+        pagetable_identity_mapping();
+    }
 }
