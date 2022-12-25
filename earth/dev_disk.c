@@ -36,9 +36,9 @@ int disk_write(int block_no, int nblocks, char* src) {
 }
 
 void disk_init() {
-    INFO("Choose a disk:");
-    printf("  Enter 0: microSD card (Arty board only)\r\n");
-    printf("  Enter 1: on-board flash ROM (Arty board or QEMU)\r\n");
+    CRITICAL("Choose a disk:");
+    printf("  Enter 0: microSD card (Arty board)\r\n");
+    printf("  Enter 1: on-board ROM (Arty board or QEMU)\r\n");
 
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));

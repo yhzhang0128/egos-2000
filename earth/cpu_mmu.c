@@ -153,8 +153,6 @@ int paging_invalidate_cache(int frame_id) {
         if (cache_slot[j] == frame_id) cache_slot[j] = -1;
 }
 
-void paging_init() { memset(cache_slot, 0xFF, sizeof(cache_slot)); }
-
 char* paging_read(int frame_id) {
     if (earth->platform == QEMU)
         return page_start + frame_id * PAGE_SIZE;
@@ -208,22 +206,30 @@ void platform_detect(int id) {
 }
 
 void mmu_init() {
+    /* Choose memory translation mechanism */
+    CRITICAL("Choose a memory translation mechanism:");
+    printf("  Enter 0: page tables  (QEMU)\r\n");
+    printf("  Enter 1: software TLB (QEMU or Arty board)\r\n");
+
+    char buf[2];
+    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
+    INFO("%s translation is chosen", (buf[0] == '0')? "Page table" : "Software");
+
+    /* Check whether the hardware platform supports supervisor mode */
     earth->platform = QEMU;
     earth->excp_register(platform_detect);
     /* This memory access triggers an exception on Arty, but not QEMU */
     *(int*)(0x1000) = 1;
     earth->excp_register(NULL);
+    if (earth->platform == ARTY && buf[0] == '0')
+        FATAL("Arty board doesn't support page tables (supervisor mode).");
 
+    /* Initialize MMU interface functions */
     earth->mmu_alloc = soft_mmu_alloc;
     earth->mmu_map = soft_mmu_map;
     earth->mmu_switch = soft_mmu_switch;
     earth->mmu_free = soft_mmu_free;
 
-    if (earth->platform == ARTY) {
-        paging_init();
-        earth->tty_info("Arty detected: Use software translation");
-    } else {
-        pagetable_identity_mapping();
-        earth->tty_info("QEMU detected: Use software + page table translation");
-    }
+    memset(cache_slot, 0xFF, sizeof(cache_slot));
+    if (buf[0] == '0') pagetable_identity_mapping();
 }
