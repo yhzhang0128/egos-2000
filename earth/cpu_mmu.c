@@ -25,7 +25,7 @@ struct frame_mapping {
     int pid;     /* Which process owns the frame? */
     int page_no; /* Which virtual page is the frame mapped to? */
 } table[NFRAMES];
-int pid_to_pagetable_base[MAX_NPROCESS];
+unsigned int* pid_to_pagetable_base[MAX_NPROCESS];
 
 int mmu_alloc(int* frame_id, void** cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
@@ -103,13 +103,12 @@ void setup_identity_region(unsigned int addr, int npages) {
         leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | FLAG_VALID_RWX;
 }
 
-void pagetable_identity_mapping() {
+void pagetable_identity_mapping(int pid) {
     /* Allocate the root page table and set the page table base (satp) */
     earth->mmu_alloc(&frame_id, (void**)&root);
     memset(root, 0, PAGE_SIZE);
-    /* Set the (1 << 31) bit of satp to enable Sv32 translation */
-    asm("csrw satp, %0" ::"r"(((unsigned int)root >> 12) | (1 << 31)));
 
+    pid_to_pagetable_base[pid] = root;
     /* Allocate the leaf page tables */
     setup_identity_region(0x02000000, 16);   /* CLINT */
     setup_identity_region(0x10013000, 1);    /* UART0 */
@@ -169,10 +168,8 @@ void mmu_init() {
 
     paging_init();
     if (buf[0] == '0') {
-        /* Student's code goes here: */
-        /* earth->mmu_map = pagetable_mmu_map; */
-        /* earth->mmu_switch = pagetable_mmu_switch; */
-        /* Student's code ends here. */
-        pagetable_identity_mapping();
+        earth->mmu_map = pagetable_mmu_map;
+        earth->mmu_switch = pagetable_mmu_switch;
+        pagetable_identity_mapping(0);
     }
 }
