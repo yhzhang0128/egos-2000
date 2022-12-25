@@ -10,22 +10,28 @@
 
 #include "sd.h"
 
-static void sd_spi_reset();
-static void sd_spi_config();
-static void sd_spi_set_clock(long baud_rate);
+static void spi_config();
+static void spi_set_clock(long baud_rate);
 
-static int sd_check_type();
+static void sd_reset();
+static int  sd_check_type();
 static void sd_check_capacity();
 
-int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
+enum {
+      SD_CARD_TYPE_SD1,
+      SD_CARD_TYPE_SD2,
+      SD_CARD_TYPE_SDHC,
+      SD_CARD_TYPE_UNKNOWN
+};
+static int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
 
 void sdinit() {
-    sd_spi_set_clock(100000);
-    sd_spi_config();
-    sd_spi_reset();
+    spi_set_clock(100000);
+    spi_config();
 
+    sd_reset();
     INFO("Set SPI clock frequency to %ldHz", CPU_CLOCK_RATE / 4);
-    sd_spi_set_clock(CPU_CLOCK_RATE / 4);
+    spi_set_clock(CPU_CLOCK_RATE / 4);
 
     INFO("Check SD card type and voltage with cmd8");
     if (0 != sd_check_type()) FATAL("Fail to check SD card type");
@@ -40,11 +46,7 @@ void sdinit() {
     while (recv_data_byte() != 0xFF);
 
     if (SD_CARD_TYPE == SD_CARD_TYPE_SD2) sd_check_capacity();
-
-    if (SD_CARD_TYPE != SD_CARD_TYPE_SDHC)
-        FATAL("Only SDHC/SDXC cards are supported");
-
-    INFO("SD card is high capacity SDHC/SDXC card");
+    if (SD_CARD_TYPE != SD_CARD_TYPE_SDHC) FATAL("Only SDHC/SDXC cards are supported");
 }
 
 static int sd_check_type() {
@@ -56,7 +58,7 @@ static int sd_check_type() {
         /* Illegal command */
         SD_CARD_TYPE = SD_CARD_TYPE_SD1;
     } else {
-        /* only need last byte of r7 response */
+        /* Only need last byte of r7 response */
         unsigned long payload;
         for (int i = 0; i < 4; i++)
             ((char*)&payload)[3 - i] = recv_data_byte();
@@ -75,35 +77,28 @@ static void sd_check_capacity() {
     while (recv_data_byte() != 0xFF);
 
     char reply, cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
-    if (sd_exec_cmd(cmd58)) FATAL("cmd58 returns failure");
-    INFO("SD card replies cmd58 with status 0x00");
+    if (sd_exec_cmd(cmd58)) FATAL("SD card cmd58 fails");
 
-    unsigned long payload;
-    for (int i = 0; i < 4; i++) {
-        reply = ((char*)&payload)[3 - i] = recv_data_byte();
+    char payload[4];
+    for (int i = 0; i < 4; i++) payload[3 - i] = recv_data_byte();
 
-        if (i == 0 && ((reply & 0XC0) == 0XC0))
-            SD_CARD_TYPE = SD_CARD_TYPE_SDHC;
-    }
-    INFO("SD card replies cmd58 with payload 0x%.8x", payload);
+    if ((payload[3] & 0xC0) == 0xC0) SD_CARD_TYPE = SD_CARD_TYPE_SDHC;
+    INFO("SD card replies cmd58 with payload 0x%.8x", *(int*)payload);
 
     while (recv_data_byte() != 0xFF);
 }
 
-static void sd_spi_reset() {
+static void sd_reset() {
     INFO("Set CS and MOSI to 1 and toggle clock.");
 
     /* Keep chip select line high */
-    REGW(SPI1_BASE, SPI1_CSMODE) &= ~3;
-    REGW(SPI1_BASE, SPI1_CSMODE) |= 2;
+    REGW(SPI1_BASE, SPI1_CSMODE) = 2;
 
     unsigned long i, rxdata;
     for (i = 0; i < 1000; i++) send_data_byte(0xFF);
 
     /* Keep chip select line low */
     REGW(SPI1_BASE, SPI1_CSDEF) = 1;
-    REGW(SPI1_BASE, SPI1_CSMODE) &= ~3;
-    REGW(SPI1_BASE, SPI1_CSMODE) |= 2;
     for (i = 0; i < 200000; i++);
     
     INFO("Set CS to 0 and send cmd0 to SD card.");
@@ -112,46 +107,32 @@ static void sd_spi_reset() {
 
     INFO("Wait for SD card's reply to cmd0 (QEMU will stuck here)");
     while (reply != 0x01) reply = recv_data_byte();
-
     while (recv_data_byte() != 0xFF);
 }
 
-static void sd_spi_config() {
-    /* Set protocol as SPI_SINGLE */
-    REGW(SPI1_BASE, SPI1_FMT) &= ~3;
+static void spi_set_clock(long baud_rate) {
+    long div = (CPU_CLOCK_RATE / (2 * baud_rate)) - 1;
+    REGW(SPI1_BASE, SPI1_SCKDIV) = (div & 0xFFF);
+}
 
+static void spi_config() {
     /* Set phase as 0*/
-    REGW(SPI1_BASE, SPI1_SCKMODE) &= ~1;
-
     /* Set polarity as 0 */
-    REGW(SPI1_BASE, SPI1_SCKMODE) &= ~2;
-
-    /* Set endianness as 0 */
-    REGW(SPI1_BASE, SPI1_FMT) &= ~4;
-
-    /* Always populate receive FIFO */
-    REGW(SPI1_BASE, SPI1_FMT) &= ~8;
-
-    /* Set CS active-high as 0 */
-    REGW(SPI1_BASE, SPI1_CSDEF) = 0;
-
-    /* Set frame length */
-    if ((REGW(SPI1_BASE, SPI1_FMT) & 0xF0000) != 0x80000) {
-        REGW(SPI1_BASE, SPI1_FMT) &= ~0xF0000;
-        REGW(SPI1_BASE, SPI1_FMT) |= 0x80000;
-    }
+    REGW(SPI1_BASE, SPI1_SCKMODE) = 0;
 
     /* Set CS line */
     REGW(SPI1_BASE, SPI1_CSID) = 0;
 
+    /* Set CS active-high as 0 */
+    REGW(SPI1_BASE, SPI1_CSDEF) = 0;
+
     /* Toggle off memory-mapped SPI flash mode;
      * toggle on programmable IO mode */
     REGW(SPI1_BASE, SPI1_FCTRL) = 0;
-}
 
-static void sd_spi_set_clock(long baud_rate) {
-    long div = (CPU_CLOCK_RATE / (2 * baud_rate)) - 1;
-
-    REGW(SPI1_BASE, SPI1_SCKDIV) &= ~0xFFF;
-    REGW(SPI1_BASE, SPI1_SCKDIV) |= (div & 0xFFF);
+    /* Set protocol as SPI_SINGLE */
+    /* Set endianness as 0 */
+    /* Always populate receive FIFO */
+    /* Set frame length */
+    REGW(SPI1_BASE, SPI1_FMT) = 0x80000;
 }

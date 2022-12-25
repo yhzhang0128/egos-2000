@@ -2,22 +2,15 @@
 
 #include "egos.h"
 
-enum {
-      SD_CARD_TYPE_SD1,
-      SD_CARD_TYPE_SD2,
-      SD_CARD_TYPE_SDHC,
-      SD_CARD_TYPE_UNKNOWN
-};
-extern int SD_CARD_TYPE;
+char recv_data_byte();
+char send_data_byte(char);
+
+char sd_exec_cmd(char*);
+char sd_exec_acmd(char*);
 
 void sdinit();
 int sdread(int offset, int nblock, char* dst);
 int sdwrite(int offset, int nblock, char* src);
-
-char sd_exec_cmd(char*);
-char sd_exec_acmd(char*);
-char recv_data_byte();
-char send_data_byte(char);
 
 /* definitions for controlling SPI1 in FE310
  * see chapter19 of the SiFive FE310-G002 Manual
