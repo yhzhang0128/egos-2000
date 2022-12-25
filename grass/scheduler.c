@@ -59,14 +59,24 @@ void ctx_entry() {
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
     /* Student's code goes here (page table translation). */
-    /* Save the interrupt stack */
+
+    /* Save the interrupt stack
+     * Copy 0x400 bytes from sp_vaddr of the current process
+     * to grass->stack_paddr of the current process
+     */
+
     /* Student's code ends here. */
 
     /* kernel_entry() is either proc_yield() or proc_syscall() */
     kernel_entry();
 
     /* Student's code goes here (page table translation). */
-    /* Restore the interrupt stack */
+
+    /* Restore the interrupt stack
+     * Copy 0x400 bytes from grass->stack_paddr of the current process
+     * to sp_vaddr of the current process
+     */
+
     /* Student's code ends here. */
 
     /* Switch back to the user application stack */
