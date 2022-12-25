@@ -16,25 +16,43 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Implementation of Software TLB Translation
- *
- * There are 256 physical frames (i.e., pages) in a paging device. 
- * And here is the paging device interface.
+/* Interface of a 1MB (256*4KB) paging device
+ * On QEMU, it is simply the first 1MB of the memory
+ * On Arty board, it is the first 1MB of the microSD card
+ *   and some frames in the paging device are cached in memory
  */
-
 #define NFRAMES 256
 char* paging_read(int frame_id);
-int paging_write(int frame_id, char* src);
+int paging_write(int frame_id, int page_no);
 int paging_invalidate_cache(int frame_id);
 
-/* software translation table */
+/* Allocation and free of physical frames */
 struct frame_mapping {
-    int use;      /* Is this physical frame allocated? */
-    int pid;      /* Which process owns this physical frame? */
-    int page_no;  /* Which virtual page does this frame map to? */
+    int use;     /* Is the frame allocated? */
+    int pid;     /* Which process owns the frame? */
+    int page_no; /* Which virtual page is the frame mapped to? */
 } table[NFRAMES];
-#define PAGENO_TO_ADDR(x) (void*)(table[x].page_no << 12)
 
+int mmu_alloc(int* frame_id, void** cached_addr) {
+    for (int i = 0; i < NFRAMES; i++)
+        if (!table[i].use) {
+            *frame_id = i;
+            *cached_addr = paging_read(i);
+            table[i].use = 1;
+            return 0;
+        }
+    FATAL("mmu_alloc: no more available frames");
+}
+
+int mmu_free(int pid) {
+    for (int i = 0; i < NFRAMES; i++)
+        if (table[i].use && table[i].pid == pid) {
+            paging_invalidate_cache(i);
+            memset(&table[i], 0, sizeof(struct frame_mapping));
+        }
+}
+
+/* Software TLB Translation */
 int soft_mmu_map(int pid, int page_no, int frame_id) {
     if (!table[frame_id].use) FATAL("mmu_map: bad frame_id");
     
@@ -49,43 +67,26 @@ int soft_mmu_switch(int pid) {
     /* Unmap curr_vm_pid from the user address space */
     for (int i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == curr_vm_pid)
-            paging_write(i, PAGENO_TO_ADDR(i));
+            paging_write(i, table[i].page_no);
 
     /* Map pid to the user address space */
     for (int i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == pid)
-            memcpy(PAGENO_TO_ADDR(i), paging_read(i), PAGE_SIZE);
+            memcpy((void*)(table[i].page_no << 12), paging_read(i), PAGE_SIZE);
 
     curr_vm_pid = pid;
 }
 
-int soft_mmu_alloc(int* frame_id, void** cached_addr) {
-    for (int i = 0; i < NFRAMES; i++)
-        if (!table[i].use) {
-            *frame_id = i;
-            *cached_addr = paging_read(i);
-            table[i].use = 1;
-            return 0;
-        }
-    FATAL("mmu_alloc: no more available frames");
-}
-
-int soft_mmu_free(int pid) {
-    for (int i = 0; i < NFRAMES; i++)
-        if (table[i].use && table[i].pid == pid) {
-            paging_invalidate_cache(i);
-            memset(&table[i], 0, sizeof(struct frame_mapping));
-        }
-}
-
-/* Implementation of Page Table Translation
+/* Page Table Translation
  *
- * The code below creates an identity mapping using page tables.
+ * The code below creates an identity mapping using RISC-V Sv32.
  * mmu_map() and mmu_switch() are still implemented by software TLB.
  *
- * Using page tables for mmu_map() and mmu_switch() is left to students
+ * Rewriting mmu_map() and mmu_switch() with Sv32 is left to students
  * as a course project. After this project, every process should have
- * its own set of page tables for translation.
+ * its own set of page tables. mmu_map() will modify entries in these
+ * page tables and mmu_switch() will modify the satp register, i.e., 
+ * the page table base register.
  */
 
 #define FLAG_VALID_RWX 0xF
@@ -122,81 +123,75 @@ void pagetable_identity_mapping() {
     setup_identity_region(0x08000000, 8);    /* ITIM memory */
     setup_identity_region(0x80000000, 1024); /* DTIM memory */
 
-    /* Translation will start when the earth main() invokes mret */
+    /* Translation will start when the earth main() invokes mret so that the processor enters supervisor mode from machine mode */
 }
 
-/* Implementation of a Paging Device
+/* A paging device with in-memory caching
  *
  * For QEMU, 256 physical frames start at address FRAME_CACHE_START.
  * For Arty, 28 physical frames are cached at address FRAME_CACHE_START
  * and 256 frames start at the beginning of the microSD card.
  */
 
-#define ARTY_CACHED_NFRAMES 28  /* 32-4, 4 pages reserved for 2 stacks */
-int cache_slot[ARTY_CACHED_NFRAMES];
-char *page_start = (void*)FRAME_CACHE_START;
+#define ARTY_CACHED_NFRAMES 28
+#define NBLOCKS_PER_PAGE PAGE_SIZE / BLOCK_SIZE  /* 4KB / 512B == 8 */
+
+int cache_slots[ARTY_CACHED_NFRAMES];
+char *pages_start = (void*)FRAME_CACHE_START;
 
 int paging_evict_cache() {
+    /* Randomly select a cache slot to evict */
     int idx = rand() % ARTY_CACHED_NFRAMES;
-    int frame_id = cache_slot[idx];
+    int frame_id = cache_slots[idx];
 
-    if (table[frame_id].use) {
-        int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        earth->disk_write(frame_id * nblocks, nblocks, page_start + PAGE_SIZE * idx);
-    }
+    if (table[frame_id].use)
+        earth->disk_write(frame_id * NBLOCKS_PER_PAGE, NBLOCKS_PER_PAGE, pages_start + PAGE_SIZE * idx);
 
     return idx;
 }
 
 int paging_invalidate_cache(int frame_id) {
     for (int j = 0; j < ARTY_CACHED_NFRAMES; j++)
-        if (cache_slot[j] == frame_id) cache_slot[j] = -1;
+        if (cache_slots[j] == frame_id) cache_slots[j] = -1;
 }
 
 char* paging_read(int frame_id) {
-    if (earth->platform == QEMU)
-        return page_start + frame_id * PAGE_SIZE;
+    if (earth->platform == QEMU) return pages_start + frame_id * PAGE_SIZE;
 
     int free_idx = -1;
     for (int i = 0; i < ARTY_CACHED_NFRAMES; i++) {
-        if (cache_slot[i] == frame_id)
-            return page_start + PAGE_SIZE * i;
-        if (cache_slot[i] == -1 && free_idx == -1) free_idx = i;
+        if (cache_slots[i] == -1 && free_idx == -1) free_idx = i;
+        if (cache_slots[i] == frame_id) return pages_start + PAGE_SIZE * i;
     }
 
     if (free_idx == -1) free_idx = paging_evict_cache();
-    cache_slot[free_idx] = frame_id;
+    cache_slots[free_idx] = frame_id;
 
-    if (table[frame_id].use) {
-        int nblocks = PAGE_SIZE / BLOCK_SIZE;
-        earth->disk_read(frame_id * nblocks, nblocks, page_start + PAGE_SIZE * free_idx);
-    }
+    if (table[frame_id].use)
+        earth->disk_read(frame_id * NBLOCKS_PER_PAGE, NBLOCKS_PER_PAGE, pages_start + PAGE_SIZE * free_idx);
 
-    return page_start + PAGE_SIZE * free_idx;
+    return pages_start + PAGE_SIZE * free_idx;
 }
 
-int paging_write(int frame_id, char* src) {
+int paging_write(int frame_id, int page_no) {
+    char* src = (void*)(page_no << 12);
     if (earth->platform == QEMU) {
-        memcpy(page_start + frame_id * PAGE_SIZE, src, PAGE_SIZE);
+        memcpy(pages_start + frame_id * PAGE_SIZE, src, PAGE_SIZE);
         return 0;
     }
 
     for (int i = 0; i < ARTY_CACHED_NFRAMES; i++)
-        if (cache_slot[i] == frame_id)
-            return memcpy(page_start + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
+        if (cache_slots[i] == frame_id) {
+            memcpy(pages_start + PAGE_SIZE * i, src, PAGE_SIZE) != NULL;
+            return 0;
+        }
 
     int free_idx = paging_evict_cache();
-    cache_slot[free_idx] = frame_id;
-    memcpy(page_start + PAGE_SIZE * free_idx, src, PAGE_SIZE);
+    cache_slots[free_idx] = frame_id;
+    memcpy(pages_start + PAGE_SIZE * free_idx, src, PAGE_SIZE);
 }
 
-/* Implementation of MMU Initialization
- *
- * Detect whether egos-2000 is running on QEMU or the Arty board.
- * Setup page table translation if on QEMU. The Arty board doesn't
- * support supervisor mode which is why it doesn't support page tables.
- */
-
+/* MMU Initialization */
 void platform_detect(int id) {
     earth->platform = ARTY;
     /* Skip the illegal store instruction */
@@ -225,11 +220,11 @@ void mmu_init() {
         FATAL("Arty board doesn't support page tables (supervisor mode).");
 
     /* Initialize MMU interface functions */
-    earth->mmu_alloc = soft_mmu_alloc;
+    earth->mmu_free = mmu_free;
+    earth->mmu_alloc = mmu_alloc;
     earth->mmu_map = soft_mmu_map;
     earth->mmu_switch = soft_mmu_switch;
-    earth->mmu_free = soft_mmu_free;
 
-    memset(cache_slot, 0xFF, sizeof(cache_slot));
+    memset(cache_slots, 0xFF, sizeof(cache_slots));
     if (buf[0] == '0') pagetable_identity_mapping();
 }
