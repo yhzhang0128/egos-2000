@@ -105,9 +105,8 @@ void pagetable_identity_mapping(int pid) {
     earth->mmu_alloc(&frame_id, (void**)&root);
     table[frame_id].pid = pid;
     memset(root, 0, PAGE_SIZE);
-
-    if (pid >= MAX_NPROCESS) FATAL("pagetable_mmu_map: too many processes");
     pid_to_pagetable_base[pid] = root;
+
     /* Allocate the leaf page tables */
     setup_identity_region(pid, 0x02000000, 16);   /* CLINT */
     setup_identity_region(pid, 0x10013000, 1);    /* UART0 */
@@ -120,6 +119,8 @@ void pagetable_identity_mapping(int pid) {
 }
 
 int pagetable_mmu_map(int pid, int page_no, int frame_id) {
+    if (pid >= MAX_NPROCESS) FATAL("pagetable_mmu_map: too many processes");
+
     /* Student's code goes here (page table translation). */
     FATAL("mmu_map() using page table translation not implemented");
     /* Student's code ends here. */
