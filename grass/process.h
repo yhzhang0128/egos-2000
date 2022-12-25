@@ -3,8 +3,6 @@
 #include "elf.h"
 #include "disk.h"
 
-#define MAX_NPROCESS       16
-
 struct process{
     int pid;
     int status;

@@ -47,6 +47,7 @@ struct grass {
 
 extern struct earth *earth;
 extern struct grass *grass;
+#define MAX_NPROCESS     16
 
 #ifndef LIBC_STDIO
 #define printf             earth->tty_printf
@@ -59,19 +60,20 @@ extern struct grass *grass;
 /* Memory layout */
 #define PAGE_SIZE          4096
 #define FRAME_CACHE_END    0x80020000
-#define FRAME_CACHE_START  0x80004000  /* 112KB  frame cache          */
-                                       /*        earth interface      */
-#define GRASS_STACK_TOP    0x80003f80  /* ~8KB   earth/grass stack    */
-                                       /*        grass interface      */
-#define APPS_STACK_TOP     0x80002000  /* ~6KB   app stack            */
-#define SYSCALL_ARG        0x80000400  /* ~1KB   syscall args         */
-#define APPS_ARG           0x80000000  /* ~1KB   argc, argv           */
+#define FRAME_CACHE_START  0x80004000  /* 112KB  frame cache           */
+                                       /*        earth interface       */
+#define GRASS_STACK_TOP    0x80003f80  /* 7KB    earth/grass stack     */
+#define SYSCALL_ARG        0x80002400  /* 1KB    system call args      */
+                                       /*        grass interface       */
+#define APPS_STACK_TOP     0x80002000  /* 6KB    app stack             */
+#define SAVED_INTR_STACK   0x80000400  /* 1KB    saved interrupt stack */
+#define APPS_ARG           0x80000000  /* 1KB    app main() argc, argv */
 #define APPS_SIZE          0x00003000  
-#define APPS_ENTRY         0x08005000  /* 12KB   app code+data        */
+#define APPS_ENTRY         0x08005000  /* 12KB   app code+data         */
 #define GRASS_SIZE         0x00002800
-#define GRASS_ENTRY        0x08002800  /* 8KB    grass code+data      */
-                                       /* 12KB   earth data           */
-                                       /* earth code is in QSPI flash */
+#define GRASS_ENTRY        0x08002800  /* 8KB    grass code+data       */
+                                       /* 12KB   earth data            */
+                                       /* earth code is in QSPI flash  */
 
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))

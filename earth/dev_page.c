@@ -5,10 +5,9 @@
 
 /* Author: Yunhao Zhang
  * Description: a 1MB (256*4KB) paging device
- *
- * On QEMU, 256 physical frames start at address FRAME_CACHE_START.
- * On Arty, 28 physical frames are cached at address FRAME_CACHE_START
- * and 256 frames (1MB) start at the beginning of the microSD card.
+ * for QEMU, 256 physical frames start at address FRAME_CACHE_START
+ * for Arty, 28 physical frames are cached at address FRAME_CACHE_START
+ * and 256 frames (1MB) start at the beginning of the microSD card
  */
 
 #include "egos.h"

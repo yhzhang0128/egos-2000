@@ -5,8 +5,7 @@
 
 /* Author: Yunhao Zhang
  * Description: memory management unit (MMU)
- * 
- * Implementation of 2 translation mechanisms: page table and software TLB.
+ * implementation of 2 translation mechanisms: page table and software TLB
  */
 
 #include "egos.h"
@@ -26,6 +25,7 @@ struct frame_mapping {
     int pid;     /* Which process owns the frame? */
     int page_no; /* Which virtual page is the frame mapped to? */
 } table[NFRAMES];
+int pid_to_pagetable_base[MAX_NPROCESS];
 
 int mmu_alloc(int* frame_id, void** cached_addr) {
     for (int i = 0; i < NFRAMES; i++)
@@ -44,6 +44,7 @@ int mmu_free(int pid) {
             paging_invalidate_cache(i);
             memset(&table[i], 0, sizeof(struct frame_mapping));
         }
+    pid_to_pagetable_base[pid] = 0;
 }
 
 /* Software TLB Translation */
@@ -120,6 +121,18 @@ void pagetable_identity_mapping() {
     /* Translation will start when the earth main() invokes mret so that the processor enters supervisor mode from machine mode */
 }
 
+int pagetable_mmu_map(int pid, int page_no, int frame_id) {
+    /* Student's code goes here: */
+    FATAL("mmu_map() with page tables not implemented");
+    /* Student's code ends here. */
+}
+
+int pagetable_mmu_switch(int pid) {
+    /* Student's code goes here: */
+    FATAL("mmu_switch() with page tables not implemented");
+    /* Student's code ends here. */
+}
+
 /* MMU Initialization */
 void platform_detect(int id) {
     earth->platform = ARTY;
@@ -156,6 +169,10 @@ void mmu_init() {
 
     paging_init();
     if (buf[0] == '0') {
+        /* Student's code goes here: */
+        /* earth->mmu_map = pagetable_mmu_map; */
+        /* earth->mmu_switch = pagetable_mmu_switch; */
+        /* Student's code ends here. */
         pagetable_identity_mapping();
     }
 }
