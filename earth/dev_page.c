@@ -20,9 +20,7 @@
 int cache_slots[ARTY_CACHED_NFRAMES];
 char *pages_start = (void*)FRAME_CACHE_START;
 
-void paging_init() { memset(cache_slots, 0xFF, sizeof(cache_slots)); }
-
-int paging_evict_cache() {
+static int cache_eviction() {
     /* Randomly select a cache slot to evict */
     int idx = rand() % ARTY_CACHED_NFRAMES;
     int frame_id = cache_slots[idx];
@@ -31,27 +29,11 @@ int paging_evict_cache() {
     return idx;
 }
 
+void paging_init() { memset(cache_slots, 0xFF, sizeof(cache_slots)); }
+
 int paging_invalidate_cache(int frame_id) {
     for (int j = 0; j < ARTY_CACHED_NFRAMES; j++)
         if (cache_slots[j] == frame_id) cache_slots[j] = -1;
-}
-
-char* paging_read(int frame_id, int alloc_only) {
-    if (earth->platform == QEMU) return pages_start + frame_id * PAGE_SIZE;
-
-    int free_idx = -1;
-    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++) {
-        if (cache_slots[i] == -1 && free_idx == -1) free_idx = i;
-        if (cache_slots[i] == frame_id) return pages_start + PAGE_SIZE * i;
-    }
-
-    if (free_idx == -1) free_idx = paging_evict_cache();
-    cache_slots[free_idx] = frame_id;
-
-    if (!alloc_only)
-        earth->disk_read(frame_id * NBLOCKS_PER_PAGE, NBLOCKS_PER_PAGE, pages_start + PAGE_SIZE * free_idx);
-
-    return pages_start + PAGE_SIZE * free_idx;
 }
 
 int paging_write(int frame_id, int page_no) {
@@ -67,8 +49,26 @@ int paging_write(int frame_id, int page_no) {
             return 0;
         }
 
-    int free_idx = paging_evict_cache();
+    int free_idx = cache_eviction();
     cache_slots[free_idx] = frame_id;
     memcpy(pages_start + PAGE_SIZE * free_idx, src, PAGE_SIZE);
+}
+
+char* paging_read(int frame_id, int alloc_only) {
+    if (earth->platform == QEMU) return pages_start + frame_id * PAGE_SIZE;
+
+    int free_idx = -1;
+    for (int i = 0; i < ARTY_CACHED_NFRAMES; i++) {
+        if (cache_slots[i] == -1 && free_idx == -1) free_idx = i;
+        if (cache_slots[i] == frame_id) return pages_start + PAGE_SIZE * i;
+    }
+
+    if (free_idx == -1) free_idx = cache_eviction();
+    cache_slots[free_idx] = frame_id;
+
+    if (!alloc_only)
+        earth->disk_read(frame_id * NBLOCKS_PER_PAGE, NBLOCKS_PER_PAGE, pages_start + PAGE_SIZE * free_idx);
+
+    return pages_start + PAGE_SIZE * free_idx;
 }
 

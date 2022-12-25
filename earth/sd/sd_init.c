@@ -106,12 +106,12 @@ static void sd_spi_reset() {
     REGW(SPI1_BASE, SPI1_CSMODE) |= 2;
     for (i = 0; i < 200000; i++);
     
-    INFO("Set CS to 0 and send cmd0 through MOSI.");
+    INFO("Set CS to 0 and send cmd0 to SD card.");
     char cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
     char reply = sd_exec_cmd(cmd0);
 
+    INFO("Wait for SD card's reply to cmd0 (QEMU will stuck here)");
     while (reply != 0x01) reply = recv_data_byte();
-    INFO("SD card replies cmd0 with 0x01");
 
     while (recv_data_byte() != 0xFF);
 }

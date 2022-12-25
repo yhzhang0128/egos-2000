@@ -49,8 +49,6 @@ int mmu_free(int pid) {
 
 /* Software TLB Translation */
 int soft_mmu_map(int pid, int page_no, int frame_id) {
-    if (!table[frame_id].use) FATAL("mmu_map: bad frame_id");
-    
     table[frame_id].pid = pid;
     table[frame_id].page_no = page_no;
 }
@@ -75,13 +73,11 @@ int soft_mmu_switch(int pid) {
 /* Page Table Translation
  *
  * The code below creates an identity mapping using RISC-V Sv32.
- * mmu_map() and mmu_switch() are still implemented by software TLB.
  *
- * Rewriting mmu_map() and mmu_switch() with Sv32 is left to students
+ * mmu_map() and mmu_switch() using page tables is given to students
  * as a course project. After this project, every process should have
  * its own set of page tables. mmu_map() will modify entries in these
- * page tables and mmu_switch() will modify the satp register, i.e., 
- * the page table base register.
+ * tables and mmu_switch() will modify satp (page table base register)
  */
 
 #define FLAG_VALID_RWX 0xF
@@ -122,13 +118,13 @@ void pagetable_identity_mapping(int pid) {
 
 int pagetable_mmu_map(int pid, int page_no, int frame_id) {
     /* Student's code goes here: */
-    FATAL("mmu_map() with page tables not implemented");
+    FATAL("mmu_map() using page table translation not implemented");
     /* Student's code ends here. */
 }
 
 int pagetable_mmu_switch(int pid) {
     /* Student's code goes here: */
-    FATAL("mmu_switch() with page tables not implemented");
+    FATAL("mmu_switch() using page table translation not implemented");
     /* Student's code ends here. */
 }
 
@@ -166,10 +162,12 @@ void mmu_init() {
     earth->mmu_map = soft_mmu_map;
     earth->mmu_switch = soft_mmu_switch;
 
-    paging_init();
     if (buf[0] == '0') {
+        pagetable_identity_mapping(0);
         earth->mmu_map = pagetable_mmu_map;
         earth->mmu_switch = pagetable_mmu_switch;
-        pagetable_identity_mapping(0);
     }
+
+    /* Initialize the paging device */
+    paging_init();
 }
