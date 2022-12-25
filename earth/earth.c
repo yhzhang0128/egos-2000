@@ -51,7 +51,7 @@ int main() {
     earth_init();
     elf_load(0, grass_read, 0, 0);
 
-    if (earth->platform == ARTY){
+    if (earth->translation == SOFT_TLB){
         /* Arty board does not support supervisor mode */
         void (*grass_entry)() = (void*)GRASS_ENTRY;
         grass_entry();

@@ -42,7 +42,7 @@ int main() {
 
     timer_reset();
     /* For QEMU, interrupt has been enabled in machine-mode earth layer */
-    if (earth->platform == ARTY) earth->intr_enable();
+    if (earth->translation == SOFT_TLB) earth->intr_enable();
 
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     asm("mv a0, %0" ::"r"(APPS_ARG));

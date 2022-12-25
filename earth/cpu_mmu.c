@@ -148,7 +148,8 @@ void mmu_init() {
 
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
-    INFO("%s translation is chosen", (buf[0] == '0')? "Page table" : "Software");
+    earth->translation = (buf[0] == '0') ? PAGE_TABLE : SOFT_TLB;
+    INFO("%s translation is chosen", earth->translation == PAGE_TABLE ? "Page table" : "Software");
 
     /* Check whether the hardware platform supports supervisor mode */
     earth->platform = QEMU;
@@ -156,7 +157,7 @@ void mmu_init() {
     /* This memory access triggers an exception on Arty, but not QEMU */
     *(int*)(0x1000) = 1;
     earth->excp_register(NULL);
-    if (earth->platform == ARTY && buf[0] == '0')
+    if (earth->platform == ARTY && earth->translation == PAGE_TABLE)
         FATAL("Arty board doesn't support page tables (supervisor mode).");
 
     /* Initialize MMU interface functions */
@@ -165,7 +166,7 @@ void mmu_init() {
     earth->mmu_map = soft_mmu_map;
     earth->mmu_switch = soft_mmu_switch;
 
-    if (buf[0] == '0') {
+    if (earth->translation == PAGE_TABLE) {
         pagetable_identity_mapping(0);
         earth->mmu_map = pagetable_mmu_map;
         earth->mmu_switch = pagetable_mmu_switch;

@@ -27,6 +27,7 @@ struct earth {
 
     /* QEMU or Arty, detected in mmu_init() */
     enum { QEMU, ARTY } platform;
+    enum { PAGE_TABLE, SOFT_TLB } translation;
 };
 
 #define MAX_NPROCESS     16
