@@ -9,7 +9,7 @@ It can run on a RISC-V board and also the QEMU software emulator.
 Note: [**cloc**](https://github.com/AlDanial/cloc) was used to count the lines of code.
 The command below uses this tool to count LOC of this repo, excluding text documents.
 
-```
+```shell
 > cloc egos-2000 --exclude-ext=md,txt
 ...
 github.com/AlDanial/cloc v 1.94  T=0.05 s (949.3 files/s, 62349.4 lines/s)
@@ -21,7 +21,7 @@ C/C++ Header                    10             70            104            287
 Assembly                         3              6             24             70
 make                             1             12              0             64
 -------------------------------------------------------------------------------
-SUM:                            50            578            706           2000 <- exactly 2000 lines
+SUM:                            50            578            706           2000 <- exactly 2000
 -------------------------------------------------------------------------------
 ```
 
