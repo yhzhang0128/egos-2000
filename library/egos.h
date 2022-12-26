@@ -53,14 +53,6 @@ struct grass {
 extern struct earth *earth;
 extern struct grass *grass;
 
-#ifndef LIBC_STDIO
-#define printf             earth->tty_printf
-#define INFO               earth->tty_info
-#define FATAL              earth->tty_fatal
-#define SUCCESS            earth->tty_success
-#define CRITICAL           earth->tty_critical
-#endif
-
 /* Memory layout */
 #define PAGE_SIZE          4096
 #define FRAME_CACHE_END    0x80020000
@@ -70,7 +62,6 @@ extern struct grass *grass;
 #define SYSCALL_ARG        0x80002400  /* 1KB    system call args      */
                                        /* 1KB    grass interface       */
 #define APPS_STACK_TOP     0x80002000  /* 6KB    app stack             */
-#define EXCP_STACK_OFFSET  0x00000400  /* 1KB    saved exception stack */
 #define APPS_ARG           0x80000000  /* 1KB    app main() argc, argv */
 #define APPS_SIZE          0x00003000  
 #define APPS_ENTRY         0x08005000  /* 12KB   app code+data         */
@@ -78,6 +69,16 @@ extern struct grass *grass;
 #define GRASS_ENTRY        0x08002800  /* 8KB    grass code+data       */
                                        /* 12KB   earth data            */
                                        /* earth code is in QSPI flash  */
+
+
+#ifndef LIBC_STDIO
+/* Only earth/dev_tty.c uses LIBC_STDIO and does not need these macros */
+#define printf             earth->tty_printf
+#define INFO               earth->tty_info
+#define FATAL              earth->tty_fatal
+#define SUCCESS            earth->tty_success
+#define CRITICAL           earth->tty_critical
+#endif
 
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))

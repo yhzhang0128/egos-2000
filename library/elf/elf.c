@@ -32,6 +32,7 @@ static void load_app(int pid, elf_reader reader,
                      int argc, void** argv,
                      struct elf32_program_header* pheader) {
 
+    /* Debug printing during bootup */
     if (pid < GPID_USER_START) {
         INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
         INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);

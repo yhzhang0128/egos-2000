@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: the inode_store for accessing the physical disk
+ * Description: the inode_store structure for accessing the physical disk
  */
 
 #include "egos.h"
