@@ -155,6 +155,9 @@ void platform_detect(int id) {
 }
 
 void mmu_init() {
+    /* Initialize the paging device */
+    paging_init();
+
     /* Choose memory translation mechanism */
     CRITICAL("Choose a memory translation mechanism:");
     printf("  Enter 0: page tables  (QEMU)\r\n");
@@ -188,7 +191,4 @@ void mmu_init() {
         earth->mmu_map = pagetable_mmu_map;
         earth->mmu_switch = pagetable_mmu_switch;
     }
-
-    /* Initialize the paging device */
-    paging_init();
 }

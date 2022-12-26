@@ -19,9 +19,7 @@ void uart_putc(int c);
 void uart_init(long baud_rate);
 
 static int c, is_reading;
-int tty_intr() {
-    return (is_reading)? 0 : (uart_getc(&c) == 3);
-}
+int tty_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }
 
 int tty_write(char* buf, int len) {
     for (int i = 0; i < len; i++) uart_putc(buf[i]);
@@ -67,10 +65,7 @@ int tty_printf(const char *format, ...)
     fflush(stdout);
 }
 
-int tty_info(const char *format, ...)
-{
-    LOG("[INFO] ", "\r\n")
-}
+int tty_info(const char *format, ...) { LOG("[INFO] ", "\r\n") }
 
 int tty_fatal(const char *format, ...)
 {
