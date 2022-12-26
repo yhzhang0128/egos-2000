@@ -1,7 +1,7 @@
 # Compile and run egos-2000
 
 You can use MacOS, Linux or Windows. 
-For MacOS on the Apple M1 chip, just download and run the `x86-64` version of the toolchain and MacOS will transparently translate the toolchain to M1.
+For MacOS on the Apple Arm chip, just download and run the `x86-64` version of the toolchain and MacOS will transparently translate the binary to Arm.
 For Windows users, use WSL (Windows Subsystem for Linux) in step1-3.
 
 Here are the tutorial videos for [MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
