@@ -71,4 +71,3 @@ char* paging_read(int frame_id, int alloc_only) {
 
     return pages_start + PAGE_SIZE * free_idx;
 }
-

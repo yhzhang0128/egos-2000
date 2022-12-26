@@ -12,6 +12,7 @@
 #include "elf.h"
 #include "disk.h"
 #include "egos.h"
+#include <string.h>
 
 void tty_init();
 void disk_init();
@@ -22,17 +23,30 @@ struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
 extern char bss_start, bss_end, data_rom, data_start, data_end;
 
+static void platform_detect(int id) {
+    earth->platform = ARTY;
+    /* Skip the illegal store instruction */
+    int mepc;
+    asm("csrr %0, mepc" : "=r"(mepc));
+    asm("csrw mepc, %0" ::"r"(mepc + 4));
+}
+
 static void earth_init() {
     tty_init();
-    CRITICAL("-----------------------------------");
-    CRITICAL("Start to initialize the earth layer");
+    CRITICAL("------------- Booting -------------");
     SUCCESS("Finished initializing the tty device");
     
-    disk_init();
-    SUCCESS("Finished initializing the disk device");
-
     intr_init();
     SUCCESS("Finished initializing the CPU interrupts");
+
+    /* Detect the hardware platform */
+    earth->platform = QEMU;
+    earth->excp_register(platform_detect);
+    /* This memory access triggers an exception on Arty, but not QEMU */
+    *(int*)(0x1000) = 1;
+
+    disk_init();
+    SUCCESS("Finished initializing the disk device");
 
     mmu_init();
     SUCCESS("Finished initializing the CPU memory management unit");
@@ -43,21 +57,20 @@ static int grass_read(int block_no, char* dst) {
 }
 
 int main() {
-    for (int i = 0; i < (&bss_end - &bss_start); i++)
-        ((char*)&bss_start)[i] = 0;
-    for (int i = 0; i < (&data_end - &data_start); i++)
-        ((char*)&data_start)[i] = ((char*)&data_rom)[i];
+    /* Prepare the bss and data memory regions */
+    memset(&bss_start, 0, (&bss_end - &bss_start));
+    memcpy(&data_start, &data_rom, (&data_end - &data_start));
 
+    /* Initialize the earth layer */
     earth_init();
-    elf_load(0, grass_read, 0, 0);
 
+    /* Load and enter the grass layer */
+    elf_load(0, grass_read, 0, 0);
     if (earth->translation == SOFT_TLB){
-        /* Arty board does not support supervisor mode */
+        /* No need to enter supervisor mode if using softTLB translation */
         void (*grass_entry)() = (void*)GRASS_ENTRY;
         grass_entry();
     } else {
-        /* QEMU supports supervisor mode */
-
         /* Enable machine-mode interrupt before entering supervisor mode */
         earth->intr_enable();
 

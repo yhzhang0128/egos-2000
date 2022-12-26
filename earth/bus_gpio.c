@@ -10,13 +10,12 @@
  * The commented functions can control the LED lights on the Arty board.
  */
 
-#include "egos.h"
-
 #define GPIO0_BASE        0x10012000UL
 #define GPIO0_IOF_ENABLE  56UL
 #define GPIO0_IOF_SELECT  60UL
 
 /*
+#include "egos.h"
 #define LED0_RED    1
 #define LED0_GREEN  2
 #define LED0_BLUE   3

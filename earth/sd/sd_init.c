@@ -5,7 +5,7 @@
 
 /* Author: Yunhao Zhang
  * Description: initialize the SD card
- * Only SDHC and SDXC cards are supported.
+ * Only SDHC and SDXC cards are supported
  */
 
 #include "sd.h"
@@ -18,12 +18,12 @@ static int  sd_check_type();
 static void sd_check_capacity();
 
 enum {
-      SD_CARD_TYPE_SD1,
-      SD_CARD_TYPE_SD2,
-      SD_CARD_TYPE_SDHC,
-      SD_CARD_TYPE_UNKNOWN
+      SD_TYPE_SD1,
+      SD_TYPE_SD2,
+      SD_TYPE_SDHC,
+      SD_TYPE_UNKNOWN
 };
-static int SD_CARD_TYPE = SD_CARD_TYPE_UNKNOWN;
+static int SD_CARD_TYPE = SD_TYPE_UNKNOWN;
 
 void sdinit() {
     spi_set_clock(100000);
@@ -36,7 +36,7 @@ void sdinit() {
     INFO("Check SD card type and voltage with cmd8");
     if (0 != sd_check_type()) FATAL("Fail to check SD card type");
 
-    char acmd41[] = {0x69, (SD_CARD_TYPE == SD_CARD_TYPE_SD2)? 0x40 : 0x00, 0x00, 0x00, 0x00, 0xFF};
+    char acmd41[] = {0x69, (SD_CARD_TYPE == SD_TYPE_SD2)? 0x40 : 0x00, 0x00, 0x00, 0x00, 0xFF};
     while (sd_exec_acmd(acmd41));
     while (recv_data_byte() != 0xFF);
 
@@ -45,8 +45,8 @@ void sdinit() {
     char reply = sd_exec_cmd(cmd16);
     while (recv_data_byte() != 0xFF);
 
-    if (SD_CARD_TYPE == SD_CARD_TYPE_SD2) sd_check_capacity();
-    if (SD_CARD_TYPE != SD_CARD_TYPE_SDHC) FATAL("Only SDHC/SDXC cards are supported");
+    if (SD_CARD_TYPE == SD_TYPE_SD2) sd_check_capacity();
+    if (SD_CARD_TYPE != SD_TYPE_SDHC) FATAL("Only SDHC/SDXC supported");
 }
 
 static int sd_check_type() {
@@ -56,7 +56,7 @@ static int sd_check_type() {
     INFO("SD card replies cmd8 with status 0x%.2x", reply);
     if (reply & 0x04) {
         /* Illegal command */
-        SD_CARD_TYPE = SD_CARD_TYPE_SD1;
+        SD_CARD_TYPE = SD_TYPE_SD1;
     } else {
         /* Only need last byte of r7 response */
         unsigned long payload;
@@ -65,7 +65,7 @@ static int sd_check_type() {
         INFO("SD card replies cmd8 with payload 0x%.8x", payload);
 
         if ((payload & 0xFFF) != 0x1AA) return -1;
-        SD_CARD_TYPE = SD_CARD_TYPE_SD2;
+        SD_CARD_TYPE = SD_TYPE_SD2;
     }
 
     while (recv_data_byte() != 0xFF);
@@ -76,22 +76,19 @@ static void sd_check_capacity() {
     INFO("Check SD card capacity with cmd58");
     while (recv_data_byte() != 0xFF);
 
-    char reply, cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
+    char reply, payload[4], cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
     if (sd_exec_cmd(cmd58)) FATAL("SD card cmd58 fails");
-
-    char payload[4];
     for (int i = 0; i < 4; i++) payload[3 - i] = recv_data_byte();
 
-    if ((payload[3] & 0xC0) == 0xC0) SD_CARD_TYPE = SD_CARD_TYPE_SDHC;
+    if ((payload[3] & 0xC0) == 0xC0) SD_CARD_TYPE = SD_TYPE_SDHC;
     INFO("SD card replies cmd58 with payload 0x%.8x", *(int*)payload);
 
     while (recv_data_byte() != 0xFF);
 }
 
 static void sd_reset() {
-    INFO("Set CS and MOSI to 1 and toggle clock.");
-
     /* Keep chip select line high */
+    INFO("Set CS and MOSI to 1 and toggle clock.");
     REGW(SPI1_BASE, SPI1_CSMODE) = 2;
 
     unsigned long i, rxdata;

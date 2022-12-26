@@ -25,7 +25,7 @@ struct earth {
     int (*tty_success)(const char *format, ...);
     int (*tty_critical)(const char *format, ...);
 
-    /* QEMU or Arty, detected in mmu_init() */
+    /* Some information about earth layer configuration */
     enum { QEMU, ARTY } platform;
     enum { PAGE_TABLE, SOFT_TLB } translation;
 };

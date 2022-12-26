@@ -14,9 +14,9 @@
 #include <string.h>
 
 /* Interface of the paging device, see earth/dev_page.c */
-void paging_init();
-int paging_invalidate_cache(int frame_id);
-int paging_write(int frame_id, int page_no);
+void  paging_init();
+int   paging_invalidate_cache(int frame_id);
+int   paging_write(int frame_id, int page_no);
 char* paging_read(int frame_id, int alloc_only);
 
 /* Allocation and free of physical frames */
@@ -71,7 +71,8 @@ int soft_tlb_switch(int pid) {
 
 /* Page Table Translation
  *
- * The code below creates an identity mapping using RISC-V Sv32.
+ * The code below creates an identity mapping using RISC-V Sv32;
+ * Read section4.3 of RISC-V manual (references/riscv-privileged-v1.10.pdf)
  *
  * mmu_map() and mmu_switch() using page tables is given to students
  * as a course project. After this project, every process should have
@@ -117,7 +118,7 @@ void pagetable_identity_mapping(int pid) {
 }
 
 int page_table_map(int pid, int page_no, int frame_id) {
-    if (pid >= MAX_NPROCESS) FATAL("pagetable_mmu_map: too many processes");
+    if (pid >= MAX_NPROCESS) FATAL("page_table_map: too many processes");
 
     /* Student's code goes here (page table translation). */
 
@@ -137,8 +138,8 @@ int page_table_switch(int pid) {
     /* Student's code goes here (page table translation). */
 
     /* Remove the following line of code and, instead,
-     * switch the page table base register (satp) similar to mmu_init();
-     * Remember to use the argument pid
+     * modify the page table base register (satp) similar to
+     * the code in mmu_init(); Remember to use the pid argument
      */
     soft_tlb_switch(pid);
 
@@ -146,42 +147,31 @@ int page_table_switch(int pid) {
 }
 
 /* MMU Initialization */
-void platform_detect(int id) {
-    earth->platform = ARTY;
-    /* Skip the illegal store instruction */
-    int mepc;
-    asm("csrr %0, mepc" : "=r"(mepc));
-    asm("csrw mepc, %0" ::"r"(mepc + 4));
-}
-
 void mmu_init() {
     /* Initialize the paging device */
     paging_init();
-
-    /* Choose memory translation mechanism */
-    CRITICAL("Choose a memory translation mechanism:");
-    printf("  Enter 0: page tables  (QEMU)\r\n");
-    printf("  Enter 1: software TLB (QEMU or Arty board)\r\n");
-
-    char buf[2];
-    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
-    earth->translation = (buf[0] == '0') ? PAGE_TABLE : SOFT_TLB;
-    INFO("%s translation is chosen", earth->translation == PAGE_TABLE ? "Page table" : "Software");
-
-    /* Check whether the hardware platform supports supervisor mode */
-    earth->platform = QEMU;
-    earth->excp_register(platform_detect);
-    /* This memory access triggers an exception on Arty, but not QEMU */
-    *(int*)(0x1000) = 1;
-    earth->excp_register(NULL);
-    if (earth->platform == ARTY && earth->translation == PAGE_TABLE)
-        FATAL("Arty board doesn't support page tables (supervisor mode).");
 
     /* Initialize MMU interface functions */
     earth->mmu_free = mmu_free;
     earth->mmu_alloc = mmu_alloc;
     earth->mmu_map = soft_tlb_map;
     earth->mmu_switch = soft_tlb_switch;
+
+    if (earth->platform == ARTY) {
+        /* Arty board does not support supervisor mode or page tables */
+        earth->translation = SOFT_TLB;
+        INFO("ARTY is detected and therefore use softTLB translation");
+        return;
+    }
+
+    /* Choose memory translation mechanism in QEMU */
+    CRITICAL("Choose a memory translation mechanism:");
+    printf("Enter 0: page tables\r\nEnter 1: software TLB\r\n");
+
+    char buf[2];
+    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
+    earth->translation = (buf[0] == '0') ? PAGE_TABLE : SOFT_TLB;
+    INFO("%s translation is chosen", earth->translation == PAGE_TABLE ? "Page table" : "Software");
 
     if (earth->translation == PAGE_TABLE) {
         /* Setup an identity mapping using page tables */

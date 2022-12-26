@@ -12,6 +12,9 @@
 static void (*intr_handler)(int);
 static void (*excp_handler)(int);
 
+int intr_register(void (*_handler)(int)) { intr_handler = _handler; }
+int excp_register(void (*_handler)(int)) { excp_handler = _handler; }
+
 void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));
 void trap_entry() {
     int mcause;
@@ -35,9 +38,6 @@ int intr_enable() {
     /* For now, egos-2000 only uses timer and software interrupts */
     asm("csrw mie, %0" ::"r"(mie | 0x88));
 }
-
-int intr_register(void (*_handler)(int)) { intr_handler = _handler; }
-int excp_register(void (*_handler)(int)) { excp_handler = _handler; }
 
 void intr_init() {
     INFO("Use direct mode and put the address of trap_entry() to mtvec");

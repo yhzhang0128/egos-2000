@@ -18,9 +18,7 @@ char send_data_byte(char byte) {
     return (char)(rxdata & 0xFF);
 }
 
-inline char recv_data_byte() {
-    return send_data_byte(0xFF);
-}
+char recv_data_byte() { return send_data_byte(0xFF); }
 
 char sd_exec_cmd(char* cmd) {
     for (int i = 0; i < 6; i++) send_data_byte(cmd[i]);
