@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: system process spawning and killing other processes
+ * Description: system process for spawning and killing other processes
  */
 
 #include "elf.h"
@@ -41,6 +41,7 @@ int main() {
         case PROC_SPAWN:
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
 
+            /* Handling background processes */
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
             if (!shell_waiting && app_pid > 0)
                 INFO("process %d running in the background", app_pid);
@@ -57,7 +58,7 @@ int main() {
         case PROC_KILLALL:
             grass->proc_free(-1); break;
         default:
-            FATAL("sys_proc: request%d not implemented", req->type);
+            FATAL("sys_proc: invalid request %d", req->type);
         }
     }
 }

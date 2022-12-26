@@ -12,6 +12,4 @@
 #include "app.h"
 #include <stdlib.h>
 
-int main() {
-    char* too_large = malloc(4096 * 4);
-}
+int main() { char* heap_overflow = malloc(4096 * 4); }

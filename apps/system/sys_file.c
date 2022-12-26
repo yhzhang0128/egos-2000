@@ -4,8 +4,8 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: the file system process
- * handling requests to the inode layer of the file system
+ * Description: the file (inode) system server
+ * handling requests to reading and writing inodes
  */
 
 #include "app.h"
@@ -18,12 +18,12 @@ int main() {
     /* Initialize the file system interface */
     inode_intf fs = treedisk_init(fs_disk_init(), 0);
 
-    /* Send notification to GPID_PROCESS */
+    /* Send a notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
     strcpy(buf, "Finish GPID_FILE initialization");
     grass->sys_send(GPID_PROCESS, buf, 32);
 
-    /* Wait for file requests */
+    /* Wait for inode read/write requests */
     while (1) {
         int sender, r;
         struct file_request *req = (void*)buf;
@@ -37,6 +37,7 @@ int main() {
             grass->sys_send(sender, (void*)reply, sizeof(*reply));
             break;
         case FILE_WRITE: default:
+            /* This part is left to students as an exercise */
             FATAL("sys_file: request%d not implemented", req->type);
         }
     }
