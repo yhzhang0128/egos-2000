@@ -47,12 +47,12 @@ int mmu_free(int pid) {
 }
 
 /* Software TLB Translation */
-int soft_mmu_map(int pid, int page_no, int frame_id) {
+int soft_tlb_map(int pid, int page_no, int frame_id) {
     table[frame_id].pid = pid;
     table[frame_id].page_no = page_no;
 }
 
-int soft_mmu_switch(int pid) {
+int soft_tlb_switch(int pid) {
     static int curr_vm_pid = -1;
     if (pid == curr_vm_pid) return 0;
 
@@ -116,7 +116,7 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, 0x80000000, 1024); /* DTIM memory */
 }
 
-int pagetable_mmu_map(int pid, int page_no, int frame_id) {
+int page_table_map(int pid, int page_no, int frame_id) {
     if (pid >= MAX_NPROCESS) FATAL("pagetable_mmu_map: too many processes");
 
     /* Student's code goes here (page table translation). */
@@ -128,19 +128,19 @@ int pagetable_mmu_map(int pid, int page_no, int frame_id) {
      * Feel free to call or modify the two helper functions:
      * pagetable_identity_mapping() and setup_identity_region()
      */
-    soft_mmu_map(pid, page_no, frame_id);
+    soft_tlb_map(pid, page_no, frame_id);
 
     /* Student's code ends here. */
 }
 
-int pagetable_mmu_switch(int pid) {
+int page_table_switch(int pid) {
     /* Student's code goes here (page table translation). */
 
     /* Remove the following line of code and, instead,
      * switch the page table base register (satp) similar to mmu_init();
      * Remember to use the argument pid
      */
-    soft_mmu_switch(pid);
+    soft_tlb_switch(pid);
 
     /* Student's code ends here. */
 }
@@ -180,15 +180,15 @@ void mmu_init() {
     /* Initialize MMU interface functions */
     earth->mmu_free = mmu_free;
     earth->mmu_alloc = mmu_alloc;
-    earth->mmu_map = soft_mmu_map;
-    earth->mmu_switch = soft_mmu_switch;
+    earth->mmu_map = soft_tlb_map;
+    earth->mmu_switch = soft_tlb_switch;
 
     if (earth->translation == PAGE_TABLE) {
         /* Setup an identity mapping using page tables */
         pagetable_identity_mapping(0);
         asm("csrw satp, %0" ::"r"(((unsigned int)root >> 12) | (1 << 31)));
 
-        earth->mmu_map = pagetable_mmu_map;
-        earth->mmu_switch = pagetable_mmu_switch;
+        earth->mmu_map = page_table_map;
+        earth->mmu_switch = page_table_switch;
     }
 }
