@@ -13,8 +13,8 @@
 #include "syscall.h"
 #include <string.h>
 
-#define INTR_ID_TMR        7
 #define INTR_ID_SOFT       3
+#define INTR_ID_TIMER      7
 
 static void proc_yield();
 static void proc_syscall();
@@ -24,8 +24,8 @@ int proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
 
 void intr_entry(int id) {
-    if (curr_pid < GPID_SHELL && id == INTR_ID_TMR) {
-        /* Do not interrupt kernel processes since IO may be busy */
+    if (id == INTR_ID_TIMER && curr_pid < GPID_SHELL) {
+        /* Do not interrupt kernel processes since IO can be stateful */
         timer_reset();
         return;
     }
@@ -38,14 +38,14 @@ void intr_entry(int id) {
     }
 
     switch (id) {
-    case INTR_ID_TMR:
-        kernel_entry = proc_yield;
-        break;
     case INTR_ID_SOFT:
         kernel_entry = proc_syscall;
         break;
+    case INTR_ID_TIMER:
+        kernel_entry = proc_yield;
+        break;
     default:
-        FATAL("intr_entry: got unknown interrupt #%d", id);
+        FATAL("intr_entry: got unknown interrupt %d", id);
     }
 
     /* Switch to the kernel stack */
