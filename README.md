@@ -7,7 +7,7 @@ It can run on a RISC-V board and also the QEMU software emulator.
 
 ![This is an image](references/screenshots/egos-2000.jpg)
 Note: [**cloc**](https://github.com/AlDanial/cloc) was used to count the lines of code.
-The command below uses this tool to count LOC of this repo, excluding text documents.
+The command below uses `cloc` to count LOC of the whole repo, excluding text documents.
 
 ```shell
 > cloc egos-2000 --exclude-ext=md,txt
