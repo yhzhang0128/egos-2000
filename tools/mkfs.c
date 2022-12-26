@@ -31,7 +31,7 @@ char* kernel_processes[] = {
                             "../build/release/sys_shell.elf",
 };
 
-/* Inode mappings:
+/* Inode - File/Directory mappings:
 #0: /           #1: /home          #2: /home/yunhao
 #3: /home/rvr   #4: /home/lorenzo  #5: /home/yunhao/README 
 #6: /bin        #7: /bin/echo      #8: /bin/cat
@@ -59,7 +59,6 @@ char* contents[] = {
 
 char fs[FS_DISK_SIZE];
 char exec[GRASS_EXEC_SIZE];
-char paging[PAGING_DEV_SIZE];
 
 void mkfs();
 inode_intf ramdisk_init();
