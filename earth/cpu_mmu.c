@@ -114,21 +114,34 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, 0x20800000, 1024); /* disk image */
     setup_identity_region(pid, 0x08000000, 8);    /* ITIM memory */
     setup_identity_region(pid, 0x80000000, 1024); /* DTIM memory */
-
-    /* Translation will start when the earth main() invokes mret so that the processor enters supervisor mode from machine mode */
 }
 
 int pagetable_mmu_map(int pid, int page_no, int frame_id) {
     if (pid >= MAX_NPROCESS) FATAL("pagetable_mmu_map: too many processes");
 
     /* Student's code goes here (page table translation). */
-    FATAL("mmu_map() using page table translation not implemented");
+
+    /* Remove the following line of code and, instead,
+     * (1) if page tables for pid do not exist, build the tables;
+     * (2) if page tables for pid exist, update entries of the tables
+     *
+     * Feel free to call or modify the two helper functions:
+     * pagetable_identity_mapping() and setup_identity_region()
+     */
+    soft_mmu_map(pid, page_no, frame_id);
+
     /* Student's code ends here. */
 }
 
 int pagetable_mmu_switch(int pid) {
     /* Student's code goes here (page table translation). */
-    FATAL("mmu_switch() using page table translation not implemented");
+
+    /* Remove the following line of code and, instead,
+     * switch the page table base register (satp) similar to mmu_init();
+     * Remember to use the argument pid
+     */
+    soft_mmu_switch(pid);
+
     /* Student's code ends here. */
 }
 
@@ -168,7 +181,10 @@ void mmu_init() {
     earth->mmu_switch = soft_mmu_switch;
 
     if (earth->translation == PAGE_TABLE) {
+        /* Setup an identity mapping using page tables */
         pagetable_identity_mapping(0);
+        asm("csrw satp, %0" ::"r"(((unsigned int)root >> 12) | (1 << 31)));
+
         earth->mmu_map = pagetable_mmu_map;
         earth->mmu_switch = pagetable_mmu_switch;
     }
