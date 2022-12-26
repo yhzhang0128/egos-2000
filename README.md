@@ -1,3 +1,5 @@
+## Vision
+
 This project's vision is to help **every** college student read **all** the code of an operating system in **one** semester.
 
 With only **2000** lines of code, **egos-2000** implements every component of an operating system for education. 
