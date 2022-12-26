@@ -5,7 +5,7 @@ For MacOS on the Apple Arm chip, just download and run the `x86-64` version of t
 For Windows users, use WSL (Windows Subsystem for Linux) in step1-3.
 
 Here are the tutorial videos for [MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
-These videos skipped step3 and regarded step4 as step3 since QEMU support is a new feature. And step3 in this document is easy to follow.
+These videos skipped step3 and regarded step4 as step3 since QEMU is a newly added feature. And step3 in this document seems to be easy to follow.
 
 **egos-2000** can run on both QEMU and a RISC-V board. 
 Running on QEMU is easier, but
