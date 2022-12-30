@@ -6,12 +6,14 @@
 struct process{
     int pid;
     int status;
-    int receiver_pid; /* used when process is waiting to send a message */
+    int receiver_pid;  /* used when waiting to send a message */
 
-    void *mepc;       /* machine exception program counter (mepc) */
-    void *sp_vaddr;   /* used for switching stack between user / kernel */
+    void *mepc;        /* machine exception program counter (mepc) */
+    void *sp_vaddr;    /* used to switch between user and kernel stacks */
+    void *stack_paddr; /* used in the page table translation project */
 };
 
+#define MAX_NPROCESS  16
 extern int proc_curr_idx;
 extern struct process proc_set[MAX_NPROCESS];
 #define curr_pid      proc_set[proc_curr_idx].pid
@@ -36,6 +38,7 @@ void proc_free(int);
 void proc_set_ready (int);
 void proc_set_running (int);
 void proc_set_runnable (int);
+void proc_save_stack_paddr(int, void*);
 
 void ctx_entry(void);
 void ctx_start(void** old_sp, void* new_sp);

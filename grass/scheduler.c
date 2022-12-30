@@ -53,30 +53,20 @@ void intr_entry(int id) {
 }
 
 void ctx_entry() {
-    /* Switched to the kernel stack */
+    /* Now on the kernel stack */
     int mepc, tmp;
     asm("csrr %0, mepc" : "=r"(mepc));
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
     /* Student's code goes here (page table translation). */
-
-    /* Save the interrupt stack
-     * Copy 0x400 bytes from sp_vaddr of the current process
-     * to grass->stack_paddr of the current process
-     */
-
+    /* Save the interrupt stack */
     /* Student's code ends here. */
 
     /* kernel_entry() is either proc_yield() or proc_syscall() */
     kernel_entry();
 
     /* Student's code goes here (page table translation). */
-
-    /* Restore the interrupt stack
-     * Copy 0x400 bytes from grass->stack_paddr of the current process
-     * to sp_vaddr of the current process
-     */
-
+    /* Restore the interrupt stack */
     /* Student's code ends here. */
 
     /* Switch back to the user application stack */
@@ -139,12 +129,12 @@ static void proc_send(struct syscall *sc) {
             } else {
                 /* Copy message from sender to kernel stack */
                 struct sys_msg tmp;
+                earth->mmu_switch(curr_pid);
                 memcpy(&tmp, &sc->msg, sizeof(tmp));
 
                 /* Copy message from kernel stack to receiver */
                 earth->mmu_switch(receiver);
                 memcpy(&sc->msg, &tmp, sizeof(tmp));
-                earth->mmu_switch(curr_pid);
 
                 /* Set receiver process as runnable */
                 proc_set_runnable(receiver);

@@ -30,12 +30,12 @@ struct earth {
     enum { PAGE_TABLE, SOFT_TLB } translation;
 };
 
-#define MAX_NPROCESS     16
 struct grass {
     /* Process control interface */
     int  (*proc_alloc)();
     void (*proc_free)(int pid);
     void (*proc_set_ready)(int pid);
+    void (*proc_save_stack_paddr)(int pid, void* paddr);
 
     /* System call interface */
     void (*sys_exit)(int status);
@@ -45,9 +45,6 @@ struct grass {
     /* Shell environment variables */
     int workdir_ino;
     char workdir[128];
-
-    /* Physical address of process stack, used in the page table project */
-    void* stack_paddr[MAX_NPROCESS];
 };
 
 extern struct earth *earth;

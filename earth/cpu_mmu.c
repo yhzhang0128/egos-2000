@@ -83,7 +83,9 @@ int soft_tlb_switch(int pid) {
 #define FLAG_VALID_RWX 0xF
 #define FLAG_NEXT_LEVEL 0x1
 static unsigned int frame_id, *root, *leaf;
-static unsigned int* pid_to_pagetable_base[MAX_NPROCESS];
+
+#define MAX_ROOT_PAGE_TABLES 32  /* A number large enough for demo purpose */
+static unsigned int* pid_to_pagetable_base[MAX_ROOT_PAGE_TABLES];
 
 void setup_identity_region(int pid, unsigned int addr, int npages) {
     /* Allocate the leaf page table */
@@ -118,7 +120,8 @@ void pagetable_identity_mapping(int pid) {
 }
 
 int page_table_map(int pid, int page_no, int frame_id) {
-    if (pid >= MAX_NPROCESS) FATAL("page_table_map: too many processes");
+    if (pid >= MAX_ROOT_PAGE_TABLES)
+        FATAL("page_table_map: too many page table allocations");
 
     /* Student's code goes here (page table translation). */
 
