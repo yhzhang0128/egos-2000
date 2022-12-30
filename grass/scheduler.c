@@ -49,7 +49,7 @@ void intr_entry(int id) {
     }
 
     /* Switch to the kernel stack */
-    ctx_start(&proc_set[proc_curr_idx].sp_vaddr, (void*)GRASS_STACK_TOP);
+    ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
 }
 
 void ctx_entry() {
@@ -72,7 +72,7 @@ void ctx_entry() {
     /* Switch back to the user application stack */
     mepc = (int)proc_set[proc_curr_idx].mepc;
     asm("csrw mepc, %0" ::"r"(mepc));
-    ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp_vaddr);
+    ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
 }
 
 static void proc_yield() {

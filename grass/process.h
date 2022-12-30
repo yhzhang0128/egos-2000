@@ -6,10 +6,10 @@
 struct process{
     int pid;
     int status;
-    int receiver_pid;  /* used when waiting to send a message */
+    int receiver_pid; /* used when waiting to send a message */
+    void *sp, *mepc;  /* process context = stack pointer (sp)
+                       * + machine exception program counter (mepc) */
 
-    void *mepc;        /* machine exception program counter (mepc) */
-    void *sp_vaddr;    /* used to switch between user and kernel stacks */
 };
 
 #define MAX_NPROCESS  16
