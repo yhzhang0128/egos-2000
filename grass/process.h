@@ -10,7 +10,6 @@ struct process{
 
     void *mepc;        /* machine exception program counter (mepc) */
     void *sp_vaddr;    /* used to switch between user and kernel stacks */
-    void *stack_paddr; /* used in the page table translation project */
 };
 
 #define MAX_NPROCESS  16

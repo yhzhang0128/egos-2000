@@ -120,8 +120,7 @@ void pagetable_identity_mapping(int pid) {
 }
 
 int page_table_map(int pid, int page_no, int frame_id) {
-    if (pid >= MAX_ROOT_PAGE_TABLES)
-        FATAL("page_table_map: too many page table allocations");
+    if (pid >= MAX_ROOT_PAGE_TABLES) FATAL("page_table_map: pid too large");
 
     /* Student's code goes here (page table translation). */
 
@@ -133,6 +132,12 @@ int page_table_map(int pid, int page_no, int frame_id) {
      * pagetable_identity_mapping() and setup_identity_region()
      */
     soft_tlb_map(pid, page_no, frame_id);
+
+    /* Student's code ends here. */
+}
+
+int page_table_translate(int pid, int page_no) {
+    /* Student's code goes here (page table translation). */
 
     /* Student's code ends here. */
 }
@@ -183,5 +188,6 @@ void mmu_init() {
 
         earth->mmu_map = page_table_map;
         earth->mmu_switch = page_table_switch;
+        earth->mmu_translate = page_table_translate;
     }
 }

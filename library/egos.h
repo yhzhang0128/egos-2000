@@ -10,6 +10,7 @@ struct earth {
     int (*mmu_free)(int pid);
     int (*mmu_map)(int pid, int page_no, int frame_no);
     int (*mmu_switch)(int pid);
+    int (*mmu_translate)(int pid, int page_no);
 
     /* Devices interface */
     int (*disk_read)(int block_no, int nblocks, char* dst);
@@ -31,6 +32,10 @@ struct earth {
 };
 
 struct grass {
+    /* Shell environment variables */
+    int workdir_ino;
+    char workdir[128];
+
     /* Process control interface */
     int  (*proc_alloc)();
     void (*proc_free)(int pid);
@@ -40,10 +45,6 @@ struct grass {
     void (*sys_exit)(int status);
     int  (*sys_send)(int pid, char* msg, int size);
     int  (*sys_recv)(int* pid, char* buf, int size);
-
-    /* Shell environment variables */
-    int workdir_ino;
-    char workdir[128];
 };
 
 extern struct earth *earth;

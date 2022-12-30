@@ -21,13 +21,12 @@ void trap_entry() {
     asm("csrr %0, mcause" : "=r"(mcause));
 
     int id = mcause & 0x3FF;
-    if (mcause & (1 << 31)) {
-        (intr_handler != 0)? intr_handler(id) :
-            FATAL("trap_entry: interrupt handler not registered");
-    } else {
-        (excp_handler != 0)? excp_handler(id) :
+    if (mcause & (1 << 31))
+        (intr_handler)? intr_handler(id) :
+            FATAL("trap_entry: intr_handler not registered");
+    else
+        (excp_handler)? excp_handler(id) :
             FATAL("trap_entry: exception handler not registered");
-    }
 }
 
 int intr_enable() {
