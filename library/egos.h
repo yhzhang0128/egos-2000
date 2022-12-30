@@ -35,7 +35,6 @@ struct grass {
     int  (*proc_alloc)();
     void (*proc_free)(int pid);
     void (*proc_set_ready)(int pid);
-    void (*proc_save_stack_paddr)(int pid, void* paddr);
 
     /* System call interface */
     void (*sys_exit)(int status);

@@ -38,7 +38,6 @@ void proc_free(int);
 void proc_set_ready (int);
 void proc_set_running (int);
 void proc_set_runnable (int);
-void proc_save_stack_paddr(int, void*);
 
 void ctx_entry(void);
 void ctx_start(void** old_sp, void* new_sp);
