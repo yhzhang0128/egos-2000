@@ -58,10 +58,10 @@ extern struct grass *grass;
 #define FRAME_CACHE_END    0x80020000
 #define FRAME_CACHE_START  0x80004000  /* 112KB  frame cache           */
                                        /*        earth interface       */
-#define GRASS_STACK_TOP    0x80003f80  /* 6KB    earth/grass stack     */
-#define SYSCALL_ARG        0x80002400  /* 1KB    system call args      */
-                                       /* 1KB    grass interface       */
+#define GRASS_STACK_TOP    0x80003f80  /* 8KB    earth/grass stack     */
+                                       /*        grass interface       */
 #define APPS_STACK_TOP     0x80002000  /* 6KB    app stack             */
+#define SYSCALL_ARG        0x80000400  /* 1KB    system call args      */
 #define APPS_ARG           0x80000000  /* 1KB    app main() argc, argv */
 #define APPS_SIZE          0x00003000  
 #define APPS_ENTRY         0x08005000  /* 12KB   app code+data         */
