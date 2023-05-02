@@ -9,6 +9,7 @@
 
 #include "app.h"
 
+/* These two functions are defined in grass/context.S */
 void ctx_start(void** old_sp, void* new_sp);
 void ctx_switch(void** old_sp, void* new_sp);
 
