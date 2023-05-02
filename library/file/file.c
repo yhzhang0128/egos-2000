@@ -116,7 +116,7 @@ static block_no treedisk_alloc_block(struct treedisk_state *ts, struct treedisk_
     union treedisk_block freelistblock;
     (*ts->below->read)(ts->below, ts->below_ino, b, (block_t *) &freelistblock);
 
-    int i;
+    unsigned int i;
     for (i = REFS_PER_BLOCK; --i > 0;)
         if (freelistblock.freelistblock.refs[i] != 0) {
             break;
@@ -392,8 +392,7 @@ int treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int n
 
     /* Compute the number of inode blocks needed to store the inodes.
      */
-    unsigned int n_inodeblocks =
-        (ninodes + INODES_PER_BLOCK - 1) / INODES_PER_BLOCK;
+    unsigned int n_inodeblocks = (ninodes + INODES_PER_BLOCK - 1) / INODES_PER_BLOCK;
 
     /* Get the size of the underlying disk and see if it's large enough.
      */
@@ -422,8 +421,7 @@ int treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int n
 
         /* The inodes all start out empty.
          */
-        unsigned int i;
-        for (i = 1; i <= n_inodeblocks; i++)
+        for (int i = 1; i <= n_inodeblocks; i++)
             if ((*below->write)(below, below_ino, i, &null_block) < 0) {
                 return -1;
             }
