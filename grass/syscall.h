@@ -16,9 +16,9 @@ struct sys_msg {
 };
 
 struct syscall {
-    enum syscall_type type;
-    struct sys_msg msg;
-    int retval;
+    enum syscall_type type;  /* Type of the system call */
+    struct sys_msg msg;      /* Data of the system call */
+    int retval;              /* Return value of the system call */
 };
 
 void sys_exit(int status);

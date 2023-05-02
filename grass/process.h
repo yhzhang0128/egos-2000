@@ -3,21 +3,6 @@
 #include "elf.h"
 #include "disk.h"
 
-struct process{
-    int pid;
-    int status;
-    int receiver_pid; /* used when waiting to send a message */
-    void *sp, *mepc;  /* process context = stack pointer (sp)
-                       * + machine exception program counter (mepc) */
-
-};
-
-#define MAX_NPROCESS  16
-extern int proc_curr_idx;
-extern struct process proc_set[MAX_NPROCESS];
-#define curr_pid      proc_set[proc_curr_idx].pid
-#define curr_status   proc_set[proc_curr_idx].status
-
 enum {
     PROC_UNUSED,
     PROC_LOADING, /* allocated and wait for loading elf binary */
@@ -27,6 +12,20 @@ enum {
     PROC_WAIT_TO_SEND,
     PROC_WAIT_TO_RECV
 };
+
+struct process{
+    int pid;
+    int status;
+    int receiver_pid; /* used when waiting to send a message */
+    void *sp, *mepc;  /* process context = stack pointer (sp)
+                       * + machine exception program counter (mepc) */
+};
+
+#define MAX_NPROCESS  16
+extern int proc_curr_idx;
+extern struct process proc_set[MAX_NPROCESS];
+#define curr_pid      proc_set[proc_curr_idx].pid
+#define curr_status   proc_set[proc_curr_idx].status
 
 void timer_init();
 void timer_reset();

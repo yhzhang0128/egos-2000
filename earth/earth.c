@@ -39,7 +39,7 @@ static void earth_init() {
     intr_init();
     SUCCESS("Finished initializing the CPU interrupts");
 
-    /* Detect the hardware platform */
+    /* Detect the hardware platform (Arty or QEMU) */
     earth->platform = QEMU;
     earth->excp_register(platform_detect);
     /* This memory access triggers an exception on Arty, but not QEMU */

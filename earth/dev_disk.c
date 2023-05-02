@@ -40,8 +40,9 @@ void disk_init() {
     earth->disk_write = disk_write;
 
     if (earth->platform == QEMU) {
+        /* QEMU only uses the on-board ROM as disk;
+         * SD card is only supported on the Arty board */
         type = FLASH_ROM;
-        INFO("QEMU is detected and therefore use on-board ROM as disk");
         return;
     }
 

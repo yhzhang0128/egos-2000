@@ -5,67 +5,71 @@
 
 /* Author: Robbert van Renesse
  * Description: course project, user-level threading
+ * Students implement a threading package and semaphore;
+ * And then spawn multiple threads as either producer or consumer.
  */
 
 #include "app.h"
 
-/* These two functions are defined in grass/context.S */
+/** These two functions are defined in grass/context.S **/
 void ctx_start(void** old_sp, void* new_sp);
 void ctx_switch(void** old_sp, void* new_sp);
 
-/* Thread and Semaphore */
+/** Multi-threading functions **/
 
 struct thread {
-    /* Student's code goes here (user-level threading). */
+    /* Student's code goes here. */
 };
 
 void thread_init(){
-    /* Student's code goes here (user-level threading). */
-}
-
-void thread_create(void (*f)(void *), void *arg, unsigned int stack_size){
-    /* Student's code goes here (user-level threading). */
-}
-
-void thread_yield(){
-    /* Student's code goes here (user-level threading). */
-}
-
-void thread_exit(){
-    /* Student's code goes here (user-level threading). */
+    /* Student's code goes here */
 }
 
 void ctx_entry(void){
-    /* Student's code goes here (user-level threading). */
+    /* Student's code goes here. */
 }
 
+void thread_create(void (*f)(void *), void *arg, unsigned int stack_size){
+    /* Student's code goes here. */
+}
+
+void thread_yield(){
+    /* Student's code goes here. */
+}
+
+void thread_exit(){
+    /* Student's code goes here. */
+}
+
+/** Semaphore functions **/
+
 struct sema {
-    /* Student's code goes here (user-level threading). */
+    /* Student's code goes here. */
 };
 
 void sema_init(struct sema *sema, unsigned int count){
-    /* Student's code goes here (user-level threading). */
+    /* Student's code goes here. */
 }
 
 void sema_inc(struct sema *sema){
-    /* Student's code goes here (user-level threading). */
+    /* Student's code goes here. */
 }
 
 void sema_dec(struct sema *sema){
-    /* Student's code goes here (user-level threading). */
+    /* Student's code goes here. */
 }
 
 int sema_release(struct sema *sema){
-    /* Student's code goes here (user-level threading). */
+    /* Student's code goes here. */
 }
 
-/* Producer and Consumer */
+/** Producer and consumer functions **/
 
 #define NSLOTS	3
 
-static struct sema s_empty, s_full;
-static unsigned int in, out;
 static char *slots[NSLOTS];
+static unsigned int in, out;
+static struct sema s_empty, s_full;
 
 static void producer(void *arg){
     for (;;) {

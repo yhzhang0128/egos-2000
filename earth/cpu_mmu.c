@@ -116,7 +116,7 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, 0x20400000, 1024); /* boot ROM */
     setup_identity_region(pid, 0x20800000, 1024); /* disk image */
     setup_identity_region(pid, 0x80000000, 1024); /* DTIM memory */
-    for (int i = 0; i < 8; i++)                   /* ITIM memory */
+    for (int i = 0; i < 8; i++)                   /* ITIM memory is 32MB on QEMU */
         setup_identity_region(pid, 0x08000000 + i * 0x400000, 1024);
 }
 

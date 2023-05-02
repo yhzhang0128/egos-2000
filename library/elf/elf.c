@@ -85,13 +85,12 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     struct elf32_header *header = (void*) buf;
     struct elf32_program_header *pheader = (void*)(buf + header->e_phoff);
 
-    if (pheader->p_vaddr == GRASS_ENTRY) {
+    if (pheader->p_vaddr == GRASS_ENTRY)
         load_grass(reader, pheader);
-    } else if (pheader->p_vaddr == APPS_ENTRY) {
+    else if (pheader->p_vaddr == APPS_ENTRY)
         load_app(pid, reader, argc, argv, pheader);
-    } else {
+    else
         FATAL("elf_load: ELF gives invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
-    }
 }
 
 

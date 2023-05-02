@@ -10,13 +10,6 @@
 
 #include "sd.h"
 
-static void spi_config();
-static void spi_set_clock(long baud_rate);
-
-static void sd_reset();
-static int  sd_check_type();
-static void sd_check_capacity();
-
 enum {
       SD_TYPE_SD1,
       SD_TYPE_SD2,
@@ -25,28 +18,18 @@ enum {
 };
 static int SD_CARD_TYPE = SD_TYPE_UNKNOWN;
 
-void sdinit() {
-    spi_set_clock(100000);
-    spi_config();
-
-    sd_reset();
-    INFO("Set SPI clock frequency to %ldHz", CPU_CLOCK_RATE / 4);
-    spi_set_clock(CPU_CLOCK_RATE / 4);
-
-    INFO("Check SD card type and voltage with cmd8");
-    if (0 != sd_check_type()) FATAL("Fail to check SD card type");
-
-    char acmd41[] = {0x69, (SD_CARD_TYPE == SD_TYPE_SD2)? 0x40 : 0x00, 0x00, 0x00, 0x00, 0xFF};
-    while (sd_exec_acmd(acmd41));
+static void sd_check_capacity() {
+    INFO("Check SD card capacity with cmd58");
     while (recv_data_byte() != 0xFF);
 
-    INFO("Set block size to 512 bytes with cmd16");
-    char cmd16[] = {0x50, 0x00, 0x00, 0x02, 0x00, 0xFF};
-    char reply = sd_exec_cmd(cmd16);
-    while (recv_data_byte() != 0xFF);
+    char reply, payload[4], cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
+    if (sd_exec_cmd(cmd58)) FATAL("SD card cmd58 fails");
+    for (int i = 0; i < 4; i++) payload[3 - i] = recv_data_byte();
 
-    if (SD_CARD_TYPE == SD_TYPE_SD2) sd_check_capacity();
-    if (SD_CARD_TYPE != SD_TYPE_SDHC) FATAL("Only SDHC/SDXC supported");
+    if ((payload[3] & 0xC0) == 0xC0) SD_CARD_TYPE = SD_TYPE_SDHC;
+    INFO("SD card replies cmd58 with payload 0x%.8x", *(int*)payload);
+
+    while (recv_data_byte() != 0xFF);
 }
 
 static int sd_check_type() {
@@ -72,20 +55,6 @@ static int sd_check_type() {
     return 0;
 }
 
-static void sd_check_capacity() {
-    INFO("Check SD card capacity with cmd58");
-    while (recv_data_byte() != 0xFF);
-
-    char reply, payload[4], cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
-    if (sd_exec_cmd(cmd58)) FATAL("SD card cmd58 fails");
-    for (int i = 0; i < 4; i++) payload[3 - i] = recv_data_byte();
-
-    if ((payload[3] & 0xC0) == 0xC0) SD_CARD_TYPE = SD_TYPE_SDHC;
-    INFO("SD card replies cmd58 with payload 0x%.8x", *(int*)payload);
-
-    while (recv_data_byte() != 0xFF);
-}
-
 static void sd_reset() {
     /* Keep chip select line high */
     INFO("Set CS and MOSI to 1 and toggle clock.");
@@ -105,11 +74,6 @@ static void sd_reset() {
     INFO("Wait for SD card's reply to cmd0 (QEMU will stuck here)");
     while (reply != 0x01) reply = recv_data_byte();
     while (recv_data_byte() != 0xFF);
-}
-
-static void spi_set_clock(long baud_rate) {
-    long div = (CPU_CLOCK_RATE / (2 * baud_rate)) - 1;
-    REGW(SPI1_BASE, SPI1_SCKDIV) = (div & 0xFFF);
 }
 
 static void spi_config() {
@@ -132,4 +96,33 @@ static void spi_config() {
     /* Always populate receive FIFO */
     /* Set frame length */
     REGW(SPI1_BASE, SPI1_FMT) = 0x80000;
+}
+
+static void spi_set_clock(long baud_rate) {
+    long div = (CPU_CLOCK_RATE / (2 * baud_rate)) - 1;
+    REGW(SPI1_BASE, SPI1_SCKDIV) = (div & 0xFFF);
+}
+
+void sdinit() {
+    spi_set_clock(100000);
+    spi_config();
+
+    sd_reset();
+    INFO("Set SPI clock frequency to %ldHz", CPU_CLOCK_RATE / 4);
+    spi_set_clock(CPU_CLOCK_RATE / 4);
+
+    INFO("Check SD card type and voltage with cmd8");
+    if (0 != sd_check_type()) FATAL("Fail to check SD card type");
+
+    char acmd41[] = {0x69, (SD_CARD_TYPE == SD_TYPE_SD2)? 0x40 : 0x00, 0x00, 0x00, 0x00, 0xFF};
+    while (sd_exec_acmd(acmd41));
+    while (recv_data_byte() != 0xFF);
+
+    INFO("Set block size to 512 bytes with cmd16");
+    char cmd16[] = {0x50, 0x00, 0x00, 0x02, 0x00, 0xFF};
+    char reply = sd_exec_cmd(cmd16);
+    while (recv_data_byte() != 0xFF);
+
+    if (SD_CARD_TYPE == SD_TYPE_SD2) sd_check_capacity();
+    if (SD_CARD_TYPE != SD_TYPE_SDHC) FATAL("Only SDHC/SDXC supported");
 }
