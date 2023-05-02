@@ -115,8 +115,9 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, 0x10013000, 1);    /* UART0 */
     setup_identity_region(pid, 0x20400000, 1024); /* boot ROM */
     setup_identity_region(pid, 0x20800000, 1024); /* disk image */
-    setup_identity_region(pid, 0x08000000, 8);    /* ITIM memory */
     setup_identity_region(pid, 0x80000000, 1024); /* DTIM memory */
+    for (int i = 0; i < 8; i++)                   /* ITIM memory */
+        setup_identity_region(pid, 0x08000000 + i * 0x400000, 1024);
 }
 
 int page_table_map(int pid, int page_no, int frame_id) {
@@ -168,7 +169,6 @@ void mmu_init() {
     if (earth->platform == ARTY) {
         /* Arty board does not support supervisor mode or page tables */
         earth->translation = SOFT_TLB;
-        INFO("ARTY is detected and therefore use softTLB translation");
         return;
     }
 
