@@ -11,6 +11,7 @@
  *     the next  4MB holds the disk image produced by mkfs;
  *     the last  4MB is currently unused.
  * The output is in binary (bootROM.bin) and Intel MCS-86 (bootROM.mcs) format.
+ * The MCS-86 format file is only for debugging and not really necessary.
  */
 
 #include <stdio.h>
@@ -42,9 +43,7 @@ int main() {
     earth_size = load_file("earth.bin",                  "Earth binary", mem_earth);
     disk_size =  load_file("disk.img",                   "Disk  image ", mem_disk);
 
-    assert(fe310_size <= SIZE_4MB);
-    assert(earth_size <= SIZE_4MB);
-    assert(disk_size  == SIZE_4MB);
+    assert(fe310_size <= SIZE_4MB && earth_size <= SIZE_4MB && disk_size  == SIZE_4MB);
 
     freopen("bootROM.bin", "w", stdout);
     for (int i = 0; i < SIZE_4MB; i++) putchar(mem_fe310[i]);
@@ -52,7 +51,7 @@ int main() {
     for (int i = 0; i < SIZE_4MB; i++) putchar(mem_disk[i]);
     fclose(stdout);
 
-    fprintf(stderr, "[INFO] Finish making the bootROM binary\n");
+    fprintf(stderr, "[INFO] Finish making the bootROM binary (tools/bootROM.bin)\n");
     /* write_intel_mcs(); */
     return 0;
 }

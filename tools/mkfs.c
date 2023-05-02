@@ -93,7 +93,7 @@ int main() {
     write(1, fs, FS_DISK_SIZE);
     fclose(stdout);
 
-    fprintf(stderr, "[INFO] Finish making the disk image\n");
+    fprintf(stderr, "[INFO] Finish making the disk image (tools/disk.img)\n");
     return 0;
 }
 
@@ -123,7 +123,6 @@ void mkfs() {
                 treedisk->write(treedisk, ino, b, (void*)(buf + b * BLOCK_SIZE));
         }
     }
-    fprintf(stderr, "[INFO] Write %d inodes\n", NINODE);
 }
 
 
