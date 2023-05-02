@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: _enter of grass, context start and context switch
+ * Description: context start and context switch
  */
     .section .text
     .global ctx_start, ctx_switch

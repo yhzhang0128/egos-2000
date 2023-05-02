@@ -37,16 +37,12 @@ void intr_entry(int id) {
         return;
     }
 
-    switch (id) {
-    case INTR_ID_SOFT:
+    if (id == INTR_ID_SOFT)
         kernel_entry = proc_syscall;
-        break;
-    case INTR_ID_TIMER:
+    else if (id == INTR_ID_TIMER)
         kernel_entry = proc_yield;
-        break;
-    default:
+    else
         FATAL("intr_entry: got unknown interrupt %d", id);
-    }
 
     /* Switch to the kernel stack */
     ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);

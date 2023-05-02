@@ -57,8 +57,7 @@ char* contents[] = {
                     "#../build/release/ult.elf",
 };
 
-char fs[FS_DISK_SIZE];
-char exec[GRASS_EXEC_SIZE];
+char fs[FS_DISK_SIZE], exec[GRASS_EXEC_SIZE];
 
 void mkfs();
 inode_intf ramdisk_init();
