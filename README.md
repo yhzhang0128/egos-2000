@@ -2,7 +2,7 @@
 
 This project's vision is to help **every** college student read **all** the code of an operating system.
 
-With only **2000** lines of code, **egos-2000** implements every component of an operating system for education. 
+With only **2000** lines of code, egos-2000 implements every component of an operating system for education. 
 It can run on a RISC-V board and also the QEMU software emulator.
 
 ![This is an image](references/screenshots/egos-2000.jpg)
@@ -27,7 +27,7 @@ SUM:                            52            596            801           2000 
 
 ## Earth and Grass Operating System
 
-We use **egos-classic** and **egos-2000** as our teaching OS at Cornell. They both adopt a 3-layer architecture.
+We use egos-2000 as a new teaching OS for [CS5411/4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/). It adopts a 3-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
