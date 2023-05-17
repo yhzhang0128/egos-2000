@@ -7,7 +7,7 @@ It can run on a RISC-V board and also the QEMU software emulator.
 
 ![This is an image](references/screenshots/egos-2000.jpg)
 Note: [**cloc**](https://github.com/AlDanial/cloc) was used to count the lines of code.
-The command below uses `cloc` to count LOC of the whole repo, excluding text documents.
+The command below uses `cloc` to count LOC of the whole repository, excluding text documents.
 
 ```shell
 > cloc egos-2000 --exclude-ext=md,txt
@@ -36,7 +36,7 @@ We use egos-2000 as a new teaching OS for [CS5411/4411 at Cornell](https://www.c
     * processes, system calls and inter-process communications
 * The **application layer** implements file system, shell and user commands.
 
-The definitions of `struct earth` and `struct grass` in [**egos.h**](library/egos.h) specify the interfaces of these layers.
+The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the interfaces.
 
 ### Usages and Documentation
 
