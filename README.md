@@ -6,10 +6,10 @@ With only **2000** lines of code, egos-2000 implements every component of an ope
 It can run on a RISC-V board and also the QEMU software emulator.
 
 ![This is an image](references/screenshots/egos-2000.jpg)
-Note: [**cloc**](https://github.com/AlDanial/cloc) was used to count the lines of code.
-The command below uses `cloc` to count LOC of the whole repository, excluding text documents.
 
 ```shell
+# The cloc utility is used to count the lines of code (LOC).
+# The command below counts the LOC of everything excluding text documents.
 > cloc egos-2000 --exclude-ext=md,txt
 ...
 github.com/AlDanial/cloc v 1.94  T=0.05 s (949.3 files/s, 62349.4 lines/s)
@@ -21,7 +21,7 @@ C/C++ Header                    10             68            105            285
 Assembly                         4              6             31             72
 make                             1             12              0             64
 -------------------------------------------------------------------------------
-SUM:                            52            596            801           2000 (exactly 2000 lines)
+SUM:                            52            596            801           2000 (exactly 2000!)
 -------------------------------------------------------------------------------
 ```
 
@@ -36,15 +36,13 @@ We use egos-2000 as a new teaching OS for [CS5411/4411 at Cornell](https://www.c
     * processes, system calls and inter-process communications
 * The **application layer** implements file system, shell and user commands.
 
-The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the interfaces.
+The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interfaces.
 
 ### Usages and Documentation
 
-For compiling and running egos-2000, please read [USAGES.md](references/USAGES.md).
-
-The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged ISA.
-The [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduces the memory map, especially the GPIO, UART and SPI bus controllers.
-[This document](references/README.md) further introduces the teaching plans, architecture and development history of egos-2000.
+For compiling and running egos-2000, please read [this document](references/USAGES.md).
+The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) and [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduce the privileged ISA and processor memory map.
+[This document](references/README.md) further introduces the teaching plans, architecture and development history.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
 
