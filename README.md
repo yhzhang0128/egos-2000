@@ -5,7 +5,7 @@ This project's vision is to help **every** college student read **all** the code
 With only **2000** lines of code, egos-2000 implements every component of an operating system for education. 
 It can run on a RISC-V board and also the QEMU software emulator.
 
-![This is an image](references/screenshots/egos-2000.jpg)
+![Fail to load an image of egos-2000.](references/screenshots/egos-2000.jpg)
 
 ```shell
 # The cloc utility is used to count the lines of code (LOC).
