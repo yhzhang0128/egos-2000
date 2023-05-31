@@ -38,8 +38,10 @@ int load_file(char* file_name, char* print_name, char* dst) {
     return st.st_size;
 }
 
-int main() {
-    fe310_size = load_file("fpga/freedom/fe310_cpu.bin", "FE310 binary", mem_fe310);
+int main(int argc, char** argv) {
+    fe310_size = load_file("fpga/freedom/fe310_cpu_a7_35t.bin", "FE310 binary", mem_fe310);
+    // Use the one below if you are using an Arty A7-100T board
+    //fe310_size = load_file("fpga/freedom/fe310_cpu_a7_100t.bin", "FE310 binary", mem_fe310);
     earth_size = load_file("earth.bin",                  "Earth binary", mem_earth);
     disk_size =  load_file("disk.img",                   "Disk  image ", mem_disk);
 

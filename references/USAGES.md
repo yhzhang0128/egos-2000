@@ -11,9 +11,12 @@ These videos skipped step3 and regarded step4 as step3 since QEMU is a newly add
 Running on QEMU is easier, but
 if you wish to run it on the board for more fun, 
 you will need to purchase the following hardware:
-* an Artix-7 35T [Arty FPGA development board](https://www.xilinx.com/products/boards-and-kits/arty.html)
+* an [Arty A7-35T board](https://www.xilinx.com/products/boards-and-kits/arty.html)
 * a microUSB cable (e.g., [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
 * [optional] a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card (e.g., [Sandisk](https://www.amazon.com/dp/B073K14CVB?ref=ppx_yo2_dt_b_product_details&th=1))
+
+You can also use the `Arty A7-100T` board.
+Search `Arty A7-100T` in `tools/mkrom.c` and `tools/fpga/openocd/7series.txt` and follow the instructions in the comments.
 
 ## Step1: Setup the compiler and compile egos-2000
 
