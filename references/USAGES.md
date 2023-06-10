@@ -52,14 +52,13 @@ Make sure you have a C compiler (i.e., the `cc` command) in your shell environme
 > make install
 -------- Create the Disk Image --------
 ......
-[INFO] Finish making the disk image
+[INFO] Finish making the disk image (tools/disk.img)
 -------- Create the BootROM Image --------
 ......
-[INFO] Finish making the bootROM binary
-[INFO] Finish making the bootROM mcs image
+[INFO] Finish making the bootROM binary (tools/bootROM.bin)
 ```
 
-This will create `disk.img`, `bootROM.bin` and `bootROM.mcs` in the `tools` directory.
+This will create `disk.img` and `bootROM.bin` under the `tools` directory.
 You can use [balena Etcher](https://www.balena.io/etcher/) or the `dd` shell command to program `disk.img` to your microSD card.
 
 ## Step3: Run egos-2000 on the QEMU emulator
@@ -119,7 +118,7 @@ You may need to register a Xilinx account, but the software is free.
 2. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window
 3. In the "Hardware" window, right click `xc7a35t` and click "Add Configuration Memory Device"
 4. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
-5. In the "Configuration file" field, choose the `bootROM.mcs` file compiled in step 2
+5. In the "Configuration file" field, choose the `bootROM.bin` file compiled in step 2
 6. Click "OK" and wait for the program to finish
 
 In **4**, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
