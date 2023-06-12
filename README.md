@@ -3,7 +3,8 @@
 This project's vision is to help **every** college student read **all** the code of an operating system.
 
 With only **2000** lines of code, egos-2000 implements every component of an operating system for education. 
-It can run on a RISC-V board and also the QEMU software emulator.
+It can run on a RISC-V board and the QEMU software emulator.
+A [special version](https://github.com/yhzhang0128/egos-2000/tree/ece4750) can further run on an educational processor implemented in Verilog.
 
 ![Fail to load an image of egos-2000.](references/screenshots/egos-2000.jpg)
 
