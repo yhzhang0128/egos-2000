@@ -4,7 +4,7 @@ This project's vision is to help **every** college student read **all** the code
 
 With only **2000** lines of code, egos-2000 implements every component of an operating system for education. 
 It can run on a RISC-V board and the QEMU software emulator.
-A [special version](https://github.com/yhzhang0128/egos-2000/tree/ece4750) can further run on an educational processor implemented in Verilog.
+A [special version](https://github.com/yhzhang0128/egos-2000/tree/ece4750) can further run on an educational RISC-V processor implemented in Verilog.
 
 ![Fail to load an image of egos-2000.](references/screenshots/egos-2000.jpg)
 
@@ -28,7 +28,7 @@ SUM:                            52            596            801           2000 
 
 ## Earth and Grass Operating System
 
-We use egos-2000 as a new teaching OS for [CS5411/4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/). It adopts a 3-layer architecture.
+Developed for [CS5411/4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/), egos-2000 adopts a 3-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
@@ -42,8 +42,8 @@ The definitions of `struct earth` and `struct grass` in [this header file](libra
 ### Usages and Documentation
 
 For compiling and running egos-2000, please read [this document](references/USAGES.md).
-The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) and [SiFive FE310 manual](references/sifive-fe310-v19p04.pdf) introduce the privileged ISA and processor memory map.
-[This document](references/README.md) further introduces the teaching plans, architecture and development history.
+The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) and [SiFive FE310 processor manual](references/sifive-fe310-v19p04.pdf) introduce the privileged ISA and memory map.
+[This document](references/README.md) further introduces the teaching plans, software architecture and development history.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
 
