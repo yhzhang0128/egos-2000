@@ -4,7 +4,6 @@ This project's vision is to help **every** college student read **all** the code
 
 With only **2000** lines of code, egos-2000 implements every component of an operating system for education. 
 It can run on a RISC-V board and the QEMU software emulator.
-A [special version](https://github.com/yhzhang0128/egos-2000/tree/ece4750) can further run on an educational RISC-V processor implemented in Verilog.
 
 ![Fail to load an image of egos-2000.](references/screenshots/egos-2000.jpg)
 
@@ -38,6 +37,7 @@ Developed for [CS5411/4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411
 * The **application layer** implements file system, shell and user commands.
 
 The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interfaces.
+A [special version of egos-2000](https://github.com/yhzhang0128/egos-2000/tree/ece4750) can run on the RISC-V processor from [ECE4750 at Cornell](https://github.com/cornell-ece4750), which is implemented in Verilog.
 
 ### Usages and Documentation
 
