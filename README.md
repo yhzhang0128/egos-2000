@@ -27,7 +27,7 @@ SUM:                            52            596            801           2000 
 
 ## Earth and Grass Operating System
 
-Developed for [CS5411/4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/), egos-2000 adopts a 3-layer architecture.
+The **egos** part of egos-2000 comes from its 3-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
@@ -37,7 +37,10 @@ Developed for [CS5411/4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411
 * The **application layer** implements file system, shell and user commands.
 
 The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interfaces.
-A [special version of egos-2000](https://github.com/yhzhang0128/egos-2000/tree/ece4750) can run on the RISC-V processor from [ECE4750 at Cornell](https://github.com/cornell-ece4750), which is implemented in Verilog.
+
+Developed for [CS4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/),
+a [special version](https://github.com/yhzhang0128/egos-2000/tree/ece4750) of egos-2000 can further run on the Verilog RISC-V processor from [ECE4750 at Cornell](https://github.com/cornell-ece4750).
+The goal is to make OS courses more connected with computer architecture courses.
 
 ### Usages and Documentation
 
