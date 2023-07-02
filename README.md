@@ -39,7 +39,7 @@ The **egos** part of egos-2000 comes from its 3-layer architecture.
 The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interfaces.
 
 Developed for [CS4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/),
-a [special version](https://github.com/yhzhang0128/egos-2000/tree/ece4750) of egos-2000 can further run on the Verilog RISC-V processor from [ECE4750 at Cornell](https://github.com/cornell-ece4750).
+egos-2000 also has a [special version](https://github.com/yhzhang0128/egos-2000/tree/ece4750) running on the RISC-V processor from [ECE4750 at Cornell](https://github.com/cornell-ece4750).
 The goal is to make OS courses more connected with computer architecture courses.
 
 ### Usages and Documentation
