@@ -27,9 +27,8 @@ puts [drscan xc7.tap 32 0]
 
 puts "Programming FPGA..."
 
-jtagspi_init 0 bscan_spi_xc7a35t.bit
-#Use the one below if you are using an Arty A7-100T board
-#jtagspi_init 0 bscan_spi_xc7a100t.bit
+#Use the one below for the Arty A7-100T board
+jtagspi_init 0 bscan_spi_xc7a100t.bit
 jtagspi_program ../../bootROM.bin 0 
 
 exit

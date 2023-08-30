@@ -7,16 +7,14 @@ For Windows users, use WSL (Windows Subsystem for Linux) in step1-3.
 Here are the tutorial videos for [MacOS](https://youtu.be/v8PW2N5edCc), [Linux](https://youtu.be/JDApdvnnz4A) and [Windows](https://youtu.be/VTTynr9MZRg).
 These videos skipped step3 and regarded step4 as step3 since QEMU is a newly added feature. And step3 in this document seems to be easy to follow.
 
-**egos-2000** can run on both QEMU and a RISC-V board. 
+**egos-2000** can run on both QEMU and RISC-V boards.
 Running on QEMU is easier, but
 if you wish to run it on the board for more fun, 
 you will need to purchase the following hardware:
-* an [Arty A7-35T board](https://www.xilinx.com/products/boards-and-kits/arty.html)
+* one of the Arty [A7-35T board](https://www.xilinx.com/products/boards-and-kits/arty.html), [A7-100T board](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/) and [S7-50 board](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/)
 * a microUSB cable (e.g., [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
 * [optional] a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card (e.g., [Sandisk](https://www.amazon.com/dp/B073K14CVB?ref=ppx_yo2_dt_b_product_details&th=1))
 
-You can also use the `Arty A7-100T` board.
-Search `Arty A7-100T` in `tools/mkrom.c` and `tools/fpga/openocd/7series.txt` and follow the instructions in the comments.
 
 ## Step1: Setup the compiler and compile egos-2000
 
@@ -82,6 +80,9 @@ qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qem
 
 
 ## Step4: Run egos-2000 on the Arty board
+
+You can use the Arty A7-35t, A7-100t or S7-50 board.
+Make sure you have set the `BOARD` variable correctly in `Makefile`.
 
 ### Step4.1 Program the Arty on-board ROM
 

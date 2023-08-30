@@ -26,12 +26,12 @@ install:
 	cp $(RELEASE)/earth.elf $(TOOLS)/earth.elf
 	$(OBJCOPY) --remove-section=.image $(TOOLS)/earth.elf
 	$(OBJCOPY) -O binary $(TOOLS)/earth.elf $(TOOLS)/earth.bin
-	$(CC) $(TOOLS)/mkrom.c -o $(TOOLS)/mkrom
+	$(CC) $(TOOLS)/mkrom.c -DCPU_BIN_FILE="\"fpga/freedom/fe310_cpu_$(BOARD).bin\"" -o $(TOOLS)/mkrom
 	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
 
 program:
 	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
-	cd $(TOOLS)/fpga/openocd; time openocd -f 7series.txt
+	cd $(TOOLS)/fpga/openocd; time openocd -f 7series_$(BOARD).txt
 
 qemu:
 	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
@@ -44,6 +44,9 @@ clean:
 	rm -rf $(TOOLS)/qemu/qemu.elf
 	rm -rf $(TOOLS)/mkfs $(TOOLS)/mkrom
 	rm -rf $(TOOLS)/disk.img $(TOOLS)/bootROM.bin $(TOOLS)/bootROM.mcs
+
+BOARD = a7_35t
+# BOARD can be a7_35t, a7_100t or s7_50
 
 RISCV_QEMU = qemu-system-riscv32
 RISCV_CC = riscv64-unknown-elf-gcc

@@ -27,7 +27,7 @@ SUM:                            52            596            801           2000 
 
 ## Earth and Grass Operating System
 
-The **egos** part of egos-2000 comes from its 3-layer architecture.
+The **egos** part of egos-2000 is named after its 3-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
