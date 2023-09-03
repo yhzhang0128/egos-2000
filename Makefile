@@ -31,6 +31,7 @@ install:
 
 program:
 	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
+	@echo "$(YELLOW)[WARNING]$(END) Make sure the board connected is Arty $(BOARD)."
 	cd $(TOOLS)/fpga/openocd; time openocd -f 7series_$(BOARD).txt
 
 qemu:

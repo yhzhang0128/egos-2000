@@ -27,8 +27,9 @@ extern struct process proc_set[MAX_NPROCESS];
 #define curr_pid      proc_set[proc_curr_idx].pid
 #define curr_status   proc_set[proc_curr_idx].status
 
-void timer_init();
 void timer_reset();
+void intr_entry(int);
+void excp_entry(int);
 
 void proc_init();
 int  proc_alloc();

@@ -12,20 +12,6 @@
 #include "syscall.h"
 #include <string.h>
 
-void intr_entry(int id);
-
-void excp_entry(int id) {
-    /* Student's code goes here (handle memory exception). */
-
-    /* If id is for system call, handle the system call and return */
-
-    /* Otherwise, kill the process if curr_pid is a user application */
-
-    /* Student's code ends here. */
-
-    FATAL("excp_entry: kernel got exception %d", id);
-}
-
 void proc_init() {
     earth->intr_register(intr_entry);
     earth->excp_register(excp_entry);

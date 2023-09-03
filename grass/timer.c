@@ -26,6 +26,4 @@ static void mtimecmp_set(long long time) {
     *(int*)(0x2004000 + 4) = (int)(time >> 32);
 }
 
-#define QUANTUM  5000
-void timer_init()  { mtimecmp_set(0); }
-void timer_reset() { mtimecmp_set(mtime_get() + QUANTUM); }
+void timer_reset() { mtimecmp_set(mtime_get() + 5000); }

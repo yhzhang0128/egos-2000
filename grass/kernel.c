@@ -4,7 +4,10 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: scheduler and inter-process communication
+ * Description: Kernel ≈ 3 handlers
+ *     proc_yield() handles timer interrupt for process scheduling
+ *     excp_entry() handles faults such as unauthorized memory access
+ *     proc_syscall() handles system calls for inter-process communication
  */
 
 
@@ -12,6 +15,19 @@
 #include "process.h"
 #include "syscall.h"
 #include <string.h>
+
+#define EXCP_ID_ECALL      11
+
+void excp_entry(int id) {
+    /* Student's code goes here (system call and memory exception). */
+
+    /* If id is for system call, handle the system call and return */
+
+    /* Otherwise, kill the process if curr_pid is a user application */
+
+    /* Student's code ends here. */
+    FATAL("excp_entry: kernel got exception %d", id);
+}
 
 #define INTR_ID_SOFT       3
 #define INTR_ID_TIMER      7
