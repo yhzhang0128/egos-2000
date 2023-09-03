@@ -137,12 +137,6 @@ int page_table_map(int pid, int page_no, int frame_id) {
     /* Student's code ends here. */
 }
 
-int page_table_translate(int pid, int page_no) {
-    /* Student's code goes here (page table translation). */
-
-    /* Student's code ends here. */
-}
-
 int page_table_switch(int pid) {
     /* Student's code goes here (page table translation). */
 
@@ -188,6 +182,5 @@ void mmu_init() {
 
         earth->mmu_map = page_table_map;
         earth->mmu_switch = page_table_switch;
-        earth->mmu_translate = page_table_translate;
     }
 }

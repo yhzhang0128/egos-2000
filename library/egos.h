@@ -10,7 +10,6 @@ struct earth {
     int (*mmu_free)(int pid);
     int (*mmu_map)(int pid, int page_no, int frame_no);
     int (*mmu_switch)(int pid);
-    int (*mmu_translate)(int pid, int page_no);
 
     /* Devices interface */
     int (*disk_read)(int block_no, int nblocks, char* dst);

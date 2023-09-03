@@ -70,16 +70,8 @@ void ctx_entry() {
     asm("csrr %0, mepc" : "=r"(mepc));
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
-    /* Student's code goes here (page table translation). */
-    /* Save the interrupt stack */
-    /* Student's code ends here. */
-
     /* kernel_entry() is either proc_yield() or proc_syscall() */
     kernel_entry();
-
-    /* Student's code goes here (page table translation). */
-    /* Restore the interrupt stack */
-    /* Student's code ends here. */
 
     /* Switch back to the user application stack */
     mepc = (int)proc_set[proc_curr_idx].mepc;
