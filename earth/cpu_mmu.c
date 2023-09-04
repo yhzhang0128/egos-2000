@@ -88,14 +88,18 @@ static unsigned int frame_id, *root, *leaf;
 static unsigned int* pid_to_pagetable_base[MAX_ROOT_PAGE_TABLES];
 
 void setup_identity_region(int pid, unsigned int addr, int npages) {
-    /* Allocate the leaf page table */
-    earth->mmu_alloc(&frame_id, (void**)&leaf);
-    table[frame_id].pid = pid;
-    memset(leaf, 0, PAGE_SIZE);
-
-    /* Setup the entry in the root page table */
     int vpn1 = addr >> 22;
-    root[vpn1] = ((unsigned int)leaf >> 2) | FLAG_NEXT_LEVEL;
+
+    if (root[vpn1] & 1) {
+        // Leaf has been allocated
+        leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000);
+    } else {
+        // Leaf has not been allocated
+        earth->mmu_alloc(&frame_id, (void**)&leaf);
+        table[frame_id].pid = pid;
+        memset(leaf, 0, PAGE_SIZE);
+        root[vpn1] = ((unsigned int)leaf >> 2) | FLAG_NEXT_LEVEL;
+    }
 
     /* Setup the entries in the leaf page table */
     int vpn0 = (addr >> 12) & 0x3FF;
@@ -116,6 +120,7 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, 0x20400000, 1024); /* boot ROM */
     setup_identity_region(pid, 0x20800000, 1024); /* disk image */
     setup_identity_region(pid, 0x80000000, 1024); /* DTIM memory */
+
     for (int i = 0; i < 8; i++)                   /* ITIM memory is 32MB on QEMU */
         setup_identity_region(pid, 0x08000000 + i * 0x400000, 1024);
 }
