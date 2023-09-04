@@ -80,12 +80,13 @@ int soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
+#define OS_RWX   0xF
 static unsigned int frame_id, *root, *leaf;
 
-#define MAX_ROOT_PAGE_TABLES 32  /* A number large enough for demo purpose */
-static unsigned int* pid_to_pagetable_base[MAX_ROOT_PAGE_TABLES];
+/* 32 is a number large enough for demo purpose */
+static unsigned int* pid_to_pagetable_base[32];
 
-void setup_identity_region(int pid, unsigned int addr, int npages) {
+void setup_identity_region(int pid, unsigned int addr, int npages, int flag) {
     int vpn1 = addr >> 22;
 
     if (root[vpn1] & 0x1) {
@@ -102,7 +103,7 @@ void setup_identity_region(int pid, unsigned int addr, int npages) {
     /* Setup the entries in the leaf page table */
     int vpn0 = (addr >> 12) & 0x3FF;
     for (int i = 0; i < npages; i++)
-        leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | 0xF;
+        leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | flag;
 }
 
 void pagetable_identity_mapping(int pid) {
@@ -113,18 +114,18 @@ void pagetable_identity_mapping(int pid) {
     pid_to_pagetable_base[pid] = root;
 
     /* Allocate the leaf page tables */
-    setup_identity_region(pid, 0x02000000, 16);   /* CLINT */
-    setup_identity_region(pid, 0x10013000, 1);    /* UART0 */
-    setup_identity_region(pid, 0x20400000, 1024); /* boot ROM */
-    setup_identity_region(pid, 0x20800000, 1024); /* disk image */
-    setup_identity_region(pid, 0x80000000, 1024); /* DTIM memory */
+    setup_identity_region(pid, 0x02000000, 16, OS_RWX);   /* CLINT */
+    setup_identity_region(pid, 0x10013000, 1, OS_RWX);    /* UART0 */
+    setup_identity_region(pid, 0x20400000, 1024, OS_RWX); /* boot ROM */
+    setup_identity_region(pid, 0x20800000, 1024, OS_RWX); /* disk image */
+    setup_identity_region(pid, 0x80000000, 1024, OS_RWX); /* DTIM memory */
 
-    for (int i = 0; i < 8; i++)                   /* ITIM memory is 32MB on QEMU */
-        setup_identity_region(pid, 0x08000000 + i * 0x400000, 1024);
+    for (int i = 0; i < 8; i++)           /* ITIM memory is 32MB on QEMU */
+        setup_identity_region(pid, 0x08000000 + i * 0x400000, 1024, OS_RWX);
 }
 
 int page_table_map(int pid, int page_no, int frame_id) {
-    if (pid >= MAX_ROOT_PAGE_TABLES) FATAL("page_table_map: pid too large");
+    if (pid >= 32) FATAL("page_table_map: pid too large");
 
     /* Student's code goes here (page table translation). */
 

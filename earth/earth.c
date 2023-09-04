@@ -77,7 +77,7 @@ int main() {
         int mstatus;
         /* Enter supervisor mode after mret */
         asm("csrr %0, mstatus" : "=r"(mstatus));
-        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) ));
+        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) | (1<<18)));
         /* Enter the grass layer after mret */
         asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
         asm("mret");

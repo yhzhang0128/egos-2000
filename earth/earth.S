@@ -23,7 +23,8 @@ trap_entry_wrapped:
     csrw mscratch, t0
 
     /* Set mstatus.MPRV in order to use virtual addresses */
-    li t0, 0x20000
+    /* If mstatus.MPP is user mode, set it to supervisor mode */
+    li t0, 0x20800
     csrs mstatus, t0
 
     csrr t0, mscratch
