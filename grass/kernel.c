@@ -16,8 +16,6 @@
 #include "syscall.h"
 #include <string.h>
 
-#define EXCP_ID_ECALL      11
-
 void excp_entry(int id) {
     /* Student's code goes here (system call and memory exception). */
 

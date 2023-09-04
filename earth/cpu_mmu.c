@@ -80,8 +80,6 @@ int soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define FLAG_VALID_RWX 0xF
-#define FLAG_NEXT_LEVEL 0x1
 static unsigned int frame_id, *root, *leaf;
 
 #define MAX_ROOT_PAGE_TABLES 32  /* A number large enough for demo purpose */
@@ -90,7 +88,7 @@ static unsigned int* pid_to_pagetable_base[MAX_ROOT_PAGE_TABLES];
 void setup_identity_region(int pid, unsigned int addr, int npages) {
     int vpn1 = addr >> 22;
 
-    if (root[vpn1] & 1) {
+    if (root[vpn1] & 0x1) {
         // Leaf has been allocated
         leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000);
     } else {
@@ -98,13 +96,13 @@ void setup_identity_region(int pid, unsigned int addr, int npages) {
         earth->mmu_alloc(&frame_id, (void**)&leaf);
         table[frame_id].pid = pid;
         memset(leaf, 0, PAGE_SIZE);
-        root[vpn1] = ((unsigned int)leaf >> 2) | FLAG_NEXT_LEVEL;
+        root[vpn1] = ((unsigned int)leaf >> 2) | 0x1;
     }
 
     /* Setup the entries in the leaf page table */
     int vpn0 = (addr >> 12) & 0x3FF;
     for (int i = 0; i < npages; i++)
-        leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | FLAG_VALID_RWX;
+        leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | 0xF;
 }
 
 void pagetable_identity_mapping(int pid) {
@@ -162,14 +160,12 @@ void mmu_init() {
     /* Initialize MMU interface functions */
     earth->mmu_free = mmu_free;
     earth->mmu_alloc = mmu_alloc;
+
+    /* Arty board does not support supervisor mode or page tables */
+    earth->translation = SOFT_TLB;
     earth->mmu_map = soft_tlb_map;
     earth->mmu_switch = soft_tlb_switch;
-
-    if (earth->platform == ARTY) {
-        /* Arty board does not support supervisor mode or page tables */
-        earth->translation = SOFT_TLB;
-        return;
-    }
+    if (earth->platform == ARTY) return;
 
     /* Choose memory translation mechanism in QEMU */
     CRITICAL("Choose a memory translation mechanism:");

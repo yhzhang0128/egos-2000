@@ -38,7 +38,8 @@ int main() {
     earth->mmu_switch(GPID_PROCESS);
 
     proc_init();
-    timer_reset();
+    earth->intr_register(intr_entry);
+    earth->excp_register(excp_entry);
     /* For page table translation, interrupt was enabled in earth layer */
     if (earth->translation == SOFT_TLB) earth->intr_enable();
 

@@ -13,9 +13,6 @@
 #include <string.h>
 
 void proc_init() {
-    earth->intr_register(intr_entry);
-    earth->excp_register(excp_entry);
-
     /* Student's code goes here (PMP memory protection). */
 
     /* Setup PMP TOR region 0x00000000 - 0x20000000 as r/w/x */
