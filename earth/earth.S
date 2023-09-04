@@ -12,8 +12,8 @@
     .global _enter, trap_entry_wrapped
 _enter:
     /* Disable machine interrupt */
-    li t0, 8
-    csrrc t1, mstatus, t0
+    li t0, 0x8
+    csrc mstatus, t0
 
     /* Call main() of earth.c */
     li sp, 0x80003f80
