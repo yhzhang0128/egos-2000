@@ -23,30 +23,21 @@ struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
 extern char bss_start, bss_end, data_rom, data_start, data_end;
 
-static void platform_detect(int id) {
-    earth->platform = ARTY;
-    /* Skip the illegal store instruction */
-    int mepc;
-    asm("csrr %0, mepc" : "=r"(mepc));
-    asm("csrw mepc, %0" ::"r"(mepc + 4));
-}
-
 static void earth_init() {
-    tty_init();
-    CRITICAL("------------- Booting -------------");
-    SUCCESS("Finished initializing the tty device");
-    
-    intr_init();
-    SUCCESS("Finished initializing the CPU interrupts");
+    int misa;
+    asm("csrr %0, misa" : "=r"(misa));
+    /* Arty board does not support supervisor mode or page tables */
+    earth->platform = (misa & (1 << 18))? QEMU : ARTY;
 
-    /* Detect the hardware platform (Arty or QEMU) */
-    earth->platform = QEMU;
-    earth->excp_register(platform_detect);
-    /* This memory access triggers an exception on Arty, but not QEMU */
-    *(int*)(0x1000) = 1;
+    tty_init();
+    CRITICAL("--- Booting on %s ---", earth->platform == QEMU? "QEMU" : "Arty");
+    SUCCESS("Finished initializing the tty device");
 
     disk_init();
     SUCCESS("Finished initializing the disk device");
+
+    intr_init();
+    SUCCESS("Finished initializing the CPU interrupts");
 
     mmu_init();
     SUCCESS("Finished initializing the CPU memory management unit");

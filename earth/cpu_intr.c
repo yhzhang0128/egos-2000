@@ -19,9 +19,9 @@ static void (*excp_handler)(int);
 int intr_register(void (*_handler)(int)) { intr_handler = _handler; }
 int excp_register(void (*_handler)(int)) { excp_handler = _handler; }
 
-void trap_entry_wrapped(); /* This wrapper is defined in earth.S */
-void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));
-void trap_entry() {
+void trap_entry_qemu(); /* This wrapper function is defined in earth.S */
+void trap_entry_arty()  __attribute__((interrupt ("machine"), aligned(128)));
+void trap_entry_arty() {
     int mcause;
     asm("csrr %0, mcause" : "=r"(mcause));
 
@@ -42,8 +42,13 @@ int intr_enable() {
 }
 
 void intr_init() {
-    /* Use direct mode and call trap_entry() for interrupts/exceptions */
-    asm("csrw mtvec, %0" ::"r"(trap_entry_wrapped));
+    if (earth->platform == ARTY) {
+        asm("csrw mtvec, %0" ::"r"(trap_entry_arty));
+        INFO("Use direct mode and put the address of trap_entry_arty() to mtvec");
+    } else {
+        asm("csrw mtvec, %0" ::"r"(trap_entry_qemu));
+        INFO("Use direct mode and put the address of trap_entry_qemu() to mtvec");
+    }
 
     earth->intr_enable = intr_enable;
     earth->intr_register = intr_register;
