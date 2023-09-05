@@ -46,7 +46,7 @@ void intr_entry(int id) {
         return;
     }
 
-    if (curr_pid >= GPID_USER_START && earth->tty_intr()) {
+    if (curr_pid >= GPID_USER_START && earth->tty_recv_intr()) {
         /* User process killed by ctrl+c interrupt */
         INFO("process %d killed by interrupt", curr_pid);
         asm("csrw mepc, %0" ::"r"(0x800500C));

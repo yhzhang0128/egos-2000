@@ -50,5 +50,5 @@ void intr_init() {
     asm("csrr %0, mie" : "=r"(mie));
     asm("csrw mie, %0" ::"r"(mie | 0x88));
     asm("csrr %0, mstatus" : "=r"(mstatus));
-    asm("csrw mstatus, %0" ::"r"(mstatus | 0x8));
+    asm("csrw mstatus, %0" ::"r"(mstatus | 0x88));
 }

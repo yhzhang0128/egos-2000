@@ -31,16 +31,15 @@ static void earth_init() {
     earth->platform = (misa & (1 << 18))? QEMU : ARTY;
 
     tty_init();
-    disk_init();
     CRITICAL("--- Booting on %s ---", earth->platform == QEMU? "QEMU" : "Arty");
+
+    disk_init();
     SUCCESS("Finished initializing the tty and disk devices");
 
     mmu_init();
     timer_init();
-    SUCCESS("Finished initializing the mmu and timer on the CPU");
-
     intr_init();
-    SUCCESS("Finished initializing and enabling the CPU interrupts");
+    SUCCESS("Finished initializing the mmu, timer and interrupts");
 }
 
 static int grass_read(int block_no, char* dst) {
@@ -57,16 +56,12 @@ int main() {
 
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);
-    if (earth->translation == SOFT_TLB){
-        /* No need to enter supervisor mode if using SOFT_TLB translation */
-        void (*grass_entry)() = (void*)GRASS_ENTRY;
-        grass_entry();
-    } else {
-        int mstatus;
+    if (earth->translation == PAGE_TABLE){
         /* Enter the grass layer in supervisor mode for PAGE_TABLE translation */
+        int mstatus;
         asm("csrr %0, mstatus" : "=r"(mstatus));
         asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) | (1 << 18)));
-        asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
-        asm("mret");
     }
+    asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
+    asm("mret");
 }

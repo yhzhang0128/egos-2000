@@ -19,7 +19,7 @@ void uart_putc(int c);
 void uart_init(long baud_rate);
 
 static int c, is_reading;
-int tty_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }
+int tty_recv_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }
 
 int tty_write(char* buf, int len) {
     for (int i = 0; i < len; i++) uart_putc(buf[i]);
@@ -84,15 +84,15 @@ int tty_critical(const char *format, ...)
 }
 
 void tty_init() {
+    /* 115200 is the UART baud rate */
     uart_init(115200);
 
     /* Wait for the tty device to be ready */
-    for (int i = 0; i < 2000000; i++);
     for (int c = 0; c != -1; uart_getc(&c));
 
-    earth->tty_intr = tty_intr;
     earth->tty_read = tty_read;
     earth->tty_write = tty_write;
+    earth->tty_recv_intr = tty_recv_intr;
     
     earth->tty_printf = tty_printf;
     earth->tty_info = tty_info;
