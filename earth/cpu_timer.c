@@ -10,6 +10,8 @@
  * and section 9.1, 9.3 of references/sifive-fe310-v19p04.pdf
  */
 
+#include "egos.h"
+
 static long long mtime_get() {
     int low, high;
     do {
@@ -26,4 +28,9 @@ static void mtimecmp_set(long long time) {
     *(int*)(0x2004000 + 4) = (int)(time >> 32);
 }
 
-void timer_reset() { mtimecmp_set(mtime_get() + 5000); }
+int timer_reset() { mtimecmp_set(mtime_get() + 50000); }
+
+void timer_init()  {
+    earth->timer_reset = timer_reset;
+    mtimecmp_set(0x0FFFFFFFFFFFFFFFUL);
+}

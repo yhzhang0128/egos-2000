@@ -24,7 +24,9 @@ void excp_entry(int id) {
     /* Otherwise, kill the process if curr_pid is a user application */
 
     /* Student's code ends here. */
-    FATAL("excp_entry: kernel got exception %d", id);
+    int mepc;
+    asm("csrr %0, mepc" : "=r"(mepc));
+    FATAL("excp_entry: kernel got exception %d, mepc=%x", id, mepc);
 }
 
 #define INTR_ID_SOFT       3
@@ -40,7 +42,7 @@ struct process proc_set[MAX_NPROCESS];
 void intr_entry(int id) {
     if (id == INTR_ID_TIMER && curr_pid < GPID_SHELL) {
         /* Do not interrupt kernel processes since IO can be stateful */
-        timer_reset();
+        earth->timer_reset();
         return;
     }
 
@@ -94,7 +96,7 @@ static void proc_yield() {
     /* Switch to the next runnable process and reset timer */
     proc_curr_idx = next_idx;
     earth->mmu_switch(curr_pid);
-    timer_reset();
+    earth->timer_reset();
 
     /* Student's code goes here (switch privilege level). */
 

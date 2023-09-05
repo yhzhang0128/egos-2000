@@ -16,29 +16,28 @@
 
 void tty_init();
 void disk_init();
-void intr_init();
 void mmu_init();
+void timer_init();
+void intr_init();
 
 struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
 extern char bss_start, bss_end, data_rom, data_start, data_end;
 
 static void earth_init() {
+    /* Arty board does not support the supervisor mode or page tables */
     int misa;
     asm("csrr %0, misa" : "=r"(misa));
-    /* Arty board does not support the supervisor mode or page tables */
-    #define MISA_SMODE (1 << 18)
-    earth->platform = (misa & MISA_SMODE)? QEMU : ARTY;
+    earth->platform = (misa & (1 << 18))? QEMU : ARTY;
 
     tty_init();
-    CRITICAL("--- Booting on %s ---", earth->platform == QEMU? "QEMU" : "Arty");
-    SUCCESS("Finished initializing the tty device");
-
     disk_init();
-    SUCCESS("Finished initializing the disk device");
+    CRITICAL("--- Booting on %s ---", earth->platform == QEMU? "QEMU" : "Arty");
+    SUCCESS("Finished initializing the tty and disk devices");
 
     mmu_init();
-    SUCCESS("Finished initializing the memory management unit");
+    timer_init();
+    SUCCESS("Finished initializing the mmu and timer on the CPU");
 
     intr_init();
     SUCCESS("Finished initializing and enabling the CPU interrupts");
@@ -55,10 +54,6 @@ int main() {
 
     /* Initialize the earth layer */
     earth_init();
-
-    /* Setup a PMP region for the whole 4GB address space */
-    asm("csrw pmpaddr0, %0" : : "r" (0x40000000));
-    asm("csrw pmpcfg0, %0" : : "r" (0xF));
 
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);

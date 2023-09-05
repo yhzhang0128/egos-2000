@@ -162,6 +162,10 @@ void mmu_init() {
     earth->mmu_free = mmu_free;
     earth->mmu_alloc = mmu_alloc;
 
+    /* Setup a PMP region for the whole 4GB address space */
+    asm("csrw pmpaddr0, %0" : : "r" (0x40000000));
+    asm("csrw pmpcfg0, %0" : : "r" (0xF));
+
     /* Arty board does not support supervisor mode or page tables */
     earth->translation = SOFT_TLB;
     earth->mmu_map = soft_tlb_map;

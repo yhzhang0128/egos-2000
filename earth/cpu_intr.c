@@ -33,6 +33,10 @@ void trap_entry() {
 }
 
 void intr_init() {
+    earth->intr_register = intr_register;
+    earth->excp_register = excp_register;
+
+    /* Setup the interrupt/exception entry function */
     if (earth->translation == PAGE_TABLE) {
         asm("csrw mtvec, %0" ::"r"(trap_entry_vmem));
         INFO("Use direct mode and put the address of trap_entry_vmem() to mtvec");
@@ -41,18 +45,10 @@ void intr_init() {
         INFO("Use direct mode and put the address of trap_entry() to mtvec");
     }
 
-    /* Enable machine-mode interrupts without triggering a timer interrupt */
-    #define MTIMECMP_ADDR 0x2004000
-    *(int*)(MTIMECMP_ADDR + 4) = 0x0FFFFFFF;
-    *(int*)(MTIMECMP_ADDR + 0) = 0xFFFFFFFF;
-
+    /* Enable the machine-mode timer and software interrupts */
     int mstatus, mie;
     asm("csrr %0, mie" : "=r"(mie));
-    asm("csrr %0, mstatus" : "=r"(mstatus));
-    /* For now, egos-2000 only uses timer and software interrupts */
     asm("csrw mie, %0" ::"r"(mie | 0x88));
+    asm("csrr %0, mstatus" : "=r"(mstatus));
     asm("csrw mstatus, %0" ::"r"(mstatus | 0x8));
-
-    earth->intr_register = intr_register;
-    earth->excp_register = excp_register;
 }

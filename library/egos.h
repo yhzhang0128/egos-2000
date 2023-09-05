@@ -2,6 +2,8 @@
 
 struct earth {
     /* CPU interface */
+    int (*timer_reset)();
+
     int (*intr_register)(void (*handler)(int));
     int (*excp_register)(void (*handler)(int));
 
