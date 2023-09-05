@@ -26,8 +26,9 @@ extern char bss_start, bss_end, data_rom, data_start, data_end;
 static void earth_init() {
     int misa;
     asm("csrr %0, misa" : "=r"(misa));
-    /* Arty board does not support supervisor mode or page tables */
-    earth->platform = (misa & (1 << 18))? QEMU : ARTY;
+    /* Arty board does not support the supervisor mode or page tables */
+    #define MISA_SMODE (1 << 18)
+    earth->platform = (misa & MISA_SMODE)? QEMU : ARTY;
 
     tty_init();
     CRITICAL("--- Booting on %s ---", earth->platform == QEMU? "QEMU" : "Arty");
@@ -36,11 +37,11 @@ static void earth_init() {
     disk_init();
     SUCCESS("Finished initializing the disk device");
 
-    intr_init();
-    SUCCESS("Finished initializing the CPU interrupts");
-
     mmu_init();
-    SUCCESS("Finished initializing the CPU memory management unit");
+    SUCCESS("Finished initializing the memory management unit");
+
+    intr_init();
+    SUCCESS("Finished initializing and enabling the CPU interrupts");
 }
 
 static int grass_read(int block_no, char* dst) {
@@ -55,21 +56,21 @@ int main() {
     /* Initialize the earth layer */
     earth_init();
 
+    /* Setup a PMP region for the whole 4GB address space */
+    asm("csrw pmpaddr0, %0" : : "r" (0x40000000));
+    asm("csrw pmpcfg0, %0" : : "r" (0xF));
+
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);
     if (earth->translation == SOFT_TLB){
-        /* No need to enter supervisor mode if using softTLB translation */
+        /* No need to enter supervisor mode if using SOFT_TLB translation */
         void (*grass_entry)() = (void*)GRASS_ENTRY;
         grass_entry();
     } else {
-        /* Enable machine-mode interrupt before entering supervisor mode */
-        earth->intr_enable();
-
         int mstatus;
-        /* Enter supervisor mode after mret */
+        /* Enter the grass layer in supervisor mode for PAGE_TABLE translation */
         asm("csrr %0, mstatus" : "=r"(mstatus));
         asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) | (1 << 18)));
-        /* Enter the grass layer after mret */
         asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
         asm("mret");
     }

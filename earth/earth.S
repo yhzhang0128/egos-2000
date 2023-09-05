@@ -9,7 +9,7 @@
  */
     .section .image.placeholder
     .section .text.enter
-    .global _enter, trap_entry_qemu
+    .global _enter, trap_entry_vmem
 _enter:
     /* Disable machine interrupt */
     li t0, 0x8
@@ -19,7 +19,7 @@ _enter:
     li sp, 0x80003f80
     call main
 
-trap_entry_qemu:
+trap_entry_vmem:
     csrw mscratch, t0
 
     /* Set mstatus.MPRV in order to use virtual addresses */
@@ -30,4 +30,4 @@ trap_entry_qemu:
     csrr t0, mscratch
 
     /* Jump to trap_entry_arty() without modifying any registers */
-    beq a0, a0, trap_entry_arty
+    j trap_entry

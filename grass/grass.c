@@ -40,8 +40,6 @@ int main() {
     proc_init();
     earth->intr_register(intr_entry);
     earth->excp_register(excp_entry);
-    /* For page table translation, interrupt was enabled in earth layer */
-    if (earth->translation == SOFT_TLB) earth->intr_enable();
 
     void (*sys_proc_entry)() = (void*)APPS_ENTRY;
     asm("mv a0, %0" ::"r"(APPS_ARG));

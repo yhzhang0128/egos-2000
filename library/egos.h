@@ -2,7 +2,6 @@
 
 struct earth {
     /* CPU interface */
-    int (*intr_enable)();
     int (*intr_register)(void (*handler)(int));
     int (*excp_register)(void (*handler)(int));
 

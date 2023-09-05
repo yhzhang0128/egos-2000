@@ -19,9 +19,9 @@ static void (*excp_handler)(int);
 int intr_register(void (*_handler)(int)) { intr_handler = _handler; }
 int excp_register(void (*_handler)(int)) { excp_handler = _handler; }
 
-void trap_entry_qemu(); /* This wrapper function is defined in earth.S */
-void trap_entry_arty()  __attribute__((interrupt ("machine"), aligned(128)));
-void trap_entry_arty() {
+void trap_entry_vmem(); /* This wrapper function is defined in earth.S */
+void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));
+void trap_entry() {
     int mcause;
     asm("csrr %0, mcause" : "=r"(mcause));
 
@@ -32,25 +32,27 @@ void trap_entry_arty() {
         (excp_handler)? excp_handler(id) : FATAL("trap_entry: exception handler not registered");
 }
 
-int intr_enable() {
-    int mstatus_val, mie_val;
-    asm("csrr %0, mstatus" : "=r"(mstatus_val));
-    asm("csrw mstatus, %0" ::"r"(mstatus_val | 0x8));
-    asm("csrr %0, mie" : "=r"(mie_val));
-    /* For now, egos-2000 only uses timer and software interrupts */
-    asm("csrw mie, %0" ::"r"(mie_val | 0x88));
-}
-
 void intr_init() {
-    if (earth->platform == ARTY) {
-        asm("csrw mtvec, %0" ::"r"(trap_entry_arty));
-        INFO("Use direct mode and put the address of trap_entry_arty() to mtvec");
+    if (earth->translation == PAGE_TABLE) {
+        asm("csrw mtvec, %0" ::"r"(trap_entry_vmem));
+        INFO("Use direct mode and put the address of trap_entry_vmem() to mtvec");
     } else {
-        asm("csrw mtvec, %0" ::"r"(trap_entry_qemu));
-        INFO("Use direct mode and put the address of trap_entry_qemu() to mtvec");
+        asm("csrw mtvec, %0" ::"r"(trap_entry));
+        INFO("Use direct mode and put the address of trap_entry() to mtvec");
     }
 
-    earth->intr_enable = intr_enable;
+    /* Enable machine-mode interrupts without triggering a timer interrupt */
+    #define MTIMECMP_ADDR 0x2004000
+    *(int*)(MTIMECMP_ADDR + 4) = 0x0FFFFFFF;
+    *(int*)(MTIMECMP_ADDR + 0) = 0xFFFFFFFF;
+
+    int mstatus, mie;
+    asm("csrr %0, mie" : "=r"(mie));
+    asm("csrr %0, mstatus" : "=r"(mstatus));
+    /* For now, egos-2000 only uses timer and software interrupts */
+    asm("csrw mie, %0" ::"r"(mie | 0x88));
+    asm("csrw mstatus, %0" ::"r"(mstatus | 0x8));
+
     earth->intr_register = intr_register;
     earth->excp_register = excp_register;
 }
