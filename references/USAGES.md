@@ -61,12 +61,12 @@ You can use [balena Etcher](https://www.balena.io/etcher/) or the `dd` shell com
 
 ## Step3: Run egos-2000 on the QEMU emulator
 
-Download the [QEMU emulator for egos-2000](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2023.5.1) to the working directory `$EGOS`.
+Download the QEMU emulator [v5.2.0](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2023.5.1) or [v8.1.0](https://github.com/yhzhang0128/qemu/releases/tag/v8.1.0-egos) for egos-2000 to the working directory `$EGOS`.
 
 ```shell
 > cd $EGOS
-> tar -zxvf riscv-qemu-xxx.tar.gz
-> export PATH=$PATH:$EGOS/riscv-qemu-5.2.0-...../bin
+> tar -zxvf riscv-qemu-5.2.0-xxxxxx.tar.gz
+> export PATH=$PATH:$EGOS/riscv-qemu-5.2.0-xxxxxx/bin
 > cd $EGOS/egos-2000
 > make qemu
 -------- Simulate on QEMU-RISCV --------
