@@ -102,8 +102,7 @@ void setup_identity_region(int pid, unsigned int addr, int npages, int flag) {
 
     /* Setup the entries in the leaf page table */
     int vpn0 = (addr >> 12) & 0x3FF;
-    for (int i = 0; i < npages; i++)
-        leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | flag;
+    for (int i = 0; i < npages; i++) leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | flag;
 }
 
 void pagetable_identity_mapping(int pid) {

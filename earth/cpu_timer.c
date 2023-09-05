@@ -28,7 +28,10 @@ static void mtimecmp_set(long long time) {
     *(int*)(0x2004000 + 4) = (int)(time >> 32);
 }
 
-int timer_reset() { mtimecmp_set(mtime_get() + 50000); }
+int timer_reset() {
+    mtimecmp_set(mtime_get() + 50000);
+    return 0;
+}
 
 void timer_init()  {
     earth->timer_reset = timer_reset;

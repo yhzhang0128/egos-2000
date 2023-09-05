@@ -54,8 +54,8 @@ RISCV_CC = riscv64-unknown-elf-gcc
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 
-APPS_SRCS = apps/app.s grass/context.s library/*/*.c
-GRASS_SRCS = grass/grass.s grass/context.s grass/*.c library/elf/*.c
+APPS_SRCS = apps/app.s grass/grass.s library/*/*.c
+GRASS_SRCS = grass/grass.s grass/*.c library/elf/*.c
 EARTH_SRCS = earth/earth.s earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
 
 CFLAGS = -march=rv32i -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections
