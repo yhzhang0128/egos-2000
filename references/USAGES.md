@@ -61,7 +61,8 @@ You can use [balena Etcher](https://www.balena.io/etcher/) or the `dd` shell com
 
 ## Step3: Run egos-2000 on the QEMU emulator
 
-Download the QEMU emulator [v5.2.0](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2023.5.1) or [v8.1.0](https://github.com/yhzhang0128/qemu/releases/tag/v8.1.0-egos) for egos-2000 to the working directory `$EGOS`.
+Download [QEMU v5.2](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2023.5.1) for egos-2000 to the working directory `$EGOS`.
+You can also compile and install [QEMU v8.1](https://github.com/yhzhang0128/qemu/releases/tag/v8.1.0-egos) yourself.
 
 ```shell
 > cd $EGOS
@@ -82,11 +83,11 @@ qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qem
 ## Step4: Run egos-2000 on the Arty board
 
 You can use the Arty A7-35t, A7-100t or S7-50 board.
-Make sure you have set the `BOARD` variable correctly in `Makefile`.
+Make sure to set the `BOARD` variable in `Makefile` correctly.
 
 ### Step4.1 Program the Arty on-board ROM
 
-#### Step4.1.1 MacOS or Linux
+#### Step4.1.1 MacOS or Linux (Recommended)
 
 Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to the working directory `$EGOS`.
 
