@@ -9,8 +9,8 @@
  */
     .section .image.placeholder
     .section .text.enter
-    .global _earth_enter, trap_entry_vmem
-_earth_enter:
+    .global earth_enter, trap_entry_vmem
+earth_enter:
     /* Disable machine interrupt */
     li t0, 0x8
     csrc mstatus, t0

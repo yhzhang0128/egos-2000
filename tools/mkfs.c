@@ -85,8 +85,12 @@ int main() {
             nread += read(0, exec + nread, exec_size - nread);
 
         write(1, exec, st.st_size);
+
+        /* Fill 0s as padding */
+        memset(exec, 0, GRASS_EXEC_SIZE);
         write(1, exec, exec_size - st.st_size);
     }
+    memset(exec, 0, GRASS_EXEC_SIZE);
     write(1, exec, (GRASS_NEXEC - NKERNEL_PROC) * exec_size);
         
     /* File system */

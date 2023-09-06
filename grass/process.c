@@ -12,27 +12,14 @@
 #include "syscall.h"
 #include <string.h>
 
-void proc_init() {
-    /* Student's code goes here (PMP memory protection). */
-
-    /* Setup PMP TOR region 0x00000000 - 0x20000000 as r/w/x */
-
-    /* Setup PMP NAPOT region 0x20400000 - 0x20800000 as r/-/x */
-
-    /* Setup PMP NAPOT region 0x20800000 - 0x20C00000 as r/-/- */
-
-    /* Setup PMP NAPOT region 0x80000000 - 0x80004000 as r/w/- */
-
-    /* Student's code ends here. */
-
-    /* The first process is currently running */
-    proc_set_running(proc_alloc());
-}
-
 static void proc_set_status(int pid, int status) {
     for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == pid) proc_set[i].status = status;
 }
+
+void proc_set_ready(int pid) { proc_set_status(pid, PROC_READY); }
+void proc_set_running(int pid) { proc_set_status(pid, PROC_RUNNING); }
+void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
 
 int proc_alloc() {
     static int proc_nprocs = 0;
@@ -61,7 +48,3 @@ void proc_free(int pid) {
             proc_set[i].status = PROC_UNUSED;
         }
 }
-
-void proc_set_ready(int pid) { proc_set_status(pid, PROC_READY); }
-void proc_set_running(int pid) { proc_set_status(pid, PROC_RUNNING); }
-void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }

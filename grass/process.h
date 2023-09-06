@@ -30,7 +30,6 @@ extern struct process proc_set[MAX_NPROCESS];
 void intr_entry(int);
 void excp_entry(int);
 
-void proc_init();
 int  proc_alloc();
 void proc_free(int);
 void proc_set_ready (int);

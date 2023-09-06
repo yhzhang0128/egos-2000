@@ -7,8 +7,8 @@
  * Description: _enter of grass, context start and context switch
  */
     .section .text
-    .global _grass_enter, ctx_start, ctx_switch
-_grass_enter:
+    .global grass_enter, ctx_start, ctx_switch
+grass_enter:
     li sp,0x80003f80
     call main
 

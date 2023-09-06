@@ -26,9 +26,9 @@ extern char bss_start, bss_end, data_rom, data_start, data_end;
 
 static void earth_init() {
     /* Arty board does not support the supervisor mode or page tables */
-    int misa;
+    int MISA_SMODE = (1 << 18), misa;
     asm("csrr %0, misa" : "=r"(misa));
-    earth->platform = (misa & (1 << 18))? QEMU : ARTY;
+    earth->platform = (misa & MISA_SMODE)? QEMU : ARTY;
 
     tty_init();
     CRITICAL("--- Booting on %s ---", earth->platform == QEMU? "QEMU" : "Arty");
@@ -39,7 +39,7 @@ static void earth_init() {
     mmu_init();
     timer_init();
     intr_init();
-    SUCCESS("Finished initializing the mmu, timer and interrupts");
+    SUCCESS("Finished initializing the CPU MMU, timer and interrupts");
 }
 
 static int grass_read(int block_no, char* dst) {

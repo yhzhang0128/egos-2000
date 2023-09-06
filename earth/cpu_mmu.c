@@ -81,6 +81,7 @@ int soft_tlb_switch(int pid) {
  */
 
 #define OS_RWX   0xF
+#define USER_RWX 0x1F
 static unsigned int frame_id, *root, *leaf;
 
 /* 32 is a number large enough for demo purpose */
@@ -165,6 +166,18 @@ void mmu_init() {
     /* Setup a PMP region for the whole 4GB address space */
     asm("csrw pmpaddr0, %0" : : "r" (0x40000000));
     asm("csrw pmpcfg0, %0" : : "r" (0xF));
+
+    /* Student's code goes here (PMP memory protection). */
+
+    /* Setup PMP TOR region 0x00000000 - 0x20000000 as r/w/x */
+
+    /* Setup PMP NAPOT region 0x20400000 - 0x20800000 as r/-/x */
+
+    /* Setup PMP NAPOT region 0x20800000 - 0x20C00000 as r/-/- */
+
+    /* Setup PMP NAPOT region 0x80000000 - 0x80004000 as r/w/- */
+
+    /* Student's code ends here. */
 
     /* Arty board does not support supervisor mode or page tables */
     earth->translation = SOFT_TLB;

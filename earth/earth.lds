@@ -1,6 +1,6 @@
 OUTPUT_ARCH("riscv")
 
-ENTRY(_earth_enter)
+ENTRY(earth_enter)
 
 MEMORY
 {

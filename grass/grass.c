@@ -31,17 +31,18 @@ int main() {
     grass->sys_exit = sys_exit;
     grass->sys_send = sys_send;
     grass->sys_recv = sys_recv;
-    
-    /* Load and enter the first kernel process sys_proc */
-    INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
-    elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
-    earth->mmu_switch(GPID_PROCESS);
 
-    proc_init();
+    /* Register interrupt and exception handlers */
     earth->intr_register(intr_entry);
     earth->excp_register(excp_entry);
+    
+    /* Load the first kernel process GPID_PROCESS */
+    INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
+    elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
+    proc_set_running(proc_alloc());
+    earth->mmu_switch(GPID_PROCESS);
 
-    void (*sys_proc_entry)() = (void*)APPS_ENTRY;
+    /* Jump to the entry of process GPID_PROCESS */
     asm("mv a0, %0" ::"r"(APPS_ARG));
-    sys_proc_entry();
+    asm("jr %0" :: "r" (APPS_ENTRY));
 }

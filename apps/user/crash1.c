@@ -12,4 +12,6 @@
 #include "app.h"
 #include <stdlib.h>
 
-int main() { char* heap_overflow = malloc(32 * 1024 * 1024); }
+int main() {
+    char* heap_overflow = malloc(32 * 1024 * 1024);
+}

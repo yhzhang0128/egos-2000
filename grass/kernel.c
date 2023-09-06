@@ -16,6 +16,9 @@
 #include "syscall.h"
 #include <string.h>
 
+#define EXCP_ID_ECALL_U    8
+#define EXCP_ID_ECALL_M    11
+
 void excp_entry(int id) {
     /* Student's code goes here (system call and memory exception). */
 
@@ -24,9 +27,7 @@ void excp_entry(int id) {
     /* Otherwise, kill the process if curr_pid is a user application */
 
     /* Student's code ends here. */
-    int mepc;
-    asm("csrr %0, mepc" : "=r"(mepc));
-    FATAL("excp_entry: kernel got exception %d, mepc=%x", id, mepc);
+    FATAL("excp_entry: kernel got exception %d", id);
 }
 
 #define INTR_ID_SOFT       3
@@ -46,7 +47,7 @@ void intr_entry(int id) {
         return;
     }
 
-    if (curr_pid >= GPID_USER_START && earth->tty_recv_intr()) {
+    if (earth->tty_recv_intr() && curr_pid >= GPID_USER_START) {
         /* User process killed by ctrl+c interrupt */
         INFO("process %d killed by interrupt", curr_pid);
         asm("csrw mepc, %0" ::"r"(0x800500C));
