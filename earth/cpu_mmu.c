@@ -117,6 +117,7 @@ void pagetable_identity_mapping(int pid) {
     /* Allocate the leaf page tables */
     setup_identity_region(pid, 0x02000000, 16, OS_RWX);   /* CLINT */
     setup_identity_region(pid, 0x10013000, 1, OS_RWX);    /* UART0 */
+    setup_identity_region(pid, 0x10024000, 1, OS_RWX);    /* SPI1 */
     setup_identity_region(pid, 0x20400000, 1024, OS_RWX); /* boot ROM */
     setup_identity_region(pid, 0x20800000, 1024, OS_RWX); /* disk image */
     setup_identity_region(pid, 0x80000000, 1024, OS_RWX); /* DTIM memory */

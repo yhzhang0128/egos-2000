@@ -30,7 +30,9 @@ int disk_read(int block_no, int nblocks, char* dst) {
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
-    if (type == FLASH_ROM) FATAL("Attempt to write the on-board ROM");
+    if (type == FLASH_ROM)
+        FATAL("Attempt to write the on-board ROM");
+
     sdwrite(block_no, nblocks, src);
     return 0;
 }
@@ -38,13 +40,6 @@ int disk_write(int block_no, int nblocks, char* src) {
 void disk_init() {
     earth->disk_read = disk_read;
     earth->disk_write = disk_write;
-
-    if (earth->platform == QEMU) {
-        /* QEMU only uses the on-board ROM as disk;
-         * SD card is only supported on the Arty board */
-        type = FLASH_ROM;
-        return;
-    }
 
     CRITICAL("Choose a disk:");
     printf("Enter 0: microSD card\r\nEnter 1: on-board ROM\r\n");
