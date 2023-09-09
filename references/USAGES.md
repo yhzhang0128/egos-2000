@@ -61,7 +61,7 @@ You can use [balena Etcher](https://www.balena.io/etcher/) or the `dd` shell com
 
 ## Step3: Run egos-2000 on the QEMU emulator
 
-Download [QEMU v5.2](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2023.5.1) for egos-2000 to the working directory `$EGOS`.
+Download [QEMU v5.2](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2023.9.8) for egos-2000 to the working directory `$EGOS`.
 You can also compile and install [QEMU v8.1](https://github.com/yhzhang0128/qemu/releases/tag/v8.1.0-egos) yourself.
 
 ```shell

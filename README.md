@@ -31,9 +31,9 @@ The **egos** part of egos-2000 is named after its 3-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interfaces
-    * interrupt and memory management interfaces
+    * timer, exception and memory management interfaces
 * The **grass layer** implements hardware-independent abstractions.
-    * processes, system calls and inter-process communications
+    * process control and system call interfaces
 * The **application layer** implements file system, shell and user commands.
 
 The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interfaces.
