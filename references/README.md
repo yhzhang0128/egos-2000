@@ -2,37 +2,39 @@ This document describes the teaching plan, architecture and development history 
 
 ## Teaching plan
 
-We use **egos** and **egos-2000** to teach our Practicum in Operating Systems (CS4411) at Cornell.
-There are six projects and one is optional.
+We use **egos-classic** and **egos-2000** to teach our Practicum in Operating Systems (CS4411) at Cornell.
+There are seven projects and two are optional.
 
 |    | Description                       | Concepts to teach                                           | Platform   |
 |----|-----------------------------------|-------------------------------------------------------------|------------|
 | P0 | Queue in C                        | memory, pointers, basic RISC-V ISA                          | Linux/Mac  |
 | P1 | Non-preemptive Multi-threading    | context switch, multi-threading, synchronization            | Linux/Mac  |
 | P2 | Multi-level Feedback Queue        | timer, interrupt handling, scheduling                       | Linux/Mac  |
-| P3 | Memory Protection and System Call | exception, control and status register, privilege level     | Arty board |
-| P4 | SD Card Driver (optional)         | I/O device, bus controller, device driver                   | Arty board |
-| P5 | File System                       | inode layer, directory layer                                | Arty board |
+| P3 | Memory Protection and System Call | exception, control and status register, privilege level     | Arty/QEMU  |
+| P4 | File System                       | inode layer, directory layer                                | Arty/QEMU  |
+| P5 | SD Card Driver (optional)         | I/O device, bus controller, device driver                   | Arty/QEMU  |
+| P6 | Page Table Translation (optional) | RISC-V Sv32 translation                                     | QEMU       |
 
 
 ## Architecture
 
 **Earth layer (hardware specific)**
-* `earth/dev_disk`: ROM and SD card (touched by P4)
+* `earth/dev_disk`: ROM and SD card (touched by P5)
+* `earth/dev_page`: memory paging
 * `earth/dev_tty`: keyboard input and tty output
 * `earth/cpu_intr`: interrupt and exception handling (touched by P3)
-* `earth/cpu_mmu`: memory paging and address translation (touched by P3)
+* `earth/cpu_mmu`: memory paging and address translation (touched by P3, P6)
+* `earth/cpu_timer`: control registers for timer
 
 **Grass layer (hardware independent)**
-* `grass/timer`: timer control registers
 * `grass/syscall`: system call interfaces to user applications
 * `grass/process`: data structures for managing processes (touched by P1)
-* `grass/scheduler`: preemptive scheduling and inter-process communication (touched by P2)
+* `grass/kernel`: preemptive scheduling and inter-process communication (touched by P2)
 
 **Application layer**
 * `app/system/sys_proc`: allocation and free of user processes
-* `app/system/sys_file`: the inode layer over the SD card (touched by P5)
-* `app/system/sys_dir`: the directory layer over the inode layer (touched by P5)
+* `app/system/sys_file`: the inode layer over the SD card (touched by P4)
+* `app/system/sys_dir`: the directory layer over the inode layer (touched by P4)
 * `app/system/sys_shell`: interactive user interface
 * shell commands: `pwd`, `cd`, `ls`, `cat`, `echo`, `clock`, `killall`
 
@@ -55,7 +57,7 @@ The complete memory layout is described in Chapter 4 of the [FE310 manual](sifiv
 | 0x8000_2000 | 0x8000_3FFF | RW- A      | DTIM, 8KB         | Earth layer and grass layer stack                          |
 | 0x8000_4000 | 0x8001_FFFF | RW- A      | DTIM, 112KB       | MMU cache of physical frames for suspended grass processes |
 
-On the Arty board, the first 1MB of the microSD card is used as 256 physical frames by the MMU for paging (see `earth/cpu_mmu.c`).
+On the Arty board, the first 1MB of the microSD card is used as 256 physical frames by the MMU for paging (see `earth/dev_page.c`).
 
 **Selected memory-mapped I/O regions**
 
@@ -66,11 +68,19 @@ On the Arty board, the first 1MB of the microSD card is used as 256 physical fra
 
 ## Software development history
 
+**Iteration #8**
+
+* [2022.05] Add `apps/user/ult.c`, a project on user-level threading
+* [2022.08] Create the `ece4750` branch and run egos-2000 on [this teaching processor](https://github.com/cornell-ece4750/)
+* [2022.09] Add support for the Arty S7-50 and A7-100t boards
+* [2022.09] Add support for the latest QEMU v8.1 with emulation of the microSD card
+* [2022.09] Simplify page table translation by using virutal addresses in the earth layer
+
 **Iteration #7**
 
 * [2022.10] Add support to the QEMU emulator
 * [2022.10] Enable the supervisor mode in the QEMU emulator
-* [2022.10] With the modified QEMU, add page table translation in `earth/cpu_mmu.c`.
+* [2022.10] With the modified QEMU, add page table translation in `earth/cpu_mmu.c`
 
 **Iteration #6**
 
