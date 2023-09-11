@@ -1,3 +1,36 @@
+# Compiler binaries from SiFive
+RISCV_CC = riscv64-unknown-elf-gcc -march=rv32i
+OBJDUMP = riscv64-unknown-elf-objdump
+OBJCOPY = riscv64-unknown-elf-objcopy
+
+# Compiler binaries from GNU
+#RISCV_CC = riscv32-unknown-elf-gcc -march=rv32im_zicsr
+#OBJDUMP = riscv32-unknown-elf-objdump
+#OBJCOPY = riscv32-unknown-elf-objcopy
+
+# BOARD can be a7_35t, a7_100t or s7_50
+BOARD = a7_35t
+RISCV_QEMU = qemu-system-riscv32
+
+TOOLS = tools
+QEMU = tools/qemu
+DEBUG = build/debug
+RELEASE = build/release
+
+APPS_SRCS = apps/app.s grass/grass.s library/*/*.c
+GRASS_SRCS = grass/grass.s grass/*.c library/elf/*.c
+EARTH_SRCS = earth/earth.s earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
+
+CFLAGS = -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -fdiagnostics-show-option
+LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
+INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers -Ilibrary/queue
+COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
+
+APPS_LD = -Tapps/app.lds -lc -lgcc
+GRASS_LD = -Tgrass/grass.lds -lc -lgcc
+EARTH_LD = -Tearth/earth.lds -lc -lgcc
+OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+
 all: apps
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
 	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
@@ -41,38 +74,7 @@ qemu:
 	$(RISCV_QEMU) -readconfig $(QEMU)/sifive-e31.cfg -kernel $(QEMU)/qemu.elf -nographic
 
 clean:
-	rm -rf build
-	rm -rf $(TOOLS)/qemu/qemu.elf
-	rm -rf $(TOOLS)/mkfs $(TOOLS)/mkrom
-	rm -rf $(TOOLS)/disk.img $(TOOLS)/bootROM.bin $(TOOLS)/bootROM.mcs
-
-BOARD = a7_35t
-# BOARD can be a7_35t, a7_100t or s7_50
-
-RISCV_QEMU = qemu-system-riscv32
-RISCV_CC = riscv64-unknown-elf-gcc
-OBJDUMP = riscv64-unknown-elf-objdump
-OBJCOPY = riscv64-unknown-elf-objcopy
-
-APPS_SRCS = apps/app.s grass/grass.s library/*/*.c
-GRASS_SRCS = grass/grass.s grass/*.c library/elf/*.c
-EARTH_SRCS = earth/earth.s earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
-
-CFLAGS = -march=rv32i -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections
-LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
-INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers -Ilibrary/queue
-
-COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
-
-APPS_LD = -Tapps/app.lds -lc -lgcc
-GRASS_LD = -Tgrass/grass.lds -lc -lgcc
-EARTH_LD = -Tearth/earth.lds -lc -lgcc
-
-TOOLS = tools
-QEMU = tools/qemu
-DEBUG = build/debug
-RELEASE = build/release
-OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+	rm -rf build $(TOOLS)/qemu/qemu.elf $(TOOLS)/disk.img $(TOOLS)/bootROM.bin $(TOOLS)/mkfs $(TOOLS)/mkrom
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

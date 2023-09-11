@@ -30,9 +30,7 @@ int disk_read(int block_no, int nblocks, char* dst) {
 }
 
 int disk_write(int block_no, int nblocks, char* src) {
-    if (type == FLASH_ROM)
-        FATAL("Attempt to write the on-board ROM");
-
+    if (type == FLASH_ROM) FATAL("disk_write: Writing ROM");
     sdwrite(block_no, nblocks, src);
     return 0;
 }

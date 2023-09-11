@@ -36,7 +36,6 @@ static int sd_check_type() {
     char cmd8[] = {0x48, 0x00, 0x00, 0x01, 0xAA, 0x87};
     char reply = sd_exec_cmd(cmd8);
 
-    INFO("SD card replies cmd8 with status 0x%.2x", reply);
     if (reply & 0x04) {
         /* Illegal command */
         SD_CARD_TYPE = SD_TYPE_SD1;
@@ -45,7 +44,7 @@ static int sd_check_type() {
         unsigned long payload;
         for (int i = 0; i < 4; i++)
             ((char*)&payload)[3 - i] = recv_data_byte();
-        INFO("SD card replies cmd8 with payload 0x%.8x", payload);
+        INFO("SD card replies cmd8 with status 0x%.2x and payload 0x%.8x", reply, payload);
 
         if ((payload & 0xFFF) != 0x1AA) return -1;
         SD_CARD_TYPE = SD_TYPE_SD2;

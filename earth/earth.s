@@ -9,7 +9,7 @@
  */
     .section .image.placeholder
     .section .text.enter
-    .global earth_enter, trap_entry_vmem
+    .global earth_enter, trap_entry_vm
 earth_enter:
     /* Disable machine interrupt */
     li t0, 0x8
@@ -19,7 +19,7 @@ earth_enter:
     li sp, 0x80003f80
     call main
 
-trap_entry_vmem:
+trap_entry_vm:
     csrw mscratch, t0
 
     /* Set mstatus.MPRV in order to use virtual addresses */

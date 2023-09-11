@@ -25,3 +25,6 @@ int _fstat(int file, void *stat) { return -1; }
 int _lseek(int file, int ptr, int dir) { return -1; }
 int _read(int file, void *ptr, int len) { return -1; }
 int _isatty(int file) { return (file == STDOUT_FILENO); }
+void _kill() {}
+int _getpid() { return -1; }
+void _exit(int status) { grass->sys_exit(status); while(1); }
