@@ -6,7 +6,7 @@ MacOS users can follow the same tutorial no matter you have an Intel CPU or Appl
 You can run egos-2000 on the QEMU emulator or RISC-V boards.
 Running on QEMU is easier but
 if you wish to run it on the board for more fun, 
-you will need to purchase the following hardware:
+you need to purchase the following hardware:
 * one of the Arty [A7-35T board](https://www.xilinx.com/products/boards-and-kits/arty.html), [A7-100T board](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/) and [S7-50 board](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/)
 * a microUSB cable (e.g., [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
 * [optional] a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card
@@ -20,22 +20,34 @@ Setup your working directory and name it as `$EGOS`.
 > export EGOS=/home/yunhao/egos
 > cd $EGOS
 > git clone https://github.com/yhzhang0128/egos-2000.git
-# now the code repository is at $EGOS/egos-2000
 ```
 
-Download the [SiFive gcc compiler](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to the working directory `$EGOS`.
+Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to `$EGOS`.
+Or, you can compile and install the [GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) yourself.
 
 ```shell
+# Use the GNU toolchain from SiFive (Recommended)
 > cd $EGOS
 > tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
 > export PATH=$PATH:$EGOS/riscv64-unknown...../bin
+
+# Or, compile and install the GNU toolchain yourself
+> cd $EGOS
+> mkdir riscv32-unknown-elf-gcc
+> export PATH=$PATH:$EGOS/riscv32-unknown-elf-gcc/bin
+> git clone git@github.com:riscv-collab/riscv-gnu-toolchain.git
+> cd riscv-gnu-toolchain
+> ./configure --with-arch=rv32imac --with-abi=ilp32 --prefix=$EGOS/riscv32-unknown-elf-gcc
+> make
+......
+# Remember to change the compiler binaries at the begining of $EGOS/egos-2000/Makefile
+
 > cd $EGOS/egos-2000
 > make
-mkdir -p build/debug build/release
 ......
 ```
 
-After this step, `build/release` holds the ELF format binary executables and `build/debug` holds the human readable assembly files.
+After this step, `build/release` holds the ELF format executables and `build/debug` holds the human readable assembly files.
 
 ## Step2: Create the disk and bootROM images
 
