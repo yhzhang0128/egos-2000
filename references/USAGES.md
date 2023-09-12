@@ -22,32 +22,36 @@ Setup your working directory and name it as `$EGOS`.
 > git clone https://github.com/yhzhang0128/egos-2000.git
 ```
 
-Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to `$EGOS`.
-Or, you can compile and install the [GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) yourself.
+Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to `$EGOS` and then compile egos-2000.
 
 ```shell
-# Use the GNU toolchain from SiFive (Recommended)
 > cd $EGOS
 > tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
 > export PATH=$PATH:$EGOS/riscv64-unknown...../bin
-
-# Or, compile and install the GNU toolchain yourself
-> cd $EGOS
-> mkdir riscv32-unknown-elf-gcc
-> export PATH=$PATH:$EGOS/riscv32-unknown-elf-gcc/bin
-> git clone git@github.com:riscv-collab/riscv-gnu-toolchain.git
-> cd riscv-gnu-toolchain
-> ./configure --with-arch=rv32imac --with-abi=ilp32 --prefix=$EGOS/riscv32-unknown-elf-gcc
-> make
-......
-# Remember to change the compiler binaries at the begining of $EGOS/egos-2000/Makefile
-
 > cd $EGOS/egos-2000
 > make
 ......
 ```
 
 After this step, `build/release` holds the ELF format executables and `build/debug` holds the human readable assembly files.
+In addition to the SiFive toolchain, you can also compile and install the [official GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) yourself.
+
+```shell
+# Prepare the environment
+> sudo apt-get install autoconf automake autotools-dev curl python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev
+> cd $EGOS
+> mkdir riscv32-unknown-elf-gcc
+> export PATH=$PATH:$EGOS/riscv32-unknown-elf-gcc/bin
+
+# Compile and install the GNU toolchain
+> git clone git@github.com:riscv-collab/riscv-gnu-toolchain.git
+> cd riscv-gnu-toolchain
+> ./configure --with-arch=rv32imac --with-abi=ilp32 --prefix=$EGOS/riscv32-unknown-elf-gcc
+> make
+......
+> vim $EGOS/egos-2000/Makefile
+# Change the compiler binaries at the begining of Makefile
+```
 
 ## Step2: Create the disk and bootROM images
 
