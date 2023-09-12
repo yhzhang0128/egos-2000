@@ -99,9 +99,9 @@ You can use the Arty A7-35t, A7-100t or S7-50 board.
 Make sure to set the `BOARD` variable in `Makefile`
 and then `make install` again to create the bootROM image for your board.
 
-### Step4.1 MacOS or Linux (Recommended)
+### Step4.1: MacOS or Linux
 
-#### Step4.1.1 Program the bootROM image to the on-board ROM
+#### Step4.1.1: Program the bootROM image to the on-board ROM
 
 Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to the working directory `$EGOS`.
 
@@ -126,7 +126,7 @@ sys     0m37.338s
 
 ```
 
-#### Step4.1.2 Connect to the egos-2000 TTY
+#### Step4.1.2: Connect to the egos-2000 TTY
 
 1. Press the `PROG` red button on the left-top corner of the Arty board
 2. To restart, press the `RESET` red button on the right-top corner
@@ -142,7 +142,7 @@ Enter 1: on-board ROM
 ```
 4. For MacOS users, use the same commands but check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`)
 
-### Step4.2: Windows or Linux
+### Step4.2: Windows
 
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
@@ -151,17 +151,15 @@ You may need to register a Xilinx account, but the software is free.
 2. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window
 3. In the "Hardware" window, right click `xc7a35t` and click "Add Configuration Memory Device"
 4. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
-5. In the "Configuration file" field, choose the `bootROM.bin` file compiled in step 2
+5. In the "Configuration file" field, choose the `bootROM.bin` file created in step 2; Note that the [tutorial video](https://youtu.be/hCDMnGGyGqM) shows how to generate this `bootROM.bin` using Docker in Windows
 6. Click "OK" and wait for the program to finish
 
-In **4**, new versions of Arty may use "s25fl128sxxxxxx0" as memory device. 
-If you choose the wrong one, **6** will tell you.
+In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](https://digilent.com/reference/software/adept/start) or reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US).
 
-In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](https://digilent.com/reference/software/adept/start) or reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US). If it still doesn't work, it may be an issue with Vivado and please [contact Xilinx](https://support.xilinx.com/s/topic/0TO2E000000YKXgWAO/programmable-logic-io-bootconfiguration?language=en_US).
+In **4**, some Arty boards may use "s25fl128sxxxxxx0" or other memory device. If you choose the wrong one, **6** will tell you.
 
 ![This is an image](screenshots/vivado.png)
 
-
-Lastly, to connect with the Arty board, find the board in your "Device Manager" (e.g., COM4) and use `PuTTY` to connect with the board with the following configuration:
+Lastly, to connect with the Arty board, find the board in your "Device Manager" (e.g., COM6) and use `PuTTY` to connect with the board with the following configuration:
 
 ![This is an image](screenshots/putty.png)
