@@ -48,8 +48,9 @@ While using the SiFive toolchain is easier, you can also compile and install the
 > ./configure --with-arch=rv32imac --with-abi=ilp32 --prefix=$EGOS/riscv32-unknown-elf-gcc
 > make
 ......
-# Switch the compiler binaries at the begining of Makefile
-> vim $EGOS/egos-2000/Makefile
+# Compile egos-2000 with the GNU toolchain
+> cd $EGOS/egos-2000
+> make TOOLCHAIN=GNU
 ```
 
 ## Step2: Create the disk and bootROM images

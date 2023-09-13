@@ -1,15 +1,19 @@
-# Compiler binaries from SiFive
+# BOARD can be a7_35t, a7_100t or s7_50
+BOARD = a7_35t
+# TOOLCHAIN can be SIFIVE or GNU
+TOOLCHAIN = SIFIVE
+
+ifeq ($(TOOLCHAIN), SIFIVE)
+# Toolchain binaries from SiFive
 RISCV_CC = riscv64-unknown-elf-gcc -march=rv32i
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
-
-# Compiler binaries from GNU
-#RISCV_CC = riscv32-unknown-elf-gcc -march=rv32im_zicsr
-#OBJDUMP = riscv32-unknown-elf-objdump
-#OBJCOPY = riscv32-unknown-elf-objcopy
-
-# BOARD can be a7_35t, a7_100t or s7_50
-BOARD = a7_35t
+else
+# Toolchain binaries from the official GNU
+RISCV_CC = riscv32-unknown-elf-gcc -march=rv32im_zicsr
+OBJDUMP = riscv32-unknown-elf-objdump
+OBJCOPY = riscv32-unknown-elf-objcopy
+endif
 RISCV_QEMU = qemu-system-riscv32
 
 TOOLS = tools
