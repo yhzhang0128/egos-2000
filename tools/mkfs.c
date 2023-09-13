@@ -28,8 +28,7 @@ char* kernel_processes[] = {
                             "../build/release/sys_proc.elf",
                             "../build/release/sys_file.elf",
                             "../build/release/sys_dir.elf",
-                            "../build/release/sys_shell.elf",
-};
+                            "../build/release/sys_shell.elf"};
 
 /* Inode - File/Directory mappings:
 #0: /              #1: /home                #2: /home/yunhao  #3: /home/rvr
@@ -54,8 +53,7 @@ char* contents[] = {
                     "#../build/release/clock.elf",
                     "#../build/release/crash1.elf",
                     "#../build/release/crash2.elf",
-                    "#../build/release/ult.elf",
-};
+                    "#../build/release/ult.elf"};
 
 char fs[FS_DISK_SIZE], exec[GRASS_EXEC_SIZE];
 

@@ -48,7 +48,7 @@ While using the SiFive toolchain is easier, you can also compile and install the
 > ./configure --with-arch=rv32imac --with-abi=ilp32 --prefix=$EGOS/riscv32-unknown-elf-gcc
 > make
 ......
-# Compile egos-2000 with the GNU toolchain
+# Compile egos-2000 with the official GNU toolchain
 > cd $EGOS/egos-2000
 > make TOOLCHAIN=GNU
 ```
@@ -150,6 +150,6 @@ In **4**, some Arty boards may use "s25fl128sxxxxxx0" or other memory device. If
 
 ![This is an image](screenshots/vivado.png)
 
-Lastly, to connect with the egos-2000 TTY, find the board in your "Device Manager" (e.g., COM6) and use `PuTTY` to connect:
+Lastly, to connect with the egos-2000 TTY, find your board in the "Device Manager" (e.g., COM6) and use `PuTTY` to connect:
 
 ![This is an image](screenshots/putty.png)

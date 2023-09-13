@@ -16,8 +16,6 @@ OBJCOPY = riscv32-unknown-elf-objcopy
 endif
 RISCV_QEMU = qemu-system-riscv32
 
-TOOLS = tools
-QEMU = tools/qemu
 DEBUG = build/debug
 RELEASE = build/release
 
@@ -25,22 +23,19 @@ APPS_SRCS = apps/app.s grass/grass.s library/*/*.c
 GRASS_SRCS = grass/grass.s grass/*.c library/elf/*.c
 EARTH_SRCS = earth/earth.s earth/*.c earth/sd/*.c library/elf/*.c library/libc/*.c
 
-CFLAGS = -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -fdiagnostics-show-option
 LDFLAGS = -Wl,--gc-sections -nostartfiles -nostdlib
-INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/libc -Ilibrary/file -Ilibrary/servers -Ilibrary/queue
-COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
+INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/servers
+CFLAGS = -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -fdiagnostics-show-option
 
-APPS_LD = -Tapps/app.lds -lc -lgcc
-GRASS_LD = -Tgrass/grass.lds -lc -lgcc
-EARTH_LD = -Tearth/earth.lds -lc -lgcc
-OBJDUMP_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+COMMON = $(CFLAGS) $(LDFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
+OBJDUMP_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 all: apps
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
-	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) $(GRASS_LD) -o $(RELEASE)/grass.elf
+	$(RISCV_CC) $(COMMON) $(GRASS_SRCS) -Tgrass/grass.lds -lc -lgcc -o $(RELEASE)/grass.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/grass.elf > $(DEBUG)/grass.lst
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
-	$(RISCV_CC) $(COMMON) $(EARTH_SRCS) $(EARTH_LD) -o $(RELEASE)/earth.elf
+	$(RISCV_CC) $(COMMON) $(EARTH_SRCS)  -Tearth/earth.lds -lc -lgcc -o $(RELEASE)/earth.elf
 	$(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/earth.elf > $(DEBUG)/earth.lst
 
 .PHONY: apps
@@ -50,35 +45,34 @@ apps: apps/system/*.c apps/user/*.c
 	for FILE in $^ ; do \
 	  export APP=$$(basename $${FILE} .c);\
 	  echo "Compile" $${FILE} "=>" $(RELEASE)/$${APP}.elf;\
-	  $(RISCV_CC) $(COMMON) $(APPS_SRCS) $${FILE} $(APPS_LD) -Iapps -o $(RELEASE)/$${APP}.elf || exit 1 ;\
+	  $(RISCV_CC) $(COMMON) $(APPS_SRCS) $${FILE} -Tapps/app.lds -lc -lgcc -Iapps -o $(RELEASE)/$${APP}.elf || exit 1 ;\
 	  echo "Compile" $${FILE} "=>" $(DEBUG)/$${APP}.lst;\
 	  $(OBJDUMP) $(OBJDUMP_FLAGS) $(RELEASE)/$${APP}.elf > $(DEBUG)/$${APP}.lst;\
 	done
 
 install:
 	@echo "$(YELLOW)-------- Create the Disk Image --------$(END)"
-	$(CC) $(TOOLS)/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o $(TOOLS)/mkfs
-	cd $(TOOLS); ./mkfs
+	$(CC) tools/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o tools/mkfs; cd tools; ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	cp $(RELEASE)/earth.elf $(TOOLS)/earth.elf
-	$(OBJCOPY) --remove-section=.image $(TOOLS)/earth.elf
-	$(OBJCOPY) -O binary $(TOOLS)/earth.elf $(TOOLS)/earth.bin
-	$(CC) $(TOOLS)/mkrom.c -DCPU_BIN_FILE="\"fpga/freedom/fe310_cpu_$(BOARD).bin\"" -o $(TOOLS)/mkrom
-	cd $(TOOLS); ./mkrom ; rm earth.elf earth.bin
+	cp $(RELEASE)/earth.elf tools/earth.elf
+	$(OBJCOPY) --remove-section=.image tools/earth.elf
+	$(OBJCOPY) -O binary tools/earth.elf tools/earth.bin
+	$(CC) tools/mkrom.c -DCPU_BIN_FILE="\"fpga/freedom/fe310_cpu_$(BOARD).bin\"" -o tools/mkrom
+	cd tools; ./mkrom ; rm earth.elf earth.bin
 
 program:
 	@echo "$(YELLOW)-------- Program the on-board ROM --------$(END)"
 	@echo "$(YELLOW)[WARNING]$(END) Make sure the board connected is Arty $(BOARD)."
-	cd $(TOOLS)/fpga/openocd; time openocd -f 7series_$(BOARD).txt
+	cd tools/fpga/openocd; time openocd -f 7series_$(BOARD).txt
 
 qemu:
 	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
-	cp $(RELEASE)/earth.elf $(QEMU)/qemu.elf
-	$(OBJCOPY) --update-section .image=$(TOOLS)/disk.img $(QEMU)/qemu.elf
-	$(RISCV_QEMU) -readconfig $(QEMU)/sifive-e31.cfg -kernel $(QEMU)/qemu.elf -nographic
+	cp $(RELEASE)/earth.elf tools/qemu/qemu.elf
+	$(OBJCOPY) --update-section .image=tools/disk.img tools/qemu/qemu.elf
+	$(RISCV_QEMU) -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qemu.elf -nographic
 
 clean:
-	rm -rf build $(TOOLS)/qemu/qemu.elf $(TOOLS)/disk.img $(TOOLS)/bootROM.bin $(TOOLS)/mkfs $(TOOLS)/mkrom
+	rm -rf build tools/qemu/qemu.elf tools/disk.img tools/bootROM.bin tools/mkfs tools/mkrom
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
