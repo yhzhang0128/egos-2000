@@ -2,10 +2,9 @@
 
 You can use MacOS, Linux or Windows and here are the tutorial videos:
 [MacOS](https://youtu.be/VJgQFcKG0uc), [Linux](https://youtu.be/2FT7AN0wPlg) and [Windows](https://youtu.be/hCDMnGGyGqM).
-MacOS users can follow the same tutorial no matter you have an Intel CPU or Apple chips.
+MacOS users can follow the same tutorial no matter you have an Apple chip or Intel CPU.
 You can run egos-2000 on the QEMU emulator or RISC-V boards.
-Running on QEMU is easier but
-if you wish to run it on the board for more fun, 
+Running on QEMU is easier but if you wish to run it on the boards for fun, 
 you need to purchase the following hardware:
 * one of the Arty [A7-35T board](https://www.xilinx.com/products/boards-and-kits/arty.html), [A7-100T board](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/) and [S7-50 board](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/)
 * a microUSB cable (e.g., [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
@@ -22,7 +21,7 @@ Setup your working directory and name it as `$EGOS`.
 > git clone https://github.com/yhzhang0128/egos-2000.git
 ```
 
-Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to `$EGOS` and then compile egos-2000.
+Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to `$EGOS` and compile egos-2000.
 
 ```shell
 > cd $EGOS
@@ -34,7 +33,7 @@ Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools
 ```
 
 After this step, `build/release` holds the ELF format executables and `build/debug` holds the human readable assembly files.
-In addition to the SiFive toolchain, you can also compile and install the [official GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) yourself.
+While using the SiFive toolchain is easier, you can also compile and install the [official GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) which takes about an hour.
 
 ```shell
 # Prepare the environment
@@ -49,8 +48,8 @@ In addition to the SiFive toolchain, you can also compile and install the [offic
 > ./configure --with-arch=rv32imac --with-abi=ilp32 --prefix=$EGOS/riscv32-unknown-elf-gcc
 > make
 ......
+# Switch the compiler binaries at the begining of Makefile
 > vim $EGOS/egos-2000/Makefile
-# Change the compiler binaries at the begining of Makefile
 ```
 
 ## Step2: Create the disk and bootROM images
@@ -69,7 +68,6 @@ Make sure you have a C compiler (i.e., the `cc` command) in your shell environme
 ```
 
 This will create `disk.img` and `bootROM.bin` under the `tools` directory.
-You can use [balena Etcher](https://www.balena.io/etcher/) or the `dd` shell command to program `disk.img` to your microSD card.
 
 ## Step3: Run egos-2000 on the QEMU emulator
 
@@ -87,23 +85,19 @@ cp build/release/earth.elf tools/qemu/qemu.elf
 riscv64-unknown-elf-objcopy --update-section .image=tools/disk.img tools/qemu/qemu.elf
 qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qemu.elf -nographic
 [CRITICAL] --- Booting on QEMU ---
-[CRITICAL] Choose a disk:
-Enter 0: microSD card
-Enter 1: on-board ROM
 ......
 ```
 
 ## Step4: Run egos-2000 on the Arty board
 
 You can use the Arty A7-35t, A7-100t or S7-50 board.
-Make sure to set the `BOARD` variable in `Makefile`
-and then `make install` again to create the bootROM image for your board.
+Make sure to set the `BOARD` variable in `Makefile` and then `make install` again.
+To use a microSD card on the board, you can program the microSD card with `disk.img` using tools like [balena Etcher](https://www.balena.io/etcher/).
 
 ### Step4.1: MacOS or Linux
 
-#### Step4.1.1: Program the bootROM image to the on-board ROM
-
-Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to the working directory `$EGOS`.
+Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to `$EGOS`
+and program `bootROM.bin` to the on-board ROM.
 
 ```shell
 > cd $EGOS
@@ -114,8 +108,6 @@ Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/re
 -------- Program the on-board ROM --------
 cd tools/openocd; time openocd -f 7series.txt
 ......
-Info : sector 188 took 223 ms
-Info : sector 189 took 223 ms
 Info : sector 190 took 229 ms
 Info : sector 191 took 243 ms  # It will pause at this point for a while
 Info : Found flash device 'micron n25q128' (ID 0x0018ba20)
@@ -126,7 +118,7 @@ sys     0m37.338s
 
 ```
 
-#### Step4.1.2: Connect to the egos-2000 TTY
+To connect with the egos-2000 TTY:
 
 1. Press the `PROG` red button on the left-top corner of the Arty board
 2. To restart, press the `RESET` red button on the right-top corner
@@ -135,12 +127,9 @@ sys     0m37.338s
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
 [CRITICAL] --- Booting on Arty ---
-[CRITICAL] Choose a disk:
-Enter 0: microSD card
-Enter 1: on-board ROM
 ......
 ```
-4. For MacOS users, use the same commands but check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`)
+4. For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`)
 
 ### Step4.2: Windows
 
@@ -151,15 +140,15 @@ You may need to register a Xilinx account, but the software is free.
 2. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window
 3. In the "Hardware" window, right click `xc7a35t` and click "Add Configuration Memory Device"
 4. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
-5. In the "Configuration file" field, choose the `bootROM.bin` file created in step 2; Note that the [tutorial video](https://youtu.be/hCDMnGGyGqM) shows how to generate this `bootROM.bin` using Docker in Windows
+5. In the "Configuration file" field, choose the `bootROM.bin` file created in step 2; Note that the [tutorial video](https://youtu.be/hCDMnGGyGqM) has shown how to generate this `bootROM.bin` file using Docker in Windows
 6. Click "OK" and wait for the program to finish
 
-In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](https://digilent.com/reference/software/adept/start) or reinstall the USB cable drivers following [these instructions](https://support.xilinx.com/s/article/59128?language=en_US).
+In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](https://digilent.com/reference/software/adept/start) or reinstall the USB cable drivers following [this post](https://support.xilinx.com/s/article/59128?language=en_US).
 
 In **4**, some Arty boards may use "s25fl128sxxxxxx0" or other memory device. If you choose the wrong one, **6** will tell you.
 
 ![This is an image](screenshots/vivado.png)
 
-Lastly, to connect with the Arty board, find the board in your "Device Manager" (e.g., COM6) and use `PuTTY` to connect with the board with the following configuration:
+Lastly, to connect with the egos-2000 TTY, find the board in your "Device Manager" (e.g., COM6) and use `PuTTY` to connect:
 
 ![This is an image](screenshots/putty.png)
