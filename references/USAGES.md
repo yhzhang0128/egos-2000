@@ -91,8 +91,8 @@ qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qem
 
 ## Step4: Run egos-2000 on the Arty board
 
-You can use the Arty A7-35t, A7-100t or S7-50 board.
-Make sure to set the `BOARD` variable in `Makefile` and then `make install` again.
+You can use the Arty A7-35t, A7-100t or S7-50 board
+and make sure to set the `BOARD` variable in `Makefile` correctly.
 To use a microSD card on the board, you can program the microSD card with `disk.img` using tools like [balena Etcher](https://www.balena.io/etcher/).
 
 ### Step4.1: MacOS or Linux
