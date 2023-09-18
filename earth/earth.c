@@ -56,12 +56,13 @@ int main() {
 
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);
-    if (earth->translation == PAGE_TABLE){
-        /* Enter the grass layer in supervisor mode for PAGE_TABLE translation */
-        int mstatus;
-        asm("csrr %0, mstatus" : "=r"(mstatus));
-        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (1 << 11) | (1 << 18)));
-    }
+
+    int mstatus;
+    int M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
+    int GRASS_MODE = (earth->translation == SOFT_TLB)? M_MODE : S_MODE;
+    asm("csrr %0, mstatus" : "=r"(mstatus));
+    asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (GRASS_MODE << 11) | (1 << 18)));
+
     asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
     asm("mret");
 }
