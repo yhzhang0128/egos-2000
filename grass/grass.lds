@@ -1,6 +1,6 @@
 OUTPUT_ARCH("riscv")
 
-ENTRY(grass_enter)
+ENTRY(grass_entry)
 
 MEMORY
 {

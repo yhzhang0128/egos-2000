@@ -1,6 +1,6 @@
 OUTPUT_ARCH("riscv")
 
-ENTRY(app_enter)
+ENTRY(app_entry)
 
 MEMORY
 {

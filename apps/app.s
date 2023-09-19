@@ -7,8 +7,8 @@
  * Description: initialize the stack pointer and call application main()
  */
     .section .text
-    .global app_enter
-app_enter:
+    .global app_entry
+app_entry:
     lw a0, 0(a0) /* a0 holds APPS_ARG, the address of integer argc */
     li sp,0x80002000
     call main

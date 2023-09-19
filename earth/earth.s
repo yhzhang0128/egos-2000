@@ -9,8 +9,8 @@
  */
     .section .image.placeholder
     .section .text.enter
-    .global earth_enter, trap_entry_vm
-earth_enter:
+    .global earth_entry, trap_entry_vm
+earth_entry:
     /* Disable machine interrupt */
     li t0, 0x8
     csrc mstatus, t0
@@ -22,12 +22,11 @@ earth_enter:
 trap_entry_vm:
     csrw mscratch, t0
 
-    /* Set mstatus.MPRV in order to use virtual addresses */
-    /* If mstatus.MPP is user mode, set it to supervisor mode */
+    /* Set mstatus.MPRV to enable page table translation in M mode */
+    /* If mstatus.MPP is U mode, set to S mode for kernel privilege */
     li t0, 0x20800
     csrs mstatus, t0
 
+    /* Jump to trap_entry() without modifying any registers */
     csrr t0, mscratch
-
-    /* Jump to trap_entry_arty() without modifying any registers */
     j trap_entry
