@@ -22,18 +22,19 @@ static unsigned long long mtime_get() {
     return (((unsigned long long)high) << 32) | low;
 }
 
-static void mtimecmp_set(unsigned long long time) {
+static int mtimecmp_set(unsigned long long time) {
     REGW(0x2004000, 4) = 0xFFFFFFFF;
     REGW(0x2004000, 0) = (unsigned int)time;
     REGW(0x2004000, 4) = (unsigned int)(time >> 32);
-}
 
-int timer_reset() {
-    mtimecmp_set(mtime_get() + 500000);
     return 0;
 }
 
+static unsigned int QUANTUM;
+int timer_reset() { return mtimecmp_set(mtime_get() + QUANTUM); }
+
 void timer_init()  {
     earth->timer_reset = timer_reset;
+    QUANTUM = (earth->platform == ARTY)? 5000 : 500000;
     mtimecmp_set(0x0FFFFFFFFFFFFFFFUL);
 }
