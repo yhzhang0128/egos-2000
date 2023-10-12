@@ -52,7 +52,8 @@ For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
 
 ## Acknowledgements
 
-Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/), [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/), [Shan Lu](https://people.cs.uchicago.edu/~shanlu/), [Hakim Weatherspoon](https://www.cs.cornell.edu/~hweather/) and [Christopher Batten](https://www.csl.cornell.edu/~cbatten/) for their support.
 Many thanks to Meta for a [Meta fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
+Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/), [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/), [Shan Lu](https://people.cs.uchicago.edu/~shanlu/), [Hakim Weatherspoon](https://www.cs.cornell.edu/~hweather/) and [Christopher Batten](https://www.csl.cornell.edu/~cbatten/) for their support.
 Many thanks to all the CS5411/4411 students at Cornell over the years for helping improve this course.
+Many thanks to [Cheng Tan](https://naizhengtan.github.io/) for using egos-2000 in his [CS6640 at Northeastern](https://naizhengtan.github.io/23fall/) and providing valuable feedback.
 Many thanks to Brandon Fusi who [ported egos-2000 to the Allwinner's D1 chip](https://github.com/cheofusi/egos-2000-d1), using Sipeed's Lichee RV compute module.
