@@ -70,11 +70,11 @@ On the Arty board, the first 1MB of the microSD card is used as 256 physical fra
 
 **Iteration #8**
 
-* [2022.05] Add `apps/user/ult.c`, a project on non-preemptive threading
-* [2022.08] Create the `ece4750` branch and run egos-2000 on [this teaching processor](https://github.com/cornell-ece4750/)
-* [2022.09] Add support for the Arty S7-50 and A7-100t boards
-* [2022.09] Add support for the latest QEMU v8.1 with emulation of the microSD card
-* [2022.09] Simplify page table translation by using virutal addresses in the earth layer
+* [2023.05] Add `apps/user/ult.c`, a project on non-preemptive threading
+* [2023.08] Create the `ece4750` branch and run egos-2000 on [this teaching processor](https://github.com/cornell-ece4750/)
+* [2023.09] Add support for the Arty S7-50 and A7-100t boards
+* [2023.09] Add support for the latest QEMU v8.1 with emulation of the microSD card
+* [2023.09] Simplify page table translation by using virutal addresses in the earth layer
 
 **Iteration #7**
 
