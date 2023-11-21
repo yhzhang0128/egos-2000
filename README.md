@@ -38,10 +38,6 @@ The **egos** part of egos-2000 is named after its three-layer architecture.
 
 The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interfaces.
 
-Developed for [CS4411 at Cornell](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/),
-egos-2000 also has a [special version](https://github.com/yhzhang0128/egos-2000/tree/ece4750) running on the Verilog processor from [ECE4750 at Cornell](https://github.com/cornell-ece4750).
-The goal is to make OS education more connected with computer architecture.
-
 ### Usages and Documentation
 
 For compiling and running egos-2000, please read [this document](references/USAGES.md).
@@ -54,6 +50,6 @@ For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).
 
 Many thanks to Meta for a [Meta fellowship](https://research.facebook.com/fellows/zhang-yunhao/).
 Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/), [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/), [Shan Lu](https://people.cs.uchicago.edu/~shanlu/), [Hakim Weatherspoon](https://www.cs.cornell.edu/~hweather/) and [Christopher Batten](https://www.csl.cornell.edu/~cbatten/) for their support.
-Many thanks to all the CS5411/4411 students at Cornell over the years for helping improve this course.
+Many thanks to all the [CS5411/4411](https://www.cs.cornell.edu/courses/cs4411/2022fa/schedule/) students at Cornell over the years for helping improve this course.
 Many thanks to [Cheng Tan](https://naizhengtan.github.io/) for providing valuable feedback and using egos-2000 in his [CS6640 at Northeastern](https://naizhengtan.github.io/23fall/).
 Many thanks to Brandon Fusi for [porting to the Allwinner's D1 chip](https://github.com/cheofusi/egos-2000-d1) using Sipeed's Lichee RV64 compute module.
