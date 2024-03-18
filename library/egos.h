@@ -81,3 +81,6 @@ extern struct grass *grass;
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
 #define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
 #define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))
+
+typedef int i32;
+typedef unsigned int u32;
