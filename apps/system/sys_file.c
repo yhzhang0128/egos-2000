@@ -12,7 +12,7 @@
 #include "file.h"
 #include <string.h>
 
-int main() {
+i32 main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
     /* Initialize the file system interface */
@@ -25,7 +25,7 @@ int main() {
 
     /* Wait for inode read/write requests */
     while (1) {
-        int sender, r;
+        i32 sender, r;
         struct file_request *req = (void*)buf;
         struct file_reply *reply = (void*)buf;
         grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);

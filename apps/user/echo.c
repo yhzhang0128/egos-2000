@@ -9,8 +9,8 @@
 
 #include "app.h"
 
-int main(int argc, char** argv) {
-    for (int i = 1; i < argc; i++) printf("%s ", argv[i]);
+i32 main(i32 argc, char** argv) {
+    for (u32 i = 1; i < argc; i++) printf("%s ", argv[i]);
     printf("\r\n");
     return 0;
 }

@@ -29,7 +29,7 @@ void ctx_entry(void){
     /* Student's code goes here. */
 }
 
-void thread_create(void (*f)(void *), void *arg, unsigned int stack_size){
+void thread_create(void (*f)(void *), void *arg, u32 stack_size){
     /* Student's code goes here. */
 }
 
@@ -47,7 +47,7 @@ struct sema {
     /* Student's code goes here. */
 };
 
-void sema_init(struct sema *sema, unsigned int count){
+void sema_init(struct sema *sema, u32 count){
     /* Student's code goes here. */
 }
 
@@ -59,7 +59,7 @@ void sema_dec(struct sema *sema){
     /* Student's code goes here. */
 }
 
-int sema_release(struct sema *sema){
+i32 sema_release(struct sema *sema){
     /* Student's code goes here. */
 }
 
@@ -68,7 +68,7 @@ int sema_release(struct sema *sema){
 #define NSLOTS	3
 
 static char *slots[NSLOTS];
-static unsigned int in, out;
+static u32 in, out;
 static struct sema s_empty, s_full;
 
 static void producer(void *arg){
@@ -85,7 +85,7 @@ static void producer(void *arg){
 }
 
 static void consumer(void *arg){
-    for (int i = 0; i < 5; i++) {
+    for (u32 i = 0; i < 5; i++) {
         // first make sure there's something in the buffer
         // then grab an entry to the queue
         // lastly, signal producers
@@ -98,7 +98,7 @@ static void consumer(void *arg){
     }
 }
 
-int main() {
+i32 main() {
     INFO("User-level threading is not implemented.");
 
     /*
