@@ -10,14 +10,14 @@
 #include "app.h"
 #include <string.h>
 
-i32 main(i32 argc, char** argv) {
+int main(int argc, char** argv) {
     if (argc == 1) {
         INFO("usage: cat [FILE]");
         return -1;
     }
 
     /* Get the inode number of the file */
-    i32 file_ino = dir_lookup(grass->workdir_ino, argv[1]);
+    int file_ino = dir_lookup(grass->workdir_ino, argv[1]);
     if (file_ino < 0) {
         INFO("cat: file %s not found", argv[1]);
         return -1;

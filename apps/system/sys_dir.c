@@ -13,11 +13,11 @@
 #include <stdlib.h>
 
 /* To understand directory management, read tools/mkfs.c */
-i32 dir_do_lookup(i32 dir_ino, char* name) {
+int dir_do_lookup(int dir_ino, char* name) {
     char buf[BLOCK_SIZE];
     file_read(dir_ino, 0, buf);
 
-    for (u32 i = 0, namelen = strlen(name); i < strlen(buf) - namelen; i++)
+    for (uint i = 0, namelen = strlen(name); i < strlen(buf) - namelen; i++)
         if (!strncmp(name, buf + i, namelen) &&
             buf[i + namelen] == ' ' && (i == 0 || buf[i - 1] == ' '))
             return atoi(buf + i + namelen);
@@ -25,7 +25,7 @@ i32 dir_do_lookup(i32 dir_ino, char* name) {
     return -1;
 }
 
-i32 main() {
+int main() {
     SUCCESS("Enter kernel process GPID_DIR");
 
     /* Send a notification to GPID_PROCESS */
@@ -35,7 +35,7 @@ i32 main() {
 
     /* Wait for directory requests */
     while (1) {
-        i32 sender;
+        int sender;
         struct dir_request *req = (void*)buf;
         struct dir_reply *reply = (void*)buf;
         grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);

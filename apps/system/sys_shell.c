@@ -10,11 +10,11 @@
 #include "app.h"
 #include <string.h>
 
-i32 parse_request(char* buf, struct proc_request* req) {
-    u32 idx = 0, nargs = 0;
+int parse_request(char* buf, struct proc_request* req) {
+    uint idx = 0, nargs = 0;
     memset(req->argv, 0, CMD_NARGS * CMD_ARG_LEN);
 
-    for (u32 i = 0; i < strlen(buf); i++)
+    for (uint i = 0; i < strlen(buf); i++)
         if (buf[i] != ' ') {
             req->argv[nargs][idx] = buf[i];
             if (++idx >= CMD_ARG_LEN) return -1;
@@ -26,7 +26,7 @@ i32 parse_request(char* buf, struct proc_request* req) {
     return 0;
 }
 
-i32 main() {
+int main() {
     CRITICAL("Welcome to the egos-2000 shell!");
     
     char buf[256] = "cd";  /* Enter the home directory first */

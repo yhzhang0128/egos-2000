@@ -12,14 +12,14 @@
 #include "disk.h"
 #include <string.h>
 
-static i32 app_ino, app_pid;
-static void sys_spawn(i32 base);
-static i32 app_spawn(struct proc_request *req);
+static int app_ino, app_pid;
+static void sys_spawn(int base);
+static int app_spawn(struct proc_request *req);
 
-i32 main() {
+int main() {
     SUCCESS("Enter kernel process GPID_PROCESS");    
 
-    i32 sender, shell_waiting;
+    int sender, shell_waiting;
     char buf[SYSCALL_MSG_LEN];
 
     sys_spawn(SYS_FILE_EXEC_START);
@@ -63,29 +63,29 @@ i32 main() {
     }
 }
 
-static i32 app_read(i32 off, char* dst) { file_read(app_ino, off, dst); }
+static int app_read(int off, char* dst) { file_read(app_ino, off, dst); }
 
-static i32 app_spawn(struct proc_request *req) {
-    i32 bin_ino = dir_lookup(0, "bin/");
+static int app_spawn(struct proc_request *req) {
+    int bin_ino = dir_lookup(0, "bin/");
     if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
 
     app_pid = grass->proc_alloc();
-    i32 argc = req->argv[req->argc - 1][0] == '&'? req->argc - 1 : req->argc;
+    int argc = req->argv[req->argc - 1][0] == '&'? req->argc - 1 : req->argc;
 
     elf_load(app_pid, app_read, argc, (void**)req->argv);
     grass->proc_set_ready(app_pid);
     return 0;
 }
 
-static i32 sys_proc_base;
+static int sys_proc_base;
 char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
 
-static i32 sys_proc_read(i32 block_no, char* dst) {
+static int sys_proc_read(int block_no, char* dst) {
     return earth->disk_read(sys_proc_base + block_no, 1, dst);
 }
 
-static void sys_spawn(i32 base) {
-    i32 pid = grass->proc_alloc();
+static void sys_spawn(int base) {
+    int pid = grass->proc_alloc();
     INFO("Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
 
     sys_proc_base = base;

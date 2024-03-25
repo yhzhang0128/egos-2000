@@ -9,7 +9,7 @@
 
 #include "app.h"
 
-i32 main(i32 argc, char** argv) {
+int main(int argc, char** argv) {
     printf("%s\r\n", grass->workdir);
     return 0;
 }

@@ -82,5 +82,4 @@ extern struct grass *grass;
 #define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
 #define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))
 
-typedef int i32;
-typedef unsigned int u32;
+typedef unsigned int uint;
