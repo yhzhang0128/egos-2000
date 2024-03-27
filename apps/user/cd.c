@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     /* Set the path name to the new working directory */
     if (!strcmp("./", argv[1])) return 0;
 
-    int len = strlen(grass->workdir);
+    uint len = strlen(grass->workdir);
     if (strcmp("../", argv[1])) {
         if (len > 1) strcat(grass->workdir, "/");
         strncat(grass->workdir, argv[1], strlen(argv[1]) - 1);

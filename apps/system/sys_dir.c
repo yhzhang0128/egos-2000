@@ -17,7 +17,7 @@ int dir_do_lookup(int dir_ino, char* name) {
     char buf[BLOCK_SIZE];
     file_read(dir_ino, 0, buf);
 
-    for (int i = 0, namelen = strlen(name); i < strlen(buf) - namelen; i++)
+    for (uint i = 0, namelen = strlen(name); i < strlen(buf) - namelen; i++)
         if (!strncmp(name, buf + i, namelen) &&
             buf[i + namelen] == ' ' && (i == 0 || buf[i - 1] == ' '))
             return atoi(buf + i + namelen);

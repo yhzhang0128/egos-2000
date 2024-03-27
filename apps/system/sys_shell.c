@@ -11,10 +11,10 @@
 #include <string.h>
 
 int parse_request(char* buf, struct proc_request* req) {
-    int idx = 0, nargs = 0;
+    uint idx = 0, nargs = 0;
     memset(req->argv, 0, CMD_NARGS * CMD_ARG_LEN);
 
-    for (int i = 0; i < strlen(buf); i++)
+    for (uint i = 0; i < strlen(buf); i++)
         if (buf[i] != ' ') {
             req->argv[nargs][idx] = buf[i];
             if (++idx >= CMD_ARG_LEN) return -1;

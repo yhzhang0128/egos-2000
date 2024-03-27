@@ -13,7 +13,7 @@
 #include <string.h>
 
 static int app_ino, app_pid;
-static void sys_spawn(int base);
+static void sys_spawn(uint base);
 static int app_spawn(struct proc_request *req);
 
 int main() {
@@ -63,7 +63,7 @@ int main() {
     }
 }
 
-static int app_read(int off, char* dst) { file_read(app_ino, off, dst); }
+static int app_read(uint off, char* dst) { file_read(app_ino, off, dst); }
 
 static int app_spawn(struct proc_request *req) {
     int bin_ino = dir_lookup(0, "bin/");
@@ -80,11 +80,11 @@ static int app_spawn(struct proc_request *req) {
 static int sys_proc_base;
 char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
 
-static int sys_proc_read(int block_no, char* dst) {
+static int sys_proc_read(uint block_no, char* dst) {
     return earth->disk_read(sys_proc_base + block_no, 1, dst);
 }
 
-static void sys_spawn(int base) {
+static void sys_spawn(uint base) {
     int pid = grass->proc_alloc();
     INFO("Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
 

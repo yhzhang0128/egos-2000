@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     file_read(grass->workdir_ino, 0, buf);
     
     /* Remove the inode numbers from the string */
-    for (int i = 1; i < strlen(buf); i++)
+    for (uint i = 1; i < strlen(buf); i++)
         if (buf[i - 1] == ' ' && buf[i] >= '0' && buf[i] <= '9') buf[i] = ' ';
 
     /* Print the directory content */
