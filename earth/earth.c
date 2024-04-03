@@ -42,7 +42,7 @@ static void earth_init() {
     SUCCESS("Finished initializing the CPU MMU, timer and interrupts");
 }
 
-static int grass_read(int block_no, char* dst) {
+static int grass_read(uint block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
