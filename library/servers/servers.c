@@ -34,7 +34,7 @@ int dir_lookup(int dir_ino, char* name) {
     return reply->status == DIR_OK? reply->ino : -1;
 }
 
-int file_read(int file_ino, int offset, char* block) {
+int file_read(int file_ino, uint offset, char* block) {
     struct file_request req;
     req.type = FILE_READ;
     req.ino = file_ino;

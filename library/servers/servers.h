@@ -5,7 +5,7 @@
 
 void exit(int status);
 int dir_lookup(int dir_ino, char* name);
-int file_read(int file_ino, int offset, char* block);
+int file_read(int file_ino, uint offset, char* block);
 
 enum grass_servers {
     GPID_UNUSED,
@@ -43,8 +43,8 @@ struct file_request {
           FILE_READ,
           FILE_WRITE,
     } type;
-    unsigned int ino;
-    unsigned int offset;
+    uint ino;
+    uint offset;
     block_t block;
 };
 
