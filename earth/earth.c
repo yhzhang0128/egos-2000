@@ -9,9 +9,9 @@
  * Load the grass layer binary from disk and run it.
  */
 
-#include "elf.h"
 #include "disk.h"
 #include "egos.h"
+#include "elf.h"
 #include <string.h>
 
 void tty_init();

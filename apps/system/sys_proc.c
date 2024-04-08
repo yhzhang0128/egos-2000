@@ -7,8 +7,8 @@
  * Description: system process for spawning and killing other processes
  */
 
-#include "elf.h"
 #include "app.h"
+#include "elf.h"
 #include "disk.h"
 #include <string.h>
 

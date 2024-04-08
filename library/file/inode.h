@@ -38,8 +38,6 @@
 #pragma once
 #include "disk.h"
 
-typedef unsigned int uint;
-
 #define NINODES  128
 
 typedef struct inode_store {

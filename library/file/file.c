@@ -26,13 +26,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "file.h"
 
 #ifdef MKFS
 #include <stdio.h>
 #else
 #include "egos.h"
 #endif
+
+#include "file.h"
 
 /* Temporary information about the file system and a particular inode.
  * Convenient for all operations. See "file.h" for field details.
