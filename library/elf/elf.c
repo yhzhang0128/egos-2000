@@ -21,8 +21,8 @@ static void load_grass(elf_reader reader,
     INFO("Grass kernel memory size: 0x%.8x bytes", pheader->p_memsz);
 
     char* entry = (char*)GRASS_ENTRY;
-    int block_offset = pheader->p_offset / BLOCK_SIZE;
-    for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE)
+    uint block_offset = pheader->p_offset / BLOCK_SIZE;
+    for (uint off = 0; off < pheader->p_filesz; off += BLOCK_SIZE)
         reader(block_offset++, entry + off);
 
     memset(entry + pheader->p_filesz, 0, GRASS_SIZE - pheader->p_filesz);
@@ -39,19 +39,19 @@ static void load_app(int pid, elf_reader reader,
     }
 
     void* base;
-    int frame_no, block_offset = pheader->p_offset / BLOCK_SIZE;
-    unsigned int code_start = APPS_ENTRY >> 12, stack_start = APPS_ARG >> 12;
+    uint frame_no, block_offset = pheader->p_offset / BLOCK_SIZE;
+    uint code_start = APPS_ENTRY >> 12, stack_start = APPS_ARG >> 12;
 
     /* Setup the text, rodata, data and bss sections */
-    for (int off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
+    for (uint off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
         if (off % PAGE_SIZE == 0) {
             earth->mmu_alloc(&frame_no, &base);
             earth->mmu_map(pid, code_start++, frame_no);
         }
         reader(block_offset++, (char*)base + (off % PAGE_SIZE));
     }
-    int last_page_filled = pheader->p_filesz % PAGE_SIZE;
-    int last_page_nzeros = PAGE_SIZE - last_page_filled;
+    uint last_page_filled = pheader->p_filesz % PAGE_SIZE;
+    uint last_page_nzeros = PAGE_SIZE - last_page_filled;
     if (last_page_filled)
         memset((char*)base + last_page_filled, 0, last_page_nzeros);
 
@@ -71,7 +71,7 @@ static void load_app(int pid, elf_reader reader,
 
     *argc_addr = argc;
     if (argv) memcpy(args_addr, argv, argc * CMD_ARG_LEN);
-    for (int i = 0; i < argc; i++)
+    for (uint i = 0; i < argc; i++)
         argv_addr[i] = APPS_ARG + 4 + 4 * CMD_NARGS + i * CMD_ARG_LEN;
 
     earth->mmu_alloc(&frame_no, &base);
@@ -85,7 +85,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     struct elf32_header *header = (void*) buf;
     struct elf32_program_header *pheader = (void*)(buf + header->e_phoff);
 
-    for (int i = 0; i < header->e_phnum; i++) {
+    for (uint i = 0; i < header->e_phnum; i++) {
         if (pheader[i].p_memsz == 0) continue;
         else if (pheader[i].p_vaddr == GRASS_ENTRY)
             load_grass(reader, &pheader[i]);
