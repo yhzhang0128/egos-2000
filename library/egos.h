@@ -83,4 +83,3 @@ extern struct grass *grass;
 #define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))
 
 typedef unsigned int uint;
-typedef unsigned short int ushort;

@@ -41,15 +41,15 @@
 #define NINODES  128
 
 typedef struct inode_store {
-    int (*getsize)(struct inode_store *this_bs, uint ino);
-    int (*setsize)(struct inode_store *this_bs, uint ino, block_no newsize);
-    int (*read)(struct inode_store *this_bs, uint ino, block_no offset, block_t *block);
-    int (*write)(struct inode_store *this_bs, uint ino, block_no offset, block_t *block);
+    int (*getsize)(struct inode_store *this_bs, unsigned int ino);
+    int (*setsize)(struct inode_store *this_bs, unsigned int ino, block_no newsize);
+    int (*read)(struct inode_store *this_bs, unsigned int ino, block_no offset, block_t *block);
+    int (*write)(struct inode_store *this_bs, unsigned int ino, block_no offset, block_t *block);
     void *state;
 } inode_store_t;
 
 typedef inode_store_t *inode_intf;    /* inode store interface */
 
 inode_intf fs_disk_init();
-inode_intf treedisk_init(inode_intf below, uint below_ino);
-int treedisk_create(inode_intf below, uint below_ino, uint ninodes);
+inode_intf treedisk_init(inode_intf below, unsigned int below_ino);
+int treedisk_create(inode_intf below, unsigned int below_ino, unsigned int ninodes);
