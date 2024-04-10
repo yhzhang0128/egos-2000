@@ -1,11 +1,14 @@
 #pragma once
 
+typedef unsigned int uint;
+typedef unsigned short int ushort;
+
 struct earth {
     /* CPU interface */
     int (*timer_reset)();
 
-    int (*intr_register)(void (*handler)(int));
-    int (*excp_register)(void (*handler)(int));
+    int (*intr_register)(void (*handler)(uint));
+    int (*excp_register)(void (*handler)(uint));
 
     int (*mmu_alloc)(int* frame_no, void** cached_addr);
     int (*mmu_free)(int pid);
@@ -43,8 +46,8 @@ struct grass {
 
     /* System call interface */
     void (*sys_exit)(int status);
-    int  (*sys_send)(int pid, char* msg, int size);
-    int  (*sys_recv)(int* pid, char* buf, int size);
+    int  (*sys_send)(int pid, char* msg, uint size);
+    int  (*sys_recv)(int* pid, char* buf, uint size);
 };
 
 extern struct earth *earth;
@@ -81,6 +84,3 @@ extern struct grass *grass;
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
 #define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
 #define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))
-
-typedef unsigned int uint;
-typedef unsigned short int ushort;

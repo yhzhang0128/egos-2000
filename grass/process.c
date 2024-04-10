@@ -12,7 +12,7 @@
 #include "syscall.h"
 #include <string.h>
 
-static void proc_set_status(int pid, int status) {
+static void proc_set_status(int pid, enum proc_status status) {
     for (int i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == pid) proc_set[i].status = status;
 }
@@ -22,8 +22,8 @@ void proc_set_running(int pid) { proc_set_status(pid, PROC_RUNNING); }
 void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
 
 int proc_alloc() {
-    static int proc_nprocs = 0;
-    for (int i = 0; i < MAX_NPROCESS; i++)
+    static uint proc_nprocs = 0;
+    for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid = ++proc_nprocs;
             proc_set[i].status = PROC_LOADING;
@@ -41,7 +41,7 @@ void proc_free(int pid) {
     }
 
     /* Free all user applications */
-    for (int i = 0; i < MAX_NPROCESS; i++)
+    for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid >= GPID_USER_START &&
             proc_set[i].status != PROC_UNUSED) {
             earth->mmu_free(proc_set[i].pid);
