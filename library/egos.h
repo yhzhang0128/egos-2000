@@ -1,7 +1,6 @@
 #pragma once
 
-typedef unsigned int uint;
-typedef unsigned short int ushort;
+#include <sys/types.h> /* Define uint and ushort */
 
 struct earth {
     /* CPU interface */
