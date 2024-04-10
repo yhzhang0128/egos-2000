@@ -18,8 +18,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
-#include "disk.h"
 #include "file.h"
 
 #define NKERNEL_PROC 5

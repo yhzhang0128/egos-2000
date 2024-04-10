@@ -8,7 +8,6 @@
  */
 
 #include "egos.h"
-#include "disk.h"
 #include "inode.h"
 
 static int disk_getsize() { return FS_DISK_SIZE / BLOCK_SIZE; }

@@ -29,6 +29,7 @@
 
 #ifdef MKFS
 #include <stdio.h>
+#include <sys/types.h>
 #else
 #include "egos.h"
 #endif
