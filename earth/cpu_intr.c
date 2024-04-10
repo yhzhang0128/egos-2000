@@ -12,12 +12,12 @@
 /* These are two static variables storing
  * the addresses of the handler functions;
  * Initially, both variables are NULL */
-static void (*intr_handler)(int);
-static void (*excp_handler)(int);
+static void (*intr_handler)(uint);
+static void (*excp_handler)(uint);
 
 /* Register handler functions by modifying the static variables */
-int intr_register(void (*_handler)(int)) { intr_handler = _handler; }
-int excp_register(void (*_handler)(int)) { excp_handler = _handler; }
+int intr_register(void (*_handler)(uint)) { intr_handler = _handler; }
+int excp_register(void (*_handler)(uint)) { excp_handler = _handler; }
 
 void trap_entry_vm(); /* This wrapper function is defined in earth.S */
 void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));

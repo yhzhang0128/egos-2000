@@ -20,7 +20,7 @@ static void sys_invoke() {
     while (sc->type != SYS_UNUSED);
 }
 
-int sys_send(int receiver, char* msg, int size) {
+int sys_send(int receiver, char* msg, uint size) {
     if (size > SYSCALL_MSG_LEN) return -1;
 
     sc->type = SYS_SEND;
@@ -30,7 +30,7 @@ int sys_send(int receiver, char* msg, int size) {
     return sc->retval;    
 }
 
-int sys_recv(int* sender, char* buf, int size) {
+int sys_recv(int* sender, char* buf, uint size) {
     if (size > SYSCALL_MSG_LEN) return -1;
 
     sc->type = SYS_RECV;

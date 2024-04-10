@@ -19,7 +19,7 @@
 #define EXCP_ID_ECALL_U    8
 #define EXCP_ID_ECALL_M    11
 
-void excp_entry(int id) {
+void excp_entry(uint id) {
     /* Student's code goes here (system call and memory exception). */
 
     /* If id is for system call, handle the system call and return */
@@ -37,10 +37,10 @@ static void proc_yield();
 static void proc_syscall();
 static void (*kernel_entry)();
 
-int proc_curr_idx;
+uint proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
 
-void intr_entry(int id) {
+void intr_entry(uint id) {
     if (id == INTR_ID_TIMER && curr_pid < GPID_SHELL) {
         /* Do not interrupt kernel processes since IO can be stateful */
         earth->timer_reset();
@@ -67,7 +67,7 @@ void intr_entry(int id) {
 
 void ctx_entry() {
     /* Now on the kernel stack */
-    int mepc, tmp;
+    uint mepc, tmp;
     asm("csrr %0, mepc" : "=r"(mepc));
     proc_set[proc_curr_idx].mepc = (void*) mepc;
 
@@ -75,7 +75,7 @@ void ctx_entry() {
     kernel_entry();
 
     /* Switch back to the user application stack */
-    mepc = (int)proc_set[proc_curr_idx].mepc;
+    mepc = (uint)proc_set[proc_curr_idx].mepc;
     asm("csrw mepc, %0" ::"r"(mepc));
     ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
 }
@@ -83,8 +83,8 @@ void ctx_entry() {
 static void proc_yield() {
     /* Find the next runnable process */
     int next_idx = -1;
-    for (int i = 1; i <= MAX_NPROCESS; i++) {
-        int s = proc_set[(proc_curr_idx + i) % MAX_NPROCESS].status;
+    for (uint i = 1; i <= MAX_NPROCESS; i++) {
+        enum proc_status s = proc_set[(proc_curr_idx + i) % MAX_NPROCESS].status;
         if (s == PROC_READY || s == PROC_RUNNING || s == PROC_RUNNABLE) {
             next_idx = (proc_curr_idx + i) % MAX_NPROCESS;
             break;
@@ -125,7 +125,7 @@ static void proc_send(struct syscall *sc) {
     sc->msg.sender = curr_pid;
     int receiver = sc->msg.receiver;
 
-    for (int i = 0; i < MAX_NPROCESS; i++)
+    for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == receiver) {
             /* Find the receiver */
             if (proc_set[i].status != PROC_WAIT_TO_RECV) {
@@ -153,7 +153,7 @@ static void proc_send(struct syscall *sc) {
 
 static void proc_recv(struct syscall *sc) {
     int sender = -1;
-    for (int i = 0; i < MAX_NPROCESS; i++)
+    for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_WAIT_TO_SEND &&
             proc_set[i].receiver_pid == curr_pid)
             sender = proc_set[i].pid;
@@ -180,7 +180,7 @@ static void proc_recv(struct syscall *sc) {
 static void proc_syscall() {
     struct syscall *sc = (struct syscall*)SYSCALL_ARG;
 
-    int type = sc->type;
+    enum syscall_type type = sc->type;
     sc->retval = 0;
     sc->type = SYS_UNUSED;
     *((int*)0x2000000) = 0;
