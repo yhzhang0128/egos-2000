@@ -28,7 +28,7 @@ void uart_init(long baud_rate) {
 }
 
 int uart_getc(int* c) {
-    int ch = REGW(UART0_BASE, UART0_RXDATA);
+    uint ch = REGW(UART0_BASE, UART0_RXDATA);
     return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
 }
 

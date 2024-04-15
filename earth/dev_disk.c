@@ -13,13 +13,13 @@
 #include "bus_gpio.c"
 #include <string.h>
 
-enum {
+enum disk_type {
       SD_CARD,
       FLASH_ROM
 };
-static int type;
+static enum disk_type type;
 
-int disk_read(int block_no, int nblocks, char* dst) {
+int disk_read(uint block_no, uint nblocks, char* dst) {
     if (type == SD_CARD) {
         sdread(block_no, nblocks, dst);
     } else {
@@ -29,7 +29,7 @@ int disk_read(int block_no, int nblocks, char* dst) {
     return 0;
 }
 
-int disk_write(int block_no, int nblocks, char* src) {
+int disk_write(uint block_no, uint nblocks, char* src) {
     if (type == FLASH_ROM)
         FATAL("disk_write: Writing to the read-only ROM");
 

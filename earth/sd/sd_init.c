@@ -10,13 +10,13 @@
 
 #include "sd.h"
 
-enum {
+enum sd_type {
       SD_TYPE_SD1,
       SD_TYPE_SD2,
       SD_TYPE_SDHC,
       SD_TYPE_UNKNOWN
 };
-static int SD_CARD_TYPE = SD_TYPE_UNKNOWN;
+static enum sd_type SD_CARD_TYPE = SD_TYPE_UNKNOWN;
 
 static void sd_check_capacity() {
     INFO("Check SD card capacity with cmd58");
@@ -24,7 +24,7 @@ static void sd_check_capacity() {
 
     char reply, payload[4], cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
     if (sd_exec_cmd(cmd58)) FATAL("SD card cmd58 fails");
-    for (int i = 0; i < 4; i++) payload[3 - i] = recv_data_byte();
+    for (uint i = 0; i < 4; i++) payload[3 - i] = recv_data_byte();
 
     if ((payload[3] & 0xC0) == 0xC0) SD_CARD_TYPE = SD_TYPE_SDHC;
     INFO("SD card replies cmd58 with payload 0x%.8x", *(int*)payload);
@@ -41,8 +41,8 @@ static int sd_check_type() {
         SD_CARD_TYPE = SD_TYPE_SD1;
     } else {
         /* Only need last byte of r7 response */
-        unsigned long payload;
-        for (int i = 0; i < 4; i++)
+        u_long payload;
+        for (uint i = 0; i < 4; i++)
             ((char*)&payload)[3 - i] = recv_data_byte();
         INFO("SD card replies cmd8 with status 0x%.2x and payload 0x%.8x", reply, payload);
 
@@ -59,7 +59,7 @@ static void sd_reset() {
     INFO("Set CS and MOSI to 1 and toggle clock.");
     REGW(SPI1_BASE, SPI1_CSMODE) = 2;
 
-    unsigned long i, rxdata;
+    u_long i, rxdata;
     for (i = 0; i < 1000; i++) send_data_byte(0xFF);
 
     /* Keep chip select line low */

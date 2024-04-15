@@ -21,13 +21,13 @@ void uart_init(long baud_rate);
 static int c, is_reading;
 int tty_recv_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }
 
-int tty_write(char* buf, int len) {
-    for (int i = 0; i < len; i++) uart_putc(buf[i]);
+int tty_write(char* buf, uint len) {
+    for (uint i = 0; i < len; i++) uart_putc(buf[i]);
 }
 
-int tty_read(char* buf, int len) {
+int tty_read(char* buf, uint len) {
     is_reading = 1;
-    for (int i = 0; i < len - 1; i++) {
+    for (uint i = 0; i < len - 1; i++) {
         for (c = -1; c == -1; uart_getc(&c));
         buf[i] = (char)c;
 

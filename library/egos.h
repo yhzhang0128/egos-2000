@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sys/types.h> /* Define uint and ushort */
+typedef unsigned long long ulonglong;
 
 struct earth {
     /* CPU interface */
@@ -9,18 +10,18 @@ struct earth {
     int (*intr_register)(void (*handler)(uint));
     int (*excp_register)(void (*handler)(uint));
 
-    int (*mmu_alloc)(int* frame_no, void** cached_addr);
+    int (*mmu_alloc)(uint* frame_no, void** cached_addr);
     int (*mmu_free)(int pid);
-    int (*mmu_map)(int pid, int page_no, int frame_no);
+    int (*mmu_map)(int pid, uint page_no, uint frame_no);
     int (*mmu_switch)(int pid);
 
     /* Devices interface */
-    int (*disk_read)(int block_no, int nblocks, char* dst);
-    int (*disk_write)(int block_no, int nblocks, char* src);
+    int (*disk_read)(uint block_no, uint nblocks, char* dst);
+    int (*disk_write)(uint block_no, uint nblocks, char* src);
 
     int (*tty_recv_intr)();
-    int (*tty_read)(char* buf, int len);
-    int (*tty_write)(char* buf, int len);
+    int (*tty_read)(char* buf, uint len);
+    int (*tty_write)(char* buf, uint len);
 
     int (*tty_printf)(const char *format, ...);
     int (*tty_info)(const char *format, ...);

@@ -10,7 +10,7 @@
 #include "sd.h"
 #include "disk.h"
 
-static void single_read(int offset, char* dst) {
+static void single_read(uint offset, char* dst) {
     /* Wait until SD card is not busy */
     while (recv_data_byte() != 0xFF);
     
@@ -23,12 +23,12 @@ static void single_read(int offset, char* dst) {
  
     /* Wait for the data packet and ignore the 2-byte checksum */
     while (recv_data_byte() != 0xFE);
-    for (int i = 0; i < BLOCK_SIZE; i++) dst[i] = recv_data_byte();
+    for (uint i = 0; i < BLOCK_SIZE; i++) dst[i] = recv_data_byte();
     recv_data_byte();
     recv_data_byte();
 }
 
-static void single_write(int offset, char* src) {
+static void single_write(uint offset, char* src) {
     /* Wait until SD card is not busy */
     while (recv_data_byte() != 0xFF);
 
@@ -40,7 +40,7 @@ static void single_write(int offset, char* src) {
 
     /* Send data packet: token + block + dummy 2-byte checksum */
     send_data_byte(0xFE);
-    for (int i = 0; i < BLOCK_SIZE; i++) send_data_byte(src[i]);
+    for (uint i = 0; i < BLOCK_SIZE; i++) send_data_byte(src[i]);
     send_data_byte(0xFF);
     send_data_byte(0xFF);
 
@@ -50,20 +50,20 @@ static void single_write(int offset, char* src) {
         FATAL("SD card write ack with status 0x%.2x", reply);
 }
 
-int sdread(int offset, int nblock, char* dst) {
+int sdread(uint offset, uint nblock, char* dst) {
     /* A better way to read multiple blocks using SD card
      * command 18 is left to students as a course project */
 
-    for (int i = 0; i < nblock; i++)
+    for (uint i = 0; i < nblock; i++)
         single_read(offset + i, dst + BLOCK_SIZE * i);
     return 0;
 }
 
-int sdwrite(int offset, int nblock, char* src) {
+int sdwrite(uint offset, uint nblock, char* src) {
     /* A better way to write multiple blocks using SD card
      * command 25 is left to students as a course project */
 
-    for (int i = 0; i < nblock; i++)
+    for (uint i = 0; i < nblock; i++)
         single_write(offset + i, src + BLOCK_SIZE * i);
     return 0;
 }
