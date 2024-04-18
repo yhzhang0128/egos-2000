@@ -9,8 +9,8 @@ char sd_exec_cmd(char*);
 char sd_exec_acmd(char*);
 
 void sdinit();
-int sdread(int offset, int nblock, char* dst);
-int sdwrite(int offset, int nblock, char* src);
+int sdread(uint offset, uint nblock, char* dst);
+int sdwrite(uint offset, uint nblock, char* src);
 
 /* definitions for controlling SPI1 in FE310
  * see chapter19 of the SiFive FE310-G002 Manual

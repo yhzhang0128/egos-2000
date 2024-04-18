@@ -26,7 +26,7 @@ extern char bss_start, bss_end, data_rom, data_start, data_end;
 
 static void earth_init() {
     /* Arty board does not support the supervisor mode or page tables */
-    int MISA_SMODE = (1 << 18), misa;
+    uint MISA_SMODE = (1 << 18), misa;
     asm("csrr %0, misa" : "=r"(misa));
     earth->platform = (misa & MISA_SMODE)? QEMU : ARTY;
 
@@ -57,9 +57,9 @@ int main() {
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);
 
-    int mstatus;
-    int M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
-    int GRASS_MODE = (earth->translation == SOFT_TLB)? M_MODE : S_MODE;
+    uint mstatus;
+    uint M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
+    uint GRASS_MODE = (earth->translation == SOFT_TLB)? M_MODE : S_MODE;
     asm("csrr %0, mstatus" : "=r"(mstatus));
     asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (GRASS_MODE << 11) | (1 << 18)));
 

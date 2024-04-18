@@ -15,20 +15,20 @@
 
 /* Interface of the paging device, see earth/dev_page.c */
 void  paging_init();
-int   paging_invalidate_cache(int frame_id);
-int   paging_write(int frame_id, int page_no);
-char* paging_read(int frame_id, int alloc_only);
+int   paging_invalidate_cache(uint frame_id);
+int   paging_write(uint frame_id, uint page_no);
+char* paging_read(uint frame_id, int alloc_only);
 
 /* Allocation and free of physical frames */
 #define NFRAMES 256
 struct frame_mapping {
     int use;     /* Is the frame allocated? */
     int pid;     /* Which process owns the frame? */
-    int page_no; /* Which virtual page is the frame mapped to? */
+    uint page_no; /* Which virtual page is the frame mapped to? */
 } table[NFRAMES];
 
-int mmu_alloc(int* frame_id, void** cached_addr) {
-    for (int i = 0; i < NFRAMES; i++)
+int mmu_alloc(uint* frame_id, void** cached_addr) {
+    for (uint i = 0; i < NFRAMES; i++)
         if (!table[i].use) {
             *frame_id = i;
             *cached_addr = paging_read(i, 1);
@@ -39,7 +39,7 @@ int mmu_alloc(int* frame_id, void** cached_addr) {
 }
 
 int mmu_free(int pid) {
-    for (int i = 0; i < NFRAMES; i++)
+    for (uint i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == pid) {
             paging_invalidate_cache(i);
             memset(&table[i], 0, sizeof(struct frame_mapping));
@@ -47,7 +47,7 @@ int mmu_free(int pid) {
 }
 
 /* Software TLB Translation */
-int soft_tlb_map(int pid, int page_no, int frame_id) {
+int soft_tlb_map(int pid, uint page_no, uint frame_id) {
     table[frame_id].pid = pid;
     table[frame_id].page_no = page_no;
 }
@@ -57,12 +57,12 @@ int soft_tlb_switch(int pid) {
     if (pid == curr_vm_pid) return 0;
 
     /* Unmap curr_vm_pid from the user address space */
-    for (int i = 0; i < NFRAMES; i++)
+    for (uint i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == curr_vm_pid)
             paging_write(i, table[i].page_no);
 
     /* Map pid to the user address space */
-    for (int i = 0; i < NFRAMES; i++)
+    for (uint i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == pid)
             memcpy((void*)(table[i].page_no << 12), paging_read(i, 0), PAGE_SIZE);
 
@@ -82,13 +82,13 @@ int soft_tlb_switch(int pid) {
 
 #define OS_RWX   0xF
 #define USER_RWX 0x1F
-static unsigned int frame_id, *root, *leaf;
+static uint frame_id, *root, *leaf;
 
 /* 32 is a number large enough for demo purpose */
-static unsigned int* pid_to_pagetable_base[32];
+static uint* pid_to_pagetable_base[32];
 
-void setup_identity_region(int pid, unsigned int addr, int npages, int flag) {
-    int vpn1 = addr >> 22;
+void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
+    uint vpn1 = addr >> 22;
 
     if (root[vpn1] & 0x1) {
         // Leaf has been allocated
@@ -98,12 +98,12 @@ void setup_identity_region(int pid, unsigned int addr, int npages, int flag) {
         earth->mmu_alloc(&frame_id, (void**)&leaf);
         table[frame_id].pid = pid;
         memset(leaf, 0, PAGE_SIZE);
-        root[vpn1] = ((unsigned int)leaf >> 2) | 0x1;
+        root[vpn1] = ((uint)leaf >> 2) | 0x1;
     }
 
     /* Setup the entries in the leaf page table */
-    int vpn0 = (addr >> 12) & 0x3FF;
-    for (int i = 0; i < npages; i++)
+    uint vpn0 = (addr >> 12) & 0x3FF;
+    for (uint i = 0; i < npages; i++)
         leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | flag;
 }
 
@@ -122,11 +122,11 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, 0x20800000, 1024, OS_RWX); /* disk image */
     setup_identity_region(pid, 0x80000000, 1024, OS_RWX); /* DTIM memory */
 
-    for (int i = 0; i < 8; i++)           /* ITIM memory is 32MB on QEMU */
+    for (uint i = 0; i < 8; i++)           /* ITIM memory is 32MB on QEMU */
         setup_identity_region(pid, 0x08000000 + i * 0x400000, 1024, OS_RWX);
 }
 
-int page_table_map(int pid, int page_no, int frame_id) {
+int page_table_map(int pid, uint page_no, uint frame_id) {
     if (pid >= 32) FATAL("page_table_map: pid too large");
 
     /* Student's code goes here (page table translation). */
@@ -198,7 +198,7 @@ void mmu_init() {
     if (earth->translation == PAGE_TABLE) {
         /* Setup an identity mapping using page tables */
         pagetable_identity_mapping(0);
-        asm("csrw satp, %0" ::"r"(((unsigned int)root >> 12) | (1 << 31)));
+        asm("csrw satp, %0" ::"r"(((uint)root >> 12) | (1 << 31)));
 
         earth->mmu_map = page_table_map;
         earth->mmu_switch = page_table_switch;

@@ -22,10 +22,10 @@ int excp_register(void (*_handler)(uint)) { excp_handler = _handler; }
 void trap_entry_vm(); /* This wrapper function is defined in earth.S */
 void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));
 void trap_entry() {
-    int mcause;
+    uint mcause;
     asm("csrr %0, mcause" : "=r"(mcause));
 
-    int id = mcause & 0x3FF;
+    uint id = mcause & 0x3FF;
     if (mcause & (1 << 31))
         (intr_handler)? intr_handler(id) : FATAL("trap_entry: interrupt handler not registered");
     else
@@ -46,7 +46,7 @@ void intr_init() {
     }
 
     /* Enable the machine-mode timer and software interrupts */
-    int mstatus, mie;
+    uint mstatus, mie;
     asm("csrr %0, mie" : "=r"(mie));
     asm("csrw mie, %0" ::"r"(mie | 0x88));
     asm("csrr %0, mstatus" : "=r"(mstatus));

@@ -12,25 +12,25 @@
 
 #include "egos.h"
 
-static unsigned long long mtime_get() {
-    unsigned int low, high;
+static ulonglong mtime_get() {
+    uint low, high;
     do {
         high = REGW(0x200BFF8, 4);
         low  = REGW(0x200BFF8, 0);
     }  while ( REGW(0x200BFF8, 4) != high );
 
-    return (((unsigned long long)high) << 32) | low;
+    return (((ulonglong)high) << 32) | low;
 }
 
-static int mtimecmp_set(unsigned long long time) {
+static int mtimecmp_set(ulonglong time) {
     REGW(0x2004000, 4) = 0xFFFFFFFF;
-    REGW(0x2004000, 0) = (unsigned int)time;
-    REGW(0x2004000, 4) = (unsigned int)(time >> 32);
+    REGW(0x2004000, 0) = (uint)time;
+    REGW(0x2004000, 4) = (uint)(time >> 32);
 
     return 0;
 }
 
-static unsigned int QUANTUM;
+static uint QUANTUM;
 int timer_reset() { return mtimecmp_set(mtime_get() + QUANTUM); }
 
 void timer_init()  {
