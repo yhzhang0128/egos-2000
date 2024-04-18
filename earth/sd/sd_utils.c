@@ -13,7 +13,7 @@ char send_data_byte(char byte) {
     while (REGW(SPI1_BASE, SPI1_TXDATA) & (1 << 31));
     REGB(SPI1_BASE, SPI1_TXDATA) = byte;
 
-    u_long rxdata;
+    uint rxdata;
     while ((rxdata = REGW(SPI1_BASE, SPI1_RXDATA)) & (1 << 31));
     return (char)(rxdata & 0xFF);
 }

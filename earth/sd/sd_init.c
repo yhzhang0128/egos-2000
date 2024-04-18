@@ -41,7 +41,7 @@ static int sd_check_type() {
         SD_CARD_TYPE = SD_TYPE_SD1;
     } else {
         /* Only need last byte of r7 response */
-        u_long payload;
+        uint payload;
         for (uint i = 0; i < 4; i++)
             ((char*)&payload)[3 - i] = recv_data_byte();
         INFO("SD card replies cmd8 with status 0x%.2x and payload 0x%.8x", reply, payload);
@@ -59,7 +59,7 @@ static void sd_reset() {
     INFO("Set CS and MOSI to 1 and toggle clock.");
     REGW(SPI1_BASE, SPI1_CSMODE) = 2;
 
-    u_long i, rxdata;
+    uint i, rxdata;
     for (i = 0; i < 1000; i++) send_data_byte(0xFF);
 
     /* Keep chip select line low */
