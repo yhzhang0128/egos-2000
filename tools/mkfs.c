@@ -68,10 +68,10 @@ int main() {
     write(1, exec, PAGING_DEV_SIZE);
 
     /* Grass kernel processes */
-    int exec_size = GRASS_EXEC_SIZE / GRASS_NEXEC;
+    uint exec_size = GRASS_EXEC_SIZE / GRASS_NEXEC;
     fprintf(stderr, "[INFO] Loading %d kernel binary files\n", NKERNEL_PROC);
 
-    for (int i = 0; i < NKERNEL_PROC; i++) {
+    for (uint i = 0; i < NKERNEL_PROC; i++) {
         struct stat st;
         stat(kernel_processes[i], &st);
         assert((st.st_size > 0) && (st.st_size <= exec_size));
@@ -79,7 +79,7 @@ int main() {
 
         freopen(kernel_processes[i], "r", stdin);
         memset(exec, 0, GRASS_EXEC_SIZE);
-        for (int nread = 0; nread < st.st_size; )
+        for (uint nread = 0; nread < st.st_size; )
             nread += read(0, exec + nread, exec_size - nread);
 
         write(1, exec, st.st_size);
@@ -106,7 +106,7 @@ void mkfs() {
     inode_intf treedisk = treedisk_init(ramdisk, 0);
 
     char buf[GRASS_EXEC_SIZE / GRASS_NEXEC];
-    for (int ino = 0; ino < NINODE; ino++) {
+    for (uint ino = 0; ino < NINODE; ino++) {
         if (contents[ino][0] != '#') {
             fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
             strncpy(buf, contents[ino], BLOCK_SIZE);
@@ -117,11 +117,11 @@ void mkfs() {
             stat(file_name, &st);
             
             freopen(file_name, "r", stdin);
-            for (int nread = 0; nread < st.st_size; )
+            for (uint nread = 0; nread < st.st_size; )
                 nread += read(0, buf + nread, st.st_size - nread);
             
             fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, (int)st.st_size);
-            for (int b = 0; b * BLOCK_SIZE < st.st_size; b++)
+            for (uint b = 0; b * BLOCK_SIZE < st.st_size; b++)
                 treedisk->write(treedisk, ino, b, (void*)(buf + b * BLOCK_SIZE));
         }
     }
@@ -132,12 +132,12 @@ int getsize() { return FS_DISK_SIZE / BLOCK_SIZE; }
 
 int setsize() { assert(0); }
 
-int ramread(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
+int ramread(inode_intf bs, uint ino, block_no offset, block_t *block) {
     memcpy(block, fs + offset * BLOCK_SIZE, BLOCK_SIZE);
     return 0;
 }
 
-int ramwrite(inode_intf bs, unsigned int ino, block_no offset, block_t *block) {
+int ramwrite(inode_intf bs, uint ino, block_no offset, block_t *block) {
     memcpy(fs + offset * BLOCK_SIZE, block, BLOCK_SIZE);
     return 0;
 }
