@@ -13,7 +13,7 @@
 #include <string.h>
 
 static void proc_set_status(int pid, enum proc_status status) {
-    for (int i = 0; i < MAX_NPROCESS; i++)
+    for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == pid) proc_set[i].status = status;
 }
 
