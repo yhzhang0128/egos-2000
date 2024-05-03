@@ -37,5 +37,4 @@ void proc_set_running (int);
 void proc_set_runnable (int);
 
 void ctx_entry(void);
-void ctx_start(void** old_sp, void* new_sp);
-void ctx_switch(void** old_sp, void* new_sp);
+void ctx_exit(void);

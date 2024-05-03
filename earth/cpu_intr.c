@@ -19,8 +19,9 @@ static void (*excp_handler)(uint);
 int intr_register(void (*_handler)(uint)) { intr_handler = _handler; }
 int excp_register(void (*_handler)(uint)) { excp_handler = _handler; }
 
-void trap_entry_vm(); /* This wrapper function is defined in earth.S */
-void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));
+/* Both wrapper functions defined in earth.S */
+void trap_entry_vm();
+void trap_entry_start(); 
 void trap_entry() {
     uint mcause;
     asm("csrr %0, mcause" : "=r"(mcause));
@@ -41,7 +42,7 @@ void intr_init() {
         asm("csrw mtvec, %0" ::"r"(trap_entry_vm));
         INFO("Use direct mode and put the address of trap_entry_vm() to mtvec");
     } else {
-        asm("csrw mtvec, %0" ::"r"(trap_entry));
+        asm("csrw mtvec, %0" ::"r"(trap_entry_start));
         INFO("Use direct mode and put the address of trap_entry() to mtvec");
     }
 

@@ -44,14 +44,14 @@ void intr_entry(uint id) {
     if (id == INTR_ID_TIMER && curr_pid < GPID_SHELL) {
         /* Do not interrupt kernel processes since IO can be stateful */
         earth->timer_reset();
-        return;
+        ctx_exit();
     }
 
     if (earth->tty_recv_intr() && curr_pid >= GPID_USER_START) {
         /* User process killed by ctrl+c interrupt */
         INFO("process %d killed by interrupt", curr_pid);
         asm("csrw mepc, %0" ::"r"(0x800500C));
-        return;
+        ctx_exit();
     }
 
     if (id == INTR_ID_SOFT)
@@ -61,23 +61,25 @@ void intr_entry(uint id) {
     else
         FATAL("intr_entry: got unknown interrupt %d", id);
 
-    /* Switch to the kernel stack */
-    ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
+    ctx_entry();
 }
 
 void ctx_entry() {
-    /* Now on the kernel stack */
-    uint mepc, tmp;
+    uint mepc, sp;
     asm("csrr %0, mepc" : "=r"(mepc));
+    asm("csrr %0, mscratch" : "=r"(sp)); // User SP held in mscratch
     proc_set[proc_curr_idx].mepc = (void*) mepc;
+    proc_set[proc_curr_idx].sp = (void*) sp;
 
     /* kernel_entry() is either proc_yield() or proc_syscall() */
     kernel_entry();
 
     /* Switch back to the user application stack */
+    sp = (uint)proc_set[proc_curr_idx].sp;
     mepc = (uint)proc_set[proc_curr_idx].mepc;
+    asm("csrw mscratch, %0" ::"r"(sp));
     asm("csrw mepc, %0" ::"r"(mepc));
-    ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
+    ctx_exit();
 }
 
 static void proc_yield() {

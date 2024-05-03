@@ -1,6 +1,6 @@
 # BOARD can be a7_35t, a7_100t or s7_50
 BOARD = a7_35t
-QEMU = qemu-system-riscv32
+QEMU = ../../riscv-qemu-5.2.0-2020.12.0-preview1-x86_64-apple-darwin/bin/qemu-system-riscv32
 
 ifeq ($(TOOLCHAIN), GNU)
 # The official GNU toolchain binaries
