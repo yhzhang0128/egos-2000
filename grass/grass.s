@@ -4,7 +4,7 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: _enter of grass, ctx_exit
+ * Description: _enter of grass
  */
     .section .text
     .global grass_entry
