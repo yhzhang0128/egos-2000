@@ -13,19 +13,23 @@ enum proc_status {
     PROC_WAIT_TO_RECV
 };
 
+#define SAVED_REGISTER_NUM  29
+#define SAVED_REGISTER_SIZE SAVED_REGISTER_NUM * sizeof(uint)
+#define SAVED_REGISTER_ADDR (void*)(GRASS_STACK_TOP - SAVED_REGISTER_SIZE)
+
 struct process{
     int pid;
     enum proc_status status;
+    uint mepc, saved_register[SAVED_REGISTER_NUM];
     int receiver_pid; /* used when waiting to send a message */
-    void *sp, *mepc;  /* process context = stack pointer (sp)
-                       * + machine exception program counter (mepc) */
 };
 
-#define MAX_NPROCESS  16
+#define MAX_NPROCESS  8
 extern uint proc_curr_idx;
 extern struct process proc_set[MAX_NPROCESS];
 #define curr_pid      proc_set[proc_curr_idx].pid
 #define curr_status   proc_set[proc_curr_idx].status
+
 
 void intr_entry(uint);
 void excp_entry(uint);
@@ -35,6 +39,3 @@ void proc_free(int);
 void proc_set_ready (int);
 void proc_set_running (int);
 void proc_set_runnable (int);
-
-void ctx_entry(void);
-void ctx_exit(void);
