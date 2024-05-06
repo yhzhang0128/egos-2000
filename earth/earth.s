@@ -9,7 +9,16 @@
  */
     .section .image.placeholder
     .section .text.enter
-    .global earth_entry, trap_entry_start, trap_entry_vm
+    .global earth_entry, trap_from_M_mode, trap_from_S_mode
+
+earth_entry:
+    /* Disable machine interrupt */
+    li t0, 0x8
+    csrc mstatus, t0
+
+    /* Call main() of earth.c */
+    li sp, 0x80003f80
+    call main
 
 .macro TRAP_START
     /* Write User SP into MScratch */
@@ -58,20 +67,7 @@
     csrw mscratch, t0
 .endm
 
-earth_entry:
-    /* Disable machine interrupt */
-    li t0, 0x8
-    csrc mstatus, t0
-
-    /* Call main() of earth.c */
-    li sp, 0x80003f80
-    call main
-
-trap_entry_start:
-    TRAP_START
-    j trap_entry
-
-trap_entry_vm:
+trap_from_S_mode:
     csrw mscratch, t0
 
     /* Set mstatus.MPRV to enable page table translation in M mode */
@@ -81,5 +77,7 @@ trap_entry_vm:
 
     /* Jump to trap_entry_start() without modifying any registers */
     csrr t0, mscratch
+
+trap_from_M_mode:
     TRAP_START
     j trap_entry
