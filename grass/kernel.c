@@ -16,6 +16,18 @@
 #include "syscall.h"
 #include <string.h>
 
+void kernel_entry(uint is_interrupt, uint id) {
+    /* Save process context */
+    asm("csrr %0, mepc" : "=r"(proc_set[proc_curr_idx].mepc));
+    memcpy(proc_set[proc_curr_idx].saved_register, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
+
+    (is_interrupt)? intr_entry(id) : excp_entry(id);
+
+    /* Restore process context */
+    asm("csrw mepc, %0" ::"r"(proc_set[proc_curr_idx].mepc));
+    memcpy(SAVED_REGISTER_ADDR, proc_set[proc_curr_idx].saved_register, SAVED_REGISTER_SIZE);
+}
+
 #define EXCP_ID_ECALL_U    8
 #define EXCP_ID_ECALL_M    11
 
@@ -35,7 +47,6 @@ void excp_entry(uint id) {
 
 static void proc_yield();
 static void proc_syscall();
-static void (*kernel_entry)();
 
 uint proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
@@ -54,18 +65,9 @@ void intr_entry(uint id) {
         return;
     }
 
-
-    /* Save process context */
-    asm("csrr %0, mepc" : "=r"(proc_set[proc_curr_idx].mepc));
-    memcpy(proc_set[proc_curr_idx].saved_register, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
-
     /* Ignore other interrupts for now */
     if (id == INTR_ID_SOFT) proc_syscall();
     if (id == INTR_ID_TIMER) proc_yield();
-
-    /* Restore process context */
-    asm("csrw mepc, %0" ::"r"(proc_set[proc_curr_idx].mepc));
-    memcpy(SAVED_REGISTER_ADDR, proc_set[proc_curr_idx].saved_register, SAVED_REGISTER_SIZE);
 }
 
 static void proc_yield() {

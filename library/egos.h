@@ -6,9 +6,7 @@ typedef unsigned long long ulonglong;
 struct earth {
     /* CPU interface */
     int (*timer_reset)();
-
-    int (*intr_register)(void (*handler)(uint));
-    int (*excp_register)(void (*handler)(uint));
+    int (*kernel_entry_init)(void (*entry)(uint, uint));
 
     int (*mmu_alloc)(uint* frame_no, void** cached_addr);
     int (*mmu_free)(int pid);
