@@ -32,9 +32,8 @@ int main() {
     grass->sys_send = sys_send;
     grass->sys_recv = sys_recv;
 
-    /* Register interrupt and exception handlers */
-    earth->intr_register(intr_entry);
-    earth->excp_register(excp_entry);
+    /* Register the kernel entry */
+    earth->kernel_entry_init(kernel_entry);
     
     /* Load the first kernel process GPID_PROCESS */
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);

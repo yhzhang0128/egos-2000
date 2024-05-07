@@ -12,36 +12,30 @@
 /* These are two static variables storing
  * the addresses of the handler functions;
  * Initially, both variables are NULL */
-static void (*intr_handler)(uint);
-static void (*excp_handler)(uint);
+static void (*kernel_entry)(uint, uint);
+int kernel_entry_init(void (*new_entry)(uint, uint)) {
+    kernel_entry = new_entry;
+}
 
-/* Register handler functions by modifying the static variables */
-int intr_register(void (*_handler)(uint)) { intr_handler = _handler; }
-int excp_register(void (*_handler)(uint)) { excp_handler = _handler; }
+/* Both trap functions are defined in earth.S */
+void trap_from_M_mode();
+void trap_from_S_mode();
 
-void trap_entry_vm(); /* This wrapper function is defined in earth.S */
-void trap_entry()  __attribute__((interrupt ("machine"), aligned(128)));
 void trap_entry() {
     uint mcause;
     asm("csrr %0, mcause" : "=r"(mcause));
-
-    uint id = mcause & 0x3FF;
-    if (mcause & (1 << 31))
-        (intr_handler)? intr_handler(id) : FATAL("trap_entry: interrupt handler not registered");
-    else
-        (excp_handler)? excp_handler(id) : FATAL("trap_entry: exception handler not registered");
+    kernel_entry(mcause & (1 << 31), mcause & 0x3FF);
 }
 
 void intr_init() {
-    earth->intr_register = intr_register;
-    earth->excp_register = excp_register;
+    earth->kernel_entry_init = kernel_entry_init;
 
     /* Setup the interrupt/exception entry function */
     if (earth->translation == PAGE_TABLE) {
-        asm("csrw mtvec, %0" ::"r"(trap_entry_vm));
+        asm("csrw mtvec, %0" ::"r"(trap_from_S_mode));
         INFO("Use direct mode and put the address of trap_entry_vm() to mtvec");
     } else {
-        asm("csrw mtvec, %0" ::"r"(trap_entry));
+        asm("csrw mtvec, %0" ::"r"(trap_from_M_mode));
         INFO("Use direct mode and put the address of trap_entry() to mtvec");
     }
 

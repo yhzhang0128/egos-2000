@@ -16,6 +16,18 @@
 #include "syscall.h"
 #include <string.h>
 
+void kernel_entry(uint is_interrupt, uint id) {
+    /* Save process context */
+    asm("csrr %0, mepc" : "=r"(proc_set[proc_curr_idx].mepc));
+    memcpy(proc_set[proc_curr_idx].saved_register, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
+
+    (is_interrupt)? intr_entry(id) : excp_entry(id);
+
+    /* Restore process context */
+    asm("csrw mepc, %0" ::"r"(proc_set[proc_curr_idx].mepc));
+    memcpy(SAVED_REGISTER_ADDR, proc_set[proc_curr_idx].saved_register, SAVED_REGISTER_SIZE);
+}
+
 #define EXCP_ID_ECALL_U    8
 #define EXCP_ID_ECALL_M    11
 
@@ -35,7 +47,6 @@ void excp_entry(uint id) {
 
 static void proc_yield();
 static void proc_syscall();
-static void (*kernel_entry)();
 
 uint proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
@@ -54,30 +65,9 @@ void intr_entry(uint id) {
         return;
     }
 
-    if (id == INTR_ID_SOFT)
-        kernel_entry = proc_syscall;
-    else if (id == INTR_ID_TIMER)
-        kernel_entry = proc_yield;
-    else
-        FATAL("intr_entry: got unknown interrupt %d", id);
-
-    /* Switch to the kernel stack */
-    ctx_start(&proc_set[proc_curr_idx].sp, (void*)GRASS_STACK_TOP);
-}
-
-void ctx_entry() {
-    /* Now on the kernel stack */
-    uint mepc, tmp;
-    asm("csrr %0, mepc" : "=r"(mepc));
-    proc_set[proc_curr_idx].mepc = (void*) mepc;
-
-    /* kernel_entry() is either proc_yield() or proc_syscall() */
-    kernel_entry();
-
-    /* Switch back to the user application stack */
-    mepc = (uint)proc_set[proc_curr_idx].mepc;
-    asm("csrw mepc, %0" ::"r"(mepc));
-    ctx_switch((void**)&tmp, proc_set[proc_curr_idx].sp);
+    /* Ignore other interrupts for now */
+    if (id == INTR_ID_SOFT) proc_syscall();
+    if (id == INTR_ID_TIMER) proc_yield();
 }
 
 static void proc_yield() {
@@ -109,13 +99,10 @@ static void proc_yield() {
 
     /* Call the entry point for newly created process */
     if (curr_status == PROC_READY) {
-        proc_set_running(curr_pid);
-        /* Prepare argc and argv */
-        asm("mv a0, %0" ::"r"(APPS_ARG));
-        asm("mv a1, %0" ::"r"(APPS_ARG + 4));
-        /* Enter application code entry using mret */
-        asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
-        asm("mret");
+        /* Set argc, argv and initial program counter */
+        proc_set[proc_curr_idx].saved_register[8] = APPS_ARG;
+        proc_set[proc_curr_idx].saved_register[9] = APPS_ARG + 4;
+        proc_set[proc_curr_idx].mepc = APPS_ENTRY;
     }
 
     proc_set_running(curr_pid);
