@@ -78,6 +78,11 @@ extern struct grass *grass;
 #define CRITICAL           earth->tty_critical
 #endif
 
+/* Platform specific configuration */
+#define UART0_BASE         (earth->platform == QEMU_LATEST? 0x10010000UL : 0x10013000UL)
+#define MTIMECMP           (earth->platform == ARTY? 0x2004000UL : 0x2004008UL)
+#define MSIP               (earth->platform == ARTY? 0x2000000UL : 0x2000004UL)
+
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
 #define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
