@@ -84,11 +84,12 @@ int tty_critical(const char *format, ...)
 }
 
 void tty_init() {
-    /* 115200 is the UART baud rate */
-    uart_init(115200);
-
-    /* Wait for the tty device to be ready */
-    for (int c = 0; c != -1; uart_getc(&c));
+    if (earth->platform == ARTY) {
+        /* 115200 is the UART baud rate */
+        uart_init(115200);
+        /* Wait for the tty device to be ready */
+        for (int c = 0; c != -1; uart_getc(&c));
+    }
 
     earth->tty_read = tty_read;
     earth->tty_write = tty_write;
