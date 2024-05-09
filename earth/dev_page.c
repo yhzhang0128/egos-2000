@@ -38,7 +38,7 @@ int paging_invalidate_cache(uint frame_id) {
 
 int paging_write(uint frame_id, uint page_no) {
     char* src = (void*)(page_no << 12);
-    if (earth->platform == QEMU) {
+    if (earth->platform != ARTY) {
         memcpy(pages_start + frame_id * PAGE_SIZE, src, PAGE_SIZE);
         return 0;
     }
@@ -55,7 +55,7 @@ int paging_write(uint frame_id, uint page_no) {
 }
 
 char* paging_read(uint frame_id, int alloc_only) {
-    if (earth->platform == QEMU) return pages_start + frame_id * PAGE_SIZE;
+    if (earth->platform != ARTY) return pages_start + frame_id * PAGE_SIZE;
 
     int free_idx = -1;
     for (uint i = 0; i < ARTY_CACHED_NFRAMES; i++) {

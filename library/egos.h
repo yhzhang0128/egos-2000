@@ -28,8 +28,8 @@ struct earth {
     int (*tty_critical)(const char *format, ...);
 
     /* Some information about earth layer configuration */
-    enum { QEMU, ARTY } platform;
     enum { PAGE_TABLE, SOFT_TLB } translation;
+    enum { ARTY, QEMU_5_2, QEMU_LATEST } platform;
 };
 
 struct grass {

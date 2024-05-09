@@ -41,7 +41,7 @@ void disk_init() {
     earth->disk_read = disk_read;
     earth->disk_write = disk_write;
 
-    if (earth->platform == QEMU) {
+    if (earth->platform != ARTY) {
         type = FLASH_ROM;
         return;
     }
