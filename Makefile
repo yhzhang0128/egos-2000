@@ -66,7 +66,7 @@ qemu: install
 	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
 	cp $(RELEASE)/earth.elf tools/qemu/qemu.elf
 	$(OBJCOPY) --update-section .image=tools/disk.img tools/qemu/qemu.elf
-	$(QEMU) -readconfig tools/qemu/sifive.cfg -bios tools/qemu/bios.bin -kernel tools/qemu/qemu.elf -nographic
+	$(QEMU) -readconfig tools/qemu/sifive.cfg -bios tools/qemu/bios.bin -kernel tools/qemu/qemu.elf -nographic -smp cpus=2
 
 program: install
 	@echo "$(YELLOW)-------- Program the Arty $(BOARD) on-board ROM --------$(END)"

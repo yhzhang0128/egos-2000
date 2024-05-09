@@ -23,9 +23,9 @@ static ulonglong mtime_get() {
 }
 
 static int mtimecmp_set(ulonglong time) {
-    REGW(0x2004000, 4) = 0xFFFFFFFF;
-    REGW(0x2004000, 0) = (uint)time;
-    REGW(0x2004000, 4) = (uint)(time >> 32);
+    REGW(0x2004008, 4) = 0xFFFFFFFF;
+    REGW(0x2004008, 0) = (uint)time;
+    REGW(0x2004008, 4) = (uint)(time >> 32);
 
     return 0;
 }

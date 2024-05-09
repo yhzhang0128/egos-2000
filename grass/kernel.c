@@ -170,7 +170,7 @@ static void proc_syscall() {
     enum syscall_type type = sc->type;
     sc->retval = 0;
     sc->type = SYS_UNUSED;
-    *((int*)0x2000000) = 0;
+    *((int*)0x2000004) = 0;
 
     switch (type) {
     case SYS_RECV:

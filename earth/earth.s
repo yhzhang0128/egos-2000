@@ -15,6 +15,8 @@ earth_entry:
     /* Disable interrupt and call main() of earth.c */
     li t0, 0x8
     csrc mstatus, t0
+    csrr a0, mhartid
+    beq a0, zero, earth_entry /* For now, disable core #0 */
     li sp, 0x80003f80
     call main
 
