@@ -25,8 +25,8 @@ struct earth *earth = (void*)GRASS_STACK_TOP;
 extern char bss_start, bss_end, data_rom, data_start, data_end;
 
 static void earth_init() {
-    uint BIOS_MAGIC = *((uint*)0x8000001c);
     earth->platform = ARTY;
+    uint BIOS_MAGIC = *((uint*)0x8000002c);
     if (BIOS_MAGIC == 52) earth->platform = QEMU_5_2;
     if (BIOS_MAGIC == 90) earth->platform = QEMU_LATEST;
 
