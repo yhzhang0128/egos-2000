@@ -29,7 +29,7 @@ struct earth {
 
     /* Some information about earth layer configuration */
     enum { PAGE_TABLE, SOFT_TLB } translation;
-    enum { ARTY, QEMU_5_2, QEMU_LATEST } platform;
+    enum { ARTY, QEMU_V5, QEMU_LATEST } platform;
 };
 
 struct grass {
@@ -79,9 +79,9 @@ extern struct grass *grass;
 #endif
 
 /* Platform specific configuration */
-#define UART0_BASE         (earth->platform == QEMU_LATEST? 0x10010000UL : 0x10013000UL)
-#define MTIMECMP           (earth->platform == ARTY? 0x2004000UL : 0x2004008UL)
 #define MSIP               (earth->platform == ARTY? 0x2000000UL : 0x2000004UL)
+#define MTIMECMP           (earth->platform == ARTY? 0x2004000UL : 0x2004008UL)
+#define UART0_BASE         (earth->platform == QEMU_LATEST? 0x10010000UL : 0x10013000UL)
 
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
