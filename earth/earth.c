@@ -27,7 +27,7 @@ extern char bss_start, bss_end, data_rom, data_start, data_end;
 static void earth_init() {
     earth->platform = ARTY;
     uint BIOS_MAGIC = *((uint*)0x8000002c);
-    if (BIOS_MAGIC == 52) earth->platform = QEMU_V5;
+    if (BIOS_MAGIC == 52) earth->platform = QEMU_SIFIVE;
     if (BIOS_MAGIC == 90) earth->platform = QEMU_LATEST;
 
     tty_init();

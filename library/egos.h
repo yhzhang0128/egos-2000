@@ -29,7 +29,7 @@ struct earth {
 
     /* Some information about earth layer configuration */
     enum { PAGE_TABLE, SOFT_TLB } translation;
-    enum { ARTY, QEMU_V5, QEMU_LATEST } platform;
+    enum { ARTY, QEMU_SIFIVE, QEMU_LATEST } platform;
 };
 
 struct grass {
