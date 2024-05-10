@@ -23,9 +23,12 @@ static ulonglong mtime_get() {
 }
 
 static int mtimecmp_set(ulonglong time) {
-    REGW(MTIMECMP, 4) = 0xFFFFFFFF;
-    REGW(MTIMECMP, 0) = (uint)time;
-    REGW(MTIMECMP, 4) = (uint)(time >> 32);
+    uint mhartid;
+    asm("csrr %0, mhartid" : "=r"(mhartid));
+
+    REGW(0x2004000, mhartid * 8 + 4) = 0xFFFFFFFF;
+    REGW(0x2004000, mhartid * 8 + 0) = (uint)time;
+    REGW(0x2004000, mhartid * 8 + 4) = (uint)(time >> 32);
 
     return 0;
 }

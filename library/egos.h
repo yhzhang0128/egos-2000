@@ -80,7 +80,6 @@ extern struct grass *grass;
 
 /* Platform specific configuration */
 #define MSIP               (earth->platform == ARTY? 0x2000000UL : 0x2000004UL)
-#define MTIMECMP           (earth->platform == ARTY? 0x2004000UL : 0x2004008UL)
 #define UART0_BASE         (earth->platform == QEMU_LATEST? 0x10010000UL : 0x10013000UL)
 
 /* Memory-mapped I/O register access macros */
