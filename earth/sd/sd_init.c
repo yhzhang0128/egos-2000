@@ -23,7 +23,7 @@ static void sd_check_capacity() {
     while (recv_data_byte() != 0xFF);
 
     char reply, payload[4], cmd58[] = {0x7A, 0x00, 0x00, 0x00, 0x00, 0xFF};
-    if (sd_exec_cmd(cmd58)) FATAL("SD card cmd58 fails");
+    if (sd_exec_cmd(cmd58) && earth->platform == ARTY) FATAL("SD card cmd58 fails");
     for (uint i = 0; i < 4; i++) payload[3 - i] = recv_data_byte();
 
     if ((payload[3] & 0xC0) == 0xC0) SD_CARD_TYPE = SD_TYPE_SDHC;
@@ -69,12 +69,12 @@ static void sd_reset() {
     INFO("Set CS to 0 and send cmd0 to SD card.");
     char cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
     char reply = sd_exec_cmd(cmd0);
-
+    
     INFO("Wait for SD card's reply to cmd0");
     if (earth->platform != ARTY)
         INFO("If stuck here, please download the latest QEMU for egos-2000");
 
-    while (reply != 0x01) reply = recv_data_byte();
+    while (reply != 0x01 && reply != 0x04) reply = recv_data_byte();
     while (recv_data_byte() != 0xFF);
 }
 
@@ -107,8 +107,10 @@ static void spi_set_clock(long baud_rate) {
 
 void sdinit() {
     spi_set_clock(100000);
-    spi_config();
 
+    if (earth->platform != ARTY) REGW(SPI1_BASE, SPI1_CSMODE) = 1;
+
+    spi_config();
     sd_reset();
     INFO("Set SPI clock frequency to %ldHz", CPU_CLOCK_RATE / 4);
     spi_set_clock(CPU_CLOCK_RATE / 4);
@@ -126,5 +128,5 @@ void sdinit() {
     while (recv_data_byte() != 0xFF);
 
     if (SD_CARD_TYPE == SD_TYPE_SD2) sd_check_capacity();
-    if (SD_CARD_TYPE != SD_TYPE_SDHC) FATAL("Only SDHC/SDXC supported");
+    if (SD_CARD_TYPE != SD_TYPE_SDHC && earth->platform == ARTY) FATAL("Only SDHC/SDXC supported");
 }

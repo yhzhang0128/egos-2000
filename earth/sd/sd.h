@@ -16,7 +16,7 @@ int sdwrite(uint offset, uint nblock, char* src);
  * see chapter19 of the SiFive FE310-G002 Manual
  */
 
-#define SPI1_BASE     0x10024000UL
+#define SPI1_BASE     0x10050000UL//0x10024000UL
 
 #define SPI1_SCKDIV   0UL
 #define SPI1_SCKMODE  4UL
