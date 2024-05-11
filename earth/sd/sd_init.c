@@ -64,7 +64,7 @@ static void sd_reset() {
     char cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
     char reply = sd_exec_cmd(cmd0);
 
-    while (reply != 0x01 && reply != 0x04) reply = recv_data_byte();
+    while (reply != 0x01) reply = recv_data_byte();
     while (recv_data_byte() != 0xFF);
 }
 
@@ -100,6 +100,7 @@ static void spi_set_clock(long baud_rate) {
 void sdinit() {
     spi_set_clock(100000);
     spi_config();
+
     sd_reset();
     INFO("Set SPI clock frequency to %ldHz", CPU_CLOCK_RATE / 4);
     spi_set_clock(CPU_CLOCK_RATE / 4);
