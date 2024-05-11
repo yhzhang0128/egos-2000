@@ -11,6 +11,8 @@
 #include "disk.h"
 
 static void single_read(uint offset, char* dst) {
+    if (SD_CARD_TYPE == SD_TYPE_SD2) offset = offset * BLOCK_SIZE;
+
     /* Wait until SD card is not busy */
     while (recv_data_byte() != 0xFF);
     
@@ -20,7 +22,7 @@ static void single_read(uint offset, char* dst) {
 
     if (reply = sd_exec_cmd(cmd17))
         FATAL("SD card replies cmd17 with status 0x%.2x", reply);
- 
+
     /* Wait for the data packet and ignore the 2-byte checksum */
     while (recv_data_byte() != 0xFE);
     for (uint i = 0; i < BLOCK_SIZE; i++) dst[i] = recv_data_byte();
@@ -29,6 +31,8 @@ static void single_read(uint offset, char* dst) {
 }
 
 static void single_write(uint offset, char* src) {
+    if (SD_CARD_TYPE == SD_TYPE_SD2) offset = offset * BLOCK_SIZE;
+
     /* Wait until SD card is not busy */
     while (recv_data_byte() != 0xFF);
 
