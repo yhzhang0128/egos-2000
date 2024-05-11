@@ -64,16 +64,16 @@ install: egos
 
 qemu: install
 	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
-	cp $(RELEASE)/earth.elf tools/qemu/qemu.elf
-	$(OBJCOPY) --update-section .image=tools/disk.img tools/qemu/qemu.elf
-	$(QEMU) -nographic -machine sifive_u -smp cpus=2 -kernel tools/qemu/qemu.elf -bios tools/qemu/bios`$(QEMU) --version | grep -c SiFive`.bin -drive file=tools/disk.img,format=raw,if=sd
+	cp $(RELEASE)/earth.elf tools/qemu/egos.elf
+	$(OBJCOPY) --update-section .image=tools/disk.img tools/qemu/egos.elf
+	$(QEMU) -nographic -readconfig tools/qemu/`$(QEMU) --version | grep -c SiFive`.cfg -smp cpus=2
 
 program: install
 	@echo "$(YELLOW)-------- Program the Arty $(BOARD) on-board ROM --------$(END)"
 	cd tools/fpga/openocd; time openocd -f 7series_$(BOARD).txt
 
 clean:
-	rm -rf build tools/mkfs tools/mkrom tools/qemu/qemu.elf tools/disk.img tools/bootROM.bin
+	rm -rf build tools/mkfs tools/mkrom tools/qemu/egos.elf tools/disk.img tools/bootROM.bin
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

@@ -41,6 +41,12 @@ void disk_init() {
     earth->disk_read = disk_read;
     earth->disk_write = disk_write;
 
+    if (earth->platform == QEMU_SIFIVE) {
+        /* SiFive QEMU v5 does not support SD card emulation */
+        type = FLASH_ROM;
+        return;
+    }
+
     CRITICAL("Choose a disk:");
     printf("Enter 0: microSD card\r\nEnter 1: on-board ROM\r\n");
 

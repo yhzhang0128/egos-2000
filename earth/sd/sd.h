@@ -24,8 +24,6 @@ int sdwrite(uint offset, uint nblock, char* src);
  * see chapter19 of the SiFive FE310-G002 Manual
  */
 
-#define SPI_BASE     (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
-
 #define SPI_SCKDIV   0UL
 #define SPI_SCKMODE  4UL
 #define SPI_CSID     16UL
