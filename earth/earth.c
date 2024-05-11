@@ -25,13 +25,13 @@ struct earth *earth = (void*)GRASS_STACK_TOP;
 extern char bss_start, bss_end, data_rom, data_start, data_end;
 
 static void earth_init() {
-    /* Arty board does not support the supervisor mode or page tables */
-    uint MISA_SMODE = (1 << 18), misa;
-    asm("csrr %0, misa" : "=r"(misa));
-    earth->platform = (misa & MISA_SMODE)? QEMU : ARTY;
+    earth->platform = ARTY;
+    uint BIOS_MAGIC = *((uint*)0x8000002c);
+    if (BIOS_MAGIC == 52) earth->platform = QEMU_SIFIVE;
+    if (BIOS_MAGIC == 90) earth->platform = QEMU_LATEST;
 
     tty_init();
-    CRITICAL("--- Booting on %s ---", earth->platform == QEMU? "QEMU" : "Arty");
+    CRITICAL("--- Booting on %s ---", earth->platform == ARTY? "Arty" : "QEMU");
 
     disk_init();
     SUCCESS("Finished initializing the tty and disk devices");

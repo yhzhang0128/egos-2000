@@ -11,7 +11,6 @@
 #include "egos.h"
 #include "bus_gpio.c"
 
-#define UART0_BASE    0x10013000UL
 #define UART0_TXDATA  0UL
 #define UART0_RXDATA  4UL
 #define UART0_TXCTRL  8UL

@@ -71,7 +71,7 @@ static void sd_reset() {
     char reply = sd_exec_cmd(cmd0);
 
     INFO("Wait for SD card's reply to cmd0");
-    if (earth->platform == QEMU)
+    if (earth->platform != ARTY)
         INFO("If stuck here, please download the latest QEMU for egos-2000");
 
     while (reply != 0x01) reply = recv_data_byte();

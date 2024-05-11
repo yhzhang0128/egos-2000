@@ -33,10 +33,10 @@ void intr_init() {
     /* Setup the interrupt/exception entry function */
     if (earth->translation == PAGE_TABLE) {
         asm("csrw mtvec, %0" ::"r"(trap_from_S_mode));
-        INFO("Use direct mode and put the address of trap_entry_vm() to mtvec");
+        INFO("Use direct mode and put the address of trap_entry_S_mode() to mtvec");
     } else {
         asm("csrw mtvec, %0" ::"r"(trap_from_M_mode));
-        INFO("Use direct mode and put the address of trap_entry() to mtvec");
+        INFO("Use direct mode and put the address of trap_entry_M_mode() to mtvec");
     }
 
     /* Enable the machine-mode timer and software interrupts */
