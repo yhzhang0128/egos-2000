@@ -2,6 +2,14 @@
 
 #include "egos.h"
 
+enum sd_type {
+      SD_TYPE_SD1,
+      SD_TYPE_SD2,
+      SD_TYPE_SDHC,
+      SD_TYPE_UNKNOWN
+};
+extern enum sd_type SD_CARD_TYPE;
+
 char recv_data_byte();
 char send_data_byte(char);
 
