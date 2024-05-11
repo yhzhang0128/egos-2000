@@ -72,13 +72,13 @@ This will create `disk.img` and `bootROM.bin` under the `tools` directory.
 
 ## Step3: Run egos-2000 on the QEMU emulator
 
-Download [QEMU v5.2](https://github.com/yhzhang0128/freedom-tools/releases/tag/v2023.9.8) for egos-2000 to the working directory `$EGOS`.
-You can also compile and install [QEMU v8.1](https://github.com/yhzhang0128/qemu/releases/tag/v8.1.0-egos) yourself.
+Download the pre-built [SiFive QEMU v5.1](https://github.com/sifive/freedom-tools/releases/tag/v2020.08.0) to `$EGOS`.
+Or you can compile and install the latest [QEMU](https://github.com/qemu/qemu) yourself.
 
 ```shell
 > cd $EGOS
-> tar -zxvf riscv-qemu-5.2.0-xxxxxx.tar.gz
-> export PATH=$PATH:$EGOS/riscv-qemu-5.2.0-xxxxxx/bin
+> tar -zxvf riscv-qemu-5.1.0-xxxxxx.tar.gz
+> export PATH=$PATH:$EGOS/riscv-qemu-5.1.0-xxxxxx/bin
 > cd $EGOS/egos-2000
 > make qemu
 -------- Simulate on QEMU-RISCV --------
