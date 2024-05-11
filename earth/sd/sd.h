@@ -24,14 +24,14 @@ int sdwrite(uint offset, uint nblock, char* src);
  * see chapter19 of the SiFive FE310-G002 Manual
  */
 
-#define SPI1_BASE     (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
+#define SPI_BASE     (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
 
-#define SPI1_SCKDIV   0UL
-#define SPI1_SCKMODE  4UL
-#define SPI1_CSID     16UL
-#define SPI1_CSDEF    20UL
-#define SPI1_CSMODE   24UL
-#define SPI1_FMT      64UL
-#define SPI1_TXDATA   72UL
-#define SPI1_RXDATA   76UL
-#define SPI1_FCTRL    96UL
+#define SPI_SCKDIV   0UL
+#define SPI_SCKMODE  4UL
+#define SPI_CSID     16UL
+#define SPI_CSDEF    20UL
+#define SPI_CSMODE   24UL
+#define SPI_FMT      64UL
+#define SPI_TXDATA   72UL
+#define SPI_RXDATA   76UL
+#define SPI_FCTRL    96UL
