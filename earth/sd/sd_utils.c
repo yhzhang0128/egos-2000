@@ -11,7 +11,10 @@
 
 char send_data_byte(char byte) {
     while (REGW(SPI1_BASE, SPI1_TXDATA) & (1 << 31));
-    REGW(SPI1_BASE, SPI1_TXDATA) = byte;
+    if (earth->platform == ARTY)
+        REGB(SPI1_BASE, SPI1_TXDATA) = byte;
+    else /* QEMU */
+        REGW(SPI1_BASE, SPI1_TXDATA) = byte;
 
     uint rxdata;
     while ((rxdata = REGW(SPI1_BASE, SPI1_RXDATA)) & (1 << 31));

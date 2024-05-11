@@ -69,7 +69,7 @@ static void sd_reset() {
 }
 
 static void spi_config() {
-    REGW(SPI1_BASE, SPI1_CSMODE) = 1;
+    if (earth->platform != ARTY) REGW(SPI1_BASE, SPI1_CSMODE) = 1;
 
     /* Set phase as 0*/
     /* Set polarity as 0 */
