@@ -4,17 +4,15 @@
  */
 
 /* Author: Yunhao Zhang
- * Description: boot loader
- * i.e., the first instructions executed by the CPU when boot up
+ * Description: boot loader & trap entry
  */
     .section .image.placeholder
     .section .text.enter
     .global earth_entry, trap_from_M_mode, trap_from_S_mode
 
 earth_entry:
-    /* Disable interrupt and call main() of earth.c */
-    li t0, 0x8
-    csrc mstatus, t0
+    li t0, 0x8         /* The first instruction during boot up */
+    csrc mstatus, t0   /* Disable interrupt */
     li sp, 0x80003f80
     call main
 
@@ -36,7 +34,7 @@ trap_from_M_mode:
     csrw mscratch, sp  /* Step1 */
     lui sp, 0x80004
     addi sp, sp, -128  /* Kernel stack is 0x80003f80 */
-    addi sp, sp, -116   /* Step2 */
+    addi sp, sp, -116  /* Step2 */
     sw ra, 0(sp)
     sw t0, 4(sp)
     sw t1, 8(sp)
@@ -66,7 +64,7 @@ trap_from_M_mode:
     sw s10, 104(sp)
     sw s11, 108(sp)
     csrr t0, mscratch
-    sw t0, 112(sp)       /* Save user sp on kernel stack */
+    sw t0, 112(sp)      /* Save user sp on kernel stack */
 
     call trap_entry     /* Step3 */
 
@@ -99,4 +97,4 @@ trap_from_M_mode:
     lw s10, 104(sp)
     lw s11, 108(sp)
     lw sp, 112(sp)      /* Step5 */
-    mret                /* Step6 */
+   mret                 /* Step6 */

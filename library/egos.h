@@ -52,36 +52,36 @@ extern struct earth *earth;
 extern struct grass *grass;
 
 /* Memory layout */
-#define PAGE_SIZE          4096
-#define FRAME_CACHE_END    0x80020000
-#define FRAME_CACHE_START  0x80004000  /* 112KB  frame cache           */
+#define PAGE_SIZE         4096
+#define FRAME_CACHE_END   0x80020000
+#define FRAME_CACHE_START 0x80004000  /* 112KB  frame cache           */
                                        /*        earth interface       */
-#define GRASS_STACK_TOP    0x80003f80  /* 8KB    earth/grass stack     */
+#define GRASS_STACK_TOP   0x80003f80  /* 8KB    earth/grass stack     */
                                        /*        grass interface       */
-#define APPS_STACK_TOP     0x80002000  /* 6KB    app stack             */
-#define SYSCALL_ARG        0x80000400  /* 1KB    system call args      */
-#define APPS_ARG           0x80000000  /* 1KB    app main() argc, argv */
-#define APPS_SIZE          0x00003000  
-#define APPS_ENTRY         0x08005000  /* 12KB   app code+data         */
-#define GRASS_SIZE         0x00002800
-#define GRASS_ENTRY        0x08002800  /* 8KB    grass code+data       */
+#define APPS_STACK_TOP    0x80002000  /* 6KB    app stack             */
+#define SYSCALL_ARG       0x80000400  /* 1KB    system call args      */
+#define APPS_ARG          0x80000000  /* 1KB    app main() argc, argv */
+#define APPS_SIZE         0x00003000
+#define APPS_ENTRY        0x08005000  /* 12KB   app code+data         */
+#define GRASS_SIZE        0x00002800
+#define GRASS_ENTRY       0x08002800  /* 8KB    grass code+data       */
                                        /* 12KB   earth data            */
                                        /* earth code is in QSPI flash  */
 
 
 #ifndef LIBC_STDIO
 /* Only earth/dev_tty.c uses LIBC_STDIO and does not need these macros */
-#define printf             earth->tty_printf
-#define INFO               earth->tty_info
-#define FATAL              earth->tty_fatal
-#define SUCCESS            earth->tty_success
-#define CRITICAL           earth->tty_critical
+#define printf   earth->tty_printf
+#define INFO     earth->tty_info
+#define FATAL    earth->tty_fatal
+#define SUCCESS  earth->tty_success
+#define CRITICAL earth->tty_critical
 #endif
 
 /* Platform specific configuration */
-#define MSIP               (earth->platform == ARTY? 0x2000000UL : 0x2000004UL)
-#define SPI_BASE           (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
-#define UART0_BASE         (earth->platform == QEMU_LATEST? 0x10010000UL : 0x10013000UL)
+#define MSIP       (earth->platform == ARTY? 0x2000000UL : 0x2000004UL)
+#define SPI_BASE   (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
+#define UART0_BASE (earth->platform == QEMU_LATEST? 0x10010000UL : 0x10013000UL)
 
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
