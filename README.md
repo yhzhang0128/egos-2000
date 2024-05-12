@@ -1,5 +1,3 @@
-**NOTICE:** This branch is under heavy revision now. See [release v2.0.3](https://github.com/yhzhang0128/egos-2000/tree/v2.0.3) for a stable snapshot.
-
 ## Vision
 
 This project's vision is to help **every** college student read **all** the code of an operating system.
