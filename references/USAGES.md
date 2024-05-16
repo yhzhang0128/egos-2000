@@ -8,7 +8,7 @@ Running on QEMU is easier but if you wish to run it on the boards for fun,
 you need to purchase the following hardware:
 * one of the Arty [A7-35T board](https://www.xilinx.com/products/boards-and-kits/arty.html), [A7-100T board](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/) and [S7-50 board](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/)
 * a microUSB cable (e.g., [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
-* [optional] a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card
+* a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card
 
 
 ## Step1: Setup the compiler and compile egos-2000
@@ -33,7 +33,7 @@ Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools
 ```
 
 After this step, `build/release` holds the ELF format executables and `build/debug` holds the human readable assembly files.
-While using the SiFive toolchain is easier, you can also compile and install the [official GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) which takes about an hour.
+While using the pre-built binaries is easier, you can also compile and install the [official GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain), which takes about an hour.
 
 ```shell
 # Prepare the environment
@@ -53,32 +53,14 @@ While using the SiFive toolchain is easier, you can also compile and install the
 > make TOOLCHAIN=GNU
 ```
 
-## Step2: Create the disk and bootROM images
+## Step2: Run egos-2000 on the QEMU emulator
 
-Make sure you have a C compiler (i.e., the `cc` command) in your shell environment.
-
-```shell
-> cd $EGOS/egos-2000
-> make install
--------- Create the Disk Image --------
-......
-[INFO] Finish making the disk image (tools/disk.img)
--------- Create the BootROM Image --------
-......
-[INFO] Finish making the bootROM binary (tools/bootROM.bin)
-```
-
-This will create `disk.img` and `bootROM.bin` under the `tools` directory.
-
-## Step3: Run egos-2000 on the QEMU emulator
-
-Download the pre-built [SiFive QEMU v5.1](https://github.com/sifive/freedom-tools/releases/tag/v2020.08.0) to `$EGOS`.
-Or you can compile and install the latest [QEMU](https://github.com/qemu/qemu) yourself.
+Download the pre-built binaries of QEMU from [xPack](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases) or [SiFive](https://github.com/sifive/freedom-tools/releases/tag/v2020.08.0).
 
 ```shell
 > cd $EGOS
-> tar -zxvf riscv-qemu-5.1.0-xxxxxx.tar.gz
-> export PATH=$PATH:$EGOS/riscv-qemu-5.1.0-xxxxxx/bin
+> tar -zxvf xpack-qemu-riscv-8.2.2-1-xxxxxx.tar.gz
+> export PATH=$PATH:$EGOS/xpack-qemu-riscv-8.2.2-1-xxxxxx/bin
 > cd $EGOS/egos-2000
 > make qemu
 -------- Simulate on QEMU-RISCV --------
@@ -89,13 +71,28 @@ qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qem
 ......
 ```
 
-## Step4: Run egos-2000 on the Arty board
+Instead, you can compile and install the latest QEMU from its [official repository](https://github.com/qemu/qemu), which takes a few minutes.
+```shell
+> cd $EGOS
+> git clone https://github.com/qemu/qemu.git
+> mkdir qemu/build
+> cd qemu/build
+> ../configure --target-list=riscv32-softmmu
+> make
+...
+> export PATH=$EGOS/qemu/build:$PATH
+> cd $EGOS/egos-2000
+> make qemu
+```
+
+
+## Step3: Run egos-2000 on the Arty board
 
 You can use the Arty A7-35t, A7-100t or S7-50 board
 and make sure to set the `BOARD` variable in `Makefile` correctly.
 To use a microSD card on the board, you can program the microSD card with `disk.img` using tools like [balena Etcher](https://www.balena.io/etcher/).
 
-### Step4.1: MacOS or Linux
+### Step3.1: MacOS or Linux
 
 Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to `$EGOS`
 and program `bootROM.bin` to the on-board ROM.
@@ -132,7 +129,7 @@ To connect with the egos-2000 TTY:
 ```
 4. For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`)
 
-### Step4.2: Windows
+### Step3.2: Windows
 
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
