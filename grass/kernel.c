@@ -67,10 +67,22 @@ void intr_entry(uint id) {
 
     /* Ignore other interrupts for now */
     if (id == INTR_ID_SOFT) proc_syscall();
-    if (id == INTR_ID_TIMER) proc_yield();
+    proc_yield();
+}
+
+static void proc_request()
+{
+    for (uint i = 0; i < MAX_NPROCESS; i++)
+        if (proc_set[i].status == PROC_REQUESTING){
+            proc_curr_idx = i;
+            earth->mmu_switch(curr_pid);
+            proc_syscall();
+        }
 }
 
 static void proc_yield() {
+    /* Run all requests to possibly make process runnable */
+    proc_request();
     /* Find the next runnable process */
     int next_idx = -1;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
@@ -108,64 +120,52 @@ static void proc_yield() {
     proc_set_running(curr_pid);
 }
 
-static void proc_send(struct syscall *sc) {
+static int proc_send(struct syscall *sc) {
     sc->msg.sender = curr_pid;
     int receiver = sc->msg.receiver;
+    int orig_idx = proc_curr_idx;
 
     for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == receiver) {
             /* Find the receiver */
-            if (proc_set[i].status != PROC_WAIT_TO_RECV) {
-                curr_status = PROC_WAIT_TO_SEND;
-                proc_set[proc_curr_idx].receiver_pid = receiver;
-            } else {
+            if (proc_set[i].received)
+                return -1;
+            else {
                 /* Copy message from sender to kernel stack */
                 struct sys_msg tmp;
-                earth->mmu_switch(curr_pid);
                 memcpy(&tmp, &sc->msg, sizeof(tmp));
 
                 /* Copy message from kernel stack to receiver */
                 earth->mmu_switch(receiver);
                 memcpy(&sc->msg, &tmp, sizeof(tmp));
 
-                /* Set receiver process as runnable */
-                proc_set_runnable(receiver);
-            }
-            proc_yield();
-            return;
-        }
+                /* Tell receiver they have received */
+                proc_set[i].received = 1;
 
-    sc->retval = -1;
+                /* Switch back to sender */
+                proc_curr_idx = orig_idx;
+                earth->mmu_switch(curr_pid);
+                return 0;
+            }
+        }
+    
+    return -2;
 }
 
-static void proc_recv(struct syscall *sc) {
-    int sender = -1;
-    for (uint i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].status == PROC_WAIT_TO_SEND &&
-            proc_set[i].receiver_pid == curr_pid)
-            sender = proc_set[i].pid;
-
-    if (sender == -1) {
-        curr_status = PROC_WAIT_TO_RECV;
-    } else {
-        /* Copy message from sender to kernel stack */
-        struct sys_msg tmp;
-        earth->mmu_switch(sender);
-        memcpy(&tmp, &sc->msg, sizeof(tmp));
-
-        /* Copy message from kernel stack to receiver */
-        earth->mmu_switch(curr_pid);
-        memcpy(&sc->msg, &tmp, sizeof(tmp));
-
-        /* Set sender process as runnable */
-        proc_set_runnable(sender);
+static int proc_recv(struct syscall *sc) {
+    if (proc_set[proc_curr_idx].received) {
+        proc_set[proc_curr_idx].received = 0;
+        return 0;
     }
 
-    proc_yield();
+    return -1;
 }
 
 static void proc_syscall() {
     struct syscall *sc = (struct syscall*)SYSCALL_ARG;
+    int rc;
+
+    proc_set_requesting(curr_pid); // Enter Requesting Mode
 
     enum syscall_type type = sc->type;
     sc->retval = 0;
@@ -174,12 +174,19 @@ static void proc_syscall() {
 
     switch (type) {
     case SYS_RECV:
-        proc_recv(sc);
+        rc = proc_recv(sc);
         break;
     case SYS_SEND:
-        proc_send(sc);
+        rc = proc_send(sc);
         break;
     default:
         FATAL("proc_syscall: got unknown syscall type=%d", type);
     }
+
+    if (rc == -1)
+        sc->type = type; // Failure, Retry Request
+    else
+        proc_set_runnable(curr_pid); // Either Success or Error, Move to User Space
+    
+    sc->retval = rc == 0 ? 0 : -1;
 }
