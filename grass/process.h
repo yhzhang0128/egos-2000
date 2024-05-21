@@ -20,7 +20,7 @@ struct process{
     int pid;
     enum proc_status status;
     uint mepc, saved_register[SAVED_REGISTER_NUM];
-    int received;
+    int is_recv;
 };
 
 #define MAX_NPROCESS  8

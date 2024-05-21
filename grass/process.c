@@ -28,7 +28,7 @@ int proc_alloc() {
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid = ++proc_nprocs;
             proc_set[i].status = PROC_LOADING;
-            proc_set[i].received = 0;
+            proc_set[i].is_recv = 0;
             return proc_nprocs;
         }
 

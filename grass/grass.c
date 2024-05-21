@@ -16,6 +16,8 @@
 struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
 
+void kernel_init();
+
 static int sys_proc_read(uint block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
@@ -35,6 +37,9 @@ int main() {
 
     /* Register the kernel entry */
     earth->kernel_entry_init(kernel_entry);
+
+    /* Initialize Kernel Buffer */
+    kernel_init();
     
     /* Load the first kernel process GPID_PROCESS */
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);

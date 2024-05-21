@@ -51,6 +51,16 @@ static void proc_syscall();
 uint proc_curr_idx, waiting = 0, wakeup = 0;
 struct process proc_set[MAX_NPROCESS];
 
+struct kernel_msg
+{
+    int in_use;
+    int sender;
+    int receiver;
+    char msg[SYSCALL_MSG_LEN];
+};
+
+struct kernel_msg *KERNEL_MSG_BUFF;
+
 void intr_entry(uint id) {
     if (id == INTR_ID_TIMER && curr_pid < GPID_SHELL) {
         /* Do not interrupt kernel processes since IO can be stateful */
@@ -124,45 +134,38 @@ static void proc_yield() {
     proc_set_running(curr_pid);
 }
 
-static int proc_send(struct syscall *sc) {
-    sc->msg.sender = curr_pid;
-    int receiver = sc->msg.receiver;
-    int orig_idx = proc_curr_idx;
-
-    for (uint i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == receiver) {
-            /* Find the receiver */
-            if (proc_set[i].received)
-                return -1;
-            else {
-                /* Copy message from sender to kernel stack */
-                struct sys_msg tmp;
-                memcpy(&tmp, &sc->msg, sizeof(tmp));
-
-                /* Copy message from kernel stack to receiver */
-                earth->mmu_switch(receiver);
-                memcpy(&sc->msg, &tmp, sizeof(tmp));
-
-                /* Tell receiver they have received */
-                proc_set[i].received = 1;
-
-                /* Switch back to sender */
-                proc_curr_idx = orig_idx;
-                earth->mmu_switch(curr_pid);
-                return 0;
-            }
-        }
+static int proc_send(struct syscall *sc)
+{
+    if (KERNEL_MSG_BUFF->in_use == 1)
+        return -1;
     
-    return -2;
+    for (uint i = 0; i < MAX_NPROCESS; i++)
+        if (proc_set[i].pid == sc->msg.receiver && !proc_set[i].is_recv)
+            return -1; // Do not send unless receiver is receiving
+
+    KERNEL_MSG_BUFF->in_use = 1;
+    KERNEL_MSG_BUFF->sender = curr_pid;
+    KERNEL_MSG_BUFF->receiver = sc->msg.receiver;
+
+    memcpy(KERNEL_MSG_BUFF->msg, sc->msg.content, sizeof(sc->msg.content));
+    return 0;
 }
 
-static int proc_recv(struct syscall *sc) {
-    if (proc_set[proc_curr_idx].received) {
-        proc_set[proc_curr_idx].received = 0;
-        return 0;
+static int proc_recv(struct syscall *sc)
+{
+    /* No Message Available, or not for Current Process */
+    if (KERNEL_MSG_BUFF->in_use == 0 || KERNEL_MSG_BUFF->receiver != curr_pid) {
+        proc_set[proc_curr_idx].is_recv = 1;
+        return -1;
     }
 
-    return -1;
+    KERNEL_MSG_BUFF->in_use = 0;
+    proc_set[proc_curr_idx].is_recv = 0;
+
+    memcpy(sc->msg.content, KERNEL_MSG_BUFF->msg, sizeof(sc->msg.content));
+    sc->msg.sender = KERNEL_MSG_BUFF->sender;
+
+    return 0;
 }
 
 static void proc_syscall() {
@@ -201,4 +204,9 @@ static void proc_syscall() {
         proc_set_runnable(curr_pid); // Either Success or Error, Move to User Space
     
     sc->retval = rc == 0 ? 0 : -1;
+}
+
+void kernel_init() {
+    KERNEL_MSG_BUFF = (struct kernel_msg *)((uint)grass + sizeof(*grass));
+    KERNEL_MSG_BUFF->in_use = 0;
 }
