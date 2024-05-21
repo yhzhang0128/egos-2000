@@ -50,7 +50,7 @@ int main() {
                     INFO("sys_shell: command causes an error");
                 else if (req.argv[req.argc - 1][0] != '&')
                     /* Wait for foreground command to terminate */
-                    grass->sys_recv(NULL, (void*)&reply, sizeof(reply));
+                    grass->sys_wait();
             }
         }
 

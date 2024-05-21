@@ -48,7 +48,7 @@ void excp_entry(uint id) {
 static void proc_yield();
 static void proc_syscall();
 
-uint proc_curr_idx;
+uint proc_curr_idx, waiting = 0, wakeup = 0;
 struct process proc_set[MAX_NPROCESS];
 
 void intr_entry(uint id) {
@@ -61,7 +61,7 @@ void intr_entry(uint id) {
     if (earth->tty_recv_intr() && curr_pid >= GPID_USER_START) {
         /* User process killed by ctrl+c interrupt */
         INFO("process %d killed by interrupt", curr_pid);
-        asm("csrw mepc, %0" ::"r"(0x800500C));
+        proc_set[proc_curr_idx].mepc = (uint)sys_exit;
         return;
     }
 
@@ -72,12 +72,16 @@ void intr_entry(uint id) {
 
 static void proc_request()
 {
+    int orig_idx = proc_curr_idx; // To Retain Scheduling Fairness
+
     for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_REQUESTING){
             proc_curr_idx = i;
             earth->mmu_switch(curr_pid);
             proc_syscall();
         }
+
+    proc_curr_idx = orig_idx;
 }
 
 static void proc_yield() {
@@ -163,7 +167,7 @@ static int proc_recv(struct syscall *sc) {
 
 static void proc_syscall() {
     struct syscall *sc = (struct syscall*)SYSCALL_ARG;
-    int rc;
+    int rc = -1;
 
     proc_set_requesting(curr_pid); // Enter Requesting Mode
 
@@ -178,6 +182,14 @@ static void proc_syscall() {
         break;
     case SYS_SEND:
         rc = proc_send(sc);
+        break;
+    case SYS_WAIT:
+        waiting++;
+        if (wakeup) rc = waiting = wakeup = 0;
+        break;
+    case SYS_EXIT:
+        proc_free(curr_pid);
+        if (waiting) wakeup++;
         break;
     default:
         FATAL("proc_syscall: got unknown syscall type=%d", type);

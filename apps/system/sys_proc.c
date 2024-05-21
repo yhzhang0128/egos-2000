@@ -47,14 +47,6 @@ int main() {
                 INFO("process %d running in the background", app_pid);
             grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
             break;
-        case PROC_EXIT:
-            grass->proc_free(sender);
-
-            if (shell_waiting && app_pid == sender)
-                grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
-            else
-                INFO("background process %d terminated", sender);
-            break;
         case PROC_KILLALL:
             grass->proc_free(-1); break;
         default:
