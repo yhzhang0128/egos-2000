@@ -1,6 +1,8 @@
 build
 mkfs
 mkrom
+.cache
+compile_commands.json
 tools/egos-ece4750
 
 *.elf
