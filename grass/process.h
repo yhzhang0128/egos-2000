@@ -9,7 +9,7 @@ enum proc_status {
     PROC_READY,   /* finished loading elf and wait for first running */
     PROC_RUNNING,
     PROC_RUNNABLE,
-    PROC_REQUESTING
+    PROC_PENDING
 };
 
 #define SAVED_REGISTER_NUM  29
@@ -20,7 +20,10 @@ struct process{
     int pid;
     enum proc_status status;
     uint mepc, saved_register[SAVED_REGISTER_NUM];
-    int is_recv;
+    enum {
+        PENDING_SEND,
+        PENDING_RECV
+    } pending_syscall;
 };
 
 #define MAX_NPROCESS  8
@@ -38,4 +41,4 @@ void proc_free(int);
 void proc_set_ready (int);
 void proc_set_running (int);
 void proc_set_runnable (int);
-void proc_set_requesting (int);
+void proc_set_pending (int);

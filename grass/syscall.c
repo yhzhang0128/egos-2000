@@ -40,13 +40,8 @@ int sys_recv(int* sender, char* buf, uint size) {
     return sc->retval;
 }
 
-int sys_wait() {
-    sc->type = SYS_WAIT;
-    sys_invoke();
-    return sc->retval;
-}
-
 void sys_exit(int status) {
-    sc->type = SYS_EXIT;
-    sys_invoke();
+    struct proc_request req;
+    req.type = PROC_EXIT;
+    sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
 }

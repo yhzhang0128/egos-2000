@@ -20,7 +20,7 @@ static void proc_set_status(int pid, enum proc_status status) {
 void proc_set_ready(int pid) { proc_set_status(pid, PROC_READY); }
 void proc_set_running(int pid) { proc_set_status(pid, PROC_RUNNING); }
 void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
-void proc_set_requesting(int pid) { proc_set_status(pid, PROC_REQUESTING); }
+void proc_set_pending(int pid) { proc_set_status(pid, PROC_PENDING); }
 
 int proc_alloc() {
     static uint proc_nprocs = 0;
@@ -28,7 +28,6 @@ int proc_alloc() {
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid = ++proc_nprocs;
             proc_set[i].status = PROC_LOADING;
-            proc_set[i].is_recv = 0;
             return proc_nprocs;
         }
 

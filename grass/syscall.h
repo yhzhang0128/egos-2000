@@ -6,8 +6,6 @@ enum syscall_type {
 	SYS_UNUSED,
 	SYS_RECV,
 	SYS_SEND,
-    SYS_WAIT,
-    SYS_EXIT,
 	SYS_NCALLS
 };
 
@@ -23,7 +21,16 @@ struct syscall {
     int retval;              /* Return value of the system call */
 };
 
+struct pending_ipc
+{
+    int in_use;
+    int sender;
+    int receiver;
+    char msg[SYSCALL_MSG_LEN];
+};
+
+extern struct pending_ipc *pending_ipc_buffer;
+
 void sys_exit(int status);
-int  sys_wait();
 int  sys_send(int pid, char* msg, uint size);
 int  sys_recv(int* pid, char* buf, uint size);

@@ -46,20 +46,11 @@ void excp_entry(uint id) {
 #define INTR_ID_TIMER      7
 
 static void proc_yield();
-static void proc_syscall();
+static void proc_syscall(struct process *proc);
 
-uint proc_curr_idx, waiting = 0, wakeup = 0;
+uint proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
-
-struct kernel_msg
-{
-    int in_use;
-    int sender;
-    int receiver;
-    char msg[SYSCALL_MSG_LEN];
-};
-
-struct kernel_msg *KERNEL_MSG_BUFF;
+struct pending_ipc *pending_ipc_buffer;
 
 void intr_entry(uint id) {
     if (id == INTR_ID_TIMER && curr_pid < GPID_SHELL) {
@@ -76,32 +67,20 @@ void intr_entry(uint id) {
     }
 
     /* Ignore other interrupts for now */
-    if (id == INTR_ID_SOFT) proc_syscall();
+    if (id == INTR_ID_SOFT) proc_syscall(&proc_set[proc_curr_idx]);
     proc_yield();
 }
 
-static void proc_request()
-{
-    int orig_idx = proc_curr_idx; // To Retain Scheduling Fairness
-
-    for (uint i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].status == PROC_REQUESTING){
-            proc_curr_idx = i;
-            earth->mmu_switch(curr_pid);
-            proc_syscall();
-        }
-
-    proc_curr_idx = orig_idx;
-}
-
 static void proc_yield() {
-    /* Run all requests to possibly make process runnable */
-    proc_request();
     /* Find the next runnable process */
     int next_idx = -1;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
-        enum proc_status s = proc_set[(proc_curr_idx + i) % MAX_NPROCESS].status;
-        if (s == PROC_READY || s == PROC_RUNNING || s == PROC_RUNNABLE) {
+        struct process *p = &proc_set[(proc_curr_idx + i) % MAX_NPROCESS];
+        if (p->status == PROC_PENDING) {
+            earth->mmu_switch(p->pid);
+            proc_syscall(p); // Run pending system call to possibly make process runnable
+        }
+        if (p->status == PROC_READY || p->status == PROC_RUNNING || p->status == PROC_RUNNABLE) {
             next_idx = (proc_curr_idx + i) % MAX_NPROCESS;
             break;
         }
@@ -134,79 +113,62 @@ static void proc_yield() {
     proc_set_running(curr_pid);
 }
 
-static int proc_send(struct syscall *sc)
-{
-    if (KERNEL_MSG_BUFF->in_use == 1)
-        return -1;
+static int proc_send(struct syscall *sc, struct process *proc) {
+    if (pending_ipc_buffer->in_use == 1) return -1;
     
     for (uint i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == sc->msg.receiver && !proc_set[i].is_recv)
-            return -1; // Do not send unless receiver is receiving
+        if (proc_set[i].pid == sc->msg.receiver) {
+            if (proc_set[i].status != PROC_PENDING || proc_set[i].pending_syscall != PENDING_RECV)
+                return -1; // Failure, only send when destination proc is receiving
+            
+            pending_ipc_buffer->in_use = 1;
+            pending_ipc_buffer->sender = proc->pid;
+            pending_ipc_buffer->receiver = sc->msg.receiver;
 
-    KERNEL_MSG_BUFF->in_use = 1;
-    KERNEL_MSG_BUFF->sender = curr_pid;
-    KERNEL_MSG_BUFF->receiver = sc->msg.receiver;
+            memcpy(pending_ipc_buffer->msg, sc->msg.content, sizeof(sc->msg.content));
+            return 0;
+        }
 
-    memcpy(KERNEL_MSG_BUFF->msg, sc->msg.content, sizeof(sc->msg.content));
-    return 0;
+    return -2; // Error, receiver does not exist
 }
 
-static int proc_recv(struct syscall *sc)
-{
+static int proc_recv(struct syscall *sc, struct process *proc) {
     /* No Message Available, or not for Current Process */
-    if (KERNEL_MSG_BUFF->in_use == 0 || KERNEL_MSG_BUFF->receiver != curr_pid) {
-        proc_set[proc_curr_idx].is_recv = 1;
-        return -1;
-    }
+    if (pending_ipc_buffer->in_use == 0 || pending_ipc_buffer->receiver != proc->pid) return -1;
 
-    KERNEL_MSG_BUFF->in_use = 0;
-    proc_set[proc_curr_idx].is_recv = 0;
+    pending_ipc_buffer->in_use = 0;
 
-    memcpy(sc->msg.content, KERNEL_MSG_BUFF->msg, sizeof(sc->msg.content));
-    sc->msg.sender = KERNEL_MSG_BUFF->sender;
+    memcpy(sc->msg.content, pending_ipc_buffer->msg, sizeof(sc->msg.content));
+    sc->msg.sender = pending_ipc_buffer->sender;
 
     return 0;
 }
 
-static void proc_syscall() {
+static void proc_syscall(struct process *proc) {
     struct syscall *sc = (struct syscall*)SYSCALL_ARG;
-    int rc = -1;
+    int rc;
 
-    proc_set_requesting(curr_pid); // Enter Requesting Mode
-
-    enum syscall_type type = sc->type;
-    sc->retval = 0;
-    sc->type = SYS_UNUSED;
     *((int*)MSIP) = 0;
 
-    switch (type) {
+    switch (sc->type) {
     case SYS_RECV:
-        rc = proc_recv(sc);
+        proc->pending_syscall = PENDING_RECV;
+        rc = proc_recv(sc, proc);
         break;
     case SYS_SEND:
-        rc = proc_send(sc);
-        break;
-    case SYS_WAIT:
-        waiting++;
-        if (wakeup) rc = waiting = wakeup = 0;
-        break;
-    case SYS_EXIT:
-        proc_free(curr_pid);
-        if (waiting) wakeup++;
+        proc->pending_syscall = PENDING_SEND;
+        rc = proc_send(sc, proc);
         break;
     default:
-        FATAL("proc_syscall: got unknown syscall type=%d", type);
+        FATAL("proc_syscall: got unknown syscall type=%d", sc->type);
     }
 
-    if (rc == -1)
-        sc->type = type; // Failure, Retry Request
-    else
-        proc_set_runnable(curr_pid); // Either Success or Error, Move to User Space
+    if (rc == -1) {
+        proc_set_pending(proc->pid); // Failure, Retry Request
+    } else {
+        proc_set_runnable(proc->pid); // Success or Error, Move to User Space
+        sc->type = SYS_UNUSED;
+    }
     
-    sc->retval = rc == 0 ? 0 : -1;
-}
-
-void kernel_init() {
-    KERNEL_MSG_BUFF = (struct kernel_msg *)((uint)grass + sizeof(*grass));
-    KERNEL_MSG_BUFF->in_use = 0;
+    sc->retval = (rc == 0) ? 0 : -1;
 }
