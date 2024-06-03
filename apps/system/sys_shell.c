@@ -48,9 +48,13 @@ int main() {
 
                 if (reply.type != CMD_OK)
                     INFO("sys_shell: command causes an error");
-                else if (req.argv[req.argc - 1][0] != '&')
+                else if (req.argv[req.argc - 1][0] != '&') {
                     /* Wait for foreground command to terminate */
-                    grass->sys_recv(NULL, (void*)&reply, sizeof(reply));
+                    int from, foreground_pid = reply.pid;
+                    do {
+                        grass->sys_recv(&from, (void*)&reply, sizeof(reply));
+                    } while ( !(from == GPID_PROCESS && reply.pid == foreground_pid) );
+                }
             }
         }
 

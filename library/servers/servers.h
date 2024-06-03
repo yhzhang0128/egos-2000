@@ -34,6 +34,7 @@ struct proc_reply {
           CMD_OK,
           CMD_ERROR
     } type;
+    int pid;
 };
 
 /* GPID_FILE */
