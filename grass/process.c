@@ -35,7 +35,7 @@ int proc_alloc() {
 }
 
 void proc_free(int pid) {
-    if (pid != -1) {
+    if (pid != GPID_ALL) {
         earth->mmu_free(pid);
         proc_set_status(pid, PROC_UNUSED);
         return;

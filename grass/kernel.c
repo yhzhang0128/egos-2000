@@ -113,28 +113,34 @@ static void proc_yield() {
     proc_set_running(curr_pid);
 }
 
-static int proc_send(struct syscall *sc, struct process *proc) {
+static int proc_send(struct syscall *sc, struct process *sender) {
     if (pending_ipc_buffer->in_use == 1) return -1;
     
-    for (uint i = 0; i < MAX_NPROCESS; i++)
-        if (proc_set[i].pid == sc->msg.receiver) {
-            if (proc_set[i].status != PROC_PENDING || proc_set[i].pending_syscall != PENDING_RECV)
-                return -1; // Failure, only send when destination proc is receiving
+    for (uint i = 0; i < MAX_NPROCESS; i++) {
+        struct process dst = proc_set[i];
+        if (dst.pid == sc->msg.receiver) {
+            /* Destination is not receiving, or will not take msg from sender */
+            if (! (dst.status == PROC_PENDING && dst.pending_syscall == PENDING_RECV) ) return -1;
+            if (! (dst.receive_from == GPID_ALL || dst.receive_from == sender->pid) ) return -1;
             
             pending_ipc_buffer->in_use = 1;
-            pending_ipc_buffer->sender = proc->pid;
+            pending_ipc_buffer->sender = sender->pid;
             pending_ipc_buffer->receiver = sc->msg.receiver;
 
             memcpy(pending_ipc_buffer->msg, sc->msg.content, sizeof(sc->msg.content));
             return 0;
         }
+    }
 
     return -2; // Error, receiver does not exist
 }
 
-static int proc_recv(struct syscall *sc, struct process *proc) {
+static int proc_recv(struct syscall *sc, struct process *receiver) {
     /* No Message Available, or not for Current Process */
-    if (pending_ipc_buffer->in_use == 0 || pending_ipc_buffer->receiver != proc->pid) return -1;
+    if (pending_ipc_buffer->in_use == 0 || pending_ipc_buffer->receiver != receiver->pid) {
+        receiver->receive_from = sc->msg.sender;
+        return -1; 
+    }
 
     pending_ipc_buffer->in_use = 0;
 

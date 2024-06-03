@@ -24,6 +24,7 @@ struct process{
         PENDING_SEND,
         PENDING_RECV
     } pending_syscall;
+    int receive_from;
 };
 
 #define MAX_NPROCESS  8

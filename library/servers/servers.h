@@ -8,6 +8,7 @@ int dir_lookup(int dir_ino, char* name);
 int file_read(int file_ino, uint offset, char* block);
 
 enum grass_servers {
+    GPID_ALL = -1,
     GPID_UNUSED,
     GPID_PROCESS,
     GPID_FILE,

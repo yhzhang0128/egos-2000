@@ -38,7 +38,7 @@ int main() {
         int sender;
         struct dir_request *req = (void*)buf;
         struct dir_reply *reply = (void*)buf;
-        grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+        grass->sys_recv(GPID_ALL, &sender, buf, SYSCALL_MSG_LEN);
 
         switch (req->type) {
         case DIR_LOOKUP:

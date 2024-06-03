@@ -33,4 +33,4 @@ extern struct pending_ipc *pending_ipc_buffer;
 
 void sys_exit(int status);
 int  sys_send(int pid, char* msg, uint size);
-int  sys_recv(int* pid, char* buf, uint size);
+int  sys_recv(int pid, int* sender, char* buf, uint size);
