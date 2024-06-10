@@ -10,8 +10,8 @@
  */
 
 #include "egos.h"
-#include "process.h"
 #include "syscall.h"
+#include "process.h"
 
 struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
@@ -36,8 +36,8 @@ int main() {
     earth->kernel_entry_init(kernel_entry);
 
     /* Initialize IPC Buffer */
-    pending_ipc_buffer = (struct pending_ipc *)((uint)grass + sizeof(*grass));
-    pending_ipc_buffer->in_use = 0;
+    msg_buffer = (struct pending_ipc *)(APPS_STACK_TOP + sizeof(*grass));
+    msg_buffer->in_use = 0;
     
     /* Load the first kernel process GPID_PROCESS */
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);

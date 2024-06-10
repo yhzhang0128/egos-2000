@@ -8,8 +8,8 @@
  */
 
 #include "egos.h"
-#include "process.h"
 #include "syscall.h"
+#include "process.h"
 #include <string.h>
 
 static void proc_set_status(int pid, enum proc_status status) {
