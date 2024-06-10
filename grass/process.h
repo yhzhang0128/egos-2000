@@ -30,10 +30,6 @@ extern struct process proc_set[MAX_NPROCESS];
 #define curr_pid      proc_set[proc_curr_idx].pid
 #define curr_status   proc_set[proc_curr_idx].status
 
-void intr_entry(uint);
-void excp_entry(uint);
-void kernel_entry(uint, uint);
-
 int  proc_alloc();
 void proc_free(int);
 void proc_set_ready (int);

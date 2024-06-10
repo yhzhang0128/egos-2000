@@ -20,16 +20,6 @@ struct syscall {
     struct sys_msg msg;      /* Data of the system call */
 };
 
-struct pending_ipc
-{
-    int in_use;
-    int sender;
-    int receiver;
-    char msg[SYSCALL_MSG_LEN];
-};
-
-extern struct pending_ipc *msg_buffer;
-
 void sys_exit(int status);
 void sys_send(int pid, char* msg, uint size);
 void sys_recv(int pid, int* sender, char* buf, uint size);
