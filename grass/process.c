@@ -20,7 +20,7 @@ static void proc_set_status(int pid, enum proc_status status) {
 void proc_set_ready(int pid) { proc_set_status(pid, PROC_READY); }
 void proc_set_running(int pid) { proc_set_status(pid, PROC_RUNNING); }
 void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
-void proc_set_pending(int pid) { proc_set_status(pid, PROC_PENDING); }
+void proc_set_pending(int pid) { proc_set_status(pid, PROC_PENDING_SYSCALL); }
 
 int proc_alloc() {
     static uint proc_nprocs = 0;

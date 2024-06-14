@@ -9,7 +9,7 @@ enum proc_status {
     PROC_READY,   /* finished loading elf and wait for first running */
     PROC_RUNNING,
     PROC_RUNNABLE,
-    PROC_PENDING
+    PROC_PENDING_SYSCALL
 };
 
 #define SAVED_REGISTER_NUM  29

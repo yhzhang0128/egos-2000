@@ -44,8 +44,8 @@ struct grass {
 
     /* System call interface */
     void (*sys_exit)(int status);
-    void (*sys_send)(int pid, char* msg, uint size);
-    void (*sys_recv)(int pid, int* sender, char* buf, uint size);
+    void (*sys_send)(int receiver, char* msg, uint size);
+    void (*sys_recv)(int from, int* sender, char* buf, uint size);
 };
 
 extern struct earth *earth;

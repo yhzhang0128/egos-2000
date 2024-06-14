@@ -12,13 +12,16 @@
 
 
 #include "egos.h"
-#include "kernel.h"
+#include "syscall.h"
+#include "process.h"
 #include <string.h>
 
 uint proc_curr_idx;
 struct process proc_set[MAX_NPROCESS];
 struct pending_ipc *msg_buffer;
 
+static void intr_entry(uint);
+static void excp_entry(uint);
 static void proc_yield();
 static void proc_try_syscall(struct process *proc);
 
@@ -34,7 +37,10 @@ void kernel_entry(uint is_interrupt, uint id) {
     memcpy(SAVED_REGISTER_ADDR, proc_set[proc_curr_idx].saved_register, SAVED_REGISTER_SIZE);
 }
 
-void excp_entry(uint id) {
+#define EXCP_ID_ECALL_U    8
+#define EXCP_ID_ECALL_M    11
+
+static void excp_entry(uint id) {
     /* Student's code goes here (system call and memory exception). */
 
     /* If id is for system call, handle the system call and return */
@@ -45,7 +51,10 @@ void excp_entry(uint id) {
     FATAL("excp_entry: kernel got exception %d", id);
 }
 
-void intr_entry(uint id) {
+#define INTR_ID_SOFT       3
+#define INTR_ID_TIMER      7
+
+static void intr_entry(uint id) {
     if (id == INTR_ID_TIMER && curr_pid < GPID_SHELL) {
         /* Do not interrupt kernel processes since IO can be stateful */
         earth->timer_reset();
@@ -69,9 +78,9 @@ static void proc_yield() {
     int next_idx = -1;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
         struct process *p = &proc_set[(proc_curr_idx + i) % MAX_NPROCESS];
-        if (p->status == PROC_PENDING) {
+        if (p->status == PROC_PENDING_SYSCALL) {
             earth->mmu_switch(p->pid);
-            proc_try_syscall(p); // Run pending system call to possibly make process runnable
+            proc_try_syscall(p); /* Retry pending system call  */
         }
         if (p->status == PROC_READY || p->status == PROC_RUNNING || p->status == PROC_RUNNABLE) {
             next_idx = (proc_curr_idx + i) % MAX_NPROCESS;
@@ -113,7 +122,7 @@ static int proc_try_send(struct syscall *sc, struct process *sender) {
         struct process dst = proc_set[i];
         if (dst.pid == sc->msg.receiver && dst.status != PROC_UNUSED) {
             /* Destination is not receiving, or will not take msg from sender */
-            if (! (dst.status == PROC_PENDING && dst.pending_syscall == SYS_RECV) )   return -1;
+            if (! (dst.status == PROC_PENDING_SYSCALL && dst.pending_syscall == SYS_RECV) )   return -1;
             if (! (dst.receive_from == GPID_ALL || dst.receive_from == sender->pid) ) return -1;
             
             msg_buffer->in_use = 1;
@@ -130,13 +139,11 @@ static int proc_try_send(struct syscall *sc, struct process *sender) {
 static int proc_try_recv(struct syscall *sc, struct process *receiver) {
     receiver->receive_from = sc->msg.sender;
     
-    /* No Message Available, or not for Current Process */
-    if (msg_buffer->in_use == 0 || msg_buffer->receiver != receiver->pid) return -1; 
-
-    memcpy(sc->msg.content, msg_buffer->msg, sizeof(sc->msg.content));
-    sc->msg.sender = msg_buffer->sender;
+    if (msg_buffer->in_use == 0 || msg_buffer->receiver != receiver->pid) return -1;
 
     msg_buffer->in_use = 0;
+    sc->msg.sender = msg_buffer->sender;
+    memcpy(sc->msg.content, msg_buffer->msg, sizeof(sc->msg.content));
     return 0;
 }
 
@@ -158,10 +165,10 @@ static void proc_try_syscall(struct process *proc) {
     }
 
     if (rc == -1) {
-        proc_set_pending(proc->pid); // Failure, Retry Request
+        proc_set_pending(proc->pid);
         proc->pending_syscall = sc->type;
     } else {
-        proc_set_runnable(proc->pid); // Success or Error, Move to User Space
         sc->type = SYS_UNUSED;
+        proc_set_runnable(proc->pid);
     }
 }

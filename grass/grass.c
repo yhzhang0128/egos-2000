@@ -10,7 +10,8 @@
  */
 
 #include "egos.h"
-#include "kernel.h"
+#include "syscall.h"
+#include "process.h"
 
 struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
@@ -18,6 +19,8 @@ struct earth *earth = (void*)GRASS_STACK_TOP;
 static int sys_proc_read(uint block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
+
+void kernel_entry(uint, uint);
 
 int main() {
     CRITICAL("Enter the grass layer");

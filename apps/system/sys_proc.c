@@ -39,11 +39,10 @@ int main() {
 
         switch (req->type) {
         case PROC_SPAWN:
+            reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
+
             /* Handling background processes */
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
-
-            reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
-            
             if (!shell_waiting && reply->type == CMD_OK)
                 INFO("process %d running in the background", app_pid);
             grass->sys_send(GPID_SHELL, (void*)reply, sizeof(*reply));
