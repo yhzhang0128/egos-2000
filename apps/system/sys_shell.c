@@ -1,10 +1,8 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
- * Description: a simple shell
+ *
+ * Description: a simple (if not naive) shell
  */
 
 #include "app.h"

@@ -1,10 +1,8 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
- * Description: _enter of grass
+ *
+ * Description: grass layer entry
  */
     .section .text
     .global grass_entry

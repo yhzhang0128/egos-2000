@@ -1,10 +1,11 @@
-build
-mkfs
-mkrom
+# Clangd lsp files (bear)
 .cache
 compile_commands.json
-tools/egos-ece4750
 
+# Binary and image files
+mkfs
+mkrom
+build
 *.elf
 *.lst
 *.bin

@@ -1,13 +1,11 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: Kernel ≈ 3 handlers
- *     proc_yield() handles timer interrupt for process scheduling
+ *     intr_entry() handles timer interrupt for scheduling
  *     excp_entry() handles faults such as unauthorized memory access
- *     proc_syscall() handles system calls for inter-process communication
+ *     proc_try_syscall() handles system calls for inter-process communication
  */
 
 

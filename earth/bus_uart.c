@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: definitions for UART0 in FE310
  * see chapter18 of the SiFive FE310-G002 Manual
  */

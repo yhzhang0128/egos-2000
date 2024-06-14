@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: create the bootROM image files
  * The ROM on the Arty board has 16MB:
  *     the first 4MB holds the FE310 processor;

@@ -1,11 +1,9 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: the directory system server
- * handling requests to directory lookup, insertion, etc.
+ * handling requests of directory lookup / insertion
  */
 
 #include "app.h"

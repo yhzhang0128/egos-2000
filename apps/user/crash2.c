@@ -1,12 +1,10 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: a program corrupting the memory of other processes
  * Students are asked to modify the grass kernel so that this 
- * program crashes and terminates without harming other processes.
+ * program terminates gracefully without harming other processes.
  */
 
 #include "app.h"

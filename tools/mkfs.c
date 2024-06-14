@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: create the disk image file (disk.img)
  * The disk image should be exactly 4MB:
  *     the first 1MB is reserved as 256 frames for memory paging;

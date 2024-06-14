@@ -1,11 +1,9 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: the file (inode) system server
- * handling requests to reading and writing inodes
+ * handling requests of reading / writing inodes
  */
 
 #include "app.h"

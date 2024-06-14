@@ -1,11 +1,9 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: load an ELF-format executable file into memory
- * Only use the program header instead of the multiple section headers.
+ * Only use the program header instead of the section headers.
  */
 
 #include "egos.h"

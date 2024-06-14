@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: a program causing a memory exception
  * Students are asked to modify the grass kernel so that this 
  * program terminates gracefully without crashing the grass kernel.

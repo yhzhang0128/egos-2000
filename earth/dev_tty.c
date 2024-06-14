@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: a simple tty device driver
  * uart_getc() and uart_putc() are implemented in bus_uart.c
  * printf-related functions are linked from the compiler's C library

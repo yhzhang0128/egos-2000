@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: definitions for GPIO0 in FE310
  * see chapter17 of the SiFive FE310-G002 Manual
  *

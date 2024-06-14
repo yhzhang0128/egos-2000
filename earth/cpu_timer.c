@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: timer reset and initialization
  * mtime is at 0x200bff8 and mtimecmp is at 0x2004000 in the memory map
  * see section 3.1.15 of references/riscv-privileged-v1.10.pdf

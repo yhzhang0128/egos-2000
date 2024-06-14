@@ -1,10 +1,8 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
- * Description: system process for spawning and killing other processes
+ *
+ * Description: the system process for spawning and killing other processes
  */
 
 #include "app.h"

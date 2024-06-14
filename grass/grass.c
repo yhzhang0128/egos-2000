@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: grass layer initialization
  * Initialize timer and the process control block; 
  * Spawn the first kernel process, GPID_PROCESS (pid=1).

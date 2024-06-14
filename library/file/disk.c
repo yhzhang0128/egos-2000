@@ -1,10 +1,8 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
- * Description: the inode_store structure for accessing the physical disk
+ *
+ * Description: the inode_store interface for accessing the physical disk
  */
 
 #include "egos.h"

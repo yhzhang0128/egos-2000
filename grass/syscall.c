@@ -1,10 +1,8 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
- * Description: the system call interface to user applications
+ *
+ * Description: the system call interface
  */
 
 #include "egos.h"

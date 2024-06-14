@@ -1,9 +1,7 @@
 /*
- * (C) 2023, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Robbert van Renesse
+ *
  * Description: course project, user-level threading
  * Students implement a threading package and semaphore;
  * And then spawn multiple threads as either producer or consumer.

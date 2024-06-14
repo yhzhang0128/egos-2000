@@ -1,11 +1,9 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: memory management unit (MMU)
- * implementation of 2 translation mechanisms: page table and software TLB
+ * 2 memory translation mechanisms: page table and software TLB
  */
 
 #include "egos.h"

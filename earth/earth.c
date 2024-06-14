@@ -1,9 +1,7 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
+ *
  * Description: Initialize the bss and data segments;
  * Initialize dev_tty, dev_disk, cpu_intr and cpu_mmu;
  * Load the grass layer binary from disk and run it.

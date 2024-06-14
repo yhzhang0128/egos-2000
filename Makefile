@@ -1,3 +1,6 @@
+# (C) 2024, Cornell University
+# All rights reserved.
+
 # BOARD can be a7_35t, a7_100t or s7_50
 BOARD = a7_35t
 QEMU = qemu-system-riscv32

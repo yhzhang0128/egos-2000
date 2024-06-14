@@ -1,10 +1,8 @@
 /*
- * (C) 2022, Cornell University
+ * (C) 2024, Cornell University
  * All rights reserved.
- */
-
-/* Author: Yunhao Zhang
- * Description: read and write SD card blocks
+ *
+ * Description: read / write blocks on an SD card
  */
 
 #include "sd.h"
