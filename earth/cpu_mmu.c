@@ -91,10 +91,10 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
     uint vpn1 = addr >> 22;
 
     if (root[vpn1] & 0x1) {
-        // Leaf has been allocated
+        /* Leaf has been allocated */
         leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000);
     } else {
-        // Leaf has not been allocated
+        /* Leaf has not been allocated */
         earth->mmu_alloc(&frame_id, (void**)&leaf);
         table[frame_id].pid = pid;
         memset(leaf, 0, PAGE_SIZE);

@@ -23,11 +23,11 @@ int main() {
     char buf[SYSCALL_MSG_LEN];
 
     sys_spawn(SYS_FILE_EXEC_START);
-    grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);
+    grass->sys_recv(GPID_FILE, NULL, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(SYS_DIR_EXEC_START);
-    grass->sys_recv(NULL, buf, SYSCALL_MSG_LEN);
+    grass->sys_recv(GPID_DIR, NULL, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(SYS_SHELL_EXEC_START);
@@ -35,7 +35,7 @@ int main() {
     while (1) {
         struct proc_request *req = (void*)buf;
         struct proc_reply *reply = (void*)buf;
-        grass->sys_recv(&sender, buf, SYSCALL_MSG_LEN);
+        grass->sys_recv(GPID_ALL, &sender, buf, SYSCALL_MSG_LEN);
 
         switch (req->type) {
         case PROC_SPAWN:
@@ -43,20 +43,20 @@ int main() {
 
             /* Handling background processes */
             shell_waiting = (req->argv[req->argc - 1][0] != '&');
-            if (!shell_waiting && app_pid > 0)
+            if (!shell_waiting && reply->type == CMD_OK)
                 INFO("process %d running in the background", app_pid);
-            grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
+            grass->sys_send(GPID_SHELL, (void*)reply, sizeof(*reply));
             break;
         case PROC_EXIT:
             grass->proc_free(sender);
 
             if (shell_waiting && app_pid == sender)
-                grass->sys_send(GPID_SHELL, (void*)reply, sizeof(reply));
+                grass->sys_send(GPID_SHELL, (void*)reply, sizeof(*reply));
             else
                 INFO("background process %d terminated", sender);
             break;
         case PROC_KILLALL:
-            grass->proc_free(-1); break;
+            grass->proc_free(GPID_ALL); break;
         default:
             FATAL("sys_proc: invalid request %d", req->type);
         }

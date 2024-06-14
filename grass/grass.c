@@ -10,8 +10,8 @@
  */
 
 #include "egos.h"
-#include "process.h"
 #include "syscall.h"
+#include "process.h"
 
 struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
@@ -19,6 +19,8 @@ struct earth *earth = (void*)GRASS_STACK_TOP;
 static int sys_proc_read(uint block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
+
+void kernel_entry(uint, uint);
 
 int main() {
     CRITICAL("Enter the grass layer");
@@ -34,6 +36,10 @@ int main() {
 
     /* Register the kernel entry */
     earth->kernel_entry_init(kernel_entry);
+
+    /* Initialize IPC Buffer */
+    msg_buffer = (struct pending_ipc *)(APPS_STACK_TOP + sizeof(*grass));
+    msg_buffer->in_use = 0;
     
     /* Load the first kernel process GPID_PROCESS */
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);

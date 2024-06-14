@@ -18,9 +18,18 @@ struct sys_msg {
 struct syscall {
     enum syscall_type type;  /* Type of the system call */
     struct sys_msg msg;      /* Data of the system call */
-    int retval;              /* Return value of the system call */
 };
 
+struct pending_ipc
+{
+    int in_use;
+    int sender;
+    int receiver;
+    char msg[SYSCALL_MSG_LEN];
+};
+
+extern struct pending_ipc *msg_buffer;
+
 void sys_exit(int status);
-int  sys_send(int pid, char* msg, uint size);
-int  sys_recv(int* pid, char* buf, uint size);
+void sys_send(int receiver, char* msg, uint size);
+void sys_recv(int from, int* sender, char* buf, uint size);

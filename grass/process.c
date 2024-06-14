@@ -8,8 +8,8 @@
  */
 
 #include "egos.h"
-#include "process.h"
 #include "syscall.h"
+#include "process.h"
 #include <string.h>
 
 static void proc_set_status(int pid, enum proc_status status) {
@@ -20,6 +20,7 @@ static void proc_set_status(int pid, enum proc_status status) {
 void proc_set_ready(int pid) { proc_set_status(pid, PROC_READY); }
 void proc_set_running(int pid) { proc_set_status(pid, PROC_RUNNING); }
 void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
+void proc_set_pending(int pid) { proc_set_status(pid, PROC_PENDING_SYSCALL); }
 
 int proc_alloc() {
     static uint proc_nprocs = 0;
@@ -34,7 +35,7 @@ int proc_alloc() {
 }
 
 void proc_free(int pid) {
-    if (pid != -1) {
+    if (pid != GPID_ALL) {
         earth->mmu_free(pid);
         proc_set_status(pid, PROC_UNUSED);
         return;
