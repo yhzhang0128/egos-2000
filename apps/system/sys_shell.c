@@ -25,6 +25,12 @@ int parse_request(char* buf, struct proc_request* req) {
 }
 
 int main() {
+    if (earth->platform == QEMU) {
+        *(uint*)(0x20800004) = 1;              /* Only the booting core is running now */
+        *(uint*)(0x20800000) = 0;              /* Release the boot lock */
+        while ( (*(uint*)(0x20800004)) != 4 ); /* Wait for the other 3 cores to start  */
+    }
+
     CRITICAL("Welcome to the egos-2000 shell!");
     
     char buf[256] = "cd";  /* Enter the home directory first */
