@@ -29,7 +29,7 @@ int main() {
     INFO("sys_proc receives: %s", buf);
 
     sys_spawn(SYS_SHELL_EXEC_START);
-    
+
     while (1) {
         struct proc_request *req = (void*)buf;
         struct proc_reply *reply = (void*)buf;

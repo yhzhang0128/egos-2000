@@ -9,10 +9,19 @@
     .global earth_entry, trap_from_M_mode, trap_from_S_mode
 
 earth_entry:
-    li t0, 0x8         /* The first instruction during boot up */
-    csrc mstatus, t0   /* Disable interrupt */
     li sp, 0x80003f80
-    call main
+
+    csrr a0, mhartid
+    beq a0, zero, boot /* Directly call boot() in Arty */
+
+    lui t0, 0x20800    /* Acquire the boot lock only in multi-core QEMU */
+    li t1, 1
+    amoswap.w.aq t1, t1, (t0)
+    bnez t1, earth_entry
+
+    lw t1, 4(t0)       /* If no other core is running, this core is booting */
+    beq t1, zero, boot
+    call non_boot      /* Otherwise, this is a non-booting core */
 
 trap_from_S_mode:
     /* Set mstatus.MPRV to enable page table translation in M mode */
@@ -31,8 +40,7 @@ trap_from_M_mode:
        Step6: invoke the mret instruction*/
     csrw mscratch, sp  /* Step1 */
     lui sp, 0x80004
-    addi sp, sp, -128  /* Kernel stack is 0x80003f80 */
-    addi sp, sp, -116  /* Step2 */
+    addi sp, sp, -244  /* Step2, sp is now SAVED_REGISTER_ADDR */
     sw ra, 0(sp)
     sw t0, 4(sp)
     sw t1, 8(sp)
@@ -95,4 +103,4 @@ trap_from_M_mode:
     lw s10, 104(sp)
     lw s11, 108(sp)
     lw sp, 112(sp)      /* Step5 */
-   mret                 /* Step6 */
+    mret                /* Step6 */

@@ -20,8 +20,6 @@ struct pending_ipc *msg_buffer;
 
 static void intr_entry(uint);
 static void excp_entry(uint);
-static void proc_yield();
-static void proc_try_syscall(struct process *proc);
 
 void kernel_entry(uint is_interrupt, uint id) {
     /* Save process context */
@@ -35,10 +33,19 @@ void kernel_entry(uint is_interrupt, uint id) {
     memcpy(SAVED_REGISTER_ADDR, proc_set[proc_curr_idx].saved_register, SAVED_REGISTER_SIZE);
 }
 
+#define INTR_ID_TIMER      7
 #define EXCP_ID_ECALL_U    8
 #define EXCP_ID_ECALL_M    11
+static void proc_yield();
+static void proc_try_syscall(struct process *proc);
 
 static void excp_entry(uint id) {
+    if (id >= EXCP_ID_ECALL_U && id <= EXCP_ID_ECALL_M) {
+        proc_set[proc_curr_idx].mepc += 4;
+        proc_try_syscall(&proc_set[proc_curr_idx]);
+        proc_yield();
+        return;
+    }
     /* Student's code goes here (system call and memory exception). */
 
     /* If id is for system call, handle the system call and return */
@@ -49,26 +56,15 @@ static void excp_entry(uint id) {
     FATAL("excp_entry: kernel got exception %d", id);
 }
 
-#define INTR_ID_SOFT       3
-#define INTR_ID_TIMER      7
-
 static void intr_entry(uint id) {
-    if (id == INTR_ID_TIMER && curr_pid < GPID_SHELL) {
-        /* Do not interrupt kernel processes since IO can be stateful */
-        earth->timer_reset();
-        return;
-    }
-
     if (earth->tty_recv_intr() && curr_pid >= GPID_USER_START) {
         /* User process killed by ctrl+c interrupt */
         INFO("process %d killed by interrupt", curr_pid);
         proc_set[proc_curr_idx].mepc = (uint)sys_exit;
-        return;
     }
 
-    /* Ignore other interrupts for now */
-    if (id == INTR_ID_SOFT) proc_try_syscall(&proc_set[proc_curr_idx]);
-    proc_yield();
+    /* Do not interrupt kernel processes since IO can be stateful */
+    if (id == INTR_ID_TIMER && curr_pid >= GPID_SHELL) proc_yield();
 }
 
 static void proc_yield() {
@@ -147,10 +143,8 @@ static int proc_try_recv(struct syscall *sc, struct process *receiver) {
 
 static void proc_try_syscall(struct process *proc) {
     struct syscall *sc = (struct syscall*)SYSCALL_ARG;
+
     int rc;
-
-    *((int*)MSIP) = 0;
-
     switch (sc->type) {
     case SYS_RECV:
         rc = proc_try_recv(sc, proc);
@@ -162,11 +156,10 @@ static void proc_try_syscall(struct process *proc) {
         FATAL("proc_try_syscall: got unknown syscall type=%d", sc->type);
     }
 
-    if (rc == -1) {
+    if (rc == 0) {
+        proc_set_runnable(proc->pid);
+    } else {
         proc_set_pending(proc->pid);
         proc->pending_syscall = sc->type;
-    } else {
-        sc->type = SYS_UNUSED;
-        proc_set_runnable(proc->pid);
     }
 }

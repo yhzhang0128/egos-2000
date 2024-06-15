@@ -7,12 +7,12 @@ QEMU = qemu-system-riscv32
 
 ifeq ($(TOOLCHAIN), GNU)
 # The official GNU toolchain binaries
-RISCV_CC = riscv32-unknown-elf-gcc -march=rv32im_zicsr
+RISCV_CC = riscv32-unknown-elf-gcc -march=rv32ima_zicsr
 OBJDUMP = riscv32-unknown-elf-objdump
 OBJCOPY = riscv32-unknown-elf-objcopy
 else
 # GNU toolchain binaries from SiFive
-RISCV_CC = riscv64-unknown-elf-gcc -march=rv32i
+RISCV_CC = riscv64-unknown-elf-gcc -march=rv32ima
 OBJDUMP = riscv64-unknown-elf-objdump
 OBJCOPY = riscv64-unknown-elf-objcopy
 endif
@@ -69,7 +69,7 @@ qemu: install
 	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
 	cp $(RELEASE)/earth.elf tools/qemu/egos.elf
 	$(OBJCOPY) --update-section .image=tools/disk.img tools/qemu/egos.elf
-	$(QEMU) -nographic -readconfig tools/qemu/`$(QEMU) --version | grep -c SiFive`.cfg
+	$(QEMU) -nographic -readconfig tools/qemu/config.toml
 
 program: install
 	@echo "$(YELLOW)-------- Program the Arty $(BOARD) on-board ROM --------$(END)"
