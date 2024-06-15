@@ -28,8 +28,8 @@ struct earth {
     int (*tty_critical)(const char *format, ...);
 
     /* Some information about earth layer configuration */
+    enum { ARTY, QEMU } platform;
     enum { PAGE_TABLE, SOFT_TLB } translation;
-    enum { ARTY, QEMU_SIFIVE, QEMU_LATEST } platform;
 };
 
 struct grass {
@@ -80,7 +80,7 @@ extern struct grass *grass;
 
 /* Platform specific configuration */
 #define SPI_BASE   (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
-#define UART0_BASE (earth->platform == QEMU_LATEST? 0x10010000UL : 0x10013000UL)
+#define UART0_BASE (earth->platform == ARTY? 0x10013000UL : 0x10010000UL)
 
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))

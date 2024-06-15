@@ -22,14 +22,10 @@ struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
 extern char bss_start, bss_end, data_rom, data_start, data_end;
 
-static void earth_init() {
-    earth->platform = ARTY;
-    uint BIOS_MAGIC = *((uint*)0x8000002c), core_id;
-    if (BIOS_MAGIC == 52) earth->platform = QEMU_SIFIVE;
-    if (BIOS_MAGIC == 90) earth->platform = QEMU_LATEST;
+static void earth_init(uint core_id) {
+    earth->platform = (core_id == 0)? ARTY : QEMU;
 
     tty_init();
-    asm("csrr %0, mhartid" : "=r"(core_id));
     CRITICAL("--- Booting with %s, core #%u ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
 
     disk_init();
@@ -45,13 +41,13 @@ static int grass_read(uint block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
-int main() {
+int boot(uint core_id) {
     /* Prepare the bss and data memory regions */
     memset(&bss_start, 0, (&bss_end - &bss_start));
     memcpy(&data_start, &data_rom, (&data_end - &data_start));
 
     /* Initialize the earth layer */
-    earth_init();
+    earth_init(core_id);
 
     /* Load and enter the grass layer */
     elf_load(0, grass_read, 0, 0);

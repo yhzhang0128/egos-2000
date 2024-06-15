@@ -12,13 +12,19 @@ earth_entry:
     li t0, 0x8       /* Disable interrupt */
     csrc mstatus, t0
 
-    lui a0, 0x20800  /* Attempt to acquire a lock */
-    li t0, 1
-    amoswap.w.aq t0, t0, (a0)
-    bnez t0, earth_entry
+    csrr a0, mhartid /* mhartid == 0 implies running on Arty */
+                     /* because core #0 on QEMU is disabled. */
+                     /* See tools/qemu/qemu.cfg for reasons. */
+    beq a0, zero, boot_core
 
-    li sp, 0x80003f80 /* Enter the main() in earth.c */
-    call main
+    lui t0, 0x20800  /* Attempt to acquire lock only in QEMU */
+    li t1, 1
+    amoswap.w.aq t1, t1, (t0)
+    bne t1, zero, earth_entry
+
+boot_core:
+    li sp, 0x80003f80
+    call boot
 
 trap_from_S_mode:
     /* Set mstatus.MPRV to enable page table translation in M mode */
