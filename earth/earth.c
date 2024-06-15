@@ -24,12 +24,13 @@ extern char bss_start, bss_end, data_rom, data_start, data_end;
 
 static void earth_init() {
     earth->platform = ARTY;
-    uint BIOS_MAGIC = *((uint*)0x8000002c);
+    uint BIOS_MAGIC = *((uint*)0x8000002c), core_id;
     if (BIOS_MAGIC == 52) earth->platform = QEMU_SIFIVE;
     if (BIOS_MAGIC == 90) earth->platform = QEMU_LATEST;
 
     tty_init();
-    CRITICAL("--- Booting on %s ---", earth->platform == ARTY? "Arty" : "QEMU");
+    asm("csrr %0, mhartid" : "=r"(core_id));
+    CRITICAL("--- Booting with %s, core #%u ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
 
     disk_init();
     SUCCESS("Finished initializing the tty and disk devices");

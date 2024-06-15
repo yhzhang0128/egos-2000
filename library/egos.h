@@ -79,7 +79,6 @@ extern struct grass *grass;
 #endif
 
 /* Platform specific configuration */
-#define MSIP       (earth->platform == ARTY? 0x2000000UL : 0x2000004UL)
 #define SPI_BASE   (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
 #define UART0_BASE (earth->platform == QEMU_LATEST? 0x10010000UL : 0x10013000UL)
 

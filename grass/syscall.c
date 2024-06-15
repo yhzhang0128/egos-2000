@@ -11,20 +11,13 @@
 
 static struct syscall *sc = (struct syscall*)SYSCALL_ARG;
 
-static void sys_invoke() {
-    /* The standard way of system call is using the `ecall` instruction; 
-     * Switching to ecall is given to students as an exercise */
-    *((int*)MSIP) = 1;
-    while (sc->type != SYS_UNUSED);
-}
-
 void sys_send(int receiver, char* msg, uint size) {
     if (size > SYSCALL_MSG_LEN) FATAL("sys_send: msg size larger than SYSCALL_MSG_LEN");
 
     sc->type = SYS_SEND;
     sc->msg.receiver = receiver;
     memcpy(sc->msg.content, msg, size);
-    sys_invoke(); 
+    asm("ecall");
 }
 
 void sys_recv(int from, int* sender, char* buf, uint size) {
@@ -32,7 +25,8 @@ void sys_recv(int from, int* sender, char* buf, uint size) {
 
     sc->msg.sender = from;
     sc->type = SYS_RECV;
-    sys_invoke();
+    asm("ecall");
+
     memcpy(buf, sc->msg.content, size);
     if (sender) *sender = sc->msg.sender;
 }

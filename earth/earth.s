@@ -9,9 +9,15 @@
     .global earth_entry, trap_from_M_mode, trap_from_S_mode
 
 earth_entry:
-    li t0, 0x8         /* The first instruction during boot up */
-    csrc mstatus, t0   /* Disable interrupt */
-    li sp, 0x80003f80
+    li t0, 0x8       /* Disable interrupt */
+    csrc mstatus, t0
+
+    lui a0, 0x20800  /* Attempt to acquire a lock */
+    li t0, 1
+    amoswap.w.aq t0, t0, (a0)
+    bnez t0, earth_entry
+
+    li sp, 0x80003f80 /* Enter the main() in earth.c */
     call main
 
 trap_from_S_mode:
