@@ -41,15 +41,6 @@ static int grass_read(uint block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
-void non_boot(uint core_id) {
-    SUCCESS("--- Core #%u starts running ---", core_id);
-    *(uint*)(0x20800004) += 1;
-    *(uint*)(0x20800000) = 0;  /* Release the boot lock */
-
-    /* Student's code goes here (multi-core and atomic instruction) */
-    while(1);
-}
-
 void boot(uint core_id) {
     /* Prepare the bss and data memory regions */
     memset(&bss_start, 0, (&bss_end - &bss_start));
@@ -68,4 +59,13 @@ void boot(uint core_id) {
 
     asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
     asm("mret");
+}
+
+void non_boot(uint core_id) {
+    SUCCESS("--- Core #%u starts running ---", core_id);
+    *(uint*)(0x20800004) += 1;
+    *(uint*)(0x20800000) = 0;  /* Release the boot lock */
+
+    /* Student's code goes here (multi-core and atomic instruction) */
+    while(1);
 }
