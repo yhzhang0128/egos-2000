@@ -26,7 +26,7 @@ static void earth_init(uint core_id) {
     earth->platform = (core_id == 0)? ARTY : QEMU;
 
     tty_init();
-    CRITICAL("--- Booting with %s, core #%u ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
+    CRITICAL("--- Booting on %s with core #%u ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
 
     disk_init();
     SUCCESS("Finished initializing the tty and disk devices");

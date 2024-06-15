@@ -9,19 +9,19 @@ It can run on RISC-V boards and the QEMU software emulator.
 
 ```shell
 # The cloc utility is used to count the lines of code (LOC).
-# The command below counts the LOC of everything excluding text documents.
-> cloc egos-2000 --exclude-ext=md,txt
+# The command below counts the LOC of everything excluding text files.
+> cloc egos-2000 --exclude-ext=md,txt,toml
 ...
 github.com/AlDanial/cloc v 1.94  T=0.05 s (949.3 files/s, 62349.4 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               36            464            597           1547
-C/C++ Header                    10             70            105            298
-Assembly                         3              6             26             91
-make                             1             14              3             64
+C                               36            463            594           1543
+C/C++ Header                    10             70            105            297
+Assembly                         3              9             26             96
+make                             1             15              5             64
 -------------------------------------------------------------------------------
-SUM:                            50            554            731           2000 (exactly 2000!)
+SUM:                            50            557            730           2000 (exactly!)
 -------------------------------------------------------------------------------
 ```
 
