@@ -36,9 +36,8 @@ int main() {
     earth->kernel_entry_init(kernel_entry);
 
     /* Initialize IPC Buffer */
-    msg_buffer = (struct pending_ipc *)(APPS_STACK_TOP + sizeof(*grass));
     msg_buffer->in_use = 0;
-    
+
     /* Load the first kernel process GPID_PROCESS */
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);

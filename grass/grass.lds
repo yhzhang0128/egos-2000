@@ -4,7 +4,7 @@ ENTRY(grass_entry)
 
 MEMORY
 {
-    ram (arw!xi) : ORIGIN = 0x08002800, LENGTH = 0x2800
+    ram (arw!xi) : ORIGIN = 0x08002000, LENGTH = 0x3000
 }
 
 PHDRS

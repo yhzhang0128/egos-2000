@@ -25,10 +25,6 @@ struct process{
 };
 
 #define MAX_NPROCESS  8
-extern uint proc_curr_idx;
-extern struct process proc_set[MAX_NPROCESS];
-#define curr_pid      proc_set[proc_curr_idx].pid
-#define curr_status   proc_set[proc_curr_idx].status
 
 int  proc_alloc();
 void proc_free(int);

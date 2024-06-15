@@ -15,8 +15,8 @@
 void tty_init();
 void disk_init();
 void mmu_init();
-void timer_init();
 void intr_init();
+void timer_init(uint core_id);
 
 struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
@@ -32,7 +32,7 @@ static void earth_init(uint core_id) {
     SUCCESS("Finished initializing the tty and disk devices");
 
     mmu_init();
-    timer_init();
+    timer_init(core_id);
     intr_init();
     SUCCESS("Finished initializing the MMU, timer and interrupts");
 }
@@ -63,9 +63,11 @@ void boot(uint core_id) {
 
 void non_boot(uint core_id) {
     SUCCESS("--- Core #%u starts running ---", core_id);
-    *(uint*)(0x20800004) += 1;
+    *(uint*)(0x20800004) += 1; /* One more core is running */
     *(uint*)(0x20800000) = 0;  /* Release the boot lock */
 
     /* Student's code goes here (multi-core and atomic instruction) */
+
+    /* Instead of stalling here, enter the scheduler of grass kernel  */
     while(1);
 }
