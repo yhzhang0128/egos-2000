@@ -10,6 +10,8 @@
 #include "process.h"
 #include <string.h>
 
+extern struct process proc_set[MAX_NPROCESS];
+
 static void proc_set_status(int pid, enum proc_status status) {
     for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].pid == pid) proc_set[i].status = status;

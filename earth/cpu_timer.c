@@ -20,22 +20,19 @@ static ulonglong mtime_get() {
     return (((ulonglong)high) << 32) | low;
 }
 
-static int mtimecmp_set(ulonglong time) {
-    uint mhartid;
-    asm("csrr %0, mhartid" : "=r"(mhartid));
-
-    REGW(0x2004000, mhartid * 8 + 4) = 0xFFFFFFFF;
-    REGW(0x2004000, mhartid * 8 + 0) = (uint)time;
-    REGW(0x2004000, mhartid * 8 + 4) = (uint)(time >> 32);
+static int mtimecmp_set(ulonglong time, uint core_id) {
+    REGW(0x2004000, core_id * 8 + 4) = 0xFFFFFFFF;
+    REGW(0x2004000, core_id * 8 + 0) = (uint)time;
+    REGW(0x2004000, core_id * 8 + 4) = (uint)(time >> 32);
 
     return 0;
 }
 
 static uint QUANTUM;
-int timer_reset() { return mtimecmp_set(mtime_get() + QUANTUM); }
+int timer_reset(uint core_id) { return mtimecmp_set(mtime_get() + QUANTUM, core_id); }
 
-void timer_init()  {
+void timer_init(uint core_id)  {
     earth->timer_reset = timer_reset;
     QUANTUM = (earth->platform == ARTY)? 5000 : 500000;
-    mtimecmp_set(0x0FFFFFFFFFFFFFFFUL);
+    mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 }

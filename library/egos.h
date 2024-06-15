@@ -5,7 +5,7 @@ typedef unsigned long long ulonglong;
 
 struct earth {
     /* CPU interface */
-    int (*timer_reset)();
+    int (*timer_reset)(uint core_id);
     int (*kernel_entry_init)(void (*entry)(uint, uint));
 
     int (*mmu_alloc)(uint* frame_no, void** cached_addr);
@@ -51,6 +51,8 @@ struct grass {
 extern struct earth *earth;
 extern struct grass *grass;
 
+#define NCORES            4
+
 /* Memory layout */
 #define PAGE_SIZE         4096
 #define FRAME_CACHE_END   0x80020000
@@ -63,8 +65,8 @@ extern struct grass *grass;
 #define APPS_ARG          0x80000000  /* 1KB    app main() argc, argv */
 #define APPS_SIZE         0x00003000
 #define APPS_ENTRY        0x08005000  /* 12KB   app code+data         */
-#define GRASS_SIZE        0x00002800
-#define GRASS_ENTRY       0x08002800  /* 8KB    grass code+data       */
+#define GRASS_SIZE        0x00003000
+#define GRASS_ENTRY       0x08002000  /* 8KB    grass code+data       */
                                        /* 12KB   earth data            */
                                        /* earth code is in QSPI flash  */
 
