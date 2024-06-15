@@ -20,8 +20,6 @@ struct pending_ipc *msg_buffer;
 
 static void intr_entry(uint);
 static void excp_entry(uint);
-static void proc_yield();
-static void proc_try_syscall(struct process *proc);
 
 void kernel_entry(uint is_interrupt, uint id) {
     /* Save process context */
@@ -38,6 +36,8 @@ void kernel_entry(uint is_interrupt, uint id) {
 #define INTR_ID_TIMER      7
 #define EXCP_ID_ECALL_U    8
 #define EXCP_ID_ECALL_M    11
+static void proc_yield();
+static void proc_try_syscall(struct process *proc);
 
 static void excp_entry(uint id) {
     if (id >= EXCP_ID_ECALL_U && id <= EXCP_ID_ECALL_M) {
