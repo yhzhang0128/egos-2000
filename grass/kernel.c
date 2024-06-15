@@ -14,11 +14,11 @@
 #include "process.h"
 #include <string.h>
 
-uint core_in_grass;
+uint core_in_kernel;
 uint core_curr_proc[NCORES + 1];
 struct process proc_set[MAX_NPROCESS];
 
-#define curr_proc_idx core_curr_proc[core_in_grass]
+#define curr_proc_idx core_curr_proc[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
 #define curr_status   proc_set[curr_proc_idx].status
 
@@ -26,10 +26,11 @@ static void intr_entry(uint);
 static void excp_entry(uint);
 
 void kernel_entry(uint is_interrupt, uint id) {
-    asm("csrr %0, mhartid" : "=r"(core_in_grass));
+    /* With the kernel lock, only one core can be in the kernel at any time */
+    asm("csrr %0, mhartid" : "=r"(core_in_kernel));
 
     /* Save process context */
-    /* curr_proc_idx == MAX_NPROCESS marks that core_in_grass is idle and not runnig a process  */
+    /* curr_proc_idx == MAX_NPROCESS marks that core_in_kernel is idle and not runnig a process  */
     if (curr_proc_idx != MAX_NPROCESS) {
         asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
         memcpy(proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
@@ -93,11 +94,11 @@ static void proc_yield() {
     }
 
     if (curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
-    earth->timer_reset(core_in_grass);
+    earth->timer_reset(core_in_kernel);
     if (next_idx == -1) {
         /* Student's code goes here (multi-core and atomic instruction) */
 
-        FATAL("proc_yield: no process to run on core %u", core_in_grass);
+        FATAL("proc_yield: no process to run on core %u", core_in_kernel);
 
         /* Student's code ends here. */
     }
