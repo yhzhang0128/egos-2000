@@ -55,7 +55,7 @@ While using the pre-built binaries is easier, you can also compile and install t
 
 ## Step2: Run egos-2000 on the QEMU emulator
 
-Download the pre-built binaries of QEMU from [xPack](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v7.2.5-1) or [SiFive](https://github.com/sifive/freedom-tools/releases/tag/v2020.08.0).
+Download the pre-built binaries of QEMU from [xPack](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v7.2.5-1).
 
 ```shell
 > cd $EGOS
