@@ -18,10 +18,9 @@ static int sys_proc_read(uint block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
 
-void kernel_entry(uint, uint);
-
+void kernel_entry(uint mcause);
 int main() {
-    CRITICAL("Enter the grass layer");
+    CRITICAL("Enter the grass layer, kernel_entry @0x%x", kernel_entry);
 
     /* Initialize the grass interface functions */
     grass->proc_alloc = proc_alloc;
@@ -31,9 +30,6 @@ int main() {
     grass->sys_exit = sys_exit;
     grass->sys_send = sys_send;
     grass->sys_recv = sys_recv;
-
-    /* Register the kernel entry */
-    earth->kernel_entry_init(kernel_entry);
 
     /* Initialize IPC Buffer */
     msg_buffer->in_use = 0;

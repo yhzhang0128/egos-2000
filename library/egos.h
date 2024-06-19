@@ -8,8 +8,6 @@ struct earth {
 
     /* CPU interface */
     int (*timer_reset)(uint core_id);
-    int (*kernel_entry_init)(void (*entry)(uint, uint));
-
     int (*mmu_alloc)(uint* frame_no, void** cached_addr);
     int (*mmu_free)(int pid);
     int (*mmu_map)(int pid, uint page_no, uint frame_no);
@@ -29,7 +27,7 @@ struct earth {
     int (*tty_success)(const char *format, ...);
     int (*tty_critical)(const char *format, ...);
 
-    /* Some information about earth layer configuration */
+    /* Earth configuration */
     enum { ARTY, QEMU } platform;
     enum { PAGE_TABLE, SOFT_TLB } translation;
 };

@@ -22,37 +22,40 @@ RELEASE = build/release
 
 APPS_DEPS = apps/*.* library/egos.h library/*/*
 GRASS_DEPS = grass/* library/egos.h library/*/*
-EARTH_DEPS = earth/* earth/sd/* library/egos.h library/*/*
-USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/user/*.c)))
-SYSAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/system/*.c)))
+EARTH_DEPS = earth/* earth/sd/* library/egos.h library/*/* build/release/grass.elf
+KERNEL_ENTRY_ADDR = $(OBJDUMP) -t build/release/grass.elf | grep "kernel_entry" | grep -o '^[^ ]*'
 
 LDFLAGS = -nostdlib -lc -lgcc
+DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
+EARTH_MACRO = -D CPU_CLOCK_RATE=65000000 -D KERNEL_ENTRY=0x`$(KERNEL_ENTRY_ADDR)`
 INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/servers
 CFLAGS = -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
-COMMON = $(CFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
-DEBUG_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+
+USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/user/*.c)))
+SYSAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/system/*.c)))
 
 egos: $(USRAPP_ELFS) $(SYSAPP_ELFS) $(RELEASE)/grass.elf $(RELEASE)/earth.elf
 
 $(RELEASE)/earth.elf: $(EARTH_DEPS)
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
-	$(RISCV_CC) $(COMMON) earth/earth.s $(filter %.c, $(wildcard $^)) -Tearth/earth.lds $(LDFLAGS) -o $@
+	@echo "$(YELLOW)Kernel entry$(END) in grass.elf is $(YELLOW)0x`$(KERNEL_ENTRY_ADDR)`$(END)"
+	$(RISCV_CC) $(CFLAGS) $(INCLUDE) $(EARTH_MACRO) earth/earth.s $(filter %.c, $(wildcard $^)) -Tearth/earth.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/earth.lst
 
 $(RELEASE)/grass.elf: $(GRASS_DEPS)
 	@echo "$(GREEN)-------- Compile the Grass Layer --------$(END)"
-	$(RISCV_CC) $(COMMON) grass/grass.s $(filter %.c, $(wildcard $^)) -Tgrass/grass.lds $(LDFLAGS) -o $@
+	$(RISCV_CC) $(CFLAGS) $(INCLUDE) grass/grass.s $(filter %.c, $(wildcard $^)) -Tgrass/grass.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/grass.lst
 
 $(SYSAPP_ELFS): $(RELEASE)/%.elf : apps/system/%.c $(APPS_DEPS)
 	@echo "Compile app$(CYAN)" $(patsubst %.c, %, $(notdir $<)) "$(END)=>" $@
-	@$(RISCV_CC) $(COMMON) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tapps/app.lds $(LDFLAGS) -o $@
+	@$(RISCV_CC) $(CFLAGS) $(INCLUDE) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tapps/app.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
 
 $(USRAPP_ELFS): $(RELEASE)/%.elf : apps/user/%.c $(APPS_DEPS)
 	@mkdir -p $(DEBUG) $(RELEASE)
 	@echo "Compile app$(CYAN)" $(patsubst %.c, %, $(notdir $<)) "$(END)=>" $@
-	@$(RISCV_CC) $(COMMON) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tapps/app.lds $(LDFLAGS) -o $@
+	@$(RISCV_CC) $(CFLAGS) $(INCLUDE) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tapps/app.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
 
 install: egos

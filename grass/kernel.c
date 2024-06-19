@@ -25,7 +25,7 @@ struct process proc_set[MAX_NPROCESS];
 static void intr_entry(uint);
 static void excp_entry(uint);
 
-void kernel_entry(uint is_interrupt, uint id) {
+void kernel_entry(uint mcause) {
     /* With the kernel lock, only one core can be in the kernel at any time */
     asm("csrr %0, mhartid" : "=r"(core_in_kernel));
 
@@ -36,7 +36,8 @@ void kernel_entry(uint is_interrupt, uint id) {
         memcpy(proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
     }
 
-    (is_interrupt)? intr_entry(id) : excp_entry(id);
+    uint id = mcause & 0x3FF;
+    (mcause & (1 << 31))? intr_entry(id) : excp_entry(id);
 
     /* Restore process context */
     asm("csrw mepc, %0" ::"r"(proc_set[curr_proc_idx].mepc));

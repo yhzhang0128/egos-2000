@@ -62,5 +62,5 @@ SECTIONS
     PROVIDE( data_rom = LOADADDR(.data) );
     PROVIDE( data_start = ADDR(.data) );
     PROVIDE( data_end = ADDR(.data) + SIZEOF(.data) );
-    PROVIDE( __heap_end = 0x08002000);
+    PROVIDE( __heap_end = 0x08002000 );
 }

@@ -6,7 +6,7 @@
  */
     .section .image.placeholder
     .section .text.enter
-    .global boot_loader, trap_from_M_mode, trap_from_S_mode
+    .global boot_loader, trap_from_M_mode, trap_from_S_mode, kernel_entry
 
 boot_loader:
     li sp, 0x80003f80
@@ -28,22 +28,23 @@ trap_from_S_mode:
 
 trap_from_M_mode:
     /* Step1: switch to the kernel stack
-       Step2: acquire the egos lock (TODO for students)
+       Step2: acquire earth->egos_lock
        Step3: save all registers on the kernel stack
-       Step4: call trap_entry()
+       Step4: call kernel_entry()
        Step5: restore all registers
        Step6: switch back to the user stack
-       Step7: release the egos lock (TODO for students)
+       Step7: release earth->egos_lock
        Step8: invoke the mret instruction*/
     csrw mscratch, sp  /* Step1 */
     lui sp, 0x80004
+    addi sp, sp, -128  /* sp == GRASS_STACK_TOP */
+trap_acquire_lock:     /* Step2 (TODO for students) */
     /* Student's code goes here (multi-core and atomic instruction) */
-    addi sp, sp, -128
-trap_lock:             /* Step2 */
-                       /* Acquire earth->egos_lock */
+                       /* Acquire earth->egos_lock; This is tricky! */
+                       /* You may need to use mscratch and sscratch */
     /* Student's code ends here. */
     addi sp, sp, -116  /* Step3 */
-    sw ra, 0(sp)       /* sp is now SAVED_REGISTER_ADDR */
+    sw ra, 0(sp)       /* sp == SAVED_REGISTER_ADDR */
     sw t0, 4(sp)
     sw t1, 8(sp)
     sw t2, 12(sp)
@@ -74,8 +75,10 @@ trap_lock:             /* Step2 */
     csrr t0, mscratch
     sw t0, 112(sp)
 
-    csrr a0, mcause
-    call trap_entry    /* Step4 */
+    csrr a0, mcause    /* Step4 */
+    la t0, kernel_entry
+    lw t1, 0(t0)
+    jalr t1
 
     lw ra, 0(sp)       /* Step5 */
     lw t0, 4(sp)
@@ -106,9 +109,9 @@ trap_lock:             /* Step2 */
     lw s10, 104(sp)
     lw s11, 108(sp)
     lw sp, 112(sp)     /* Step6 */
+trap_release_lock:     /* Step7 (TODO for students) */
     /* Student's code goes here (multi-core and atomic instruction) */
-trap_unlock:           /* Step7 */
-                       /* Release earth->egos_lock */
-                       /* Use mscratch and sscratch to save & restore registers */
+                       /* Release earth->egos_lock; This is tricky! */
+                       /* You may need to use mscratch and sscratch */
     /* Student's code ends here. */
     mret               /* Step8 */

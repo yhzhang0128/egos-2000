@@ -39,6 +39,9 @@ static int grass_read(uint block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
+/* Makefile defines KERNEL_ENTRY which is parsed from grass.elf */
+void (*kernel_entry)(uint) = (void*)KERNEL_ENTRY;
+
 void boot(uint core_id, uint booted_core_cnt) {
     if (core_id == 0 || booted_core_cnt == 0) {
         /* Zero out the bss region and copy the data region from ROM */
@@ -63,12 +66,13 @@ void boot(uint core_id, uint booted_core_cnt) {
         /* This is not the first booted core */
         SUCCESS("--- Core #%u starts running ---", core_id);
         earth->booted_core_cnt++;
-        release(earth->egos_lock);
 
         /* Student's code goes here (multi-core and atomic instruction) */
 
-        /* Instead of stalling here, enter the scheduler of grass kernel  */
+        /* Initialize the MMU and interrupts on this core */
+        /* Enter the kernel_entry and mock a timer interrupt */
         while(1);
+
         /* Student's code ends here. */
     }
 }

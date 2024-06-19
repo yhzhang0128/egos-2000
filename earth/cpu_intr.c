@@ -28,12 +28,6 @@ static int mtimecmp_set(ulonglong time, uint core_id) {
 static uint QUANTUM;
 int timer_reset(uint core_id) { return mtimecmp_set(mtime_get() + QUANTUM, core_id); }
 
-static void (*kernel_entry)(uint, uint);
-int kernel_entry_init(void (*new_entry)(uint, uint)) { kernel_entry = new_entry; }
-void trap_entry(uint mcause) {
-    kernel_entry(mcause & (1 << 31), mcause & 0x3FF);
-}
-
 /* Both trap functions are defined in earth.S */
 void trap_from_M_mode();
 void trap_from_S_mode();
@@ -43,7 +37,6 @@ void intr_init(uint core_id) {
     mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
     earth->timer_reset = timer_reset;
-    earth->kernel_entry_init = kernel_entry_init;
 
     /* Setup the interrupt/exception entry function */
     if (earth->translation == PAGE_TABLE) {
