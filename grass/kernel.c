@@ -8,7 +8,6 @@
  *     proc_try_syscall() handles system calls for inter-process communication
  */
 
-
 #include "egos.h"
 #include "syscall.h"
 #include "process.h"
@@ -16,7 +15,9 @@
 
 uint core_in_kernel;
 uint core_curr_proc[NCORES + 1];
-struct process proc_set[MAX_NPROCESS];
+struct process proc_set[MAX_NPROCESS + 1];
+/* proc_set[0..MAX_NPROCESS-1] are real processes */
+/* proc_set[MAX_NPROCESS] is a place holder for idle cores */
 
 #define curr_proc_idx core_curr_proc[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
@@ -30,11 +31,8 @@ void kernel_entry(uint mcause) {
     asm("csrr %0, mhartid" : "=r"(core_in_kernel));
 
     /* Save process context */
-    /* curr_proc_idx == MAX_NPROCESS marks that core_in_kernel is idle and not runnig a process  */
-    if (curr_proc_idx != MAX_NPROCESS) {
-        asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
-        memcpy(proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
-    }
+    asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
+    memcpy(proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
 
     uint id = mcause & 0x3FF;
     (mcause & (1 << 31))? intr_entry(id) : excp_entry(id);
@@ -44,7 +42,6 @@ void kernel_entry(uint mcause) {
     memcpy(SAVED_REGISTER_ADDR, proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_SIZE);
 }
 
-#define INTR_ID_SOFT       3
 #define INTR_ID_TIMER      7
 #define EXCP_ID_ECALL_U    8
 #define EXCP_ID_ECALL_M    11
