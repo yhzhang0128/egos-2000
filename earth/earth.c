@@ -15,8 +15,7 @@
 void tty_init();
 void disk_init();
 void mmu_init();
-void intr_init();
-void timer_init(uint core_id);
+void intr_init(uint core_id);
 
 struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
@@ -32,8 +31,7 @@ static void earth_init(uint core_id) {
     SUCCESS("Finished initializing the tty and disk devices");
 
     mmu_init();
-    timer_init(core_id);
-    intr_init();
+    intr_init(core_id);
     SUCCESS("Finished initializing the MMU, timer and interrupts");
 }
 

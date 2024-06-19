@@ -1,6 +1,6 @@
 OUTPUT_ARCH("riscv")
 
-ENTRY(earth_entry)
+ENTRY(boot_loader)
 
 MEMORY
 {

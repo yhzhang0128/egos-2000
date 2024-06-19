@@ -6,15 +6,15 @@
  */
     .section .image.placeholder
     .section .text.enter
-    .global earth_entry, trap_from_M_mode, trap_from_S_mode
+    .global boot_loader, trap_from_M_mode, trap_from_S_mode
 
-earth_entry:
+boot_loader:
     li sp, 0x80003f80
     csrr a0, mhartid
     beq a0, zero, boot /* Directly call boot() in Arty (single-core) */
     li t1, 1           /* Acquire earth->stack_lock in QEMU (multi-core) */
     amoswap.w.aq t1, t1, (sp)
-    bnez t1, earth_entry
+    bnez t1, boot_loader
     lw a1, 4(sp)       /* Load earth->booted_core_cnt */
     call boot
 
@@ -28,15 +28,22 @@ trap_from_S_mode:
 
 trap_from_M_mode:
     /* Step1: switch to the kernel stack
-       Step2: save all registers on the kernel stack
-       Step3: call trap_entry()
-       Step4: restore all registers
-       Step5: switch back to the user stack
-       Step6: invoke the mret instruction*/
+       Step2: acquire the egos lock (TODO for students)
+       Step3: save all registers on the kernel stack
+       Step4: call trap_entry()
+       Step5: restore all registers
+       Step6: switch back to the user stack
+       Step7: release the egos lock (TODO for students)
+       Step8: invoke the mret instruction*/
     csrw mscratch, sp  /* Step1 */
     lui sp, 0x80004
-    addi sp, sp, -244  /* Step2, sp is now SAVED_REGISTER_ADDR */
-    sw ra, 0(sp)
+    /* Student's code goes here (multi-core and atomic instruction) */
+    addi sp, sp, -128
+trap_lock:             /* Step2 */
+                       /* Acquire earth->egos_lock */
+    /* Student's code ends here. */
+    addi sp, sp, -116  /* Step3 */
+    sw ra, 0(sp)       /* sp is now SAVED_REGISTER_ADDR */
     sw t0, 4(sp)
     sw t1, 8(sp)
     sw t2, 12(sp)
@@ -65,11 +72,12 @@ trap_from_M_mode:
     sw s10, 104(sp)
     sw s11, 108(sp)
     csrr t0, mscratch
-    sw t0, 112(sp)      /* Save user sp on kernel stack */
+    sw t0, 112(sp)
 
-    call trap_entry     /* Step3 */
+    csrr a0, mcause
+    call trap_entry    /* Step4 */
 
-    lw ra, 0(sp)        /* Step4 */
+    lw ra, 0(sp)       /* Step5 */
     lw t0, 4(sp)
     lw t1, 8(sp)
     lw t2, 12(sp)
@@ -97,5 +105,10 @@ trap_from_M_mode:
     lw s9, 100(sp)
     lw s10, 104(sp)
     lw s11, 108(sp)
-    lw sp, 112(sp)      /* Step5 */
-    mret                /* Step6 */
+    lw sp, 112(sp)     /* Step6 */
+    /* Student's code goes here (multi-core and atomic instruction) */
+trap_unlock:           /* Step7 */
+                       /* Release earth->egos_lock */
+                       /* Use mscratch and sscratch to save & restore registers */
+    /* Student's code ends here. */
+    mret               /* Step8 */
