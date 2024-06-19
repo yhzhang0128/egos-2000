@@ -4,6 +4,8 @@
 typedef unsigned long long ulonglong;
 
 struct earth {
+    int egos_lock, booted_core_cnt;
+
     /* CPU interface */
     int (*timer_reset)(uint core_id);
     int (*kernel_entry_init)(void (*entry)(uint, uint));
@@ -52,14 +54,16 @@ extern struct earth *earth;
 extern struct grass *grass;
 
 #define NCORES            4
+#define acquire(x)        while(__sync_lock_test_and_set(&x, 1) != 0);
+#define release(x)        __sync_lock_release(&x)
 
 /* Memory layout */
 #define PAGE_SIZE         4096
 #define FRAME_CACHE_END   0x80020000
 #define FRAME_CACHE_START 0x80004000  /* 112KB  frame cache           */
-                                       /*        earth interface       */
+                                      /*        earth interface       */
 #define GRASS_STACK_TOP   0x80003f80  /* 8KB    earth/grass stack     */
-                                       /*        grass interface       */
+                                      /*        grass interface       */
 #define APPS_STACK_TOP    0x80002000  /* 6KB    app stack             */
 #define SYSCALL_ARG       0x80000400  /* 1KB    system call args      */
 #define APPS_ARG          0x80000000  /* 1KB    app main() argc, argv */
@@ -67,9 +71,12 @@ extern struct grass *grass;
 #define APPS_ENTRY        0x08005000  /* 12KB   app code+data         */
 #define GRASS_SIZE        0x00003000
 #define GRASS_ENTRY       0x08002000  /* 8KB    grass code+data       */
-                                       /* 12KB   earth data            */
-                                       /* earth code is in QSPI flash  */
+                                      /* 12KB   earth data            */
+                                      /* earth code is in QSPI flash  */
 
+/* Platform specific configuration */
+#define SPI_BASE   (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
+#define UART0_BASE (earth->platform == ARTY? 0x10013000UL : 0x10010000UL)
 
 #ifndef LIBC_STDIO
 /* Only earth/dev_tty.c uses LIBC_STDIO and does not need these macros */
@@ -79,10 +86,6 @@ extern struct grass *grass;
 #define SUCCESS  earth->tty_success
 #define CRITICAL earth->tty_critical
 #endif
-
-/* Platform specific configuration */
-#define SPI_BASE   (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
-#define UART0_BASE (earth->platform == ARTY? 0x10013000UL : 0x10010000UL)
 
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))

@@ -41,33 +41,36 @@ static int grass_read(uint block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
-void boot(uint core_id) {
-    /* Prepare the bss and data memory regions */
-    memset(&bss_start, 0, (&bss_end - &bss_start));
-    memcpy(&data_start, &data_rom, (&data_end - &data_start));
+void boot(uint core_id, uint booted_core_cnt) {
+    if (core_id == 0 || booted_core_cnt == 0) {
+        /* Zero out the bss region and copy the data region from ROM */
+        memset(&bss_start, 0, (&bss_end - &bss_start));
+        memcpy(&data_start, &data_rom, (&data_end - &data_start));
 
-    /* Initialize the earth layer */
-    earth_init(core_id);
+        /* Initialize the earth layer */
+        earth_init(core_id);
+        earth->booted_core_cnt = 1;
 
-    /* Load and enter the grass layer */
-    elf_load(0, grass_read, 0, 0);
+        /* Load and enter the grass layer */
+        elf_load(0, grass_read, 0, 0);
 
-    uint mstatus, M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
-    uint GRASS_MODE = (earth->translation == SOFT_TLB)? M_MODE : S_MODE;
-    asm("csrr %0, mstatus" : "=r"(mstatus));
-    asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (GRASS_MODE << 11) | (1 << 18)));
+        uint mstatus, M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
+        uint GRASS_MODE = (earth->translation == SOFT_TLB)? M_MODE : S_MODE;
+        asm("csrr %0, mstatus" : "=r"(mstatus));
+        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (GRASS_MODE << 11) | (1 << 18)));
 
-    asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
-    asm("mret");
-}
+        asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
+        asm("mret");
+    } else {
+        /* This is not the first booted core */
+        SUCCESS("--- Core #%u starts running ---", core_id);
+        earth->booted_core_cnt++;
+        release(earth->egos_lock);
 
-void non_boot(uint core_id) {
-    SUCCESS("--- Core #%u starts running ---", core_id);
-    *(uint*)(0x20800004) += 1; /* One more core is running */
-    *(uint*)(0x20800000) = 0;  /* Release the boot lock */
+        /* Student's code goes here (multi-core and atomic instruction) */
 
-    /* Student's code goes here (multi-core and atomic instruction) */
-
-    /* Instead of stalling here, enter the scheduler of grass kernel  */
-    while(1);
+        /* Instead of stalling here, enter the scheduler of grass kernel  */
+        while(1);
+        /* Student's code ends here. */
+    }
 }

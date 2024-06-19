@@ -27,8 +27,7 @@ int parse_request(char* buf, struct proc_request* req) {
 int main() {
     /* Student's code goes here (multi-core and atomic instruction) */
 
-    /* If earth->platform == QEMU, */
-    /* release the boot lock so that other cores can start running. */
+    /* Release the earth lock so that other cores can start running. */
 
     /* Student's code ends here. */
     CRITICAL("Welcome to the egos-2000 shell!");

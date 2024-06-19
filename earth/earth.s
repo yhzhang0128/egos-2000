@@ -10,18 +10,13 @@
 
 earth_entry:
     li sp, 0x80003f80
-
     csrr a0, mhartid
-    beq a0, zero, boot /* Directly call boot() in Arty */
-
-    lui t0, 0x20800    /* Acquire the boot lock only in multi-core QEMU */
-    li t1, 1
-    amoswap.w.aq t1, t1, (t0)
+    beq a0, zero, boot /* Directly call boot() in Arty (single-core) */
+    li t1, 1           /* Acquire earth->stack_lock in QEMU (multi-core) */
+    amoswap.w.aq t1, t1, (sp)
     bnez t1, earth_entry
-
-    lw t1, 4(t0)       /* If no other core is running, this core is booting */
-    beq t1, zero, boot
-    call non_boot      /* Otherwise, this is a non-booting core */
+    lw a1, 4(sp)       /* Load earth->booted_core_cnt */
+    call boot
 
 trap_from_S_mode:
     /* Set mstatus.MPRV to enable page table translation in M mode */
