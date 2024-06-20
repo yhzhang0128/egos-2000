@@ -12,10 +12,14 @@ boot_loader:
     li sp, 0x80003f80
     csrr a0, mhartid
     beq a0, zero, boot /* Directly call boot() in Arty (single-core) */
-    li t1, 1           /* Acquire earth->stack_lock in QEMU (multi-core) */
-    amoswap.w.aq t1, t1, (sp)
-    bnez t1, boot_loader
-    lw a1, 4(sp)       /* Load earth->booted_core_cnt */
+    li t0, 1           /* Acquire earth->boot_lock in QEMU (multi-core) */
+    amoswap.w.aq t0, t0, (sp)
+    bnez t0, boot_loader
+    /* Student's code goes here (multi-core and atomic instruction) */
+    /* Acquire earth->kernel_lock */
+
+    /* Student's code ends here. */
+    lw a1, 8(sp)       /* Load earth->booted_core_cnt */
     call boot
 
 trap_from_S_mode:
@@ -28,20 +32,20 @@ trap_from_S_mode:
 
 trap_from_M_mode:
     /* Step1: switch to the kernel stack
-       Step2: acquire earth->egos_lock
+       Step2: acquire earth->kernel_lock
        Step3: save all registers on the kernel stack
        Step4: call kernel_entry()
        Step5: restore all registers
        Step6: switch back to the user stack
-       Step7: release earth->egos_lock
+       Step7: release earth->kernel_lock
        Step8: invoke the mret instruction*/
     csrw mscratch, sp  /* Step1 */
-    lui sp, 0x80004
-    addi sp, sp, -128  /* sp == GRASS_STACK_TOP */
-trap_acquire_lock:     /* Step2 (TODO for students) */
+    li sp, 0x80003f80  /* sp == GRASS_STACK_TOP */
+                       /* Step2 */
     /* Student's code goes here (multi-core and atomic instruction) */
-                       /* Acquire earth->egos_lock; This is tricky! */
-                       /* You may need to use mscratch and sscratch */
+    /* Acquire earth->kernel_lock; This is tricky! */
+    /* You may need to use sscratch */
+
     /* Student's code ends here. */
     addi sp, sp, -116  /* Step3 */
     sw ra, 0(sp)       /* sp == SAVED_REGISTER_ADDR */
@@ -109,9 +113,10 @@ trap_acquire_lock:     /* Step2 (TODO for students) */
     lw s10, 104(sp)
     lw s11, 108(sp)
     lw sp, 112(sp)     /* Step6 */
-trap_release_lock:     /* Step7 (TODO for students) */
+                       /* Step7 */
     /* Student's code goes here (multi-core and atomic instruction) */
-                       /* Release earth->egos_lock; This is tricky! */
-                       /* You may need to use mscratch and sscratch */
+    /* Release earth->kernel_lock; This is tricky! */
+    /* You may need to use mscratch and sscratch */
+
     /* Student's code ends here. */
     mret               /* Step8 */

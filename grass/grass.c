@@ -26,6 +26,8 @@ int main() {
     grass->proc_alloc = proc_alloc;
     grass->proc_free = proc_free;
     grass->proc_set_ready = proc_set_ready;
+    grass->proc_set_idle = proc_set_idle;
+    grass->proc_coresinfo = proc_coresinfo;
 
     grass->sys_exit = sys_exit;
     grass->sys_send = sys_send;
@@ -39,6 +41,9 @@ int main() {
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
     proc_set_running(proc_alloc());
     earth->mmu_switch(GPID_PROCESS);
+
+    /* Finish using the kernel stack and thus release the lock */
+    release(earth->kernel_lock);
 
     /* Jump to the entry of process GPID_PROCESS */
     asm("mv a0, %0" ::"r"(APPS_ARG));

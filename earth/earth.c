@@ -63,16 +63,18 @@ void boot(uint core_id, uint booted_core_cnt) {
         asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
         asm("mret");
     } else {
-        /* This is not the first booted core */
         SUCCESS("--- Core #%u starts running ---", core_id);
         earth->booted_core_cnt++;
 
         /* Student's code goes here (multi-core and atomic instruction) */
 
         /* Initialize the MMU and interrupts on this core */
-        /* Enter the kernel_entry and mock a timer interrupt */
-        while(1);
+        /* Read mmu_init() and intr_init(), and decide what to do here */
 
         /* Student's code ends here. */
+
+        /* Mock a timer interrupt and enter the kernel entry */
+        grass->proc_set_idle(core_id);
+        kernel_entry(0x80000007);
     }
 }

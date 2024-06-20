@@ -2,7 +2,9 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: the system process for spawning and killing other processes
+ * Description: the system process for spawning and killing processes
+ * In the project of multi-core and atomic instruction, students need
+ * to modify this file and acquire/release the kernel lock at several places
  */
 
 #include "app.h"
@@ -50,11 +52,9 @@ int main() {
 
             if (shell_waiting && app_pid == sender)
                 grass->sys_send(GPID_SHELL, (void*)reply, sizeof(*reply));
-            else
+            else if (app_pid == sender)
                 INFO("background process %d terminated", sender);
             break;
-        case PROC_KILLALL:
-            grass->proc_free(GPID_ALL); break;
         default:
             FATAL("sys_proc: invalid request %d", req->type);
         }
@@ -66,12 +66,12 @@ static int app_read(uint off, char* dst) { file_read(app_ino, off, dst); }
 static int app_spawn(struct proc_request *req) {
     int bin_ino = dir_lookup(0, "bin/");
     if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
-
-    app_pid = grass->proc_alloc();
     int argc = req->argv[req->argc - 1][0] == '&'? req->argc - 1 : req->argc;
 
+    app_pid = grass->proc_alloc();
     elf_load(app_pid, app_read, argc, (void**)req->argv);
     grass->proc_set_ready(app_pid);
+
     return 0;
 }
 

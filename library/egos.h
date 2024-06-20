@@ -4,7 +4,7 @@
 typedef unsigned long long ulonglong;
 
 struct earth {
-    int egos_lock, booted_core_cnt;
+    int boot_lock, kernel_lock, booted_core_cnt;
 
     /* CPU interface */
     int (*timer_reset)(uint core_id);
@@ -40,7 +40,9 @@ struct grass {
     /* Process control interface */
     int  (*proc_alloc)();
     void (*proc_free)(int pid);
+    void (*proc_coresinfo)();
     void (*proc_set_ready)(int pid);
+    void (*proc_set_idle)(uint core_id);
 
     /* System call interface */
     void (*sys_exit)(int status);

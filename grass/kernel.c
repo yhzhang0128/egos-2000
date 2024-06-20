@@ -18,6 +18,14 @@ uint core_curr_proc[NCORES + 1];
 struct process proc_set[MAX_NPROCESS + 1];
 /* proc_set[0..MAX_NPROCESS-1] are real processes */
 /* proc_set[MAX_NPROCESS] is a place holder for idle cores */
+void proc_set_idle(uint core) { core_curr_proc[core] = MAX_NPROCESS; }
+void proc_coresinfo() {
+    /* Student's code goes here (multi-core and atomic instruction) */
+
+    /* Print out the pid of the process running on each core */
+
+    /* Student's code ends here. */
+}
 
 #define curr_proc_idx core_curr_proc[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
@@ -57,9 +65,7 @@ static void excp_entry(uint id) {
     }
     /* Student's code goes here (system call and memory exception). */
 
-    /* If id is for system call, handle the system call and return */
-
-    /* Otherwise, kill the process if curr_pid is a user application */
+    /* Kill the process if curr_pid is a user application */
 
     /* Student's code ends here. */
     FATAL("excp_entry: kernel got exception %d", id);
@@ -73,37 +79,40 @@ static void intr_entry(uint id) {
     }
 
     /* Do not interrupt kernel processes since IO can be stateful */
-    if (id == INTR_ID_TIMER && curr_pid >= GPID_SHELL) proc_yield();
+    if (id == INTR_ID_TIMER && (curr_proc_idx == MAX_NPROCESS || curr_pid >= GPID_SHELL)) proc_yield();
 }
 
 static void proc_yield() {
+    if (curr_proc_idx != MAX_NPROCESS && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
+
     /* Find the next runnable process */
-    int next_idx = -1;
+    int next_idx = MAX_NPROCESS;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
         struct process *p = &proc_set[(curr_proc_idx + i) % MAX_NPROCESS];
         if (p->status == PROC_PENDING_SYSCALL) {
             earth->mmu_switch(p->pid);
             proc_try_syscall(p); /* Retry pending system call  */
         }
-        if (p->status == PROC_READY || p->status == PROC_RUNNING || p->status == PROC_RUNNABLE) {
+        if (p->status == PROC_READY || p->status == PROC_RUNNABLE) {
             next_idx = (curr_proc_idx + i) % MAX_NPROCESS;
             break;
         }
     }
 
-    if (curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
+    curr_proc_idx = next_idx;
     earth->timer_reset(core_in_kernel);
-    if (next_idx == -1) {
+    if (curr_proc_idx == MAX_NPROCESS) {
         /* Student's code goes here (multi-core and atomic instruction) */
 
-        FATAL("proc_yield: no process to run on core %u", core_in_kernel);
+        /* Release earth->kernel_lock and earth->boot_lock
+         * And then call proc_idle with mepc and mret;
+         * Why not do proc_idle() directly? Think about it. */
 
         /* Student's code ends here. */
+        FATAL("proc_yield: no process to run on core %u", core_in_kernel);
     }
-    curr_proc_idx = next_idx;
-    earth->mmu_switch(curr_pid);
 
-    /* Student's code goes here (switch privilege level). */
+    /* Student's code goes here (PMP / page table translation). */
 
     /* Modify mstatus.MPP to enter machine or user mode during mret
      * depending on whether curr_pid is a grass server or a user app
@@ -111,7 +120,7 @@ static void proc_yield() {
 
     /* Student's code ends here. */
 
-    /* Call the entry point for newly created process */
+    /* Call the entry point for newly created processes */
     if (curr_status == PROC_READY) {
         /* Set argc, argv and initial program counter */
         proc_set[curr_proc_idx].saved_register[8] = APPS_ARG;
@@ -120,6 +129,7 @@ static void proc_yield() {
     }
 
     proc_set_running(curr_pid);
+    earth->mmu_switch(curr_pid);
 }
 
 struct pending_ipc *msg_buffer = (void*)(APPS_STACK_TOP + sizeof(struct grass));
