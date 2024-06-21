@@ -43,7 +43,7 @@ int main() {
     earth->mmu_switch(GPID_PROCESS);
 
     /* Finish using the kernel stack and thus release the lock */
-    release(earth->kernel_lock);
+    if (earth->platform == QEMU) release(earth->kernel_lock);
 
     /* Jump to the entry of process GPID_PROCESS */
     asm("mv a0, %0" ::"r"(APPS_ARG));
