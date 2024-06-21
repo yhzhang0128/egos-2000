@@ -3,8 +3,8 @@
  * All rights reserved.
  *
  * Description: the system process for spawning and killing processes
- * In the project of multi-core and atomic instruction, students need
- * to modify this file and acquire/release the kernel lock at several places
+ * When implementing multi-core support, students need to decide where
+ * to acquire or release earth->kernel_lock throughout this file
  */
 
 #include "app.h"
