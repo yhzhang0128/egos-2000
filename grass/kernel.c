@@ -100,7 +100,6 @@ static void proc_yield() {
     }
 
     curr_proc_idx = next_idx;
-    earth->mmu_switch(curr_pid);
     earth->timer_reset(core_in_kernel);
     if (curr_proc_idx == MAX_NPROCESS) {
         /* Student's code goes here (multi-core and atomic instruction) */
@@ -112,6 +111,7 @@ static void proc_yield() {
         /* Student's code ends here. */
         FATAL("proc_yield: no process to run on core %u", core_in_kernel);
     }
+    earth->mmu_switch(curr_pid);
 
     /* Student's code goes here (PMP / page table translation). */
 
