@@ -100,6 +100,7 @@ static void proc_yield() {
     }
 
     curr_proc_idx = next_idx;
+    earth->mmu_switch(curr_pid);
     earth->timer_reset(core_in_kernel);
     if (curr_proc_idx == MAX_NPROCESS) {
         /* Student's code goes here (multi-core and atomic instruction) */
@@ -127,9 +128,7 @@ static void proc_yield() {
         proc_set[curr_proc_idx].saved_register[9] = APPS_ARG + 4;
         proc_set[curr_proc_idx].mepc = APPS_ENTRY;
     }
-
     proc_set_running(curr_pid);
-    earth->mmu_switch(curr_pid);
 }
 
 struct pending_ipc *msg_buffer = (void*)(APPS_STACK_TOP + sizeof(struct grass));
