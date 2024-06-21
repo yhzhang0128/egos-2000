@@ -39,8 +39,7 @@ static int grass_read(uint block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
-/* Makefile defines KERNEL_ENTRY which is parsed from grass.elf */
-void (*kernel_entry)(uint) = (void*)KERNEL_ENTRY;
+void kernel_entry(uint);
 
 void boot(uint core_id, uint booted_core_cnt) {
     if (core_id == 0 || booted_core_cnt == 0) {

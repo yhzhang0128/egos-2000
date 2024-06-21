@@ -56,7 +56,8 @@ int main() {
                 INFO("background process %d terminated", sender);
             break;
         case PROC_KILLALL:
-            grass->proc_free(GPID_ALL); break;
+            grass->proc_free(GPID_ALL);
+            break;
         default:
             FATAL("sys_proc: invalid request %d", req->type);
         }

@@ -80,9 +80,7 @@ trap_from_M_mode:
     sw t0, 112(sp)
 
     csrr a0, mcause    /* Step4 */
-    la t0, kernel_entry
-    lw t1, 0(t0)
-    jalr t1
+    call kernel_entry
 
     lw ra, 0(sp)       /* Step5 */
     lw t0, 4(sp)
