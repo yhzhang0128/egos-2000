@@ -64,6 +64,6 @@ SECTIONS
     PROVIDE( data_end = ADDR(.data) + SIZEOF(.data) );
     PROVIDE( __heap_end = 0x08002000 );
 
-    /* This file is generated at compile time by Makefile */
     INCLUDE earth/kernel_entry.lds
+    /* This file is generated at compile time by Makefile */
 }

@@ -1,10 +1,8 @@
-This document describes the teaching plan, architecture and development history of egos-2000.
-
 ## Teaching plan
 
 |    | Description                       | Concepts to teach                                           | Platform  |
 |----|-----------------------------------|-------------------------------------------------------------|-----------|
-| P0 | Queue in C                        | memory, pointers, basic RISC-V ISA                          | POSIX     |
+| P0 | Queue data structure in C         | memory, pointers, user-level ISA                            | POSIX     |
 | P1 | Non-preemptive Multi-threading    | context switch, multi-threading, synchronization            | QEMU/Arty |
 | P2 | Multi-level Feedback Queue        | timer, interrupt handling, scheduling                       | QEMU/Arty |
 | P3 | Memory Protection and System Call | exception, control and status register, privilege level     | QEMU/Arty |

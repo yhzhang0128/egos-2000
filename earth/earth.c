@@ -72,7 +72,7 @@ void boot(uint core_id, uint booted_core_cnt) {
 
         /* Student's code ends here. */
 
-        /* Mock a timer interrupt and enter the kernel entry */
+        /* Mock a timer interrupt (#7) and enter the kernel entry */
         grass->proc_set_idle(core_id);
         kernel_entry(0x80000007);
     }

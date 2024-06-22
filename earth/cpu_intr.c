@@ -25,18 +25,17 @@ static int mtimecmp_set(ulonglong time, uint core_id) {
     return 0;
 }
 
-static uint QUANTUM;
-int timer_reset(uint core_id) { return mtimecmp_set(mtime_get() + QUANTUM, core_id); }
+#define QUANTUM ((earth->platform == ARTY)? 5000UL : 500000UL)
+static int timer_reset(uint core_id) { return mtimecmp_set(mtime_get() + QUANTUM, core_id); }
 
 /* Both trap functions are defined in earth.S */
 void trap_from_M_mode();
 void trap_from_S_mode();
 
 void intr_init(uint core_id) {
-    QUANTUM = (earth->platform == ARTY)? 5000 : 500000;
-    mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
-
+    /* Setup the timer */
     earth->timer_reset = timer_reset;
+    mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
     /* Setup the interrupt/exception entry function */
     if (earth->translation == PAGE_TABLE) {

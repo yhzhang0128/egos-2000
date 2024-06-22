@@ -113,7 +113,7 @@ static void proc_yield() {
     }
     earth->mmu_switch(curr_pid);
 
-    /* Student's code goes here (PMP / page table translation). */
+    /* Student's code goes here (PMP, page table translation, and multi-core). */
 
     /* Modify mstatus.MPP to enter machine or user mode during mret
      * depending on whether curr_pid is a grass server or a user app
