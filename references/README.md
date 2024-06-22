@@ -5,11 +5,11 @@
 | P0 | Queue data structure in C         | memory, pointers, user-level ISA                            | POSIX     |
 | P1 | Non-preemptive Multi-threading    | context switch, multi-threading, synchronization            | QEMU/Arty |
 | P2 | Multi-level Feedback Queue        | timer, interrupt handling, scheduling                       | QEMU/Arty |
-| P3 | Memory Protection and System Call | exception, control and status register, privilege level     | QEMU/Arty |
-| P4 | File System                       | inode layer, directory layer                                | QEMU/Arty |
-| P5 | Page Table Translation            | RISC-V Sv32 translation                                     | QEMU      |
-| P6 | Multi-core and Atomic Instruction | spinlock, synchronization, atomic instruction               | QEMU      |
-| P7 | SD Card Driver                    | I/O device, bus controller, device driver                   | QEMU/Arty |
+| P3 | System Call and Memory Protection | exception, control and status register, privilege level     | QEMU/Arty |
+| P4 | Page Table Translation            | RISC-V Sv32 translation                                     | QEMU      |
+| P5 | SD Card Driver                    | I/O device, bus controller, device driver                   | QEMU/Arty |
+| P6 | File System                       | inode layer, directory layer                                | QEMU/Arty |
+| P7 | Multi-core and Atomic Instruction | spinlock, synchronization, atomic instruction               | QEMU      |
 
 ## Architecture
 
