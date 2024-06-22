@@ -38,7 +38,7 @@ egos: $(USRAPP_ELFS) $(SYSAPP_ELFS) $(RELEASE)/grass.elf $(RELEASE)/earth.elf
 
 $(RELEASE)/earth.elf: $(EARTH_DEPS)
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
-	@echo "Kernel entry in the $(GREEN)grass layer$(END) is at $(YELLOW)0x`$(KERNEL_ENTRY_ADDR)`$(END)"
+	@echo "Kernel entry in $(GREEN)the grass layer$(END) is at $(YELLOW)0x`$(KERNEL_ENTRY_ADDR)`$(END)"
 	@echo "PROVIDE( kernel_entry = 0x`$(KERNEL_ENTRY_ADDR)` );" > earth/kernel_entry.lds
 	$(RISCV_CC) $(COMMON) earth/earth.s $(filter %.c, $(wildcard $^)) -Tearth/earth.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/earth.lst

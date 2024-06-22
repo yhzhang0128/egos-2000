@@ -4,7 +4,7 @@
  *
  * Description: the system process for spawning and killing processes
  * When implementing multi-core support, students need to decide where
- * to acquire or release earth->kernel_lock throughout this file
+ * to acquire and release earth->kernel_lock throughout this file
  */
 
 #include "app.h"
