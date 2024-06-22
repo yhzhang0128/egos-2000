@@ -2,19 +2,16 @@ This document describes the teaching plan, architecture and development history 
 
 ## Teaching plan
 
-We use **egos-classic** and **egos-2000** to teach our Practicum in Operating Systems (CS4411) at Cornell.
-There are seven projects and two are optional.
-
-|    | Description                       | Concepts to teach                                           | Platform   |
-|----|-----------------------------------|-------------------------------------------------------------|------------|
-| P0 | Queue in C                        | memory, pointers, basic RISC-V ISA                          | Linux/Mac  |
-| P1 | Non-preemptive Multi-threading    | context switch, multi-threading, synchronization            | Linux/Mac  |
-| P2 | Multi-level Feedback Queue        | timer, interrupt handling, scheduling                       | Linux/Mac  |
-| P3 | Memory Protection and System Call | exception, control and status register, privilege level     | Arty/QEMU  |
-| P4 | File System                       | inode layer, directory layer                                | Arty/QEMU  |
-| P5 | SD Card Driver (optional)         | I/O device, bus controller, device driver                   | Arty/QEMU  |
-| P6 | Page Table Translation (optional) | RISC-V Sv32 translation                                     | QEMU       |
-
+|    | Description                       | Concepts to teach                                           | Platform  |
+|----|-----------------------------------|-------------------------------------------------------------|-----------|
+| P0 | Queue in C                        | memory, pointers, basic RISC-V ISA                          | POSIX     |
+| P1 | Non-preemptive Multi-threading    | context switch, multi-threading, synchronization            | QEMU/Arty |
+| P2 | Multi-level Feedback Queue        | timer, interrupt handling, scheduling                       | QEMU/Arty |
+| P3 | Memory Protection and System Call | exception, control and status register, privilege level     | QEMU/Arty |
+| P4 | File System                       | inode layer, directory layer                                | QEMU/Arty |
+| P5 | Page Table Translation            | RISC-V Sv32 translation                                     | QEMU      |
+| P6 | Multi-core and Atomic Instruction | spinlock, synchronization, atomic instruction               | QEMU      |
+| P7 | SD Card Driver                    | I/O device, bus controller, device driver                   | QEMU/Arty |
 
 ## Architecture
 
@@ -24,7 +21,6 @@ There are seven projects and two are optional.
 * `earth/dev_tty`: keyboard input and tty output
 * `earth/cpu_intr`: interrupt and exception handling (touched by P3)
 * `earth/cpu_mmu`: memory paging and address translation (touched by P3, P6)
-* `earth/cpu_timer`: control registers for timer
 
 **Grass layer (hardware independent)**
 * `grass/syscall`: system call interfaces to user applications
@@ -41,12 +37,12 @@ There are seven projects and two are optional.
 Every layer has dedicated memory regions as described below (and in `library/egos.h`).
 The complete memory layout is described in Chapter 4 of the [FE310 manual](sifive-fe310-v19p04.pdf).
 
-**Selected RAM regions**
+**Selected memory regions**
 
 | Base        | Top         | Attributes | Description       | Notes                                                      |
 |-------------|-------------|------------|-------------------|------------------------------------------------------------|
-| 0x0800_0000 | 0x0800_27FF | RWX A      | ITIM, 10KB        | Earth layer bss, data and heap                             |
-| 0x0800_2800 | 0x0800_4FFF | RWX A      | ITIM, 10KB        | Grass layer code, bss, data and heap                       |
+| 0x0800_0000 | 0x0800_1FFF | RWX A      | ITIM, 10KB        | Earth layer bss, data and heap                             |
+| 0x0800_2000 | 0x0800_4FFF | RWX A      | ITIM, 10KB        | Grass layer code, bss, data and heap                       |
 | 0x0800_5000 | 0x0800_7FFF | RWX A      | ITIM, 12KB        | App layer code, bss, data and heap                         |
 | ......      | ......      | ......     | ......            |                                                            |
 | 0x2000_0000 | 0x203F_FFFF | R XC       | Flash ROM, 4MB    | FPGA binary of the FE310 RISC-V processor                  |
@@ -59,38 +55,36 @@ The complete memory layout is described in Chapter 4 of the [FE310 manual](sifiv
 
 On the Arty board, the first 1MB of the microSD card is used as 256 physical frames by the MMU for paging (see `earth/dev_page.c`).
 
-**Selected memory-mapped I/O regions**
-
-| Base        | Top         | Attributes | Description   | Notes                            |
-|-------------|-------------|------------|---------------|----------------------------------|
-| 0x1001_4000 | 0x1001_4FFF | RW A       | QSPI 0        | Control the 16MB on-board ROM    |
-| 0x1002_4000 | 0x1002_4FFF | RW A       | SPI 1         | Control the Pmod1 (microSD card) |
-
 ## Software development history
 
-**Iteration #8**
+**Iteration #9**
+* [2024.04] Run egos-2000 on the [mriscv processor](https://github.com/0x486F626F/mriscv/tree/egos) in System Verilog
+* [2024.04] Improve type usage, especially the use of unsigned types
+* [2024.05] Improve the trap entry assembly code: entering kernel stack right after exceptions
+* [2024.05] Switch to `sifive_u` in QEMU and run the SD driver code on emulated `sifive_u` machine
+* [2024.06] Improve system call implementation: making `SYS_SEND` and `SYS_RECV` asynchronous
+* [2024.06] Enable multi-core in QEMU and create a new project for spinlock and synchronization
 
+**Iteration #8**
 * [2023.05] Add `apps/user/ult.c`, a project on non-preemptive threading
 * [2023.08] Create the `ece4750` branch and run egos-2000 on [this teaching processor](https://github.com/cornell-ece4750/)
+* [2023.09] Add support for the [official GNU C compiler](https://github.com/riscv-collab/riscv-gnu-toolchain)
 * [2023.09] Add support for the Arty S7-50 and A7-100t boards
-* [2023.09] Add support for the latest QEMU v8.1 with emulation of the microSD card
-* [2023.09] Simplify page table translation by using virutal addresses in the earth layer
+* [2023.09] Simplify page table translation by using virutal addresses in the earth layer (`mstatus.MPRV`)
 
 **Iteration #7**
-
 * [2022.10] Add support to the QEMU emulator
 * [2022.10] Enable the supervisor mode in the QEMU emulator
 * [2022.10] With the modified QEMU, add page table translation in `earth/cpu_mmu.c`
+* [2022.10] Use egos-2000 in CS4411/5411 at Cornell University and obtain [5-star rating](https://www.ratemyprofessors.com/professor/2651034)
 
 **Iteration #6**
-
 * [2022.04] Add a simple boot loader `earth/earth.S`; Remove dependency on the Metal library
 * [2022.04] Add `_write()` and `_sbrk()` in `library/libc`; Remove the Metal library entirely
 * [2022.04] Enrich `struct grass` in order to improve clarity of the architecture
 * [2022.04] Experiment with Physical Memory Protection (PMP) and switching privilege level (machine <-> user)
 
 **Iteration #5**
-
 * [2022.03] Implement system calls and 4 shell commands: `pwd`, `ls`, `cat` and `echo`
 * [2022.03] Add support of background shell commands and `killall`
 * [2022.03] Add servers in `library` and cleanup access to the file system
