@@ -6,22 +6,21 @@
  */
     .section .image.placeholder
     .section .text.enter
-    .global earth_entry, trap_from_M_mode, trap_from_S_mode
+    .global boot_loader, trap_from_M_mode, trap_from_S_mode
 
-earth_entry:
+boot_loader:
     li sp, 0x80003f80
-
     csrr a0, mhartid
-    beq a0, zero, boot /* Directly call boot() in Arty */
+    beq a0, zero, boot /* Directly call boot() in Arty (single-core) */
+    li t0, 1           /* Acquire earth->boot_lock in QEMU (multi-core) */
+    amoswap.w.aq t0, t0, (sp)
+    bnez t0, boot_loader
+    /* Student's code goes here (multi-core and atomic instruction) */
+    /* Acquire earth->kernel_lock */
 
-    lui t0, 0x20800    /* Acquire the boot lock only in multi-core QEMU */
-    li t1, 1
-    amoswap.w.aq t1, t1, (t0)
-    bnez t1, earth_entry
-
-    lw t1, 4(t0)       /* If no other core is running, this core is booting */
-    beq t1, zero, boot
-    call non_boot      /* Otherwise, this is a non-booting core */
+    /* Student's code ends here. */
+    lw a1, 8(sp)       /* Load earth->booted_core_cnt */
+    call boot
 
 trap_from_S_mode:
     /* Set mstatus.MPRV to enable page table translation in M mode */
@@ -33,14 +32,24 @@ trap_from_S_mode:
 
 trap_from_M_mode:
     /* Step1: switch to the kernel stack
-       Step2: save all registers on the kernel stack
-       Step3: call trap_entry()
-       Step4: restore all registers
-       Step5: switch back to the user stack
-       Step6: invoke the mret instruction*/
-    csrw mscratch, sp  /* Step1 */
-    lui sp, 0x80004
-    addi sp, sp, -244  /* Step2, sp is now SAVED_REGISTER_ADDR */
+       Step2: acquire earth->kernel_lock
+       Step3: save all registers on the kernel stack
+       Step4: call kernel_entry()
+       Step5: restore all registers
+       Step6: switch back to the user stack
+       Step7: release earth->kernel_lock
+       Step8: invoke the mret instruction */
+    /* Step1 */
+    csrw mscratch, sp
+    li sp, 0x80003f80  /* sp == GRASS_STACK_TOP */
+    /* Step2 */
+    /* Student's code goes here (multi-core and atomic instruction) */
+    /* Acquire earth->kernel_lock; This is tricky! */
+    /* You may need to use sscratch */
+
+    /* Student's code ends here. */
+    /* Step3 */
+    addi sp, sp, -116  /* sp == SAVED_REGISTER_ADDR */
     sw ra, 0(sp)
     sw t0, 4(sp)
     sw t1, 8(sp)
@@ -70,11 +79,14 @@ trap_from_M_mode:
     sw s10, 104(sp)
     sw s11, 108(sp)
     csrr t0, mscratch
-    sw t0, 112(sp)      /* Save user sp on kernel stack */
+    sw t0, 112(sp)
 
-    call trap_entry     /* Step3 */
+    /* Step4 */
+    csrr a0, mcause
+    call kernel_entry
 
-    lw ra, 0(sp)        /* Step4 */
+    /* Step5 */
+    lw ra, 0(sp)
     lw t0, 4(sp)
     lw t1, 8(sp)
     lw t2, 12(sp)
@@ -102,5 +114,13 @@ trap_from_M_mode:
     lw s9, 100(sp)
     lw s10, 104(sp)
     lw s11, 108(sp)
-    lw sp, 112(sp)      /* Step5 */
-    mret                /* Step6 */
+    /* Step6 */
+    lw sp, 112(sp)
+    /* Step7 */
+    /* Student's code goes here (multi-core and atomic instruction) */
+    /* Release earth->kernel_lock; This is tricky! */
+    /* You may need to use mscratch and sscratch */
+
+    /* Student's code ends here. */
+    /* Step8 */
+    mret

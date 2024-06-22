@@ -133,7 +133,7 @@ int page_table_map(int pid, uint page_no, uint frame_id) {
      * (1) if page tables for pid do not exist, build the tables;
      * (2) if page tables for pid exist, update entries of the tables
      *
-     * Feel free to call or modify the two helper functions:
+     * Feel free to modify and call the two helper functions:
      * pagetable_identity_mapping() and setup_identity_region()
      */
     soft_tlb_map(pid, page_no, frame_id);

@@ -15,8 +15,7 @@
 void tty_init();
 void disk_init();
 void mmu_init();
-void intr_init();
-void timer_init(uint core_id);
+void intr_init(uint core_id);
 
 struct grass *grass = (void*)APPS_STACK_TOP;
 struct earth *earth = (void*)GRASS_STACK_TOP;
@@ -32,8 +31,7 @@ static void earth_init(uint core_id) {
     SUCCESS("Finished initializing the tty and disk devices");
 
     mmu_init();
-    timer_init(core_id);
-    intr_init();
+    intr_init(core_id);
     SUCCESS("Finished initializing the MMU, timer and interrupts");
 }
 
@@ -41,33 +39,41 @@ static int grass_read(uint block_no, char* dst) {
     return earth->disk_read(GRASS_EXEC_START + block_no, 1, dst);
 }
 
-void boot(uint core_id) {
-    /* Prepare the bss and data memory regions */
-    memset(&bss_start, 0, (&bss_end - &bss_start));
-    memcpy(&data_start, &data_rom, (&data_end - &data_start));
+void kernel_entry(uint);
 
-    /* Initialize the earth layer */
-    earth_init(core_id);
+void boot(uint core_id, uint booted_core_cnt) {
+    if (core_id == 0 || booted_core_cnt == 0) {
+        /* Zero out the bss region and copy the data region from ROM */
+        memset(&bss_start, 0, (&bss_end - &bss_start));
+        memcpy(&data_start, &data_rom, (&data_end - &data_start));
 
-    /* Load and enter the grass layer */
-    elf_load(0, grass_read, 0, 0);
+        /* Initialize the earth layer */
+        earth_init(core_id);
+        earth->booted_core_cnt = 1;
 
-    uint mstatus, M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
-    uint GRASS_MODE = (earth->translation == SOFT_TLB)? M_MODE : S_MODE;
-    asm("csrr %0, mstatus" : "=r"(mstatus));
-    asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (GRASS_MODE << 11) | (1 << 18)));
+        /* Load and enter the grass layer */
+        elf_load(0, grass_read, 0, 0);
 
-    asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
-    asm("mret");
-}
+        uint mstatus, M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
+        uint GRASS_MODE = (earth->translation == SOFT_TLB)? M_MODE : S_MODE;
+        asm("csrr %0, mstatus" : "=r"(mstatus));
+        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (GRASS_MODE << 11) | (1 << 18)));
 
-void non_boot(uint core_id) {
-    SUCCESS("--- Core #%u starts running ---", core_id);
-    *(uint*)(0x20800004) += 1; /* One more core is running */
-    *(uint*)(0x20800000) = 0;  /* Release the boot lock */
+        asm("csrw mepc, %0" ::"r"(GRASS_ENTRY));
+        asm("mret");
+    } else {
+        SUCCESS("--- Core #%u starts running ---", core_id);
+        earth->booted_core_cnt++;
 
-    /* Student's code goes here (multi-core and atomic instruction) */
+        /* Student's code goes here (multi-core and atomic instruction) */
 
-    /* Instead of stalling here, enter the scheduler of grass kernel  */
-    while(1);
+        /* Initialize the MMU and interrupts on this core */
+        /* Read mmu_init() and intr_init(), and decide what to do here */
+
+        /* Student's code ends here. */
+
+        /* Mock a timer interrupt (#7) and enter the kernel entry */
+        grass->proc_set_idle(core_id);
+        kernel_entry(0x80000007);
+    }
 }

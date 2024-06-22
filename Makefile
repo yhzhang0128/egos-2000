@@ -20,22 +20,26 @@ endif
 DEBUG = build/debug
 RELEASE = build/release
 
-APPS_DEPS = apps/*.* library/egos.h library/*/*
-GRASS_DEPS = grass/* library/egos.h library/*/*
-EARTH_DEPS = earth/* earth/sd/* library/egos.h library/*/*
-USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/user/*.c)))
-SYSAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/system/*.c)))
+APPS_DEPS = apps/*.* library/egos.h library/*/* Makefile
+GRASS_DEPS = grass/* library/egos.h library/*/* Makefile
+EARTH_DEPS = earth/* earth/sd/* library/egos.h library/*/* Makefile build/release/grass.elf
+KERNEL_ENTRY_ADDR = $(OBJDUMP) -t build/release/grass.elf | grep "kernel_entry" | grep -o '^[^ ]*'
 
 LDFLAGS = -nostdlib -lc -lgcc
 INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/servers
 CFLAGS = -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
 COMMON = $(CFLAGS) $(INCLUDE) -D CPU_CLOCK_RATE=65000000
-DEBUG_FLAGS =  --source --all-headers --demangle --line-numbers --wide
+DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
+
+USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/user/*.c)))
+SYSAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/system/*.c)))
 
 egos: $(USRAPP_ELFS) $(SYSAPP_ELFS) $(RELEASE)/grass.elf $(RELEASE)/earth.elf
 
 $(RELEASE)/earth.elf: $(EARTH_DEPS)
 	@echo "$(YELLOW)-------- Compile the Earth Layer --------$(END)"
+	@echo "Kernel entry in $(GREEN)the grass layer$(END) is at $(YELLOW)0x`$(KERNEL_ENTRY_ADDR)`$(END)"
+	@echo "PROVIDE( kernel_entry = 0x`$(KERNEL_ENTRY_ADDR)` );" > earth/kernel_entry.lds
 	$(RISCV_CC) $(COMMON) earth/earth.s $(filter %.c, $(wildcard $^)) -Tearth/earth.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/earth.lst
 
@@ -76,7 +80,7 @@ program: install
 	cd tools/fpga/openocd; time openocd -f 7series_$(BOARD).txt
 
 clean:
-	rm -rf build tools/mkfs tools/mkrom tools/qemu/egos.elf tools/disk.img tools/bootROM.bin
+	rm -rf build earth/kernel_entry.lds tools/mkfs tools/mkrom tools/qemu/egos.elf tools/disk.img tools/bootROM.bin
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

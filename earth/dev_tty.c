@@ -56,12 +56,9 @@ int tty_read(char* buf, uint len) {
                    vprintf(format, args); \
                    va_end(args); \
                    printf(y); \
+                   fflush(stdout);
 
-int tty_printf(const char *format, ...)
-{
-    LOG("", "")
-    fflush(stdout);
-}
+int tty_printf(const char *format, ...) { LOG("", "") }
 
 int tty_info(const char *format, ...) { LOG("[INFO] ", "\r\n") }
 

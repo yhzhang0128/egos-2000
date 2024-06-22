@@ -7,26 +7,35 @@
 
 #include "egos.h"
 
-/* These are two static variables storing
- * the addresses of the handler functions;
- * Initially, both variables are NULL */
-static void (*kernel_entry)(uint, uint);
-int kernel_entry_init(void (*new_entry)(uint, uint)) {
-    kernel_entry = new_entry;
+static ulonglong mtime_get() {
+    uint low, high;
+    do {
+        high = REGW(0x200BFF8, 4);
+        low  = REGW(0x200BFF8, 0);
+    }  while ( REGW(0x200BFF8, 4) != high );
+
+    return (((ulonglong)high) << 32) | low;
 }
+
+static int mtimecmp_set(ulonglong time, uint core_id) {
+    REGW(0x2004000, core_id * 8 + 4) = 0xFFFFFFFF;
+    REGW(0x2004000, core_id * 8 + 0) = (uint)time;
+    REGW(0x2004000, core_id * 8 + 4) = (uint)(time >> 32);
+
+    return 0;
+}
+
+#define QUANTUM ((earth->platform == ARTY)? 5000UL : 500000UL)
+static int timer_reset(uint core_id) { return mtimecmp_set(mtime_get() + QUANTUM, core_id); }
 
 /* Both trap functions are defined in earth.S */
 void trap_from_M_mode();
 void trap_from_S_mode();
 
-void trap_entry() {
-    uint mcause;
-    asm("csrr %0, mcause" : "=r"(mcause));
-    kernel_entry(mcause & (1 << 31), mcause & 0x3FF);
-}
-
-void intr_init() {
-    earth->kernel_entry_init = kernel_entry_init;
+void intr_init(uint core_id) {
+    /* Setup the timer */
+    earth->timer_reset = timer_reset;
+    mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
     /* Setup the interrupt/exception entry function */
     if (earth->translation == PAGE_TABLE) {

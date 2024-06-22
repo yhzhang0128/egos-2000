@@ -27,8 +27,8 @@ int parse_request(char* buf, struct proc_request* req) {
 int main() {
     /* Student's code goes here (multi-core and atomic instruction) */
 
-    /* If earth->platform == QEMU, */
-    /* release the boot lock so that other cores can start running. */
+    /* Release the boot lock so that other cores can start running. */
+    /* Wait for all cores to finish booting up */
 
     /* Student's code ends here. */
     CRITICAL("Welcome to the egos-2000 shell!");
@@ -38,12 +38,13 @@ int main() {
         struct proc_request req;
         struct proc_reply reply;
 
-        if (strcmp(buf, "killall") == 0) {
+        if (strcmp(buf, "coresinfo") == 0) {
+            grass->proc_coresinfo();
+        } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
             grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
         } else {
             req.type = PROC_SPAWN;
-
             if (0 != parse_request(buf, &req)) {
                 INFO("sys_shell: too many arguments or argument too long");
             } else {

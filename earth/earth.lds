@@ -1,6 +1,6 @@
 OUTPUT_ARCH("riscv")
 
-ENTRY(earth_entry)
+ENTRY(boot_loader)
 
 MEMORY
 {
@@ -62,5 +62,8 @@ SECTIONS
     PROVIDE( data_rom = LOADADDR(.data) );
     PROVIDE( data_start = ADDR(.data) );
     PROVIDE( data_end = ADDR(.data) + SIZEOF(.data) );
-    PROVIDE( __heap_end = 0x08002000);
+    PROVIDE( __heap_end = 0x08002000 );
+
+    INCLUDE earth/kernel_entry.lds
+    /* This file is generated at compile time by Makefile */
 }
