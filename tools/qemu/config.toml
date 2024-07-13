@@ -11,6 +11,9 @@
 # The reason is that core #0 of sifive_u is an E31 core, which does not
 # support the S-mode. We thus disabled this core within BIOS (bios.bin).
 
+[memory]
+  size = "256M"
+
 [drive]
   if = "sd"
   format = "raw"

@@ -61,11 +61,11 @@ $(USRAPP_ELFS): $(RELEASE)/%.elf : apps/user/%.c $(APPS_DEPS)
 
 install: egos
 	@echo "$(GREEN)-------- Create the Disk Image --------$(END)"
-	$(CC) tools/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o tools/mkfs; cd tools; ./mkfs
-	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	cp $(RELEASE)/earth.elf tools/earth.elf
 	$(OBJCOPY) --remove-section=.image tools/earth.elf
 	$(OBJCOPY) -O binary tools/earth.elf tools/earth.bin
+	$(CC) tools/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o tools/mkfs; cd tools; ./mkfs
+	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	$(CC) tools/mkrom.c -DCPU_BIN_FILE="\"fpga/freedom/fe310_cpu_$(BOARD).bin\"" -o tools/mkrom
 	cd tools; ./mkrom ; rm earth.elf earth.bin
 
