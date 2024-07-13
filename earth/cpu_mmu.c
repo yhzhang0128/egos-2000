@@ -11,12 +11,6 @@
 #include "servers.h"
 #include <string.h>
 
-/* Interface of the paging device, see earth/dev_page.c */
-void  paging_init();
-int   paging_invalidate_cache(uint frame_id);
-int   paging_write(uint frame_id, uint page_no);
-char* paging_read(uint frame_id, int alloc_only);
-
 /* Allocation and free of physical frames */
 #define NFRAMES 256
 struct frame_mapping {
@@ -25,11 +19,13 @@ struct frame_mapping {
     uint page_no; /* Which virtual page is the frame mapped to? */
 } table[NFRAMES];
 
+char* pages_start = (void*)FRAME_CACHE_START;
+
 int mmu_alloc(uint* frame_id, void** cached_addr) {
     for (uint i = 0; i < NFRAMES; i++)
         if (!table[i].use) {
             *frame_id = i;
-            *cached_addr = paging_read(i, 1);
+            *cached_addr = pages_start + i * PAGE_SIZE;
             table[i].use = 1;
             return 0;
         }
@@ -38,10 +34,8 @@ int mmu_alloc(uint* frame_id, void** cached_addr) {
 
 int mmu_free(int pid) {
     for (uint i = 0; i < NFRAMES; i++)
-        if (table[i].use && table[i].pid == pid) {
-            paging_invalidate_cache(i);
+        if (table[i].use && table[i].pid == pid)
             memset(&table[i], 0, sizeof(struct frame_mapping));
-        }
 }
 
 /* Software TLB Translation */
@@ -57,12 +51,12 @@ int soft_tlb_switch(int pid) {
     /* Unmap curr_vm_pid from the user address space */
     for (uint i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == curr_vm_pid)
-            paging_write(i, table[i].page_no);
+            memcpy(pages_start + i * PAGE_SIZE, (void*)(table[i].page_no << 12), PAGE_SIZE);
 
     /* Map pid to the user address space */
     for (uint i = 0; i < NFRAMES; i++)
         if (table[i].use && table[i].pid == pid)
-            memcpy((void*)(table[i].page_no << 12), paging_read(i, 0), PAGE_SIZE);
+            memcpy((void*)(table[i].page_no << 12), pages_start + i * PAGE_SIZE, PAGE_SIZE);
 
     curr_vm_pid = pid;
 }
@@ -155,9 +149,6 @@ int page_table_switch(int pid) {
 
 /* MMU Initialization */
 void mmu_init() {
-    /* Initialize the paging device */
-    paging_init();
-
     /* Initialize MMU interface functions */
     earth->mmu_free = mmu_free;
     earth->mmu_alloc = mmu_alloc;
