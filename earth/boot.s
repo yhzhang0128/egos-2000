@@ -4,22 +4,19 @@
  *
  * Description: boot loader and trap entry
  */
-    .section .image.placeholder
     .section .text.enter
     .global boot_loader, trap_from_M_mode, trap_from_S_mode
 
 boot_loader:
-    li sp, 0x80003f80
-    csrr a0, mhartid
-    beq a0, zero, boot /* Directly call boot() in Arty (single-core) */
-    li t0, 1           /* Acquire earth->boot_lock in QEMU (multi-core) */
-    amoswap.w.aq t0, t0, (sp)
-    bnez t0, boot_loader
+    li t0, 0x80300000
+    li t1, 1           /* Acquire earth->boot_lock in QEMU (multi-core) */
+    amoswap.w.aq t1, t1, (t0)
+    bnez t1, boot_loader
     /* Student's code goes here (multi-core and atomic instruction) */
     /* Acquire earth->kernel_lock */
 
     /* Student's code ends here. */
-    lw a1, 8(sp)       /* Load earth->booted_core_cnt */
+    li sp, 0x80400000
     call boot
 
 trap_from_S_mode:
@@ -41,7 +38,7 @@ trap_from_M_mode:
        Step8: invoke the mret instruction */
     /* Step1 */
     csrw mscratch, sp
-    li sp, 0x80003f80  /* sp == GRASS_STACK_TOP */
+    li sp, 0x80400000
     /* Step2 */
     /* Student's code goes here (multi-core and atomic instruction) */
     /* Acquire earth->kernel_lock; This is tricky! */

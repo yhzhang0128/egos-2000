@@ -8,10 +8,11 @@
  */
 
 #include "app.h"
+#include "egos.h"
 #include <string.h>
 
 int main() {
-    memset((void*)FRAME_CACHE_START, 0, FRAME_CACHE_END - FRAME_CACHE_START);
+    memset((void*)APPS_PAGES_BASE, 0, RAM_END - APPS_PAGES_BASE);
     /* If the OS protects memory correctly,
      * this memset should trigger an exception, killing this application;
      * Otherwise, the following message will be printed

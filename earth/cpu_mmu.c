@@ -11,37 +11,39 @@
 #include "servers.h"
 #include <string.h>
 
-/* Allocation and free of physical frames */
-#define NFRAMES 256
-struct frame_mapping {
-    int use;     /* Is the frame allocated? */
-    int pid;     /* Which process owns the frame? */
-    uint page_no; /* Which virtual page is the frame mapped to? */
-} table[NFRAMES];
+#define APPS_PAGES_CNT (RAM_END - APPS_PAGES_BASE) / PAGE_SIZE
+struct page_info {
+    int  use;      /* Is this page allocated? */
+    int  pid;      /* Which process owns this page? */
+    uint vpage_no; /* Which virtual page of this process maps to this physial page? */
+} page_info_table[APPS_PAGES_CNT];
 
-char* pages_start = (void*)FRAME_CACHE_START;
+#define PAGE_NO_TO_PAGE_ADDR(x) (char*)(x * PAGE_SIZE)
+#define PAGE_ID_TO_PAGE_ADDR(x) (char*)APPS_PAGES_BASE + x * PAGE_SIZE
 
-int mmu_alloc(uint* frame_id, void** cached_addr) {
-    for (uint i = 0; i < NFRAMES; i++)
-        if (!table[i].use) {
-            *frame_id = i;
-            *cached_addr = pages_start + i * PAGE_SIZE;
-            table[i].use = 1;
+int mmu_alloc(uint* ppage_id, void** ppage_addr) {
+    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+        if (!page_info_table[i].use) {
+            page_info_table[i].use = 1;
+            *ppage_id              = i;
+            *ppage_addr            = PAGE_ID_TO_PAGE_ADDR(i);
             return 0;
         }
-    FATAL("mmu_alloc: no more available frames");
+    return -1;
 }
 
 int mmu_free(int pid) {
-    for (uint i = 0; i < NFRAMES; i++)
-        if (table[i].use && table[i].pid == pid)
-            memset(&table[i], 0, sizeof(struct frame_mapping));
+    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+        if (page_info_table[i].use && page_info_table[i].pid == pid)
+            memset(&page_info_table[i], 0, sizeof(struct page_info));
+    return 0;
 }
 
 /* Software TLB Translation */
-int soft_tlb_map(int pid, uint page_no, uint frame_id) {
-    table[frame_id].pid = pid;
-    table[frame_id].page_no = page_no;
+int soft_tlb_map(int pid, uint vpage_no, uint ppage_id) {
+    page_info_table[ppage_id].pid      = pid;
+    page_info_table[ppage_id].vpage_no = vpage_no;
+    return 0;
 }
 
 int soft_tlb_switch(int pid) {
@@ -49,14 +51,18 @@ int soft_tlb_switch(int pid) {
     if (pid == curr_vm_pid) return 0;
 
     /* Unmap curr_vm_pid from the user address space */
-    for (uint i = 0; i < NFRAMES; i++)
-        if (table[i].use && table[i].pid == curr_vm_pid)
-            memcpy(pages_start + i * PAGE_SIZE, (void*)(table[i].page_no << 12), PAGE_SIZE);
+    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+        if (page_info_table[i].use && page_info_table[i].pid == curr_vm_pid)
+            memcpy(PAGE_ID_TO_PAGE_ADDR(i),
+                   PAGE_NO_TO_PAGE_ADDR(page_info_table[i].vpage_no),
+                   PAGE_SIZE);
 
     /* Map pid to the user address space */
-    for (uint i = 0; i < NFRAMES; i++)
-        if (table[i].use && table[i].pid == pid)
-            memcpy((void*)(table[i].page_no << 12), pages_start + i * PAGE_SIZE, PAGE_SIZE);
+    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+        if (page_info_table[i].use && page_info_table[i].pid == pid)
+            memcpy(PAGE_NO_TO_PAGE_ADDR(page_info_table[i].vpage_no),
+                   PAGE_ID_TO_PAGE_ADDR(i),
+                   PAGE_SIZE);
 
     curr_vm_pid = pid;
 }
@@ -74,7 +80,7 @@ int soft_tlb_switch(int pid) {
 
 #define OS_RWX   0xF
 #define USER_RWX 0x1F
-static uint frame_id, *root, *leaf;
+static uint *root, *leaf;
 
 /* 32 is a number large enough for demo purpose */
 static uint* pid_to_pagetable_base[32];
@@ -87,8 +93,9 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
         leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000);
     } else {
         /* Leaf has not been allocated */
-        earth->mmu_alloc(&frame_id, (void**)&leaf);
-        table[frame_id].pid = pid;
+        uint ppage_id;
+        earth->mmu_alloc(&ppage_id, (void**)&leaf);
+        page_info_table[ppage_id].pid = pid;
         memset(leaf, 0, PAGE_SIZE);
         root[vpn1] = ((uint)leaf >> 2) | 0x1;
     }
@@ -101,24 +108,21 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
 
 void pagetable_identity_mapping(int pid) {
     /* Allocate the root page table and set the page table base (satp) */
-    earth->mmu_alloc(&frame_id, (void**)&root);
-    table[frame_id].pid = pid;
+    uint ppage_id;
+    earth->mmu_alloc(&ppage_id, (void**)&root);
+    page_info_table[ppage_id].pid = pid;
     memset(root, 0, PAGE_SIZE);
     pid_to_pagetable_base[pid] = root;
 
     /* Allocate the leaf page tables */
-    setup_identity_region(pid, 0x02000000, 16, OS_RWX);   /* CLINT */
-    setup_identity_region(pid, UART0_BASE, 1, OS_RWX);    /* UART0 */
-    setup_identity_region(pid, SPI_BASE, 1, OS_RWX);      /* SPI1 */
-    setup_identity_region(pid, 0x20400000, 1024, OS_RWX); /* boot ROM */
-    setup_identity_region(pid, 0x20800000, 1024, OS_RWX); /* disk image */
-    setup_identity_region(pid, 0x80000000, 1024, OS_RWX); /* DTIM memory */
-
-    for (uint i = 0; i < 8; i++)           /* ITIM memory is 32MB on QEMU */
-        setup_identity_region(pid, 0x08000000 + i * 0x400000, 1024, OS_RWX);
+    for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
+        setup_identity_region(pid, i, 1024, OS_RWX);      /* RAM   */
+    setup_identity_region(pid, CLINT_BASE, 16, OS_RWX);   /* CLINT */
+    setup_identity_region(pid, UART0_BASE, 1,  OS_RWX);   /* UART  */
+    setup_identity_region(pid, SPI_BASE,   1,  OS_RWX);   /* SPI   */
 }
 
-int page_table_map(int pid, uint page_no, uint frame_id) {
+int page_table_map(int pid, uint vpage_no, uint ppage_id) {
     if (pid >= 32) FATAL("page_table_map: pid too large");
 
     /* Student's code goes here (page table translation). */
@@ -130,7 +134,7 @@ int page_table_map(int pid, uint page_no, uint frame_id) {
      * Feel free to modify and call the two helper functions:
      * pagetable_identity_mapping() and setup_identity_region()
      */
-    soft_tlb_map(pid, page_no, frame_id);
+    soft_tlb_map(pid, vpage_no, ppage_id);
 
     /* Student's code ends here. */
 }

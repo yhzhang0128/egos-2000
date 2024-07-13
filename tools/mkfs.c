@@ -19,9 +19,8 @@
 #include "disk.h"
 #include "file.h"
 
-#define EGOS_BIN_NUM 6
-char* egos_binaries[] = {"./earth.bin",
-                         "../build/release/grass.elf",
+#define EGOS_BIN_NUM 5
+char* egos_binaries[] = {"./qemu/egos.bin",
                          "../build/release/sys_proc.elf",
                          "../build/release/sys_file.elf",
                          "../build/release/sys_dir.elf",

@@ -7,22 +7,12 @@
  */
 
 #include "egos.h"
-#include "bus_gpio.c"
 
 #define UART0_TXDATA  0UL
 #define UART0_RXDATA  4UL
 #define UART0_TXCTRL  8UL
 #define UART0_RXCTRL  12UL
 #define UART0_DIV     24UL
-
-void uart_init(long baud_rate) {
-    REGW(UART0_BASE, UART0_DIV) = CPU_CLOCK_RATE / baud_rate - 1;
-    REGW(UART0_BASE, UART0_TXCTRL) |= 1;
-    REGW(UART0_BASE, UART0_RXCTRL) |= 1;
-
-    /* UART0 send/recv are mapped to GPIO pin16 and pin17 */
-    REGW(GPIO0_BASE, GPIO0_IOF_ENABLE) |= (1 << 16) | (1 << 17);
-}
 
 int uart_getc(int* c) {
     uint ch = REGW(UART0_BASE, UART0_RXDATA);

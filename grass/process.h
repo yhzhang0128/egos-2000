@@ -14,7 +14,7 @@ enum proc_status {
 
 #define SAVED_REGISTER_NUM  29
 #define SAVED_REGISTER_SIZE SAVED_REGISTER_NUM * sizeof(uint)
-#define SAVED_REGISTER_ADDR (void*)(GRASS_STACK_TOP - SAVED_REGISTER_SIZE)
+#define SAVED_REGISTER_ADDR (void*)(EGOS_STACK_TOP - SAVED_REGISTER_SIZE)
 
 struct process{
     int pid;

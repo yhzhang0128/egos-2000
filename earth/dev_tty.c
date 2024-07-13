@@ -14,7 +14,6 @@
 
 int uart_getc(int* c);
 void uart_putc(int c);
-void uart_init(long baud_rate);
 
 static int c, is_reading;
 int tty_recv_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }

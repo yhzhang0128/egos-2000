@@ -8,7 +8,6 @@
 #include "egos.h"
 #include "disk.h"
 #include "sd/sd.h"
-#include "bus_gpio.c"
 #include <string.h>
 
 enum disk_type {
@@ -39,13 +38,10 @@ void disk_init() {
     earth->disk_read = disk_read;
     earth->disk_write = disk_write;
 
-    CRITICAL("Choose a disk:");
-    printf("Enter 0: microSD card\r\nEnter 1: on-board ROM\r\n");
-
-    char buf[2];
-    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
-    type = (buf[0] == '0')? SD_CARD : FLASH_ROM;
-    INFO("%s is chosen", type == SD_CARD? "microSD" : "on-board ROM");
-
-    if (type == SD_CARD) sdinit();
+    if (earth->platform == ARTY) {
+        type = FLASH_ROM;
+    } else {
+        type = SD_CARD;
+        sdinit();
+    }
 }

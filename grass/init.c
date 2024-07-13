@@ -11,16 +11,12 @@
 #include "syscall.h"
 #include "process.h"
 
-struct grass *grass = (void*)APPS_STACK_TOP;
-struct earth *earth = (void*)GRASS_STACK_TOP;
-
 static int sys_proc_read(uint block_no, char* dst) {
     return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
 
-void kernel_entry(uint mcause);
-int main() {
-    CRITICAL("Enter the grass layer, kernel_entry @0x%x", kernel_entry);
+void grass_entry() {
+    SUCCESS("Enter the grass layer");
 
     /* Initialize the grass interface functions */
     grass->proc_free = proc_free;

@@ -8,10 +8,10 @@ struct earth {
 
     /* CPU interface */
     int (*timer_reset)(uint core_id);
-    int (*mmu_alloc)(uint* frame_no, void** cached_addr);
-    int (*mmu_free)(int pid);
-    int (*mmu_map)(int pid, uint page_no, uint frame_no);
+    int (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
+    int (*mmu_map)(int pid, uint vpage_no, uint ppage_id);
     int (*mmu_switch)(int pid);
+    int (*mmu_free)(int pid);
 
     /* Devices interface */
     int (*disk_read)(uint block_no, uint nblocks, char* dst);
@@ -54,40 +54,40 @@ extern struct earth *earth;
 extern struct grass *grass;
 
 #define NCORES            4
-#define acquire(x)        while(__sync_lock_test_and_set(&x, 1) != 0);
 #define release(x)        __sync_lock_release(&x)
+#define acquire(x)        while(__sync_lock_test_and_set(&x, 1) != 0);
 
-/* Memory layout */
+/* Memory regions */
 #define PAGE_SIZE         4096
-#define FRAME_CACHE_END   0x80020000
-#define FRAME_CACHE_START 0x80004000  /* 112KB  frame cache           */
-                                      /*        earth interface       */
-#define GRASS_STACK_TOP   0x80003f80  /* 8KB    earth/grass stack     */
-                                      /*        grass interface       */
-#define APPS_STACK_TOP    0x80002000  /* 6KB    app stack             */
-#define SYSCALL_ARG       0x80000400  /* 1KB    system call args      */
-#define APPS_ARG          0x80000000  /* 1KB    app main() argc, argv */
-#define APPS_SIZE         0x00003000
-#define APPS_ENTRY        0x08005000  /* 12KB   app code+data         */
-#define GRASS_SIZE        0x00003000
-#define GRASS_ENTRY       0x08002000  /* 8KB    grass code+data       */
-                                      /* 12KB   earth data            */
-                                      /* earth code is in QSPI flash  */
+#define RAM_END           0x90000000 /* 256MB memory in total     */
+#define APPS_PAGES_BASE   0x80800000 /* 248MB initially free      */
 
-/* Platform specific configuration */
+#define APPS_STACK_TOP    0x80800000 /* 2MB app stack             */
+#define SYSCALL_ARG       0x80601000 /* struct syscall            */
+#define APPS_ARG          0x80600000 /* main() argc/argv          */
+#define APPS_ENTRY        0x80400000 /* 2MB app code and data     */
+
+#define EGOS_STACK_TOP    0x80400000 /* 2MB egos stack            */
+#define GRASS_STRUCT_BASE 0x80300800
+#define EARTH_STRUCT_BASE 0x80300000 /* struct earth/grass        */
+#define EGOS_HEAP_END     0x80200000 /* kernel message buffer     */
+#define RAM_START         0x80000000 /* 2MB egos code and data    */
+
+/* Memory-mapped I/O regions */
+#define CLINT_BASE 0x02000000
 #define SPI_BASE   (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
 #define UART0_BASE (earth->platform == ARTY? 0x10013000UL : 0x10010000UL)
 
-#ifndef LIBC_STDIO
+/* Memory-mapped I/O register access macros */
+#define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
+#define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
+#define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))
+
 /* Only earth/dev_tty.c uses LIBC_STDIO and does not need these macros */
+#ifndef LIBC_STDIO
 #define printf   earth->tty_printf
 #define INFO     earth->tty_info
 #define FATAL    earth->tty_fatal
 #define SUCCESS  earth->tty_success
 #define CRITICAL earth->tty_critical
 #endif
-
-/* Memory-mapped I/O register access macros */
-#define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
-#define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
-#define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))

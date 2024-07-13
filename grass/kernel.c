@@ -70,7 +70,9 @@ static void excp_entry(uint id) {
     /* Kill the process if curr_pid is a user application */
 
     /* Student's code ends here. */
-    FATAL("excp_entry: kernel got exception %d", id);
+    uint mepc;
+    asm("csrr %0, mepc":"=r"(mepc));
+    FATAL("excp_entry: kernel got exception %d, mepc=0x%x", id, mepc);
 }
 
 static void intr_entry(uint id) {
@@ -132,7 +134,7 @@ static void proc_yield() {
     proc_set_running(curr_pid);
 }
 
-struct pending_ipc *msg_buffer = (void*)(APPS_STACK_TOP + sizeof(struct grass));
+struct pending_ipc *msg_buffer = (void*)(EGOS_HEAP_END);
 
 static int proc_try_send(struct syscall *sc, struct process *sender) {
     if (msg_buffer->in_use == 1) return -1;
