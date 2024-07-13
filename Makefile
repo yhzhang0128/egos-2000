@@ -21,7 +21,7 @@ DEBUG = build/debug
 RELEASE = build/release
 
 APPS_DEPS = apps/*.* library/egos.h library/*/* Makefile
-EGOS_DEPS = earth/* earth/sd/* grass/* library/egos.h library/*/* Makefile
+EGOS_DEPS = earth/* grass/* library/egos.h library/*/* Makefile
 
 LDFLAGS = -nostdlib -lc -lgcc
 INCLUDE = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/servers

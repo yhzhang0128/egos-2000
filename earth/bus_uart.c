@@ -14,12 +14,12 @@
 #define UART0_RXCTRL  12UL
 #define UART0_DIV     24UL
 
-int uart_getc(int* c) {
-    uint ch = REGW(UART0_BASE, UART0_RXDATA);
-    return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
-}
-
 void uart_putc(int c) {
     while ((REGW(UART0_BASE, UART0_TXDATA) & (1 << 31)));
     REGW(UART0_BASE, UART0_TXDATA) = c;
+}
+
+int uart_getc(int* c) {
+    uint ch = REGW(UART0_BASE, UART0_RXDATA);
+    return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
 }
