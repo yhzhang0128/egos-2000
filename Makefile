@@ -55,7 +55,7 @@ install: egos
 	$(OBJCOPY) -O binary $(RELEASE)/egos.elf tools/qemu/egos.bin
 	$(CC) tools/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o tools/mkfs; cd tools; ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	$(CC) tools/mkrom.c -DCPU_BIN_FILE="\"fpga/freedom/fe310_cpu_$(BOARD).bin\"" -o tools/mkrom
+	$(CC) tools/mkrom.c -DCPU_BIN_FILE="\"fpga/vexriscv/vexriscv_cpu_$(BOARD).bin\"" -o tools/mkrom
 	cd tools; ./mkrom
 
 qemu: install

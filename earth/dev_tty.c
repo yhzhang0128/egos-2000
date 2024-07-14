@@ -12,11 +12,11 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-int uart_getc(int* c);
+void uart_getc(int* c);
 void uart_putc(int c);
 
 static int c, is_reading;
-int tty_recv_intr() { return (is_reading)? 0 : (uart_getc(&c) == 3); }
+int tty_recv_intr() { return 0; }
 
 int tty_write(char* buf, uint len) {
     for (uint i = 0; i < len; i++) uart_putc(buf[i]);
@@ -25,7 +25,7 @@ int tty_write(char* buf, uint len) {
 int tty_read(char* buf, uint len) {
     is_reading = 1;
     for (uint i = 0; i < len - 1; i++) {
-        for (c = -1; c == -1; uart_getc(&c));
+        uart_getc(&c);
         buf[i] = (char)c;
 
         switch (c) {

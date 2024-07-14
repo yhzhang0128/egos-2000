@@ -10,14 +10,23 @@
 #include "elf.h"
 #include "disk.h"
 #include "servers.h"
-
 #include <string.h>
 
-static void load_app(int pid, elf_reader reader,
-                     int argc, void** argv,
-                     struct elf32_program_header* pheader) {
+void elf_load(int pid, elf_reader reader, int argc, void** argv) {
+    char buf[BLOCK_SIZE];
+    reader(0, buf);
 
-    /* Debug printing during bootup */
+    struct elf32_header *header = (void*) buf;
+    struct elf32_program_header *pheader = (void*)(buf + header->e_phoff);
+
+    for (uint i = 0; i < header->e_phnum; i++) {
+        if (pheader[i].p_memsz == 0) continue;
+        else if (pheader[i].p_vaddr == APPS_ENTRY) {
+            pheader = &pheader[i];
+            break;
+        } else FATAL("elf_load: Invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
+    }
+
     if (pid < GPID_USER_START) {
         INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
         INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
@@ -70,19 +79,4 @@ static void load_app(int pid, elf_reader reader,
 
     earth->mmu_alloc(&ppage_id, &base);
     earth->mmu_map(pid, stack_start++, ppage_id);
-}
-
-void elf_load(int pid, elf_reader reader, int argc, void** argv) {
-    char buf[BLOCK_SIZE];
-    reader(0, buf);
-
-    struct elf32_header *header = (void*) buf;
-    struct elf32_program_header *pheader = (void*)(buf + header->e_phoff);
-
-    for (uint i = 0; i < header->e_phnum; i++) {
-        if (pheader[i].p_memsz == 0) continue;
-        else if (pheader[i].p_vaddr == APPS_ENTRY)
-            load_app(pid, reader, argc, argv, &pheader[i]);
-        else FATAL("elf_load: Invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
-    }
 }

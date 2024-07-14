@@ -8,18 +8,31 @@
 
 #include "egos.h"
 
-#define UART0_TXDATA  0UL
-#define UART0_RXDATA  4UL
-#define UART0_TXCTRL  8UL
-#define UART0_RXCTRL  12UL
-#define UART0_DIV     24UL
+#define SIFIVE_UART_TXDATA  0UL
+#define SIFIVE_UART_RXDATA  4UL
+
+#define LITEX_UART_TXFULL   4UL
+#define LITEX_UART_RXEMPTY  8UL
+#define LITEX_UART_EVPEND   16UL
 
 void uart_putc(int c) {
-    while ((REGW(UART0_BASE, UART0_TXDATA) & (1 << 31)));
-    REGW(UART0_BASE, UART0_TXDATA) = c;
+    if (earth->platform == ARTY) {
+        while (REGW(UART_BASE, LITEX_UART_TXFULL));
+        REGW(UART_BASE, 0) = c;
+        REGW(UART_BASE, LITEX_UART_EVPEND) = 1;
+    } else {
+        while ((REGW(UART_BASE, SIFIVE_UART_TXDATA) & (1 << 31)));
+        REGW(UART_BASE, SIFIVE_UART_TXDATA) = c;
+    }
 }
 
-int uart_getc(int* c) {
-    uint ch = REGW(UART0_BASE, UART0_RXDATA);
-    return *c = (ch & (1 << 31))? -1 : (ch & 0xFF);
+void uart_getc(int* c) {
+    if (earth->platform == ARTY) {
+        while(REGW(UART_BASE, LITEX_UART_RXEMPTY));
+        *c = REGW(UART_BASE, 0) & 0xFF;
+        REGW(UART_BASE, LITEX_UART_EVPEND) = 2;
+    } else {
+        while ((*c = REGW(UART_BASE, SIFIVE_UART_RXDATA)) & (1 << 31));
+        *c &= 0xFF;
+    }
 }

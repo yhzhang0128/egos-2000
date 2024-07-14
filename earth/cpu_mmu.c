@@ -116,10 +116,10 @@ void pagetable_identity_mapping(int pid) {
 
     /* Allocate the leaf page tables */
     for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
-        setup_identity_region(pid, i, 1024, OS_RWX);      /* RAM   */
-    setup_identity_region(pid, CLINT_BASE, 16, OS_RWX);   /* CLINT */
-    setup_identity_region(pid, UART0_BASE, 1,  OS_RWX);   /* UART  */
-    setup_identity_region(pid, SPI_BASE,   1,  OS_RWX);   /* SPI   */
+        setup_identity_region(pid, i, 1024, OS_RWX);    /* RAM   */
+    setup_identity_region(pid, CLINT_BASE, 16, OS_RWX); /* CLINT */
+    setup_identity_region(pid, UART_BASE, 1,  OS_RWX);  /* UART  */
+    setup_identity_region(pid, SPI_BASE,   1,  OS_RWX); /* SPI   */
 }
 
 int page_table_map(int pid, uint vpage_no, uint ppage_id) {
@@ -177,7 +177,6 @@ void mmu_init() {
     earth->translation = SOFT_TLB;
     earth->mmu_map = soft_tlb_map;
     earth->mmu_switch = soft_tlb_switch;
-    if (earth->platform == ARTY) return;
 
     /* Choose memory translation mechanism in QEMU */
     CRITICAL("Choose a memory translation mechanism:");

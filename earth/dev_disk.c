@@ -23,7 +23,7 @@ static int disk_read(uint block_no, uint nblocks, char* dst) {
     if (type == SD_CARD) {
         sdread(block_no, nblocks, dst);
     } else {
-        char* src = (char*)0x20800000 + block_no * BLOCK_SIZE;
+        char* src = (char*)0x20400000 + block_no * BLOCK_SIZE;
         memcpy(dst, src, nblocks * BLOCK_SIZE);
     }
     return 0;

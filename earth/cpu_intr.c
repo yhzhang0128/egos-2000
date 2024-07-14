@@ -26,7 +26,8 @@ static int mtimecmp_set(ulonglong time, uint core_id) {
 }
 
 #define QUANTUM ((earth->platform == ARTY)? 5000UL : 500000UL)
-static int timer_reset(uint core_id) { return mtimecmp_set(mtime_get() + QUANTUM, core_id); }
+static int timer_reset(uint core_id) { return 0; }
+//static int timer_reset(uint core_id) { return mtimecmp_set(mtime_get() + QUANTUM, core_id); }
 
 /* Both trap functions are defined in earth.S */
 void trap_from_M_mode();
@@ -48,8 +49,8 @@ void intr_init(uint core_id) {
 
     /* Enable the machine-mode timer and software interrupts */
     uint mstatus, mie;
-    asm("csrr %0, mie" : "=r"(mie));
-    asm("csrw mie, %0" ::"r"(mie | 0x88));
-    asm("csrr %0, mstatus" : "=r"(mstatus));
-    asm("csrw mstatus, %0" ::"r"(mstatus | 0x88));
+    //asm("csrr %0, mie" : "=r"(mie));
+    //asm("csrw mie, %0" ::"r"(mie | 0x88));
+    //asm("csrr %0, mstatus" : "=r"(mstatus));
+    //asm("csrw mstatus, %0" ::"r"(mstatus | 0x88));
 }
