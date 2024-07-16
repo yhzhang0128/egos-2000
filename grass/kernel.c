@@ -76,7 +76,7 @@ static void excp_entry(uint id) {
 }
 
 static void intr_entry(uint id) {
-    if (earth->tty_recv_intr() && curr_pid >= GPID_USER_START) {
+    if (id == 2 && curr_pid >= GPID_USER_START) {
         /* User process killed by ctrl+c interrupt */
         INFO("process %d killed by interrupt", curr_pid);
         proc_set[curr_proc_idx].mepc = (uint)sys_exit;

@@ -8,21 +8,36 @@
 #include "egos.h"
 #include <unistd.h>
 
-/* printf() is linked from the compiler's C library;
- * printf() constructs a string based on its arguments
- * and prints the string to the tty device by calling _write().
+/* earth->vsprintf is the C library vsprintf, which converts
+ * a format and arguments (e.g., arguments to printf) into a
+ * string. This string is then passed to earth->tty_write().
  */
 
-int _write(int file, char *ptr, uint len) {
-    if (file != STDOUT_FILENO) return -1;
-    return earth->tty_write(ptr, len);
+#define LOG(x, y)  earth->tty_write(x, sizeof(x)); \
+                   va_list args; \
+                   va_start(args, format); \
+                   char str_to_print[256]; \
+                   uint len = earth->tty_vsprintf(str_to_print, format, args); \
+                   earth->tty_write(str_to_print, len); \
+                   va_end(args); \
+                   earth->tty_write(y, sizeof(y));
+
+int my_printf(const char *format, ...) { LOG("", ""); }
+
+int INFO(const char *format, ...) { LOG("[INFO] ", "\r\n") }
+
+int FATAL(const char *format, ...)
+{
+    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n") /* red color */
+    while(1);
 }
 
-int _close(int file) { return -1; }
-int _fstat(int file, void *stat) { return -1; }
-int _lseek(int file, int ptr, int dir) { return -1; }
-int _read(int file, void *ptr, uint len) { return -1; }
-int _isatty(int file) { return (file == STDOUT_FILENO); }
-void _kill() {}
-int _getpid() { return -1; }
-void _exit(int status) { grass->sys_exit(status); while(1); }
+int SUCCESS(const char *format, ...)
+{
+    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n") /* green color */
+}
+
+int CRITICAL(const char *format, ...)
+{
+    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n") /* yellow color */
+}

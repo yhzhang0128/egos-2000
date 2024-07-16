@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdarg.h>    /* Define va_list for vsprintf */
 #include <sys/types.h> /* Define uint and ushort */
 typedef unsigned long long ulonglong;
 
@@ -18,15 +19,9 @@ struct earth {
     int (*disk_read)(uint block_no, uint nblocks, char* dst);
     int (*disk_write)(uint block_no, uint nblocks, char* src);
 
-    int (*tty_recv_intr)();
     int (*tty_read)(char* buf, uint len);
     int (*tty_write)(char* buf, uint len);
-
-    int (*tty_printf)(const char *format, ...);
-    int (*tty_info)(const char *format, ...);
-    int (*tty_fatal)(const char *format, ...);
-    int (*tty_success)(const char *format, ...);
-    int (*tty_critical)(const char *format, ...);
+    int (*tty_vsprintf)(char * s, const char * format, va_list arg );
 
     /* Earth configuration */
     enum { ARTY, QEMU } platform;
@@ -84,11 +79,10 @@ extern struct grass *grass;
 #define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
 #define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))
 
-/* Only earth/dev_tty.c uses LIBC_STDIO and does not need these macros */
-#ifndef LIBC_STDIO
-#define printf   earth->tty_printf
-#define INFO     earth->tty_info
-#define FATAL    earth->tty_fatal
-#define SUCCESS  earth->tty_success
-#define CRITICAL earth->tty_critical
-#endif
+/* Printing functionalities defined in library/libc/print.c */
+int INFO(const char *format, ...);
+int FATAL(const char *format, ...);
+int SUCCESS(const char *format, ...);
+int CRITICAL(const char *format, ...);
+int my_printf(const char *format, ...);
+#define printf   my_printf
