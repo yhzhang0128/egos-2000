@@ -115,6 +115,7 @@ static void proc_yield() {
         FATAL("proc_yield: no process to run on core %u", core_in_kernel);
     }
     earth->mmu_switch(curr_pid);
+    earth->mmu_flush_cache();
 
     /* Student's code goes here (PMP, page table translation, and multi-core). */
 

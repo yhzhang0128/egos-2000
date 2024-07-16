@@ -151,6 +151,17 @@ int page_table_switch(int pid) {
     /* Student's code ends here. */
 }
 
+int flush_cache() {
+    if (earth->platform == ARTY) {
+        /* Flush the instruction cache */
+        /* See https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25 */
+        asm volatile(
+            ".word(0x100F)\n"
+            "nop\nnop\nnop\nnop\nnop\n"
+        );
+    }
+}
+
 /* MMU Initialization */
 void mmu_init() {
     /* Initialize MMU interface functions */
@@ -177,6 +188,7 @@ void mmu_init() {
     earth->translation = SOFT_TLB;
     earth->mmu_map = soft_tlb_map;
     earth->mmu_switch = soft_tlb_switch;
+    earth->mmu_flush_cache = flush_cache;
 
     /* Choose memory translation mechanism in QEMU */
     CRITICAL("Choose a memory translation mechanism:");
