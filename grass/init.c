@@ -11,8 +11,8 @@
 #include "syscall.h"
 #include "process.h"
 
-static int sys_proc_read(uint block_no, char* dst) {
-    return earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
+static void sys_proc_read(uint block_no, char* dst) {
+    earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
 
 void grass_entry() {

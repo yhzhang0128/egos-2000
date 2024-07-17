@@ -11,11 +11,13 @@
 static int disk_getsize() { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
 
 static int disk_read(inode_intf bs, uint ino, block_no offset, block_t *block) {
-    return earth->disk_read(FILE_SYS_DISK_START + offset, 1, block->bytes);
+    earth->disk_read(FILE_SYS_DISK_START + offset, 1, block->bytes);
+    return 0;
 }
 
 static int disk_write(inode_intf bs, uint ino, block_no offset, block_t *block) {
-    return earth->disk_write(FILE_SYS_DISK_START + offset, 1, block->bytes);
+    earth->disk_write(FILE_SYS_DISK_START + offset, 1, block->bytes);
+    return 0;
 }
 
 static inode_store_t disk;

@@ -8,17 +8,17 @@ struct earth {
     int boot_lock, kernel_lock, booted_core_cnt;
 
     /* CPU interface */
-    int (*timer_reset)(uint core_id);
+    void (*timer_reset)(uint core_id);
 
-    int (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
-    int (*mmu_free)(int pid);
-    int (*mmu_map)(int pid, uint vpage_no, uint ppage_id);
-    int (*mmu_switch)(int pid);
-    int (*mmu_flush_cache)();
+    void (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
+    void (*mmu_free)(int pid);
+    void (*mmu_map)(int pid, uint vpage_no, uint ppage_id);
+    void (*mmu_switch)(int pid);
+    void (*mmu_flush_cache)();
 
     /* Devices interface */
-    int (*disk_read)(uint block_no, uint nblocks, char* dst);
-    int (*disk_write)(uint block_no, uint nblocks, char* src);
+    void (*disk_read)(uint block_no, uint nblocks, char* dst);
+    void (*disk_write)(uint block_no, uint nblocks, char* src);
 
     int (*tty_read)(char* buf, uint len);
     int (*tty_write)(char* buf, uint len);

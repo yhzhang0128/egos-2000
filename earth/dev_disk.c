@@ -19,20 +19,18 @@ static void sdinit();
 static int sdread(uint offset, uint nblock, char* dst);
 static int sdwrite(uint offset, uint nblock, char* src);
 
-static int disk_read(uint block_no, uint nblocks, char* dst) {
+static void disk_read(uint block_no, uint nblocks, char* dst) {
     if (type == SD_CARD) {
         sdread(block_no, nblocks, dst);
     } else {
         char* src = (char*)0x20400000 + block_no * BLOCK_SIZE;
         memcpy(dst, src, nblocks * BLOCK_SIZE);
     }
-    return 0;
 }
 
-static int disk_write(uint block_no, uint nblocks, char* src) {
+static void disk_write(uint block_no, uint nblocks, char* src) {
     if (type == FLASH_ROM) FATAL("disk_write: Writing to ROM");
     sdwrite(block_no, nblocks, src);
-    return 0;
 }
 
 void disk_init() {

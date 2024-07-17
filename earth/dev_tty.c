@@ -15,6 +15,7 @@ void uart_putc(int c);
 
 int tty_write(char* buf, uint len) {
     for (uint i = 0; i < len; i++) uart_putc(buf[i]);
+    return len;
 }
 
 int tty_read(char* buf, uint len) {

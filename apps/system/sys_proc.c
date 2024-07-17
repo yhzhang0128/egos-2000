@@ -64,7 +64,7 @@ int main() {
     }
 }
 
-static int app_read(uint off, char* dst) { file_read(app_ino, off, dst); }
+static void app_read(uint off, char* dst) { file_read(app_ino, off, dst); }
 
 static int app_spawn(struct proc_request *req) {
     int bin_ino = dir_lookup(0, "bin/");
@@ -81,8 +81,8 @@ static int app_spawn(struct proc_request *req) {
 static int sys_proc_base;
 char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
 
-static int sys_proc_read(uint block_no, char* dst) {
-    return earth->disk_read(sys_proc_base + block_no, 1, dst);
+static void sys_proc_read(uint block_no, char* dst) {
+    earth->disk_read(sys_proc_base + block_no, 1, dst);
 }
 
 static void sys_spawn(uint base) {

@@ -21,16 +21,14 @@ static ulonglong mtime_get() {
     return (((ulonglong)high) << 32) | low;
 }
 
-static int mtimecmp_set(ulonglong time, uint core_id) {
+static void mtimecmp_set(ulonglong time, uint core_id) {
     REGW(MTIMECMP_BASE, core_id * 8 + 4) = 0xFFFFFFFF;
     REGW(MTIMECMP_BASE, core_id * 8 + 0) = (uint)time;
     REGW(MTIMECMP_BASE, core_id * 8 + 4) = (uint)(time >> 32);
-
-    return 0;
 }
 
-static int timer_reset(uint core_id) {
-    return mtimecmp_set(mtime_get() + QUANTUM, core_id);
+static void timer_reset(uint core_id) {
+    mtimecmp_set(mtime_get() + QUANTUM, core_id);
 }
 
 /* Both trap functions are defined in earth.S */

@@ -21,34 +21,32 @@ struct page_info {
 #define PAGE_NO_TO_PAGE_ADDR(x) (char*)(x * PAGE_SIZE)
 #define PAGE_ID_TO_PAGE_ADDR(x) (char*)APPS_PAGES_BASE + x * PAGE_SIZE
 
-int mmu_alloc(uint* ppage_id, void** ppage_addr) {
+void mmu_alloc(uint* ppage_id, void** ppage_addr) {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (!page_info_table[i].use) {
             page_info_table[i].use = 1;
             *ppage_id              = i;
             *ppage_addr            = PAGE_ID_TO_PAGE_ADDR(i);
-            return 0;
+            return;
         }
-    return -1;
+    FATAL("mmu_alloc: no more free memory");
 }
 
-int mmu_free(int pid) {
+void mmu_free(int pid) {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (page_info_table[i].use && page_info_table[i].pid == pid)
             memset(&page_info_table[i], 0, sizeof(struct page_info));
-    return 0;
 }
 
 /* Software TLB Translation */
-int soft_tlb_map(int pid, uint vpage_no, uint ppage_id) {
+void soft_tlb_map(int pid, uint vpage_no, uint ppage_id) {
     page_info_table[ppage_id].pid      = pid;
     page_info_table[ppage_id].vpage_no = vpage_no;
-    return 0;
 }
 
-int soft_tlb_switch(int pid) {
+void soft_tlb_switch(int pid) {
     static int curr_vm_pid = -1;
-    if (pid == curr_vm_pid) return 0;
+    if (pid == curr_vm_pid) return;
 
     /* Unmap curr_vm_pid from the user address space */
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
@@ -122,7 +120,7 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, SPI_BASE,   1,  OS_RWX); /* SPI   */
 }
 
-int page_table_map(int pid, uint vpage_no, uint ppage_id) {
+void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     if (pid >= 32) FATAL("page_table_map: pid too large");
 
     /* Student's code goes here (page table translation). */
@@ -139,7 +137,7 @@ int page_table_map(int pid, uint vpage_no, uint ppage_id) {
     /* Student's code ends here. */
 }
 
-int page_table_switch(int pid) {
+void page_table_switch(int pid) {
     /* Student's code goes here (page table translation). */
 
     /* Remove the following line of code and, instead,
@@ -151,7 +149,7 @@ int page_table_switch(int pid) {
     /* Student's code ends here. */
 }
 
-int flush_cache() {
+void flush_cache() {
     if (earth->platform == ARTY) {
         /* Flush the instruction cache */
         /* See https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25 */
