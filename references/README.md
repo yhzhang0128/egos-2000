@@ -6,7 +6,7 @@
 | P1 | Non-preemptive Multi-threading    | context switch, multi-threading, synchronization            | QEMU/Arty |
 | P2 | Multi-level Feedback Queue        | timer, interrupt handling, scheduling                       | QEMU/Arty |
 | P3 | System Call and Memory Protection | exception, control and status register, privilege level     | QEMU/Arty |
-| P4 | Page Table Translation            | RISC-V Sv32 translation                                     | QEMU      |
+| P4 | Page Table Translation            | RISC-V Sv32 translation                                     | QEMU/Arty |
 | P5 | SD Card Driver                    | I/O device, bus controller, device driver                   | QEMU/Arty |
 | P6 | File System                       | inode layer, directory layer                                | QEMU/Arty |
 | P7 | Multi-core and Atomic Instruction | spinlock, synchronization, atomic instruction               | QEMU      |
@@ -14,46 +14,43 @@
 ## Architecture
 
 **Earth layer (hardware specific)**
-* `earth/dev_disk`: ROM and SD card (touched by P5)
-* `earth/dev_page`: memory paging
-* `earth/dev_tty`: keyboard input and tty output
+* `earth/boot`: boot loader
+* `earth/dev_disk`: sd card driver (touched by P5)
+* `earth/dev_tty`: keyboard input and screen output
 * `earth/cpu_intr`: interrupt and exception handling (touched by P3)
-* `earth/cpu_mmu`: memory paging and address translation (touched by P3, P6)
+* `earth/cpu_mmu`: memory allocation and address translation (touched by P3, P6)
 
 **Grass layer (hardware independent)**
-* `grass/syscall`: system call interfaces to user applications
+* `grass/syscall`: system call interface
 * `grass/process`: data structures for managing processes (touched by P1)
 * `grass/kernel`: preemptive scheduling and inter-process communication (touched by P2)
 
 **Application layer**
-* `app/system/sys_proc`: allocation and free of user processes
-* `app/system/sys_file`: the inode layer over the SD card (touched by P4)
-* `app/system/sys_dir`: the directory layer over the inode layer (touched by P4)
+* `app/system/sys_proc`: spawn and kill processes
+* `app/system/sys_file`: the inode layer of file system (touched by P4)
+* `app/system/sys_dir`: the directory layer of file system (touched by P4)
 * `app/system/sys_shell`: interactive user interface
-* shell commands: `pwd`, `cd`, `ls`, `cat`, `echo`, `clock`, `killall`
+* user commands: `pwd`, `cd`, `ls`, `cat`, `echo`, `clock`, ...
 
-Every layer has dedicated memory regions as described below (and in `library/egos.h`).
-The complete memory layout is described in Chapter 4 of the [FE310 manual](sifive-fe310-v19p04.pdf).
+**Memory layout**
 
-**Selected memory regions**
-
-| Base        | Top         | Attributes | Description       | Notes                                                      |
-|-------------|-------------|------------|-------------------|------------------------------------------------------------|
-| 0x0800_0000 | 0x0800_1FFF | RWX A      | ITIM, 10KB        | Earth layer bss, data and heap                             |
-| 0x0800_2000 | 0x0800_4FFF | RWX A      | ITIM, 10KB        | Grass layer code, bss, data and heap                       |
-| 0x0800_5000 | 0x0800_7FFF | RWX A      | ITIM, 12KB        | App layer code, bss, data and heap                         |
-| ......      | ......      | ......     | ......            |                                                            |
-| 0x2000_0000 | 0x203F_FFFF | R XC       | Flash ROM, 4MB    | FPGA binary of the FE310 RISC-V processor                  |
-| 0x2040_0000 | 0x207F_FFFF | R XC       | Flash ROM, 4MB    | Earth layer binary                                         |
-| 0x2080_0000 | 0x20BF_FFFF | R XC       | Flash ROM, 4MB    | Disk image (disk.img produced by mkrom)                    |
-| ......      | ......      | ......     | ......            |                                                            |
-| 0x8000_0000 | 0x8000_1FFF | RW- A      | DTIM, 8KB         | App layer stack                                            |
-| 0x8000_2000 | 0x8000_3FFF | RW- A      | DTIM, 8KB         | Earth layer and grass layer stack                          |
-| 0x8000_4000 | 0x8001_FFFF | RW- A      | DTIM, 112KB       | MMU cache of physical frames for suspended grass processes |
-
-On the Arty board, the first 1MB of the microSD card is used as 256 physical frames by the MMU for paging (see `earth/dev_page.c`).
+| Base        | Top         | Attributes | Description    | Notes                                              |
+|-------------|-------------|------------|----------------|----------------------------------------------------|
+| 0x2000_0000 | 0x203F_FFFF | R          | Flash ROM, 4MB | FPGA binary of the LiteX+VexRiscv processor        |
+| 0x2040_0000 | 0x207F_FFFF | R          | Flash ROM, 4MB | disk.img produced by mkfs (only on the Arty board) |
+| ......      | ......      | ......     | ......         |                                                    |
+| 0x8000_0000 | 0x801F_FFFF | RWX        | RAM, 2MB       | EGOS code, data and heap                           |
+| 0x8020_0000 | 0x803F_FFFF | RWX        | RAM, 2MB       | EGOS stack                                         |
+| 0x8020_0000 | 0x803F_FFFF | RWX        | RAM, 2MB       | Application code, data and heap                    |
+| 0x8040_0000 | 0x807F_FFFF | RWX        | RAM, 2MB       | Application stack                                  |
+| 0x8080_0000 | 0x8FFF_FFFF | RWX        | RAM, 248MB     | Initially free memory for allocation by earth/mmu  |
 
 ## Software development history
+
+**Iteration #10**
+* [2024.7] Switch from SiFive FE310 to LiteX+VexRiscv (a [Linux-compatible](https://github.com/litex-hub/linux-on-litex-vexriscv) CPU design) for the FPGA boards
+* [2024.7] With LiteX+VexRiscv, remove the paging device and cleanup memory layout
+* [2024.7] With LiteX+VexRiscv, try SD card driver and Ethernet/UDP on the Arty board
 
 **Iteration #9**
 * [2024.04] Run egos-2000 on the [mriscv processor](https://github.com/0x486F626F/mriscv/tree/egos) in System Verilog
