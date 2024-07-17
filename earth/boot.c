@@ -37,9 +37,9 @@ void boot() {
     }
 
     if (earth->booted_core_cnt == 0) {
+        /* The first booted core needs to do some more job */
         earth->booted_core_cnt = 1;
 
-        /* The first booted core needs to do some more job */
         tty_init();
         CRITICAL("--- Booting on %s with core #%u ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
 

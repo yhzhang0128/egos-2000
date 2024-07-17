@@ -9,10 +9,11 @@ struct earth {
 
     /* CPU interface */
     int (*timer_reset)(uint core_id);
+
     int (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
+    int (*mmu_free)(int pid);
     int (*mmu_map)(int pid, uint vpage_no, uint ppage_id);
     int (*mmu_switch)(int pid);
-    int (*mmu_free)(int pid);
     int (*mmu_flush_cache)();
 
     /* Devices interface */
