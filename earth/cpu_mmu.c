@@ -76,8 +76,8 @@ void soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define OS_RWX   0xF
-#define USER_RWX 0x1F
+#define OS_RWX   (0xC0 | 0xF)
+#define USER_RWX (0xC0 | 0x1F)
 static uint *root, *leaf;
 
 /* 32 is a number large enough for demo purpose */
@@ -118,6 +118,7 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, CLINT_BASE, 16, OS_RWX); /* CLINT */
     setup_identity_region(pid, UART_BASE, 1,  OS_RWX);  /* UART  */
     setup_identity_region(pid, SPI_BASE,   1,  OS_RWX); /* SPI   */
+    if (earth->platform == ARTY) setup_identity_region( pid, 0x20400000, 1024, OS_RWX);
 }
 
 void page_table_map(int pid, uint vpage_no, uint ppage_id) {

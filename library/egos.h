@@ -71,9 +71,9 @@ extern struct grass *grass;
 #define RAM_START         0x80000000 /* 2MB egos code and data    */
 
 /* Memory-mapped I/O regions */
-#define CLINT_BASE 0x02000000
 #define SPI_BASE   (earth->platform == ARTY? 0x10024000UL : 0x10050000UL)
 #define UART_BASE  (earth->platform == ARTY? 0xF0001000UL : 0x10010000UL)
+#define CLINT_BASE (earth->platform == ARTY? 0xF0010000UL : 0x02000000UL)
 
 /* Memory-mapped I/O register access macros */
 #define ACCESS(x) (*(__typeof__(*x) volatile *)(x))

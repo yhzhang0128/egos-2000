@@ -7,9 +7,9 @@
 
 #include "egos.h"
 
+#define MTIME_BASE    (CLINT_BASE | 0xBFF8)
+#define MTIMECMP_BASE (CLINT_BASE | 0x4000)
 #define QUANTUM       (earth->platform == QEMU? 500000UL : 50000000UL)
-#define MTIME_BASE    (earth->platform == QEMU? 0x200BFF8 : 0xF001BFF8)
-#define MTIMECMP_BASE (earth->platform == QEMU? 0x2004000 : 0xF0014000)
 
 static ulonglong mtime_get() {
     uint low, high;
