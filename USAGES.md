@@ -135,8 +135,8 @@ In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](http
 
 In **4**, some Arty boards may use "s25fl128sxxxxxx0" or other memory device. If you choose the wrong one, **6** will tell you.
 
-![This is an image](screenshots/vivado.png)
+![This is an image](tools/screenshots/vivado.png)
 
 Lastly, to connect with the egos-2000 TTY, find your board in the "Device Manager" (e.g., COM6) and use `PuTTY` to connect:
 
-![This is an image](screenshots/putty.png)
+![This is an image](tools/screenshots/putty.png)

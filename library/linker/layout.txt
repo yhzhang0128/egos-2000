@@ -1,0 +1,10 @@
+| Base        | Top         | Size           | Description                                        |
+|-------------|-------------|----------------|----------------------------------------------------|
+| 0x2000_0000 | 0x203F_FFFF | Flash ROM, 4MB | FPGA binary of the LiteX+VexRiscv processor        |
+| 0x2040_0000 | 0x207F_FFFF | Flash ROM, 4MB | disk.img produced by mkfs (only on the Arty board) |
+| ......      | ......      | ......         |                                                    |
+| 0x8000_0000 | 0x801F_FFFF | RAM, 2MB       | EGOS code, data and heap                           |
+| 0x8020_0000 | 0x803F_FFFF | RAM, 2MB       | EGOS stack                                         |
+| 0x8020_0000 | 0x803F_FFFF | RAM, 2MB       | Application code, data and heap                    |
+| 0x8040_0000 | 0x807F_FFFF | RAM, 2MB       | Application stack                                  |
+| 0x8080_0000 | 0x8FFF_FFFF | RAM, 248MB     | Initially free memory for allocation by earth/mmu  |

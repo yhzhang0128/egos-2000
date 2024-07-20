@@ -5,7 +5,7 @@ This project's vision is to help **every** student read **all** the code of a te
 With only **2000** lines of code, egos-2000 implements every component of an operating system for education. 
 It can run on RISC-V boards and the QEMU software emulator.
 
-![Fail to load an image of egos-2000.](references/screenshots/egos-2000.jpg)
+![Fail to load an image of egos-2000.](tools/screenshots/egos-2000.jpg)
 
 ```shell
 # The cloc utility is used to count the lines of code (LOC).
@@ -36,11 +36,9 @@ The **egos** part of egos-2000 is named after its three-layer architecture.
     * process control block and system call interface
 * The **application layer** implements file system, shell and user commands.
 
-The definitions of `struct earth` and `struct grass` in [this header file](library/egos.h) specify the layer interface.
-
-For compiling and running egos-2000, please read [this document](references/USAGES.md).
-The [RISC-V instruction set manual](references/riscv-privileged-v1.10.pdf) introduces the privileged ISA.
-[This document](references/README.md) introduces the memory map and teaching plans, etc.
+The definitions of `struct earth` and `struct grass` in [`egos.h`](library/egos.h) specify the layer interface.
+Please read [USAGES.md](USAGES.md) for running egos-2000 and
+the [instruction set manual](https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf) for the privileged RISC-V ISA.
 
 ## Acknowledgements
 
