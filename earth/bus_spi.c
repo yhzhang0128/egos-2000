@@ -2,12 +2,9 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: definitions for SPI1 in FE310
+ * Description: definitions for the SPI bus
  */
 #include "egos.h"
-
-#define SIFIVE_SPI_TXDATA   72UL
-#define SIFIVE_SPI_RXDATA   76UL
 
 #define LITEX_SPI_CONTROL    0UL
 #define LITEX_SPI_STATUS     4UL
@@ -15,8 +12,11 @@
 #define LITEX_SPI_MISO      12UL
 #define LITEX_SPI_CLKDIV    24UL
 
+#define SIFIVE_SPI_TXDATA   72UL
+#define SIFIVE_SPI_RXDATA   76UL
+
 char spi_transfer(char byte) {
-    /* SPI transfer means sending a byte and then receiving a byte */
+    /* "transfer" means sending a byte and then receiving a byte */
     uint rxdata;
     if (earth->platform == ARTY) {
         REGW(SPI_BASE, LITEX_SPI_MOSI) = byte;

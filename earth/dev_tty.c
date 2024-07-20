@@ -10,6 +10,7 @@
 #include "egos.h"
 #include <stdio.h>
 
+/* UART functions defined in earth/bus_uart.c */
 void uart_getc(int* c);
 void uart_putc(int c);
 

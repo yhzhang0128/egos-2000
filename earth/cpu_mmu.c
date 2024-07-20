@@ -3,7 +3,9 @@
  * All rights reserved.
  *
  * Description: memory management unit (MMU)
- * 2 memory translation mechanisms: page table and software TLB
+ * This MMU code contains a simple memory allocation/free mechanism
+ * and two memory translation mechanisms: software TLB and page table.
+ * It also contains hardware-specific cache flushing functions.
  */
 
 #include "egos.h"
@@ -11,22 +13,23 @@
 #include "servers.h"
 #include <string.h>
 
+/* Memory allocation and free */
 #define APPS_PAGES_CNT (RAM_END - APPS_PAGES_BASE) / PAGE_SIZE
 struct page_info {
-    int  use;      /* Is this page allocated? */
+    int  use;      /* Is this page free or allocated? */
     int  pid;      /* Which process owns this page? */
-    uint vpage_no; /* Which virtual page of this process maps to this physial page? */
+    uint vpage_no; /* Which virtual page in this process maps to this physial page? */
 } page_info_table[APPS_PAGES_CNT];
 
-#define PAGE_NO_TO_PAGE_ADDR(x) (char*)(x * PAGE_SIZE)
-#define PAGE_ID_TO_PAGE_ADDR(x) (char*)APPS_PAGES_BASE + x * PAGE_SIZE
+#define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
+#define PAGE_ID_TO_ADDR(x) (char*)APPS_PAGES_BASE + x * PAGE_SIZE
 
 void mmu_alloc(uint* ppage_id, void** ppage_addr) {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (!page_info_table[i].use) {
             page_info_table[i].use = 1;
             *ppage_id              = i;
-            *ppage_addr            = PAGE_ID_TO_PAGE_ADDR(i);
+            *ppage_addr            = PAGE_ID_TO_ADDR(i);
             return;
         }
     FATAL("mmu_alloc: no more free memory");
@@ -51,15 +54,15 @@ void soft_tlb_switch(int pid) {
     /* Unmap curr_vm_pid from the user address space */
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (page_info_table[i].use && page_info_table[i].pid == curr_vm_pid)
-            memcpy(PAGE_ID_TO_PAGE_ADDR(i),
-                   PAGE_NO_TO_PAGE_ADDR(page_info_table[i].vpage_no),
+            memcpy(PAGE_ID_TO_ADDR(i),
+                   PAGE_NO_TO_ADDR(page_info_table[i].vpage_no),
                    PAGE_SIZE);
 
     /* Map pid to the user address space */
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (page_info_table[i].use && page_info_table[i].pid == pid)
-            memcpy(PAGE_NO_TO_PAGE_ADDR(page_info_table[i].vpage_no),
-                   PAGE_ID_TO_PAGE_ADDR(i),
+            memcpy(PAGE_NO_TO_ADDR(page_info_table[i].vpage_no),
+                   PAGE_ID_TO_ADDR(i),
                    PAGE_SIZE);
 
     curr_vm_pid = pid;
@@ -118,10 +121,12 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, CLINT_BASE, 16, OS_RWX); /* CLINT */
     setup_identity_region(pid, UART_BASE, 1,  OS_RWX);  /* UART  */
     setup_identity_region(pid, SPI_BASE,   1,  OS_RWX); /* SPI   */
+
     if (earth->platform == ARTY) {
-        setup_identity_region( pid, 0x20400000, 1024, OS_RWX); /* ROM */
-        setup_identity_region( pid, 0x90001000, 1, OS_RWX);    /* ETHMAC */
-        setup_identity_region( pid, 0xF0002000, 1, OS_RWX);    /* ETHMAC CSR */
+        setup_identity_region( pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
+        setup_identity_region( pid, ETHMAC_CSR_BASE,  1, OS_RWX);   /* ETHMAC CSR */
+        setup_identity_region( pid, ETHMAC_RX_BUFFER, 1, OS_RWX);   /* ETHMAC RX buffer */
+        setup_identity_region( pid, ETHMAC_TX_BUFFER, 1, OS_RWX);   /* ETHMAC TX buffer */
     }
 }
 
@@ -156,7 +161,7 @@ void page_table_switch(int pid) {
 
 void flush_cache() {
     if (earth->platform == ARTY) {
-        /* Flush the instruction cache */
+        /* Flush the L1 instruction cache */
         /* See https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25 */
         asm volatile(
             ".word(0x100F)\n"
@@ -167,9 +172,9 @@ void flush_cache() {
 
 /* MMU Initialization */
 void mmu_init() {
-    /* Initialize MMU interface functions */
     earth->mmu_free = mmu_free;
     earth->mmu_alloc = mmu_alloc;
+    earth->mmu_flush_cache = flush_cache;
 
     /* Setup a PMP region for the whole 4GB address space */
     asm("csrw pmpaddr0, %0" : : "r" (0x40000000));
@@ -187,12 +192,6 @@ void mmu_init() {
 
     /* Student's code ends here. */
 
-    /* Arty board does not support supervisor mode or page tables */
-    earth->translation = SOFT_TLB;
-    earth->mmu_map = soft_tlb_map;
-    earth->mmu_switch = soft_tlb_switch;
-    earth->mmu_flush_cache = flush_cache;
-
     /* Choose memory translation mechanism in QEMU */
     CRITICAL("Choose a memory translation mechanism:");
     printf("Enter 0: page tables\r\nEnter 1: software TLB\r\n");
@@ -209,5 +208,8 @@ void mmu_init() {
 
         earth->mmu_map = page_table_map;
         earth->mmu_switch = page_table_switch;
+    } else {
+        earth->mmu_map = soft_tlb_map;
+        earth->mmu_switch = soft_tlb_switch;
     }
 }

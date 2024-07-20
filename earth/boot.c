@@ -2,9 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: Initialize the bss and data segments;
- * Initialize dev_tty, dev_disk, cpu_intr and cpu_mmu;
- * Load the grass layer binary from disk and run it.
+ * Description: Initialize TTY/disk devices and MMU/interrupt on the CPU
  */
 
 #include "disk.h"
@@ -29,7 +27,7 @@ void boot() {
     asm("csrr %0, mvendorid" : "=r"(vendor_id));
     earth->platform = (vendor_id == 666)? ARTY : QEMU;
 
-    /* Disable core#0 on QEMU because E31 core does not support S-mode */
+    /* Disable core#0 on QEMU because it is an E31 core without S-mode */
     /* See https://www.qemu.org/docs/master/system/riscv/sifive_u.html */
     if (earth->platform == QEMU && core_id == 0) {
         release(earth->boot_lock);

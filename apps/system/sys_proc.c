@@ -2,9 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: the system process for spawning and killing processes
- * When implementing multi-core support, students need to decide where
- * to acquire and release earth->kernel_lock throughout this file
+ * Description: the system server for spawning and killing processes
  */
 
 #include "app.h"

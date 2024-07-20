@@ -2,13 +2,13 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: interrupt and exception handling
+ * Description: initialize and control CPU interrupts
  */
 
 #include "egos.h"
 
-#define MTIME_BASE    (CLINT_BASE | 0xBFF8)
-#define MTIMECMP_BASE (CLINT_BASE | 0x4000)
+#define MTIME_BASE    (CLINT_BASE + 0xBFF8)
+#define MTIMECMP_BASE (CLINT_BASE + 0x4000)
 #define QUANTUM       (earth->platform == QEMU? 500000UL : 50000000UL)
 
 static ulonglong mtime_get() {
@@ -31,7 +31,7 @@ static void timer_reset(uint core_id) {
     mtimecmp_set(mtime_get() + QUANTUM, core_id);
 }
 
-/* Both trap functions are defined in earth.S */
+/* Both trap functions are defined in boot.S */
 void trap_from_M_mode();
 void trap_from_S_mode();
 

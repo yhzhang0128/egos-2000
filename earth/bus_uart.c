@@ -2,18 +2,17 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: definitions for UART0 in FE310
- * see chapter18 of the SiFive FE310-G002 Manual
+ * Description: definitions for the UART bus
  */
 
 #include "egos.h"
 
-#define SIFIVE_UART_TXDATA  0UL
-#define SIFIVE_UART_RXDATA  4UL
-
 #define LITEX_UART_TXFULL   4UL
 #define LITEX_UART_RXEMPTY  8UL
 #define LITEX_UART_EVPEND   16UL
+
+#define SIFIVE_UART_TXDATA  0UL
+#define SIFIVE_UART_RXDATA  4UL
 
 void uart_putc(int c) {
     if (earth->platform == ARTY) {

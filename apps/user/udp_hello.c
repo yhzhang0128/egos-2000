@@ -3,10 +3,10 @@
  * All rights reserved.
  *
  * Description: a simple UDP hello-world
- * This user app sends the string HELLO_MSG to a destination IP/port
+ * This app sends the string HELLO_MSG to a destination IP/UDP port
  * (i.e., the dest_ip and dest_udp_port variables below); This is a
  * demo of kernel-bypass networking because network communication is
- * fully done within this app, without any help from the kernel.
+ * fully handled within this app, without any help from the kernel.
  */
 
 #include "app.h"
@@ -128,11 +128,7 @@ int main() {
     if (earth->platform == QEMU) {
         CRITICAL("UDP on QEMU is coming soon.");
     } else {
-
-        #define ETHMAC_RX_BASE        0x90000000
-        #define ETHMAC_RX_SLOTS       2
-        #define ETHMAC_SLOT_SIZE      2048
-        char* txbuffer = (void*)(ETHMAC_RX_BASE + ETHMAC_SLOT_SIZE * ETHMAC_RX_SLOTS);
+        char* txbuffer = (void*)(ETHMAC_TX_BUFFER);
         memcpy(txbuffer, &eth_frame, sizeof(struct ethernet_frame));
 
         /* CRC is another checksum code */
@@ -144,14 +140,15 @@ int main() {
         txbuffer[txlen + 3] = (crc & 0xff000000) >> 24;
         txlen += 4;
 
-        #define ETHMAC_CSR_BASE           0xF0002000
         #define ETHMAC_CSR_START_WRITE    0x18
         #define ETHMAC_CSR_READY          0x1C
         #define ETHMAC_CSR_SLOT_WRITE     0x24
         #define ETHMAC_CSR_SLOT_LEN_WRITE 0x28
 
         while(!(REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_READY)));
-        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_WRITE) = 0; /* txbuffer is TX slot#0 */
+        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_WRITE) = 0; /* ETHMAC provides 2 TX slots */
+                                                          /* txbuffer is TX slot#0 */
+                                                          /* TX slot#1 is at 0x90001800 */
         REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_LEN_WRITE) = txlen;
         REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_START_WRITE) = 1;
     }

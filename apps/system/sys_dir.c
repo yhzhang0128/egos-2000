@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: the directory system server
- * handling requests of directory lookup / insertion
+ * handling requests of directory lookup, insertion, etc.
  */
 
 #include "app.h"
