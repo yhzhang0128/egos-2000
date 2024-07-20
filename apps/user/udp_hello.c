@@ -1,8 +1,20 @@
+/*
+ * (C) 2024, Cornell University
+ * All rights reserved.
+ *
+ * Description: a simple UDP hello-world
+ * This user app sends the string HELLO_MSG to a destination IP/port
+ * (i.e., the dest_ip and dest_udp_port variables below); This is a
+ * demo of kernel-bypass networking because network communication is
+ * fully done within this app, without any help from the kernel.
+ */
+
 #include "app.h"
 #include <string.h>
 
 #define HELLO_MSG "Hello from egos-2000!\n\r"
 
+/* Mac address, IP address, and UDP port */
 #define LOCAL_MAC {0x10, 0xe2, 0xd5, 0x00, 0x00, 0x00}
 #define DEST_MAC  {0x98, 0x48, 0x27, 0x51, 0x53, 0x1e}
 
@@ -11,29 +23,32 @@ static uint local_ip = IPTOINT(192, 168, 1, 50);
 static uint dest_ip  = IPTOINT(192, 168, 0, 212);
 static uint local_udp_port = 8001, dest_udp_port = 8002;
 
-#define bswap_16(x) (ushort)((ushort)(x<<8) | ((ushort)x>>8))
-#define bswap_32(x) (uint)(((uint)x>>24) | (((uint)x>>8)&0xff00) | (((uint)x<<8)&0xff0000) | ((uint)x<<24))
+/* bswap converts little-ending encoding to big-ending encoding */
+#define bswap_16(x) (ushort)((ushort)((x)<<8) | ((ushort)(x)>>8))
+#define bswap_32(x) (uint)(((uint)(x)>>24) | (((uint)(x)>>8)&0xff00) | (((uint)(x)<<8)&0xff0000) | ((uint)(x)<<24))
 
-static unsigned int crc32(const unsigned char *message, unsigned int len);
-static unsigned short ip_checksum(unsigned int r, void *buffer, unsigned int length, int complete);
+/* Helper functions for generating checksums */
+static uint crc32(const uchar *message, uint len);
+static ushort checksum(uint r, void *buffer, uint length, int complete);
 
+/* Data structures for the memory-mapped Ethernet device */
 struct ethernet_header {
-    uchar destmac[6];
-    uchar srcmac[6];
+    uchar  destmac[6];
+    uchar  srcmac[6];
     ushort ethertype;
 } __attribute__((packed));
 
 struct ip_header {
-    uchar version;
-    uchar diff_services;
+    uchar  version;
+    uchar  diff_services;
     ushort total_length;
     ushort identification;
     ushort fragment_offset;
-    uchar ttl;
-    uchar proto;
+    uchar  ttl;
+    uchar  proto;
     ushort checksum;
-    uint src_ip;
-    uint dst_ip;
+    uint   src_ip;
+    uint   dst_ip;
 } __attribute__((packed));
 
 struct udp_header {
@@ -43,18 +58,14 @@ struct udp_header {
     ushort checksum;
 } __attribute__((packed));
 
-struct udp_frame {
-    struct ip_header ip;
-    struct udp_header udp;
-    char payload[sizeof(HELLO_MSG)];
-} __attribute__((packed));
-
 struct ethernet_frame {
-    struct ethernet_header eth_header;
-    struct udp_frame frame;
+    struct ethernet_header eth;
+    struct ip_header       ip;
+    struct udp_header      udp;
+    char                   payload[sizeof(HELLO_MSG)];
 } __attribute__((packed));
 
-struct header_for_checksum {
+struct checksum_fields {
     uint src_ip;
     uint dst_ip;
     uchar zero;
@@ -63,105 +74,112 @@ struct header_for_checksum {
 } __attribute__((packed));
 
 int main() {
-    struct ethernet_header eth_header = {
-        .srcmac = LOCAL_MAC,
-        .destmac = DEST_MAC,
-        .ethertype = bswap_16(0x0800) /* ETHERTYPE_IP */
-    };
-
-    struct udp_frame frame;
-    struct header_for_checksum check;
-    uint length = sizeof(HELLO_MSG);
-    memcpy(frame.payload, HELLO_MSG, length);
-    frame.ip.version = 0x45; /* IP_IPV4 */
-    frame.ip.diff_services = 0;
-    frame.ip.total_length = bswap_16(sizeof(struct udp_frame));
-    frame.ip.identification = bswap_16(0);
-    frame.ip.fragment_offset = bswap_16(0x4000); /* IP_DONT_FRAGMENT */
-    frame.ip.ttl = 64;
-    check.proto = frame.ip.proto = 0x11; /* IP_PROTO_UDP */
-    frame.ip.checksum = 0;
-    check.src_ip = frame.ip.src_ip = bswap_32(local_ip);
-    check.dst_ip = frame.ip.dst_ip = bswap_32(dest_ip);
-    frame.ip.checksum = bswap_16(ip_checksum(0, &frame.ip, sizeof(struct ip_header), 1));
-
-    frame.udp.src_port = bswap_16(local_udp_port);
-    frame.udp.dst_port = bswap_16(dest_udp_port);
-    check.length = frame.udp.length = bswap_16(length + sizeof(struct udp_header));
-    frame.udp.checksum = 0;
-
-    check.zero = 0;
-    uint r = ip_checksum(0, &check, sizeof(struct header_for_checksum), 0);
-    if(length & 1) FATAL("Message needs to have even length");
-    r = ip_checksum(r, &frame.udp, sizeof(struct udp_header)+length, 1);
-    frame.udp.checksum = bswap_16(r);
-
-    #define ETHMAC_RX_BASE        0x90000000
-    #define ETHMAC_RX_SLOTS       2
-    #define ETHMAC_SLOT_SIZE      2048
-    char* txbuffer = (void*)(ETHMAC_RX_BASE + ETHMAC_SLOT_SIZE * ETHMAC_RX_SLOTS);
+    /* Initialize the ethernet_frame data structure */
     struct ethernet_frame eth_frame = {
-        .eth_header = eth_header,
-        .frame = frame
+        .eth = {
+            .srcmac = LOCAL_MAC,
+            .destmac = DEST_MAC,
+            .ethertype = bswap_16(0x0800) /* ETHERTYPE_IP */
+        },
+        .ip = {
+            .version = 0x45, /* IP_IPV4 */
+            .diff_services = 0,
+            .total_length = bswap_16(sizeof(struct ip_header) + sizeof(struct udp_header) + sizeof(HELLO_MSG)),
+            .identification = bswap_16(0),
+            .fragment_offset = bswap_16(0x4000), /* IP_DONT_FRAGMENT */
+            .ttl = 64,
+            .proto = 0x11, /* IP_PROTO_UDP */
+            .checksum = 0, /* to be calculated later */
+            .src_ip = bswap_32(local_ip),
+            .dst_ip = bswap_32(dest_ip)
+        },
+        .udp = {
+            .src_port = bswap_16(local_udp_port),
+            .dst_port = bswap_16(dest_udp_port),
+            .length = bswap_16(sizeof(struct udp_header) + sizeof(HELLO_MSG)),
+            .checksum = 0 /* to be calculated later */
+        }
     };
-    INFO("Sending a packet of %u bytes", sizeof(struct ethernet_frame));
-    INFO("Ethernet header is  %u bytes", sizeof(struct ethernet_header));
-    INFO("IP header is        %u bytes", sizeof(struct ip_header));
-    INFO("UDP header is        %u bytes", sizeof(struct udp_header));
-    INFO("Message size is     %u bytes", sizeof(HELLO_MSG));
-    memcpy(txbuffer, &eth_frame, sizeof(struct ethernet_frame));
+    if(sizeof(HELLO_MSG) & 1) FATAL("Please send a message with even length");
+    memcpy(eth_frame.payload, HELLO_MSG, sizeof(HELLO_MSG));
 
-    unsigned int crc, txlen = sizeof(struct ethernet_frame);
-    crc = crc32(&txbuffer[8], txlen-8);
-    txbuffer[txlen  ] = (crc & 0xff);
-    txbuffer[txlen+1] = (crc & 0xff00) >> 8;
-    txbuffer[txlen+2] = (crc & 0xff0000) >> 16;
-    txbuffer[txlen+3] = (crc & 0xff000000) >> 24;
-    txlen += 4;
+    /* Calculate the IP checksum */
+    eth_frame.ip.checksum = bswap_16(checksum(0, &eth_frame.ip, sizeof(struct ip_header), 1));
 
-    #define ETHMAC_BASE           0xF0002000
-    #define ETHMAC_START_WRITE    0x18
-    #define ETHMAC_READY          0x1C
-    #define ETHMAC_SLOT_WRITE     0x24
-    #define ETHMAC_SLOT_LEN_WRITE 0x28
+    /* Calculate the UDP checksum */
+    struct checksum_fields check = {
+        .src_ip = eth_frame.ip.src_ip,
+        .dst_ip = eth_frame.ip.dst_ip,
+        .zero = 0,
+        .proto = eth_frame.ip.proto, /* IP_PROTO_UDP */
+        .length = eth_frame.udp.length
+    };
+    uint r = checksum(0, &check, sizeof(struct checksum_fields), 0);
+    r = checksum(r, &eth_frame.udp, sizeof(struct udp_header) + sizeof(HELLO_MSG), 1);
+    eth_frame.udp.checksum = bswap_16(r);
 
-    while(!(REGW(ETHMAC_BASE, ETHMAC_READY)));
-    REGW(ETHMAC_BASE, ETHMAC_SLOT_WRITE) = 0; /* TX slot#0 */
-    REGW(ETHMAC_BASE, ETHMAC_SLOT_LEN_WRITE) = txlen;
-    REGW(ETHMAC_BASE, ETHMAC_START_WRITE) = 1;
+    /* Sending the Ethernet frame */
+    INFO("Sending a Ethernet frame of %u bytes", sizeof(struct ethernet_frame));
+    INFO("Ethernet header is          %u bytes", sizeof(struct ethernet_header));
+    INFO("IP header is                %u bytes", sizeof(struct ip_header));
+    INFO("UDP header is                %u bytes", sizeof(struct udp_header));
+    INFO("Payload is                  %u bytes", sizeof(HELLO_MSG));
+
+    if (earth->platform == QEMU) {
+        CRITICAL("UDP on QEMU is coming soon.");
+    } else {
+
+        #define ETHMAC_RX_BASE        0x90000000
+        #define ETHMAC_RX_SLOTS       2
+        #define ETHMAC_SLOT_SIZE      2048
+        char* txbuffer = (void*)(ETHMAC_RX_BASE + ETHMAC_SLOT_SIZE * ETHMAC_RX_SLOTS);
+        memcpy(txbuffer, &eth_frame, sizeof(struct ethernet_frame));
+
+        /* CRC is another checksum code */
+        uint crc, txlen = sizeof(struct ethernet_frame);
+        crc = crc32(&txbuffer[8], txlen - 8);
+        txbuffer[txlen  ] = (crc & 0xff);
+        txbuffer[txlen + 1] = (crc & 0xff00) >> 8;
+        txbuffer[txlen + 2] = (crc & 0xff0000) >> 16;
+        txbuffer[txlen + 3] = (crc & 0xff000000) >> 24;
+        txlen += 4;
+
+        #define ETHMAC_CSR_BASE           0xF0002000
+        #define ETHMAC_CSR_START_WRITE    0x18
+        #define ETHMAC_CSR_READY          0x1C
+        #define ETHMAC_CSR_SLOT_WRITE     0x24
+        #define ETHMAC_CSR_SLOT_LEN_WRITE 0x28
+
+        while(!(REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_READY)));
+        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_WRITE) = 0; /* txbuffer is TX slot#0 */
+        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_LEN_WRITE) = txlen;
+        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_START_WRITE) = 1;
+    }
+
 }
 
-static unsigned int crc32(const unsigned char *message, unsigned int len) {
-   int i, j;
-   unsigned int byte, crc, mask;
-
-   i = 0;
-   crc = 0xFFFFFFFF;
-   while (i < len) {
-      byte = message[i];            // Get next byte.
+static uint crc32(const uchar *message, uint len) {
+   uint byte, mask, crc = 0xFFFFFFFF;
+   for (int i = 0; i < len; i++) {
+      byte = message[i];
       crc = crc ^ byte;
-      for (j = 7; j >= 0; j--) {    // Do eight times.
+      for (int j = 7; j >= 0; j--) {
          mask = -(crc & 1);
          crc = (crc >> 1) ^ (0xEDB88320 & mask);
       }
-      i = i + 1;
    }
    return ~crc;
 }
 
-static unsigned short ip_checksum(unsigned int r, void *buffer, unsigned int length, int complete) {
-    unsigned char *ptr;
-    unsigned int i;
-
-    ptr = (unsigned char *)buffer;
+static ushort checksum(uint r, void *buffer, uint length, int complete) {
+    uchar *ptr = (uchar *)buffer;
     length >>= 1;
 
-    for(i=0;i<length;i++)
-        r += ((unsigned int)(ptr[2*i]) << 8)|(unsigned int)(ptr[2*i+1]) ;
+    for(int i = 0; i < length; i++)
+        r += ((uint)(ptr[2 * i]) << 8)|(uint)(ptr[2 * i+1]) ;
 
     /* Add overflows */
-    while(r >> 16)
-        r = (r & 0xffff) + (r >> 16);
+    while(r >> 16) r = (r & 0xffff) + (r >> 16);
 
     if(complete) {
         r = ~r;
