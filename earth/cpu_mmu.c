@@ -118,7 +118,11 @@ void pagetable_identity_mapping(int pid) {
     setup_identity_region(pid, CLINT_BASE, 16, OS_RWX); /* CLINT */
     setup_identity_region(pid, UART_BASE, 1,  OS_RWX);  /* UART  */
     setup_identity_region(pid, SPI_BASE,   1,  OS_RWX); /* SPI   */
-    if (earth->platform == ARTY) setup_identity_region( pid, 0x20400000, 1024, OS_RWX);
+    if (earth->platform == ARTY) {
+        setup_identity_region( pid, 0x20400000, 1024, OS_RWX); /* ROM */
+        setup_identity_region( pid, 0x90001000, 1, OS_RWX);    /* ETHMAC */
+        setup_identity_region( pid, 0xF0002000, 1, OS_RWX);    /* ETHMAC CSR */
+    }
 }
 
 void page_table_map(int pid, uint vpage_no, uint ppage_id) {

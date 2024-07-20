@@ -2,6 +2,7 @@
 
 #include <stdarg.h>    /* Define va_list for vsprintf */
 #include <sys/types.h> /* Define uint and ushort */
+typedef unsigned char uchar;
 typedef unsigned long long ulonglong;
 
 struct earth {
