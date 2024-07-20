@@ -34,23 +34,23 @@
 
 **Memory layout**
 
-| Base        | Top         | Attributes | Description    | Notes                                              |
-|-------------|-------------|------------|----------------|----------------------------------------------------|
-| 0x2000_0000 | 0x203F_FFFF | R          | Flash ROM, 4MB | FPGA binary of the LiteX+VexRiscv processor        |
-| 0x2040_0000 | 0x207F_FFFF | R          | Flash ROM, 4MB | disk.img produced by mkfs (only on the Arty board) |
-| ......      | ......      | ......     | ......         |                                                    |
-| 0x8000_0000 | 0x801F_FFFF | RWX        | RAM, 2MB       | EGOS code, data and heap                           |
-| 0x8020_0000 | 0x803F_FFFF | RWX        | RAM, 2MB       | EGOS stack                                         |
-| 0x8020_0000 | 0x803F_FFFF | RWX        | RAM, 2MB       | Application code, data and heap                    |
-| 0x8040_0000 | 0x807F_FFFF | RWX        | RAM, 2MB       | Application stack                                  |
-| 0x8080_0000 | 0x8FFF_FFFF | RWX        | RAM, 248MB     | Initially free memory for allocation by earth/mmu  |
+| Base        | Top         | Size           | Description                                        |
+|-------------|-------------|----------------|----------------------------------------------------|
+| 0x2000_0000 | 0x203F_FFFF | Flash ROM, 4MB | FPGA binary of the LiteX+VexRiscv processor        |
+| 0x2040_0000 | 0x207F_FFFF | Flash ROM, 4MB | disk.img produced by mkfs (only on the Arty board) |
+| ......      | ......      | ......         |                                                    |
+| 0x8000_0000 | 0x801F_FFFF | RAM, 2MB       | EGOS code, data and heap                           |
+| 0x8020_0000 | 0x803F_FFFF | RAM, 2MB       | EGOS stack                                         |
+| 0x8020_0000 | 0x803F_FFFF | RAM, 2MB       | Application code, data and heap                    |
+| 0x8040_0000 | 0x807F_FFFF | RAM, 2MB       | Application stack                                  |
+| 0x8080_0000 | 0x8FFF_FFFF | RAM, 248MB     | Initially free memory for allocation by earth/mmu  |
 
 ## Software development history
 
 **Iteration #10**
 * [2024.7] Switch from SiFive FE310 to LiteX+VexRiscv (a [Linux-compatible](https://github.com/litex-hub/linux-on-litex-vexriscv) CPU design) for the FPGA boards
 * [2024.7] With LiteX+VexRiscv, remove the paging device and cleanup memory layout
-* [2024.7] With LiteX+VexRiscv, try SD card driver and Ethernet/UDP on the Arty board
+* [2024.7] With LiteX+VexRiscv, implement SD card driver and Ethernet/UDP for LiteX+VexRiscv
 
 **Iteration #9**
 * [2024.04] Run egos-2000 on the [mriscv processor](https://github.com/0x486F626F/mriscv/tree/egos) in System Verilog
