@@ -45,11 +45,16 @@ Download the pre-built binaries of QEMU from [xPack](https://github.com/xpack-de
 > cd $EGOS/egos-2000
 > make qemu
 -------- Simulate on QEMU-RISCV --------
-cp build/release/earth.elf tools/qemu/qemu.elf
-riscv64-unknown-elf-objcopy --update-section .image=tools/disk.img tools/qemu/qemu.elf
-qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qemu.elf -nographic
-[CRITICAL] --- Booting on QEMU ---
-......
+qemu-system-riscv32 -nographic -readconfig tools/qemu/config.toml
+[CRITICAL] --- Booting on QEMU with core #4 ---
+[INFO] Set the CS pin to HIGH and toggle clock.
+[INFO] Set the CS pin to LOW and send cmd0 to SD card.
+[INFO] Check SD card type and voltage with cmd8
+[INFO] SD card replies cmd8 with status 0x01 and payload 0x000001aa
+[SUCCESS] Finished initializing the tty and disk devices
+[CRITICAL] Choose a memory translation mechanism:
+Enter 0: page tables
+Enter 1: software TLB
 ```
 
 Instead, you can compile and install the latest QEMU from its [official repository](https://github.com/qemu/qemu), which takes a few minutes.
@@ -91,7 +96,7 @@ Info : sector 190 took 229 ms
 Info : sector 191 took 243 ms  # It will pause at this point for a while
 Info : Found flash device 'micron n25q128' (ID 0x0018ba20)
 
-real    2m51.019s
+real    1m24.019s
 user    0m11.540s
 sys     0m37.338s
 
@@ -105,7 +110,11 @@ To connect with the egos-2000 TTY:
 ```shell
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
-[CRITICAL] --- Booting on Arty ---
+......
+[INFO] LiteX + VexRiscv (vendorid: 666)
+[INFO] Press 'b' to enter BIOS instead of EGOS
+[INFO] Loading EGOS binary from 0x2040_0000 to 0x8000_0000
+[CRITICAL] --- Booting on Arty with core #0 ---
 ......
 ```
 4. For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`)
