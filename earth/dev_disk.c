@@ -117,7 +117,7 @@ static void sd_write(uint offset, char* src) {
 
 static int sd_init() {
     /* Configure the SPI controller */
-    INFO("Set the CS pin to HIGH and toggle clock.");
+    INFO("Set the CS pin to HIGH and toggle clock");
 
     if (earth->platform == ARTY) {
         spi_set_clock(400000);
@@ -134,7 +134,7 @@ static int sd_init() {
         REGW(SPI_BASE, SIFIVE_SPI_CSDEF) = 1;
     }
 
-    INFO("Set the CS pin to LOW and send cmd0 to SD card.");
+    INFO("Set the CS pin to LOW and send cmd0 to SD card");
     char reply, cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
     if ((reply = sd_exec_cmd(cmd0)) == 0xFF) return -1;
     while (reply != 0x01) reply = spi_transfer(0xFF);
@@ -163,7 +163,7 @@ static int sd_init() {
     while (spi_transfer(0xFF) != 0xFF);
 
     if (earth->platform == ARTY) {
-        INFO("Set the SPI clock to 20MHz for the SD card.");
+        INFO("Set the SPI clock to 20MHz for the SD card");
         spi_set_clock(20000000);
     }
     return 0;
