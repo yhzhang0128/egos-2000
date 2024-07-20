@@ -6,7 +6,7 @@ MacOS users can follow the same tutorial no matter you have an Apple chip or Int
 You can run egos-2000 on the QEMU emulator or RISC-V boards.
 Running on QEMU is easier but if you wish to run it on the boards for fun, 
 you need to purchase the following hardware:
-* one of the Arty [A7-35T board](https://www.xilinx.com/products/boards-and-kits/arty.html), [A7-100T board](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/) and [S7-50 board](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/)
+* Arty [A7-35T](https://www.xilinx.com/products/boards-and-kits/arty.html) or [A7-100T](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/) board
 * a microUSB cable (e.g., [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
 * a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card
 
@@ -33,25 +33,6 @@ Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools
 ```
 
 After this step, `build/release` holds the ELF format executables and `build/debug` holds the human readable assembly files.
-While using the pre-built binaries is easier, you can also compile and install the [official GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain), which takes about an hour.
-
-```shell
-# Prepare the environment
-> sudo apt-get install autoconf automake autotools-dev curl python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev
-> cd $EGOS
-> mkdir riscv32-unknown-elf-gcc
-> export PATH=$PATH:$EGOS/riscv32-unknown-elf-gcc/bin
-
-# Compile and install the GNU toolchain
-> git clone git@github.com:riscv-collab/riscv-gnu-toolchain.git
-> cd riscv-gnu-toolchain
-> ./configure --with-arch=rv32imac --with-abi=ilp32 --prefix=$EGOS/riscv32-unknown-elf-gcc
-> make
-......
-# Compile egos-2000 with the official GNU toolchain
-> cd $EGOS/egos-2000
-> make TOOLCHAIN=GNU
-```
 
 ## Step2: Run egos-2000 on the QEMU emulator
 
@@ -64,11 +45,16 @@ Download the pre-built binaries of QEMU from [xPack](https://github.com/xpack-de
 > cd $EGOS/egos-2000
 > make qemu
 -------- Simulate on QEMU-RISCV --------
-cp build/release/earth.elf tools/qemu/qemu.elf
-riscv64-unknown-elf-objcopy --update-section .image=tools/disk.img tools/qemu/qemu.elf
-qemu-system-riscv32 -readconfig tools/qemu/sifive-e31.cfg -kernel tools/qemu/qemu.elf -nographic
-[CRITICAL] --- Booting on QEMU ---
-......
+qemu-system-riscv32 -nographic -readconfig tools/qemu/config.toml
+[CRITICAL] --- Booting on QEMU with core #4 ---
+[INFO] Set the CS pin to HIGH and toggle clock.
+[INFO] Set the CS pin to LOW and send cmd0 to SD card.
+[INFO] Check SD card type and voltage with cmd8
+[INFO] SD card replies cmd8 with status 0x01 and payload 0x000001aa
+[SUCCESS] Finished initializing the tty and disk devices
+[CRITICAL] Choose a memory translation mechanism:
+Enter 0: page tables
+Enter 1: software TLB
 ```
 
 Instead, you can compile and install the latest QEMU from its [official repository](https://github.com/qemu/qemu), which takes a few minutes.
@@ -88,7 +74,7 @@ Instead, you can compile and install the latest QEMU from its [official reposito
 
 ## Step3: Run egos-2000 on the Arty board
 
-You can use the Arty A7-35t, A7-100t or S7-50 board
+You can use the Arty A7-35t or A7-100t board
 and make sure to set the `BOARD` variable in `Makefile` correctly.
 To use a microSD card on the board, you can program the microSD card with `disk.img` using tools like [balena Etcher](https://www.balena.io/etcher/).
 
@@ -110,9 +96,9 @@ Info : sector 190 took 229 ms
 Info : sector 191 took 243 ms  # It will pause at this point for a while
 Info : Found flash device 'micron n25q128' (ID 0x0018ba20)
 
-real    2m51.019s
-user    0m11.540s
-sys     0m37.338s
+real	1m37.926s
+user	0m7.109s
+sys	0m20.089s
 
 ```
 
@@ -124,7 +110,11 @@ To connect with the egos-2000 TTY:
 ```shell
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
-[CRITICAL] --- Booting on Arty ---
+......
+[INFO] LiteX + VexRiscv (vendorid: 666)
+[INFO] Press 'b' to enter BIOS instead of EGOS
+[INFO] Loading EGOS binary from 0x2040_0000 to 0x8000_0000
+[CRITICAL] --- Booting on Arty with core #0 ---
 ......
 ```
 4. For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`)

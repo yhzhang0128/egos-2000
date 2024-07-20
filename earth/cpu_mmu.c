@@ -3,7 +3,9 @@
  * All rights reserved.
  *
  * Description: memory management unit (MMU)
- * 2 memory translation mechanisms: page table and software TLB
+ * This MMU code contains a simple memory allocation/free mechanism
+ * and two memory translation mechanisms: software TLB and page table.
+ * It also contains hardware-specific cache flushing functions.
  */
 
 #include "egos.h"
@@ -11,58 +13,57 @@
 #include "servers.h"
 #include <string.h>
 
-/* Interface of the paging device, see earth/dev_page.c */
-void  paging_init();
-int   paging_invalidate_cache(uint frame_id);
-int   paging_write(uint frame_id, uint page_no);
-char* paging_read(uint frame_id, int alloc_only);
+/* Memory allocation and free */
+#define APPS_PAGES_CNT (RAM_END - APPS_PAGES_BASE) / PAGE_SIZE
+struct page_info {
+    int  use;      /* Is this page free or allocated? */
+    int  pid;      /* Which process owns this page? */
+    uint vpage_no; /* Which virtual page in this process maps to this physial page? */
+} page_info_table[APPS_PAGES_CNT];
 
-/* Allocation and free of physical frames */
-#define NFRAMES 256
-struct frame_mapping {
-    int use;     /* Is the frame allocated? */
-    int pid;     /* Which process owns the frame? */
-    uint page_no; /* Which virtual page is the frame mapped to? */
-} table[NFRAMES];
+#define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
+#define PAGE_ID_TO_ADDR(x) (char*)APPS_PAGES_BASE + x * PAGE_SIZE
 
-int mmu_alloc(uint* frame_id, void** cached_addr) {
-    for (uint i = 0; i < NFRAMES; i++)
-        if (!table[i].use) {
-            *frame_id = i;
-            *cached_addr = paging_read(i, 1);
-            table[i].use = 1;
-            return 0;
+void mmu_alloc(uint* ppage_id, void** ppage_addr) {
+    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+        if (!page_info_table[i].use) {
+            page_info_table[i].use = 1;
+            *ppage_id              = i;
+            *ppage_addr            = PAGE_ID_TO_ADDR(i);
+            return;
         }
-    FATAL("mmu_alloc: no more available frames");
+    FATAL("mmu_alloc: no more free memory");
 }
 
-int mmu_free(int pid) {
-    for (uint i = 0; i < NFRAMES; i++)
-        if (table[i].use && table[i].pid == pid) {
-            paging_invalidate_cache(i);
-            memset(&table[i], 0, sizeof(struct frame_mapping));
-        }
+void mmu_free(int pid) {
+    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+        if (page_info_table[i].use && page_info_table[i].pid == pid)
+            memset(&page_info_table[i], 0, sizeof(struct page_info));
 }
 
 /* Software TLB Translation */
-int soft_tlb_map(int pid, uint page_no, uint frame_id) {
-    table[frame_id].pid = pid;
-    table[frame_id].page_no = page_no;
+void soft_tlb_map(int pid, uint vpage_no, uint ppage_id) {
+    page_info_table[ppage_id].pid      = pid;
+    page_info_table[ppage_id].vpage_no = vpage_no;
 }
 
-int soft_tlb_switch(int pid) {
+void soft_tlb_switch(int pid) {
     static int curr_vm_pid = -1;
-    if (pid == curr_vm_pid) return 0;
+    if (pid == curr_vm_pid) return;
 
     /* Unmap curr_vm_pid from the user address space */
-    for (uint i = 0; i < NFRAMES; i++)
-        if (table[i].use && table[i].pid == curr_vm_pid)
-            paging_write(i, table[i].page_no);
+    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+        if (page_info_table[i].use && page_info_table[i].pid == curr_vm_pid)
+            memcpy(PAGE_ID_TO_ADDR(i),
+                   PAGE_NO_TO_ADDR(page_info_table[i].vpage_no),
+                   PAGE_SIZE);
 
     /* Map pid to the user address space */
-    for (uint i = 0; i < NFRAMES; i++)
-        if (table[i].use && table[i].pid == pid)
-            memcpy((void*)(table[i].page_no << 12), paging_read(i, 0), PAGE_SIZE);
+    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+        if (page_info_table[i].use && page_info_table[i].pid == pid)
+            memcpy(PAGE_NO_TO_ADDR(page_info_table[i].vpage_no),
+                   PAGE_ID_TO_ADDR(i),
+                   PAGE_SIZE);
 
     curr_vm_pid = pid;
 }
@@ -78,9 +79,9 @@ int soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define OS_RWX   0xF
-#define USER_RWX 0x1F
-static uint frame_id, *root, *leaf;
+#define OS_RWX   (0xC0 | 0xF)
+#define USER_RWX (0xC0 | 0x1F)
+static uint *root, *leaf;
 
 /* 32 is a number large enough for demo purpose */
 static uint* pid_to_pagetable_base[32];
@@ -93,8 +94,9 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
         leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000);
     } else {
         /* Leaf has not been allocated */
-        earth->mmu_alloc(&frame_id, (void**)&leaf);
-        table[frame_id].pid = pid;
+        uint ppage_id;
+        earth->mmu_alloc(&ppage_id, (void**)&leaf);
+        page_info_table[ppage_id].pid = pid;
         memset(leaf, 0, PAGE_SIZE);
         root[vpn1] = ((uint)leaf >> 2) | 0x1;
     }
@@ -107,24 +109,28 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
 
 void pagetable_identity_mapping(int pid) {
     /* Allocate the root page table and set the page table base (satp) */
-    earth->mmu_alloc(&frame_id, (void**)&root);
-    table[frame_id].pid = pid;
+    uint ppage_id;
+    earth->mmu_alloc(&ppage_id, (void**)&root);
+    page_info_table[ppage_id].pid = pid;
     memset(root, 0, PAGE_SIZE);
     pid_to_pagetable_base[pid] = root;
 
     /* Allocate the leaf page tables */
-    setup_identity_region(pid, 0x02000000, 16, OS_RWX);   /* CLINT */
-    setup_identity_region(pid, UART0_BASE, 1, OS_RWX);    /* UART0 */
-    setup_identity_region(pid, SPI_BASE, 1, OS_RWX);      /* SPI1 */
-    setup_identity_region(pid, 0x20400000, 1024, OS_RWX); /* boot ROM */
-    setup_identity_region(pid, 0x20800000, 1024, OS_RWX); /* disk image */
-    setup_identity_region(pid, 0x80000000, 1024, OS_RWX); /* DTIM memory */
+    for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
+        setup_identity_region(pid, i, 1024, OS_RWX);    /* RAM   */
+    setup_identity_region(pid, CLINT_BASE, 16, OS_RWX); /* CLINT */
+    setup_identity_region(pid, UART_BASE, 1,  OS_RWX);  /* UART  */
+    setup_identity_region(pid, SPI_BASE,   1,  OS_RWX); /* SPI   */
 
-    for (uint i = 0; i < 8; i++)           /* ITIM memory is 32MB on QEMU */
-        setup_identity_region(pid, 0x08000000 + i * 0x400000, 1024, OS_RWX);
+    if (earth->platform == ARTY) {
+        setup_identity_region( pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
+        setup_identity_region( pid, ETHMAC_CSR_BASE,  1, OS_RWX);   /* ETHMAC CSR */
+        setup_identity_region( pid, ETHMAC_RX_BUFFER, 1, OS_RWX);   /* ETHMAC RX buffer */
+        setup_identity_region( pid, ETHMAC_TX_BUFFER, 1, OS_RWX);   /* ETHMAC TX buffer */
+    }
 }
 
-int page_table_map(int pid, uint page_no, uint frame_id) {
+void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     if (pid >= 32) FATAL("page_table_map: pid too large");
 
     /* Student's code goes here (page table translation). */
@@ -136,12 +142,12 @@ int page_table_map(int pid, uint page_no, uint frame_id) {
      * Feel free to modify and call the two helper functions:
      * pagetable_identity_mapping() and setup_identity_region()
      */
-    soft_tlb_map(pid, page_no, frame_id);
+    soft_tlb_map(pid, vpage_no, ppage_id);
 
     /* Student's code ends here. */
 }
 
-int page_table_switch(int pid) {
+void page_table_switch(int pid) {
     /* Student's code goes here (page table translation). */
 
     /* Remove the following line of code and, instead,
@@ -153,14 +159,22 @@ int page_table_switch(int pid) {
     /* Student's code ends here. */
 }
 
+void flush_cache() {
+    if (earth->platform == ARTY) {
+        /* Flush the L1 instruction cache */
+        /* See https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25 */
+        asm volatile(
+            ".word(0x100F)\n"
+            "nop\nnop\nnop\nnop\nnop\n"
+        );
+    }
+}
+
 /* MMU Initialization */
 void mmu_init() {
-    /* Initialize the paging device */
-    paging_init();
-
-    /* Initialize MMU interface functions */
     earth->mmu_free = mmu_free;
     earth->mmu_alloc = mmu_alloc;
+    earth->mmu_flush_cache = flush_cache;
 
     /* Setup a PMP region for the whole 4GB address space */
     asm("csrw pmpaddr0, %0" : : "r" (0x40000000));
@@ -178,12 +192,6 @@ void mmu_init() {
 
     /* Student's code ends here. */
 
-    /* Arty board does not support supervisor mode or page tables */
-    earth->translation = SOFT_TLB;
-    earth->mmu_map = soft_tlb_map;
-    earth->mmu_switch = soft_tlb_switch;
-    if (earth->platform == ARTY) return;
-
     /* Choose memory translation mechanism in QEMU */
     CRITICAL("Choose a memory translation mechanism:");
     printf("Enter 0: page tables\r\nEnter 1: software TLB\r\n");
@@ -200,5 +208,8 @@ void mmu_init() {
 
         earth->mmu_map = page_table_map;
         earth->mmu_switch = page_table_switch;
+    } else {
+        earth->mmu_map = soft_tlb_map;
+        earth->mmu_switch = soft_tlb_switch;
     }
 }

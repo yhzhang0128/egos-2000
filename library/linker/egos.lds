@@ -1,10 +1,10 @@
 OUTPUT_ARCH("riscv")
 
-ENTRY(grass_entry)
+ENTRY(boot_loader)
 
 MEMORY
 {
-    ram (arw!xi) : ORIGIN = 0x08002000, LENGTH = 0x3000
+    ram (arw!xi) : ORIGIN = 0x80000000, LENGTH = 0x200000
 }
 
 PHDRS
@@ -14,7 +14,9 @@ PHDRS
 
 SECTIONS
 {
-    __heap_size = 0x800;
+    .init : ALIGN(8) {
+        *(.text.enter)
+    } >ram :ram
 
     .text : ALIGN(8) {
         *(.text .text.*)
@@ -37,11 +39,11 @@ SECTIONS
         *(.sbss*)
         *(.bss .bss.*)
         *(COMMON)
-    } >ram :ram
+    } >ram :ram 
 
     .heap (NOLOAD) : ALIGN(8) {
-          PROVIDE( __heap_start = . );
-          . = __heap_size;
+        PROVIDE( __heap_start = . );
     } >ram :ram
-    PROVIDE( __heap_end = 0x08005000 );
+
+    PROVIDE( __heap_end = 0x80200000 );
 }

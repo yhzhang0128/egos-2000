@@ -7,6 +7,7 @@
 
 #include "egos.h"
 
+/* Heap start/end are defined in library/linker/*.lds */
 extern char __heap_start, __heap_end;
 static char* brk = &__heap_start;
 
@@ -16,10 +17,9 @@ static char* brk = &__heap_start;
  */
 
 char *_sbrk(int size) {
-    char* heap_end = (earth->platform == ARTY)? (&__heap_end) : (char*)0xa000000;
-    if (brk + size > heap_end) {
+    if (brk + size > (char*)&__heap_end) {
         earth->tty_write("_sbrk: heap grows too large\r\n", 29);
-        *(int*)(0xFFFFFFF0) = 1; /* Trigger a memory exception */
+        *(int*)(0) = 1; /* Trigger a memory exception */
     }
 
     char *old_brk = brk;

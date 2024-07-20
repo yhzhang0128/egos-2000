@@ -1,15 +1,14 @@
 [machine]
   type = "sifive_u"
-  kernel = "tools/qemu/egos.elf"
-  firmware = "tools/qemu/bios.bin"
+  firmware = "tools/qemu/egos.bin"
+
+[memory]
+  size = "256M"
 
 [smp-opts]
-   cpus = "5"
+  cpus = "5"
 
-# The actual number of CPU cores is (smp-opts.cpus - 1).
-# In other words, smp-opts.cpus=5 means a 4-core CPU machine.
-# The reason is that core #0 of sifive_u is an E31 core, which does not
-# support the S-mode. We thus disabled this core within BIOS (bios.bin).
+# CPU#0 is disabled in earth/boot.c, so there are effectively 4 cores.
 
 [drive]
   if = "sd"

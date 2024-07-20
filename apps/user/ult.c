@@ -2,9 +2,9 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: course project, user-level threading
- * Students implement a threading package and semaphore;
- * And then spawn multiple threads as either producer or consumer.
+ * Description: user-level, non-preemptive threading
+ * Students will implement a minimal threading package;
+ * Then spawn multiple threads for the producer/consumer problem.
  */
 
 #include "app.h"
