@@ -12,7 +12,8 @@ enum proc_status {
     PROC_PENDING_SYSCALL
 };
 
-#define SAVED_REGISTER_NUM  29
+#define SAVED_REGISTER_NUM  (32-3) /* zero, gp and tp are the 3 registers not saved */
+                                   /* zero is always zero; gp/tp are not used in egos-2000 */
 #define SAVED_REGISTER_SIZE SAVED_REGISTER_NUM * sizeof(uint)
 #define SAVED_REGISTER_ADDR (void*)(EGOS_STACK_TOP - SAVED_REGISTER_SIZE)
 
@@ -24,7 +25,7 @@ struct process{
     int receive_from;
 };
 
-#define MAX_NPROCESS  8
+#define MAX_NPROCESS  16
 
 int  proc_alloc();
 void proc_free(int);

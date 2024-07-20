@@ -3,8 +3,7 @@
  * All rights reserved.
  *
  * Description: grass layer initialization
- * Initialize timer and the process control block; 
- * Spawn the first kernel process, GPID_PROCESS (pid=1).
+ * Spawn the first system server, GPID_PROCESS (pid=1).
  */
 
 #include "egos.h"
@@ -29,10 +28,10 @@ void grass_entry() {
     grass->sys_send = sys_send;
     grass->sys_recv = sys_recv;
 
-    /* Initialize IPC Buffer */
+    /* Initialize the IPC Buffer */
     msg_buffer->in_use = 0;
 
-    /* Load the first kernel process GPID_PROCESS */
+    /* Load the first system server GPID_PROCESS */
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
     proc_set_running(proc_alloc());

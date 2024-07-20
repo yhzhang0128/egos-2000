@@ -36,7 +36,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     uint ppage_id, block_offset = pheader->p_offset / BLOCK_SIZE;
     uint code_start = APPS_ENTRY >> 12;
 
-    /* Setup the text, rodata, data and bss sections */
+    /* Setup pages for text, rodata, data and bss sections */
     for (uint off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
         if (off % PAGE_SIZE == 0) {
             earth->mmu_alloc(&ppage_id, &base);
@@ -55,7 +55,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
         memset((char*)base, 0, PAGE_SIZE);
     }
 
-    /* Setup two pages for main() args and syscall args */
+    /* Setup two pages for main() args (argc/argv) and syscall args */
     uint args_start = APPS_ARG >> 12;
     earth->mmu_alloc(&ppage_id, &base);
     earth->mmu_map(pid, args_start++, ppage_id);

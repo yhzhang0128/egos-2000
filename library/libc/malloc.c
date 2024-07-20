@@ -7,6 +7,7 @@
 
 #include "egos.h"
 
+/* Heap start/end are defined in library/linker/*.lds */
 extern char __heap_start, __heap_end;
 static char* brk = &__heap_start;
 

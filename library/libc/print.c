@@ -9,8 +9,8 @@
 #include <unistd.h>
 
 /* earth->vsprintf is the C library vsprintf, which converts
- * a format and arguments (e.g., arguments to printf) into a
- * string. This string is then passed to earth->tty_write().
+ * a format and arguments (e.g., ("example int=%d", 100)) into
+ * a string. The string is passed to earth->tty_write() for printing.
  */
 
 #define LOG(x, y)  earth->tty_write(x, sizeof(x)); \

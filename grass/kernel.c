@@ -2,10 +2,9 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: Kernel ≈ 3 handlers
- *     intr_entry() handles timer interrupt for scheduling
- *     excp_entry() handles faults such as unauthorized memory access
- *     proc_try_syscall() handles system calls for inter-process communication
+ * Description: Kernel ≈ 2 handlers
+ *     intr_entry() handles timer or keyboard ctrl+c interrupts
+ *     excp_entry() handles system calls and faults (e.g., unauthorized memory access)
  */
 
 #include "egos.h"
@@ -15,19 +14,11 @@
 
 uint core_in_kernel;
 uint core_curr_proc[NCORES + 1];
-struct process proc_set[MAX_NPROCESS + 1];
-/* proc_set[0..MAX_NPROCESS-1] are real processes */
-/* proc_set[MAX_NPROCESS] is a place holder for idle cores */
+struct process proc_set[MAX_NPROCESS + 1]; /* proc_set[0..MAX_NPROCESS-1] are actual processes */
+                                           /* proc_set[MAX_NPROCESS] is a place holder for idle cores */
 
 #define PROC_IDLE (curr_proc_idx == MAX_NPROCESS)
 void proc_set_idle(uint core) { core_curr_proc[core] = MAX_NPROCESS; }
-void proc_coresinfo() {
-    /* Student's code goes here (multi-core and atomic instruction) */
-
-    /* Print out the pid of the process running on each core */
-
-    /* Student's code ends here. */
-}
 
 #define curr_proc_idx core_curr_proc[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
@@ -37,7 +28,7 @@ static void intr_entry(uint);
 static void excp_entry(uint);
 
 void kernel_entry(uint mcause) {
-    /* With the kernel lock, only one core can be in the kernel at any time */
+    /* With the kernel lock, only one core can enter this point at any time */
     asm("csrr %0, mhartid" : "=r"(core_in_kernel));
 
     /* Save process context */
@@ -52,6 +43,7 @@ void kernel_entry(uint mcause) {
     memcpy(SAVED_REGISTER_ADDR, proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_SIZE);
 }
 
+#define INTR_ID_CTRL_C     2
 #define INTR_ID_TIMER      7
 #define EXCP_ID_ECALL_U    8
 #define EXCP_ID_ECALL_M    11
@@ -70,13 +62,11 @@ static void excp_entry(uint id) {
     /* Kill the process if curr_pid is a user application */
 
     /* Student's code ends here. */
-    uint mepc;
-    asm("csrr %0, mepc":"=r"(mepc));
-    FATAL("excp_entry: kernel got exception %d, mepc=0x%x", id, mepc);
+    FATAL("excp_entry: kernel got exception %d", id);
 }
 
 static void intr_entry(uint id) {
-    if (id == 2 && curr_pid >= GPID_USER_START) {
+    if (id == INTR_ID_CTRL_C && curr_pid >= GPID_USER_START) {
         /* User process killed by ctrl+c interrupt */
         INFO("process %d killed by interrupt", curr_pid);
         proc_set[curr_proc_idx].mepc = (uint)sys_exit;
@@ -87,9 +77,10 @@ static void intr_entry(uint id) {
 }
 
 static void proc_yield() {
+    /* Set the current process status to RUNNABLE if it was RUNNING */
     if (!PROC_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
-    /* Find the next runnable process */
+    /* Find the next process to run */
     int next_idx = MAX_NPROCESS;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
         struct process *p = &proc_set[(curr_proc_idx + i) % MAX_NPROCESS];
@@ -103,6 +94,7 @@ static void proc_yield() {
         }
     }
 
+    /* Context switch */
     curr_proc_idx = next_idx;
     earth->timer_reset(core_in_kernel);
     if (PROC_IDLE) {
@@ -125,12 +117,12 @@ static void proc_yield() {
 
     /* Student's code ends here. */
 
-    /* Call the entry point for newly created processes */
+    /* Setup the entry point for newly created processes */
     if (curr_status == PROC_READY) {
         /* Set argc, argv and initial program counter */
         proc_set[curr_proc_idx].saved_register[8] = APPS_ARG;
         proc_set[curr_proc_idx].saved_register[9] = APPS_ARG + 4;
-        proc_set[curr_proc_idx].mepc = APPS_ENTRY;
+        proc_set[curr_proc_idx].mepc              = APPS_ENTRY;
     }
     proc_set_running(curr_pid);
 }
@@ -190,4 +182,12 @@ static void proc_try_syscall(struct process *proc) {
         proc_set_pending(proc->pid);
         proc->pending_syscall = sc->type;
     }
+}
+
+void proc_coresinfo() {
+    /* Student's code goes here (multi-core and atomic instruction) */
+
+    /* Print out the pid of the process running on each core */
+
+    /* Student's code ends here. */
 }

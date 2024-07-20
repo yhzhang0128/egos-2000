@@ -1,9 +1,10 @@
 #pragma once
 
-#include <stdarg.h>    /* Define va_list for vsprintf */
-#include <sys/types.h> /* Define uint and ushort */
-typedef unsigned char uchar;
+typedef unsigned char      uchar;
+typedef unsigned short     ushort;
+typedef unsigned int       uint;
 typedef unsigned long long ulonglong;
+#include <stdarg.h>    /* Define va_list for vsprintf */
 
 struct earth {
     int boot_lock, kernel_lock, booted_core_cnt;
@@ -11,11 +12,11 @@ struct earth {
     /* CPU interface */
     void (*timer_reset)(uint core_id);
 
+    void (*mmu_flush_cache)();
     void (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
     void (*mmu_free)(int pid);
     void (*mmu_map)(int pid, uint vpage_no, uint ppage_id);
     void (*mmu_switch)(int pid);
-    void (*mmu_flush_cache)();
 
     /* Devices interface */
     void (*disk_read)(uint block_no, uint nblocks, char* dst);
