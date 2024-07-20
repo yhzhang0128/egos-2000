@@ -2,11 +2,13 @@
   type = "sifive_u"
   firmware = "tools/qemu/egos.bin"
 
+[memory]
+  size = "256M"
+
 [smp-opts]
   cpus = "5"
 
-[memory]
-  size = "256M"
+# CPU#0 is disabled in earth/boot.c, so there are effectively 4 cores.
 
 [drive]
   if = "sd"

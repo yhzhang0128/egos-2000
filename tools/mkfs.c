@@ -4,8 +4,8 @@
  *
  * Description: create the disk image file (disk.img)
  * The disk image should be exactly 4MB:
- *     the first 2MB contains the binary executables for EGOS;
- *     the last  2MB is managed by a file system.
+ *     2MB contains executables of EGOS;
+ *     2MB is managed by a file system.
  */
 
 #include <stdio.h>
@@ -31,6 +31,7 @@ char* egos_binaries[] = {"./qemu/egos.bin",
 #4: /home/yacqub   #5: /home/yunhao/README  #6: /bin          #7: /bin/echo
 #8: /bin/cat       #9: /bin/ls              #10:/bin/cd       #11:/bin/pwd
 #12:/bin/clock     #13:/bin/crash1          #14:/bin/crash2   #15:/bin/ult
+#16:/bin/udp_hello
 */
 #define NINODE 17
 char* contents[] = {
@@ -57,7 +58,7 @@ char exec[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE], fs[FILE_SYS_DISK_SIZE];
 inode_intf ramdisk_init();
 
 int main() {
-    /* Make the file system into fs[] */
+    /* Make the file system into char fs[] */
     inode_intf ramdisk = ramdisk_init();
     assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
     inode_intf treedisk = treedisk_init(ramdisk, 0);
@@ -102,10 +103,10 @@ int main() {
         write(1, exec + st.st_size, sizeof(exec) - st.st_size);
     }
     memset(exec, 0, sizeof(exec));
-    for (uint i = 0; i < EGOS_MAX_BIN_NUM - EGOS_BIN_NUM; i++)
+    for (uint i = 0; i < EGOS_BIN_MAX_NUM - EGOS_BIN_NUM; i++)
         write(1, exec, sizeof(exec));
 
-    /* Write file system into disk.img */
+    /* Write the file system into disk.img */
     write(1, fs, sizeof(fs));
     fclose(stdout);
 

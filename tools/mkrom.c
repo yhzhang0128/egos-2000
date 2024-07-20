@@ -3,10 +3,9 @@
  * All rights reserved.
  *
  * Description: create the bootROM image files
- * The ROM on the Arty board has 16MB:
- *     the first 4MB holds the VexRiscv processor;
- *     the next  4MB holds the disk image produced by mkfs;
- *     the last  8MB is currently unused.
+ * The ROM on the Arty board has 16MB and only 8MB is used:
+ *     4MB holds the VexRiscv processor FPGA binary;
+ *     4MB holds the disk image produced by mkfs.
  */
 
 #include <stdio.h>
@@ -36,7 +35,7 @@ int load_file(char* file_name, char* print_name, char* dst) {
 
 int main(int argc, char** argv) {
     vexriscv_size = load_file(CPU_BIN_FILE, "VexRiscv binary", mem_vexriscv);
-    disk_size =  load_file("disk.img",   "Disk  image ", mem_disk);
+    disk_size     = load_file("disk.img",   "Disk     image ",    mem_disk    );
 
     assert(vexriscv_size <= SIZE_4MB && disk_size  == SIZE_4MB);
 
