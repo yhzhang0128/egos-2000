@@ -112,39 +112,6 @@ struct header_for_checksum {
     ushort length;
 } __attribute__((packed));
 
-static void send_packet(struct ethernet_frame *eth_frame)
-{
-    #define ETHMAC_BASE           0xF0002000
-    #define ETHMAC_START_WRITE    0x18
-    #define ETHMAC_READY          0x1C
-    #define ETHMAC_SLOT_WRITE     0x24
-    #define ETHMAC_SLOT_LEN_WRITE 0x28
-
-    #define ETHMAC_RX_BASE        0x90000000
-    #define ETHMAC_RX_SLOTS       2
-    #define ETHMAC_SLOT_SIZE      2048
-    char* txbuffer = (void*)(ETHMAC_RX_BASE + ETHMAC_SLOT_SIZE * ETHMAC_RX_SLOTS);
-
-    INFO("Sending a packet of %u bytes", sizeof(struct ethernet_frame));
-    memcpy(txbuffer, eth_frame, sizeof(struct ethernet_frame));
-    /* wait buffer to be available */
-    while(!(REGW(ETHMAC_BASE, ETHMAC_READY)));
-
-    /* fill txbuffer */
-    unsigned int crc, txlen = sizeof(struct ethernet_frame);
-    crc = crc32(&txbuffer[8], txlen-8);
-    txbuffer[txlen  ] = (crc & 0xff);
-    txbuffer[txlen+1] = (crc & 0xff00) >> 8;
-    txbuffer[txlen+2] = (crc & 0xff0000) >> 16;
-    txbuffer[txlen+3] = (crc & 0xff000000) >> 24;
-    txlen += 4;
-
-    /* fill slot, length and send */
-    REGW(ETHMAC_BASE, ETHMAC_SLOT_WRITE) = 0; /* TX slot#0 */
-    REGW(ETHMAC_BASE, ETHMAC_SLOT_LEN_WRITE) = txlen;
-    REGW(ETHMAC_BASE, ETHMAC_START_WRITE) = 1;
-}
-
 int main() {
     struct ethernet_header eth_header = {
         .srcmac = LOCAL_MAC,
@@ -179,9 +146,33 @@ int main() {
     r = ip_checksum(r, &frame.udp, sizeof(struct udp_header)+length, 1);
     frame.udp.checksum = htons(r);
 
+    #define ETHMAC_RX_BASE        0x90000000
+    #define ETHMAC_RX_SLOTS       2
+    #define ETHMAC_SLOT_SIZE      2048
+    char* txbuffer = (void*)(ETHMAC_RX_BASE + ETHMAC_SLOT_SIZE * ETHMAC_RX_SLOTS);
     struct ethernet_frame eth_frame = {
         .eth_header = eth_header,
         .frame = frame
     };
-    send_packet(&eth_frame);
+    INFO("Sending a packet of %u bytes", sizeof(struct ethernet_frame));
+    memcpy(txbuffer, &eth_frame, sizeof(struct ethernet_frame));
+
+    unsigned int crc, txlen = sizeof(struct ethernet_frame);
+    crc = crc32(&txbuffer[8], txlen-8);
+    txbuffer[txlen  ] = (crc & 0xff);
+    txbuffer[txlen+1] = (crc & 0xff00) >> 8;
+    txbuffer[txlen+2] = (crc & 0xff0000) >> 16;
+    txbuffer[txlen+3] = (crc & 0xff000000) >> 24;
+    txlen += 4;
+
+    #define ETHMAC_BASE           0xF0002000
+    #define ETHMAC_START_WRITE    0x18
+    #define ETHMAC_READY          0x1C
+    #define ETHMAC_SLOT_WRITE     0x24
+    #define ETHMAC_SLOT_LEN_WRITE 0x28
+
+    while(!(REGW(ETHMAC_BASE, ETHMAC_READY)));
+    REGW(ETHMAC_BASE, ETHMAC_SLOT_WRITE) = 0; /* TX slot#0 */
+    REGW(ETHMAC_BASE, ETHMAC_SLOT_LEN_WRITE) = txlen;
+    REGW(ETHMAC_BASE, ETHMAC_START_WRITE) = 1;
 }
