@@ -2,9 +2,9 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: user-level, non-preemptive threading
- * Students will implement a minimal threading package;
- * Then spawn multiple threads for the producer/consumer problem.
+ * Description: non-preemptive multi-threading (mt)
+ * Students will implement a minimal threading package and
+ * then spawn multiple threads for the producer/consumer problem.
  */
 
 #include "app.h"

@@ -28,9 +28,9 @@ char* egos_binaries[] = {"./qemu/egos.bin",
 
 /* Inode - File/Directory mappings:
 #0: /              #1: /home                #2: /home/yunhao  #3: /home/rvr
-#4: /home/yacqub   #5: /home/yunhao/README  #6: /bin          #7: /bin/echo
-#8: /bin/cat       #9: /bin/ls              #10:/bin/cd       #11:/bin/pwd
-#12:/bin/clock     #13:/bin/crash1          #14:/bin/crash2   #15:/bin/ult
+#4: /home/yacqub   #5: /home/yunhao/README  #6: /bin          #7: /bin/cat
+#8: /bin/cd        #9: /bin/clock           #10:/bin/crash1   #11:/bin/crash2
+#12:/bin/echo      #13:/bin/ls              #14:/bin/mt       #15:/bin/pwd
 #16:/bin/udp_hello
 */
 #define NINODE 17
@@ -40,17 +40,17 @@ char* contents[] = {
                     "./   2 ../   1 README   5 ",
                     "./   3 ../   1 ",
                     "./   4 ../   1 ",
-                    "With only 2000 lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory paging, address translation, interrupt handling, process scheduling and messaging, system call, file system, shell, 7 user commands and the `mkfs/mkrom` tools.",
-                    "./   6 ../   0 echo   7 cat   8 ls   9 cd  10 pwd  11 clock  12 crash1  13 crash2  14 ult  15 udp_hello  16",
-                    "#../build/release/echo.elf",
+                    "With only 2000 lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory translation, interrupt handling, preemptive scheduler, system call, file system, shell, a UDP/Ethernet demo, several user commands, and the `mkfs/mkrom` tools.",
+                    "./   6 ../   0 cat   7 cd   8 clock    9 crash1  10 crash2  11 echo  12 ls  13 mt  14 pwd  15 udp_hello  16",
                     "#../build/release/cat.elf",
-                    "#../build/release/ls.elf",
                     "#../build/release/cd.elf",
-                    "#../build/release/pwd.elf",
                     "#../build/release/clock.elf",
                     "#../build/release/crash1.elf",
                     "#../build/release/crash2.elf",
-                    "#../build/release/ult.elf",
+                    "#../build/release/echo.elf",
+                    "#../build/release/ls.elf",
+                    "#../build/release/mt.elf",
+                    "#../build/release/pwd.elf",
                     "#../build/release/udp_hello.elf"};
 
 char exec[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE], fs[FILE_SYS_DISK_SIZE];
