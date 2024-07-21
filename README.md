@@ -36,9 +36,9 @@ The **egos** part of egos-2000 is named after its three-layer architecture.
     * process control block and system call interface
 * The **application layer** implements file system, shell and user commands.
 
-The definitions of `struct earth` and `struct grass` in [`egos.h`](library/egos.h) specify the layer interface.
+The definitions of `struct earth` and `struct grass` in header file [egos.h](library/egos.h) specify the layer interface.
 Please read [USAGES.md](USAGES.md) for running egos-2000 and
-the [instruction set manual](https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf) for the privileged RISC-V ISA.
+the [instruction set manual](https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf) for the RISC-V privileged ISA.
 
 ## Acknowledgements
 
