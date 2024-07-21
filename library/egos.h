@@ -1,10 +1,11 @@
 #pragma once
 
+#include <stdarg.h>    /* Define va_list for vsprintf */
+
 typedef unsigned char      uchar;
 typedef unsigned short     ushort;
 typedef unsigned int       uint;
 typedef unsigned long long ulonglong;
-#include <stdarg.h>    /* Define va_list for vsprintf */
 
 struct earth {
     int boot_lock, kernel_lock, booted_core_cnt;
@@ -22,9 +23,9 @@ struct earth {
     void (*disk_read)(uint block_no, uint nblocks, char* dst);
     void (*disk_write)(uint block_no, uint nblocks, char* src);
 
-    int (*tty_read)(char* buf, uint len);
-    int (*tty_write)(char* buf, uint len);
-    int (*tty_vsprintf)(char * s, const char * format, va_list arg );
+    int  (*tty_read)(char* buf, uint len);
+    int  (*tty_write)(char* buf, uint len);
+    int  (*tty_vsprintf)(char * s, const char * format, va_list arg );
 
     /* Earth configuration */
     enum { ARTY, QEMU } platform;
@@ -52,45 +53,45 @@ struct grass {
 extern struct earth *earth;
 extern struct grass *grass;
 
-#define NCORES            4
-#define release(x)        __sync_lock_release(&x)
-#define acquire(x)        while(__sync_lock_test_and_set(&x, 1) != 0);
+#define NCORES             4
+#define release(x)         __sync_lock_release(&x)
+#define acquire(x)         while(__sync_lock_test_and_set(&x, 1) != 0);
 
 /* Memory regions */
-#define PAGE_SIZE         4096
-#define RAM_END           0x90000000 /* 256MB memory in total     */
-#define APPS_PAGES_BASE   0x80800000 /* 248MB initially free      */
+#define PAGE_SIZE          4096
+#define RAM_END            0x90000000 /* 256MB memory in total     */
+#define APPS_PAGES_BASE    0x80800000 /* 248MB initially free      */
 
-#define APPS_STACK_TOP    0x80800000 /* 2MB app stack             */
-#define SYSCALL_ARG       0x80601000 /* struct syscall            */
-#define APPS_ARG          0x80600000 /* main() argc/argv          */
-#define APPS_ENTRY        0x80400000 /* 2MB app code and data     */
+#define APPS_STACK_TOP     0x80800000 /* 2MB app stack             */
+#define SYSCALL_ARG        0x80601000 /* struct syscall            */
+#define APPS_ARG           0x80600000 /* main() argc/argv          */
+#define APPS_ENTRY         0x80400000 /* 2MB app code and data     */
 
-#define EGOS_STACK_TOP    0x80400000 /* 2MB egos stack            */
-#define GRASS_STRUCT_BASE 0x80300800
-#define EARTH_STRUCT_BASE 0x80300000 /* struct earth/grass        */
-#define EGOS_HEAP_END     0x80200000 /* kernel message buffer     */
-#define RAM_START         0x80000000 /* 2MB egos code and data    */
+#define EGOS_STACK_TOP     0x80400000 /* 2MB egos stack            */
+#define GRASS_STRUCT_BASE  0x80300800
+#define EARTH_STRUCT_BASE  0x80300000 /* struct earth/grass        */
+#define EGOS_HEAP_END      0x80200000 /* kernel message buffer     */
+#define RAM_START          0x80000000 /* 2MB egos code and data    */
 
-#define BOARD_FLASH_ROM   0x20400000 /* 4MB disk image, only used on the Arty board */
+#define BOARD_FLASH_ROM    0x20400000 /* 4MB disk image, only used on the Arty board */
 
 /* Memory-mapped I/O regions */
-#define ETHMAC_RX_BUFFER 0x90000000
-#define ETHMAC_TX_BUFFER 0x90001000
-#define ETHMAC_CSR_BASE  0xF0002000
-#define SPI_BASE         (earth->platform == ARTY? 0xF0008800UL : 0x10050000UL)
-#define UART_BASE        (earth->platform == ARTY? 0xF0001000UL : 0x10010000UL)
-#define CLINT_BASE       (earth->platform == ARTY? 0xF0010000UL : 0x02000000UL)
+#define ETHMAC_RX_BUFFER   0x90000000
+#define ETHMAC_TX_BUFFER   0x90001000
+#define ETHMAC_CSR_BASE    0xF0002000
+#define SPI_BASE           (earth->platform == ARTY? 0xF0008800UL : 0x10050000UL)
+#define UART_BASE          (earth->platform == ARTY? 0xF0001000UL : 0x10010000UL)
+#define CLINT_BASE         (earth->platform == ARTY? 0xF0010000UL : 0x02000000UL)
 
 /* Memory-mapped I/O register access macros */
-#define ACCESS(x) (*(__typeof__(*x) volatile *)(x))
-#define REGW(base, offset) (ACCESS((unsigned int*)(base + offset)))
-#define REGB(base, offset) (ACCESS((unsigned char*)(base + offset)))
+#define ACCESS(x)          (*(__typeof__(*x) volatile *)(x))
+#define REGW(base, offset) (ACCESS((uint*)(base + offset)))
+#define REGB(base, offset) (ACCESS((uchar*)(base + offset)))
 
 /* Printing functionalities defined in library/libc/print.c */
 int INFO(const char *format, ...);
 int FATAL(const char *format, ...);
 int SUCCESS(const char *format, ...);
 int CRITICAL(const char *format, ...);
-int my_printf(const char *format, ...);
 #define printf   my_printf
+int my_printf(const char *format, ...);
