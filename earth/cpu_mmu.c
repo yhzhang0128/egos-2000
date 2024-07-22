@@ -125,8 +125,14 @@ void pagetable_identity_mapping(int pid) {
     if (earth->platform == ARTY) {
         setup_identity_region( pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
         setup_identity_region( pid, ETHMAC_CSR_BASE,  1, OS_RWX);   /* ETHMAC CSR */
-        setup_identity_region( pid, ETHMAC_RX_BUFFER, 1, OS_RWX);   /* ETHMAC RX buffer */
         setup_identity_region( pid, ETHMAC_TX_BUFFER, 1, OS_RWX);   /* ETHMAC TX buffer */
+    } else {
+        /* Student's code goes here (networking) */
+
+        /* Create page tables for the GEM region of the sifive_u machine */
+        /* Reference: https://github.com/qemu/qemu/blob/stable-9.0/hw/riscv/sifive_u.c#L86 */
+
+        /* Student's code ends here. */
     }
 }
 

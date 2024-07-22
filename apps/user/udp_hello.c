@@ -126,7 +126,16 @@ int main() {
     INFO("Payload is                  %u bytes", sizeof(HELLO_MSG));
 
     if (earth->platform == QEMU) {
-        CRITICAL("UDP on QEMU is coming soon.");
+        CRITICAL("UDP on QEMU is left to students as an exercise.");
+        /* Student's code goes here (networking) */
+
+        /* Understand the Gigabit Ethernet Controller (GEM) on QEMU
+         * and send the UDP network packet through GEM */
+
+        /* Reference#1: GEM in the sifive_u machine: https://github.com/qemu/qemu/blob/stable-9.0/include/hw/riscv/sifive_u.h#L54 */
+        /* Reference#2: GEM memory-mapped I/O registers: https://github.com/qemu/qemu/blob/stable-9.0/hw/net/cadence_gem.c#L1422 */
+
+        /* Student's code ends here. */
     } else {
         char* txbuffer = (void*)(ETHMAC_TX_BUFFER);
         memcpy(txbuffer, &eth_frame, sizeof(struct ethernet_frame));
