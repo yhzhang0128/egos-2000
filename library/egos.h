@@ -25,7 +25,7 @@ struct earth {
 
     int  (*tty_read)(char* buf, uint len);
     int  (*tty_write)(char* buf, uint len);
-    int  (*tty_vsprintf)(char * s, const char * format, va_list arg );
+    int  (*tty_vsprintf)(char* str, const char* format, va_list arg);
 
     /* Earth configuration */
     enum { ARTY, QEMU } platform;
