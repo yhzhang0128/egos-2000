@@ -146,11 +146,10 @@ static int proc_try_send(struct process *sender) {
 
 static int proc_try_recv(struct process *receiver) {
     if (!receiver->sc.msg.received) return -1;
-
+    
     receiver->sc.msg.received = 0;
     earth->mmu_switch(receiver->pid);
-    struct syscall *sc = (struct syscall *)SYSCALL_ARG;
-    memcpy(sc, &receiver->sc, sizeof(struct syscall));
+    memcpy((void*)SYSCALL_ARG, &receiver->sc, sizeof(struct syscall));
     return 0;
 }
 
