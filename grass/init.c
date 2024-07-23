@@ -28,9 +28,6 @@ void grass_entry() {
     grass->sys_send = sys_send;
     grass->sys_recv = sys_recv;
 
-    /* Initialize the IPC Buffer */
-    msg_buffer->in_use = 0;
-
     /* Load the first system server GPID_PROCESS */
     INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);

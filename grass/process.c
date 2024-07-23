@@ -28,6 +28,9 @@ int proc_alloc() {
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid = ++proc_nprocs;
             proc_set[i].status = PROC_LOADING;
+            
+            memset(&proc_set[i].sc, 0, sizeof(struct syscall));
+            proc_set[i].sc.type = SYS_UNUSED;
             return proc_nprocs;
         }
 
