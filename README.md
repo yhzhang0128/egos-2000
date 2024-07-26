@@ -8,9 +8,8 @@ It can run on RISC-V boards and the QEMU software emulator.
 ![Fail to load an image of egos-2000.](tools/screenshots/egos-2000.jpg)
 
 ```shell
-# The cloc utility is used to count the lines of code (LOC).
-# The command below counts the LOC of everything excluding text files.
-> cloc egos-2000 --exclude-ext=md,txt,toml,json
+# The cloc utility is used to count the lines of code.
+> cloc egos-2000 --exclude-ext=md,txt,toml,json  # excluding text files
 ...
 github.com/AlDanial/cloc v 1.94  T=0.05 s (949.3 files/s, 62349.4 lines/s)
 -------------------------------------------------------------------------------
