@@ -70,7 +70,6 @@ extern struct grass *grass;
 #define EGOS_STACK_TOP     0x80400000 /* 2MB egos stack            */
 #define GRASS_STRUCT_BASE  0x80300800
 #define EARTH_STRUCT_BASE  0x80300000 /* struct earth/grass        */
-#define EGOS_HEAP_END      0x80200000 /* kernel message buffer     */
 #define RAM_START          0x80000000 /* 2MB egos code and data    */
 
 #define BOARD_FLASH_ROM    0x20400000 /* 4MB disk image, only used on the Arty board */

@@ -13,7 +13,7 @@ struct sys_msg {
     int sender;
     int receiver;
     char content[SYSCALL_MSG_LEN];
-    int received;
+    enum {PENDING, RECEIVED} status;
 };
 
 struct syscall {

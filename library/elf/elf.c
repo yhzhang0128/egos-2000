@@ -71,7 +71,6 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
 
     earth->mmu_alloc(&ppage_id, &base);
     earth->mmu_map(pid, args_start++, ppage_id);
-    memset((char*)base, 0, PAGE_SIZE);
 
     /* Setup two pages for user stack (should be enough for demo purpose) */
     uint stack_start = (APPS_STACK_TOP - PAGE_SIZE * 2) >> 12;
