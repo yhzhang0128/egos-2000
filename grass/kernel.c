@@ -134,9 +134,9 @@ static int proc_try_send(struct process *sender) {
             /* Destination is not receiving, or will not take msg from sender */
             if (! (dst->syscall.type == SYS_RECV && dst->syscall.msg.status == PENDING) ) return -1;
             if (! (dst->syscall.msg.sender == GPID_ALL || dst->syscall.msg.sender == sender->pid) ) return -1;
-            
-            dst->syscall.msg.sender = sender->pid;
+
             dst->syscall.msg.status = RECEIVED;
+            dst->syscall.msg.sender = sender->pid;
             memcpy(dst->syscall.msg.content, sender->syscall.msg.content, SYSCALL_MSG_LEN);
             return 0;
         }
