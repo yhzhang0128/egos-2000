@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdarg.h>    /* Define va_list for vsprintf */
+#include <stdarg.h>    /* Define type va_list */
 
 typedef unsigned char      uchar;
 typedef unsigned short     ushort;
