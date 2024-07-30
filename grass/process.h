@@ -19,9 +19,9 @@ enum proc_status {
 
 struct process{
     int pid;
+    struct syscall syscall;
     enum proc_status status;
     uint mepc, saved_register[SAVED_REGISTER_NUM];
-    struct syscall syscall;
 };
 
 #define MAX_NPROCESS  16
