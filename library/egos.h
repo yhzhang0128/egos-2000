@@ -25,7 +25,7 @@ struct earth {
 
     int  (*tty_read)(char* buf, uint len);
     int  (*tty_write)(char* buf, uint len);
-    int  (*tty_vsprintf)(char* str, const char* format, va_list arg);
+    int  (*format_to_str)(char* str_output, const char* format, va_list arg);
 
     /* Earth configuration */
     enum { ARTY, QEMU } platform;
@@ -68,9 +68,8 @@ extern struct grass *grass;
 #define APPS_ENTRY         0x80400000 /* 2MB app code and data     */
 
 #define EGOS_STACK_TOP     0x80400000 /* 2MB egos stack            */
-#define GRASS_STRUCT_BASE  0x80300800
-#define EARTH_STRUCT_BASE  0x80300000 /* struct earth/grass        */
-#define EGOS_HEAP_END      0x80200000 /* kernel message buffer     */
+#define GRASS_STRUCT_BASE  0x80201000 /* struct grass              */
+#define EARTH_STRUCT_BASE  0x80200000 /* struct earth              */
 #define RAM_START          0x80000000 /* 2MB egos code and data    */
 
 #define BOARD_FLASH_ROM    0x20400000 /* 4MB disk image, only used on the Arty board */

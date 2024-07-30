@@ -8,7 +8,7 @@
     .global boot_loader, trap_from_M_mode, trap_from_S_mode
 
 boot_loader:
-    li t0, 0x80300000
+    li t0, 0x80200000
     li t1, 1           /* Acquire earth->boot_lock in QEMU (multi-core) */
     amoswap.w.aq t1, t1, (t0)
     bnez t1, boot_loader

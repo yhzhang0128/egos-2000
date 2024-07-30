@@ -103,6 +103,9 @@ static void sd_write(uint offset, char* src) {
     if (reply = sd_exec_cmd(cmd24))
         FATAL("SD card replies cmd24 with status %.2x", reply);
 
+    /* 1-byte buffer before writing block */
+    spi_transfer(0xFF);
+
     /* Send data packet: token + block + dummy 2-byte checksum */
     spi_transfer(0xFE);
     for (uint i = 0; i < BLOCK_SIZE; i++) spi_transfer(src[i]);

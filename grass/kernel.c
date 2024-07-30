@@ -53,6 +53,8 @@ static void proc_try_syscall(struct process *proc);
 static void excp_entry(uint id) {
     if (id >= EXCP_ID_ECALL_U && id <= EXCP_ID_ECALL_M) {
         proc_set[curr_proc_idx].mepc += 4;
+        memcpy(&proc_set[curr_proc_idx].syscall, (void*)SYSCALL_ARG, sizeof(struct syscall));
+        proc_set[curr_proc_idx].syscall.msg.status = PENDING;
         proc_try_syscall(&proc_set[curr_proc_idx]);
         proc_yield();
         return;
@@ -84,10 +86,8 @@ static void proc_yield() {
     int next_idx = MAX_NPROCESS;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
         struct process *p = &proc_set[(curr_proc_idx + i) % MAX_NPROCESS];
-        if (p->status == PROC_PENDING_SYSCALL) {
-            earth->mmu_switch(p->pid);
-            proc_try_syscall(p); /* Retry pending system call  */
-        }
+        if (p->status == PROC_PENDING_SYSCALL) proc_try_syscall(p);
+
         if (p->status == PROC_READY || p->status == PROC_RUNNABLE) {
             next_idx = (curr_proc_idx + i) % MAX_NPROCESS;
             break;
@@ -127,61 +127,46 @@ static void proc_yield() {
     proc_set_running(curr_pid);
 }
 
-struct pending_ipc *msg_buffer = (void*)(EGOS_HEAP_END);
-
-static int proc_try_send(struct syscall *sc, struct process *sender) {
-    if (msg_buffer->in_use == 1) return -1;
-    
+static int proc_try_send(struct process *sender) {
     for (uint i = 0; i < MAX_NPROCESS; i++) {
-        struct process dst = proc_set[i];
-        if (dst.pid == sc->msg.receiver && dst.status != PROC_UNUSED) {
+        struct process *dst = &proc_set[i];
+        if (dst->pid == sender->syscall.msg.receiver && dst->status != PROC_UNUSED) {
             /* Destination is not receiving, or will not take msg from sender */
-            if (! (dst.status == PROC_PENDING_SYSCALL && dst.pending_syscall == SYS_RECV) )   return -1;
-            if (! (dst.receive_from == GPID_ALL || dst.receive_from == sender->pid) ) return -1;
-            
-            msg_buffer->in_use = 1;
-            msg_buffer->sender = sender->pid;
-            msg_buffer->receiver = sc->msg.receiver;
+            if (! (dst->syscall.type == SYS_RECV && dst->syscall.msg.status == PENDING) ) return -1;
+            if (! (dst->syscall.msg.sender == GPID_ALL || dst->syscall.msg.sender == sender->pid) ) return -1;
 
-            memcpy(msg_buffer->msg, sc->msg.content, sizeof(sc->msg.content));
+            dst->syscall.msg.status = RECEIVED;
+            dst->syscall.msg.sender = sender->pid;
+            memcpy(dst->syscall.msg.content, sender->syscall.msg.content, SYSCALL_MSG_LEN);
             return 0;
         }
     }
-    FATAL("proc_try_send: process %d sending to unknown process %d", sender->pid, sc->msg.receiver);
+    FATAL("proc_try_send: process %d sending to unknown process %d", sender->pid, sender->syscall.msg.receiver);
 }
 
-static int proc_try_recv(struct syscall *sc, struct process *receiver) {
-    receiver->receive_from = sc->msg.sender;
+static int proc_try_recv(struct process *receiver) {
+    if (receiver->syscall.msg.status == PENDING) return -1;
     
-    if (msg_buffer->in_use == 0 || msg_buffer->receiver != receiver->pid) return -1;
-
-    msg_buffer->in_use = 0;
-    sc->msg.sender = msg_buffer->sender;
-    memcpy(sc->msg.content, msg_buffer->msg, sizeof(sc->msg.content));
+    earth->mmu_switch(receiver->pid);
+    memcpy((void*)SYSCALL_ARG, &receiver->syscall, sizeof(struct syscall));
     return 0;
 }
 
 static void proc_try_syscall(struct process *proc) {
-    struct syscall *sc = (struct syscall*)SYSCALL_ARG;
-
     int rc;
-    switch (sc->type) {
+
+    switch (proc->syscall.type) {
     case SYS_RECV:
-        rc = proc_try_recv(sc, proc);
+        rc = proc_try_recv(proc);
         break;
     case SYS_SEND:
-        rc = proc_try_send(sc, proc);
+        rc = proc_try_send(proc);
         break;
     default:
-        FATAL("proc_try_syscall: got unknown syscall type=%d", sc->type);
+        FATAL("proc_try_syscall: got unknown syscall type=%d", proc->syscall.type);
     }
 
-    if (rc == 0) {
-        proc_set_runnable(proc->pid);
-    } else {
-        proc_set_pending(proc->pid);
-        proc->pending_syscall = sc->type;
-    }
+    (rc == 0) ? proc_set_runnable(proc->pid) : proc_set_pending(proc->pid);
 }
 
 void proc_coresinfo() {

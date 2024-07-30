@@ -46,5 +46,5 @@ int tty_read(char* buf, uint len) {
 void tty_init() {
     earth->tty_read = tty_read;
     earth->tty_write = tty_write;
-    earth->tty_vsprintf = vsprintf;
+    earth->format_to_str = vsprintf;
 }
