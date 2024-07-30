@@ -20,12 +20,12 @@ struct earth {
     void (*mmu_switch)(int pid);
 
     /* Devices interface */
-    void (*disk_read)(uint block_no, uint nblocks, char* dst);
-    void (*disk_write)(uint block_no, uint nblocks, char* src);
-
     int  (*tty_read)(char* buf, uint len);
     int  (*tty_write)(char* buf, uint len);
     int  (*format_to_str)(char* str_output, const char* format, va_list arg);
+
+    void (*disk_read)(uint block_no, uint nblocks, char* dst);
+    void (*disk_write)(uint block_no, uint nblocks, char* src);
 
     /* Earth configuration */
     enum { ARTY, QEMU } platform;
@@ -40,9 +40,7 @@ struct grass {
     /* Process control interface */
     int  (*proc_alloc)();
     void (*proc_free)(int pid);
-    void (*proc_coresinfo)();
     void (*proc_set_ready)(int pid);
-    void (*proc_set_idle)(uint core_id);
 
     /* System call interface */
     void (*sys_exit)(int status);

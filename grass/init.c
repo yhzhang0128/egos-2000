@@ -20,9 +20,7 @@ void grass_entry() {
     /* Initialize the grass interface functions */
     grass->proc_free = proc_free;
     grass->proc_alloc = proc_alloc;
-    grass->proc_set_idle = proc_set_idle;
     grass->proc_set_ready = proc_set_ready;
-    grass->proc_coresinfo = proc_coresinfo;
 
     grass->sys_exit = sys_exit;
     grass->sys_send = sys_send;

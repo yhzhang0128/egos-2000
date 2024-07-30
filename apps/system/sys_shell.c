@@ -27,7 +27,7 @@ int parse_request(char* buf, struct proc_request* req) {
 int main() {
     /* Student's code goes here (multi-core and atomic instruction) */
 
-    /* Release the boot lock so that other cores can start running. */
+    /* Release the boot lock so that other cores can start running */
     /* Wait for all cores to finish booting up */
 
     /* Student's code ends here. */
@@ -39,7 +39,13 @@ int main() {
         struct proc_reply reply;
 
         if (strcmp(buf, "coresinfo") == 0) {
-            grass->proc_coresinfo();
+            /* Student's code goes here (multi-core and atomic instruction) */
+
+            /* Add proc_coresinfo() from kernel.c into the grass interface */
+            /* Invoke the function here to show which process is running on each core */
+
+            /* Student's code ends here. */
+
         } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
             grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
