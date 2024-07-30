@@ -166,10 +166,7 @@ static void proc_try_syscall(struct process *proc) {
         FATAL("proc_try_syscall: got unknown syscall type=%d", proc->syscall.type);
     }
 
-    if (rc == 0) 
-        proc_set_runnable(proc->pid);
-    else         
-        proc_set_pending(proc->pid);
+    (rc == 0) ? proc_set_runnable(proc->pid) : proc_set_pending(proc->pid);
 }
 
 void proc_coresinfo() {

@@ -17,7 +17,7 @@
                    va_list args; \
                    va_start(args, format); \
                    char str_to_print[256]; \
-                   uint len = earth->tty_vsprintf(str_to_print, format, args); \
+                   uint len = earth->format_to_str(str_to_print, format, args); \
                    earth->tty_write(str_to_print, len); \
                    va_end(args); \
                    earth->tty_write(y, sizeof(y));
