@@ -24,10 +24,6 @@ int main() {
     grass->sys_recv(GPID_FILE, NULL, buf, SYSCALL_MSG_LEN);
     INFO("sys_proc receives: %s", buf);
 
-    sys_spawn(SYS_DIR_EXEC_START);
-    grass->sys_recv(GPID_DIR, NULL, buf, SYSCALL_MSG_LEN);
-    INFO("sys_proc receives: %s", buf);
-
     sys_spawn(SYS_SHELL_EXEC_START);
 
     while (1) {

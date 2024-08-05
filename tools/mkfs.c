@@ -19,11 +19,10 @@
 #include "disk.h"
 #include "file.h"
 
-#define EGOS_BIN_NUM 5
+#define EGOS_BIN_NUM 4
 char* egos_binaries[] = {"./qemu/egos.bin",
                          "../build/release/sys_proc.elf",
                          "../build/release/sys_file.elf",
-                         "../build/release/sys_dir.elf",
                          "../build/release/sys_shell.elf"};
 
 /* Inode - File/Directory mappings:
