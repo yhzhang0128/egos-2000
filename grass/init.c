@@ -27,7 +27,7 @@ void grass_entry() {
     grass->sys_recv = sys_recv;
 
     /* Load the first system server GPID_PROCESS */
-    INFO("Load kernel process #%d: sys_proc", GPID_PROCESS);
+    INFO("Load kernel process #%d: sys_process", GPID_PROCESS);
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
     proc_set_running(proc_alloc());
     earth->mmu_switch(GPID_PROCESS);
