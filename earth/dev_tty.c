@@ -19,28 +19,8 @@ int tty_write(char* buf, uint len) {
     return len;
 }
 
-int tty_read(char* buf, uint len) {
-    for (int i = 0, c; i < len - 1; i++) {
-        uart_getc(&c);
-        buf[i] = (char)c;
-
-        switch (c) {
-        case 0x03:  /* Ctrl+C    */
-            buf[0] = 0;
-        case 0x0d:  /* Enter     */
-            buf[i] = 0;
-            tty_write("\r\n", 2);
-            return c == 0x03? 0 : i;
-        case 0x7f:  /* Backspace */
-            c = 0;
-            if (i) tty_write("\b \b", 3);
-            i = i ? i - 2 : i - 1;
-        }
-        if (c) tty_write((void*)&c, 1);
-    }
-
-    buf[len - 1] = 0;
-    return len - 1;
+int tty_read(char* c) {
+    uart_getc((int*)c);
 }
 
 void tty_init() {
