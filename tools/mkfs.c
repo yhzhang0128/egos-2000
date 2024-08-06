@@ -19,9 +19,10 @@
 #include "disk.h"
 #include "file.h"
 
-#define EGOS_BIN_NUM 4
+#define EGOS_BIN_NUM 5
 char* egos_binaries[] = {"./qemu/egos.bin",
-                         "../build/release/sys_proc.elf",
+                         "../build/release/sys_process.elf",
+                         "../build/release/sys_terminal.elf",
                          "../build/release/sys_file.elf",
                          "../build/release/sys_shell.elf"};
 

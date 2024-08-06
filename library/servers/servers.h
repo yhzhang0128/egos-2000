@@ -11,6 +11,7 @@ enum grass_servers {
     GPID_ALL = -1,
     GPID_UNUSED,
     GPID_PROCESS,
+    GPID_TERMINAL,
     GPID_FILE,
     GPID_SHELL,
     GPID_USER_START
@@ -34,6 +35,22 @@ struct proc_reply {
           CMD_OK,
           CMD_ERROR
     } type;
+};
+
+/* GPID_TERMINAL */
+#define BUFSIZE     256
+struct term_request {
+    enum {
+        TERM_INPUT,
+        TERM_OUTPUT
+    } type;
+    int len;
+    char buf[BUFSIZE];
+};
+
+struct term_reply {
+    enum term_status { TERM_OK, TERM_ERROR } status;
+    char buf[BUFSIZE];
 };
 
 /* GPID_FILE */

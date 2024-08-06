@@ -15,10 +15,12 @@ static void sys_spawn(uint base);
 static int app_spawn(struct proc_request *req);
 
 int main() {
-    SUCCESS("Enter kernel process GPID_PROCESS");    
-
     int sender, shell_waiting;
     char buf[SYSCALL_MSG_LEN];
+
+    sys_spawn(SYS_TERM_EXEC_START);
+    grass->sys_recv(GPID_TERMINAL, NULL, buf, SYSCALL_MSG_LEN);
+    INFO("sys_proc receives: %s", buf);
 
     sys_spawn(SYS_FILE_EXEC_START);
     grass->sys_recv(GPID_FILE, NULL, buf, SYSCALL_MSG_LEN);
@@ -73,7 +75,7 @@ static int app_spawn(struct proc_request *req) {
 }
 
 static int sys_proc_base;
-char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
+char* sysproc_names[] = {"sys_process", "sys_terminal", "sys_file", "sys_shell"};
 
 static void sys_proc_read(uint block_no, char* dst) {
     earth->disk_read(sys_proc_base + block_no, 1, dst);
