@@ -20,7 +20,7 @@ struct earth {
     void (*mmu_switch)(int pid);
 
     /* Devices interface */
-    int  (*tty_read)(char* c);
+    void (*tty_read)(char* c);
     int  (*tty_write)(char* buf, uint len);
     int  (*format_to_str)(char* str_output, const char* format, va_list arg);
 
@@ -33,9 +33,6 @@ struct earth {
 };
 
 struct grass {
-    /* Print configuration */
-    enum { PRINT_KERNEL, PRINT_USER } print_status;
-
     /* Shell environment variables */
     int workdir_ino;
     char workdir[128];

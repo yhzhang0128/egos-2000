@@ -35,11 +35,8 @@ void kernel_entry(uint mcause) {
     asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
     memcpy(proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
 
-    grass->print_status = PRINT_KERNEL;
     uint id = mcause & 0x3FF;
     (mcause & (1 << 31))? intr_entry(id) : excp_entry(id);
-    grass->print_status = (curr_pid < GPID_SHELL)? PRINT_KERNEL : PRINT_USER;
-    earth->timer_reset(core_in_kernel);
 
     /* Restore process context */
     asm("csrw mepc, %0" ::"r"(proc_set[curr_proc_idx].mepc));
@@ -79,6 +76,7 @@ static void intr_entry(uint id) {
 
     /* Do not interrupt kernel processes since IO can be stateful */
     if (id == INTR_ID_TIMER && (PROC_IDLE || curr_pid >= GPID_SHELL)) proc_yield();
+    else earth->timer_reset(core_in_kernel);
 }
 
 static void proc_yield() {

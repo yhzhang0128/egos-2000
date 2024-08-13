@@ -2,27 +2,26 @@
 #include "string.h"
 
 int parse_input(char* buf, uint len) {
-    for (int i = 0, c; i < len - 1; i++) {
-        earth->tty_read((char*)&c);
-        buf[i] = (char)c;
+    char c;
+    for (int i = 0; i < len - 1; i++) {
+        earth->tty_read(&c);
+        buf[i] = c;
 
         switch (c) {
-        case 0x03:  /* Ctrl+C    */
-            buf[0] = 0;
         case 0x0d:  /* Enter     */
             buf[i] = 0;
             earth->tty_write("\r\n", 2);
-            return c == 0x03? 0 : i;
+            return i ? i + 1 : 0;
         case 0x7f:  /* Backspace */
             c = 0;
             if (i) earth->tty_write("\b \b", 3);
             i = i ? i - 2 : i - 1;
         }
-        if (c) earth->tty_write((void*)&c, 1);
+        if (c) earth->tty_write(&c, 1);
     }
 
     buf[len - 1] = 0;
-    return len - 1;
+    return len;
 }
 
 int main() {
@@ -38,14 +37,11 @@ int main() {
 		struct term_reply *reply = (void*)buf;
 		grass->sys_recv(GPID_ALL, &sender, (void*)req, SYSCALL_MSG_LEN);
 
-		if (req->len > BUFSIZE) FATAL("sys_terminal: request from process %d exceeds BUFSIZE", sender);
+		if (req->len > TERM_BUF_SIZE) FATAL("sys_terminal: request from process %d exceeds TERM_BUF_SIZE", sender);
 
 		switch (req->type) {
 			case TERM_INPUT:
-				if ((reply->len = parse_input(reply->buf, req->len)) > 0) { 
-					reply->buf[reply->len] = '\0';
-					reply->len++;
-				}
+				reply->len = parse_input(reply->buf, req->len);
 				grass->sys_send(sender, (void*)reply, sizeof(*reply));
 				break;
 			case TERM_OUTPUT:

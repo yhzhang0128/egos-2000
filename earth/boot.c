@@ -26,7 +26,6 @@ void boot() {
     asm("csrr %0, mhartid" : "=r"(core_id));
     asm("csrr %0, mvendorid" : "=r"(vendor_id));
     earth->platform = (vendor_id == 666)? ARTY : QEMU;
-    grass->print_status = PRINT_KERNEL;
 
     /* Disable core#0 on QEMU because it is an E31 core without S-mode */
     /* See https://www.qemu.org/docs/master/system/riscv/sifive_u.html */

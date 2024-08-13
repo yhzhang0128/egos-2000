@@ -47,8 +47,6 @@ int file_read(int file_ino, uint offset, char* block) {
 }
 
 int term_read(char *buf, uint len) {
-    if (grass->print_status == PRINT_KERNEL) FATAL("term_read: kernel reading chars through server interface");
-
     struct term_request req;
     struct term_reply reply;
     req.type = TERM_INPUT;
@@ -60,11 +58,13 @@ int term_read(char *buf, uint len) {
 }
 
 void term_write(char *str, uint len) {
-    if (grass->print_status == PRINT_KERNEL) { earth->tty_write(str, len); return; }
-    
+#ifdef KERNEL
+    earth->tty_write(str, len);
+#else
     struct term_request req;
     req.type = TERM_OUTPUT;
     req.len = len;
     memcpy(req.buf, str, len);
     grass->sys_send(GPID_TERMINAL, (void*)&req, sizeof(req));
+#endif
 }

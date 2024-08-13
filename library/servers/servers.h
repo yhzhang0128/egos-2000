@@ -40,16 +40,16 @@ struct proc_reply {
 };
 
 /* GPID_TERMINAL */
-#define BUFSIZE     512
+#define TERM_BUF_SIZE   512
 struct term_request {
     enum { TERM_INPUT, TERM_OUTPUT } type;
     uint len;
-    char buf[BUFSIZE];
+    char buf[TERM_BUF_SIZE];
 };
 
 struct term_reply {
     uint len;
-    char buf[BUFSIZE];
+    char buf[TERM_BUF_SIZE];
 };
 
 /* GPID_FILE */
