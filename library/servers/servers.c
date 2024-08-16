@@ -71,7 +71,9 @@ int term_read(char* buf, uint len) {
     return len;
 }
 
-void term_write(char* str, uint len) { earth->tty_write(str, len); }
+void term_write(char* str, uint len) {
+    earth->tty_write(str, len);
+}
 
 #else /* terminal read/write for user applications */
 
