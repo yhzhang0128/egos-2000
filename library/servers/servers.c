@@ -46,6 +46,34 @@ int file_read(int file_ino, uint offset, char* block) {
     return reply->status == FILE_OK? 0 : -1;
 }
 
+#ifdef KERNEL
+int term_read(char* buf, uint len) {
+    char c;
+    for (int i = 0; i < len - 1; i++) {
+        earth->tty_read(&c);
+        buf[i] = c;
+
+        switch (c) {
+        case 0x0d:  /* Enter     */
+            buf[i] = 0;
+            earth->tty_write("\r\n", 2);
+            return i ? i + 1 : 0;
+        case 0x7f:  /* Backspace */
+            c = 0;
+            if (i) earth->tty_write("\b \b", 3);
+            i = i ? i - 2 : i - 1;
+        }
+        if (c) earth->tty_write(&c, 1);
+    }
+
+    buf[len - 1] = 0;
+    return len;
+}
+
+void term_write(char *str, uint len) {
+    earth->tty_write(str, len);
+}
+#else /* terminal server for user applications */
 int term_read(char *buf, uint len) {
     struct term_request req;
     struct term_reply reply;
@@ -58,13 +86,10 @@ int term_read(char *buf, uint len) {
 }
 
 void term_write(char *str, uint len) {
-#ifdef KERNEL
-    earth->tty_write(str, len);
-#else
     struct term_request req;
     req.type = TERM_OUTPUT;
     req.len = len;
     memcpy(req.buf, str, len);
     grass->sys_send(GPID_TERMINAL, (void*)&req, sizeof(req));
-#endif
 }
+#endif
