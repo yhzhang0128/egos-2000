@@ -16,9 +16,8 @@ uint core_in_kernel;
 uint core_curr_proc[NCORES + 1];
 struct process proc_set[MAX_NPROCESS + 1]; /* proc_set[0..MAX_NPROCESS-1] are actual processes */
                                            /* proc_set[MAX_NPROCESS] is a place holder for idle cores */
-
-#define PROC_IDLE (curr_proc_idx == MAX_NPROCESS)
-void proc_set_idle(uint core) { core_curr_proc[core] = MAX_NPROCESS; }
+#define CORE_IDLE (curr_proc_idx == MAX_NPROCESS)
+void core_set_idle(uint core) { core_curr_proc[core] = MAX_NPROCESS; }
 
 #define curr_proc_idx core_curr_proc[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
@@ -75,18 +74,21 @@ static void intr_entry(uint id) {
     }
 
     /* Do not interrupt kernel processes since IO can be stateful */
-    if (id == INTR_ID_TIMER && (PROC_IDLE || curr_pid >= GPID_SHELL)) proc_yield();
-    else earth->timer_reset(core_in_kernel);
+    if (id == INTR_ID_TIMER && (CORE_IDLE || curr_pid >= GPID_SHELL)) {
+        proc_yield();
+    } else {
+        earth->timer_reset(core_in_kernel);
+    }
 }
 
 static void proc_yield() {
     /* Set the current process status to RUNNABLE if it was RUNNING */
-    if (!PROC_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
+    if (!CORE_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
     /* Find the next process to run */
     int next_idx = MAX_NPROCESS;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
-        struct process *p = &proc_set[(curr_proc_idx + i) % MAX_NPROCESS];
+        struct process* p = &proc_set[(curr_proc_idx + i) % MAX_NPROCESS];
         if (p->status == PROC_PENDING_SYSCALL) proc_try_syscall(p);
 
         if (p->status == PROC_READY || p->status == PROC_RUNNABLE) {
@@ -98,7 +100,7 @@ static void proc_yield() {
     /* Context switch */
     curr_proc_idx = next_idx;
     earth->timer_reset(core_in_kernel);
-    if (PROC_IDLE) {
+    if (CORE_IDLE) {
         /* Student's code goes here (multi-core and atomic instruction) */
 
         /* Release earth->kernel_lock and earth->boot_lock; Call proc_idle
@@ -128,9 +130,9 @@ static void proc_yield() {
     proc_set_running(curr_pid);
 }
 
-static int proc_try_send(struct process *sender) {
+static int proc_try_send(struct process* sender) {
     for (uint i = 0; i < MAX_NPROCESS; i++) {
-        struct process *dst = &proc_set[i];
+        struct process* dst = &proc_set[i];
         if (dst->pid == sender->syscall.msg.receiver && dst->status != PROC_UNUSED) {
             /* Destination is not receiving, or will not take msg from sender */
             if (! (dst->syscall.type == SYS_RECV && dst->syscall.msg.status == PENDING) ) return -1;
@@ -145,7 +147,7 @@ static int proc_try_send(struct process *sender) {
     FATAL("proc_try_send: process %d sending to unknown process %d", sender->pid, sender->syscall.msg.receiver);
 }
 
-static int proc_try_recv(struct process *receiver) {
+static int proc_try_recv(struct process* receiver) {
     if (receiver->syscall.msg.status == PENDING) return -1;
     
     earth->mmu_switch(receiver->pid);
@@ -153,7 +155,7 @@ static int proc_try_recv(struct process *receiver) {
     return 0;
 }
 
-static void proc_try_syscall(struct process *proc) {
+static void proc_try_syscall(struct process* proc) {
     int rc;
 
     switch (proc->syscall.type) {
@@ -173,7 +175,8 @@ static void proc_try_syscall(struct process *proc) {
 void proc_coresinfo() {
     /* Student's code goes here (multi-core and atomic instruction) */
 
-    /* Print out the pid of the process running on each core */
+    /* Print out the pid of the process running on each core;
+     * Add this function into the grass interface so that shell can invoke it */
 
     /* Student's code ends here. */
 }

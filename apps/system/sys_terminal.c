@@ -10,8 +10,8 @@ int main() {
 
 	while (1) {
 		int sender;
-		struct term_request *req = (void*)buf;
-		struct term_reply *reply = (void*)buf;
+		struct term_request* req = (void*)buf;
+		struct term_reply* reply = (void*)buf;
 		grass->sys_recv(GPID_ALL, &sender, (void*)req, SYSCALL_MSG_LEN);
 
 		if (req->len > TERM_BUF_SIZE) FATAL("sys_terminal: request from process %d exceeds TERM_BUF_SIZE", sender);

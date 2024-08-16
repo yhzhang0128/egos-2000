@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: load an ELF-format executable file into memory
- * Only use the program header instead of the section headers.
+ * Only uses the program header instead of the section headers.
  */
 
 #include "egos.h"
@@ -16,15 +16,16 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     char buf[BLOCK_SIZE];
     reader(0, buf);
 
-    struct elf32_header *header = (void*) buf;
-    struct elf32_program_header *pheader = (void*)(buf + header->e_phoff);
+    struct elf32_header* header = (void*) buf;
+    struct elf32_program_header* pheader = (void*)(buf + header->e_phoff);
 
     for (uint i = 0; i < header->e_phnum; i++) {
         if (pheader[i].p_memsz == 0) continue;
-        else if (pheader[i].p_vaddr == APPS_ENTRY) {
+        if (pheader[i].p_vaddr == APPS_ENTRY) {
             pheader = &pheader[i];
             break;
-        } else FATAL("elf_load: Invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
+        }
+        FATAL("elf_load: Invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
     }
 
     if (pid < GPID_USER_START) {
@@ -33,8 +34,8 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     }
 
     void* base;
-    uint ppage_id, block_offset = pheader->p_offset / BLOCK_SIZE;
     uint code_start = APPS_ENTRY >> 12;
+    uint ppage_id, block_offset = pheader->p_offset / BLOCK_SIZE;
 
     /* Setup pages for text, rodata, data and bss sections */
     for (uint off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {

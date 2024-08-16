@@ -16,8 +16,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "disk.h"
-#include "file.h"
+#include "inode.h"
 
 #define EGOS_BIN_NUM 5
 char* egos_binaries[] = {"./qemu/egos.bin",
@@ -30,10 +29,9 @@ char* egos_binaries[] = {"./qemu/egos.bin",
 #0: /              #1: /home                #2: /home/yunhao  #3: /home/rvr
 #4: /home/yacqub   #5: /home/yunhao/README  #6: /bin          #7: /bin/cat
 #8: /bin/cd        #9: /bin/clock           #10:/bin/crash1   #11:/bin/crash2
-#12:/bin/echo      #13:/bin/ls              #14:/bin/mt       #15:/bin/pwd
-#16:/bin/udp_hello
+#12:/bin/echo      #13:/bin/ls              #14:/bin/pwd      #15:/bin/udp_hello
 */
-#define NINODE 17
+#define NINODE 16
 char* contents[] = {
                     "./   0 ../   0 home/   1 bin/   6 ",
                     "./   1 ../   0 yunhao/   2 rvr/   3 yacqub/   4 ",
@@ -41,7 +39,7 @@ char* contents[] = {
                     "./   3 ../   1 ",
                     "./   4 ../   1 ",
                     "With only 2000 lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory translation, interrupt handling, preemptive scheduler, system call, file system, shell, a UDP/Ethernet demo, several user commands, and the `mkfs/mkrom` tools.",
-                    "./   6 ../   0 cat   7 cd   8 clock    9 crash1  10 crash2  11 echo  12 ls  13 mt  14 pwd  15 udp_hello  16",
+                    "./   6 ../   0 cat   7 cd   8 clock    9 crash1  10 crash2  11 echo  12 ls  13 pwd  14 udp_hello  15",
                     "#../build/release/cat.elf",
                     "#../build/release/cd.elf",
                     "#../build/release/clock.elf",
@@ -49,7 +47,6 @@ char* contents[] = {
                     "#../build/release/crash2.elf",
                     "#../build/release/echo.elf",
                     "#../build/release/ls.elf",
-                    "#../build/release/mt.elf",
                     "#../build/release/pwd.elf",
                     "#../build/release/udp_hello.elf"};
 
@@ -59,16 +56,23 @@ inode_intf ramdisk_init();
 
 int main() {
     /* Make the file system into char fs[] */
-    inode_intf ramdisk = ramdisk_init();
-    assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
-    inode_intf treedisk = treedisk_init(ramdisk, 0);
+    inode_intf filesys, ramdisk = ramdisk_init();
+
+    if (FILESYS == 0) {
+        assert(mydisk_create(ramdisk, 0, NINODES) >= 0);
+        filesys = mydisk_init(ramdisk, 0);
+    } else {
+        assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
+        filesys = treedisk_init(ramdisk, 0);
+    }
+    fprintf(stderr, "MKFS is using file system: %s\n", FILESYS == 0? "mydisk" : "treedisk");
 
     char buf[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE];
     for (uint ino = 0; ino < NINODE; ino++) {
         if (contents[ino][0] != '#') {
             fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
             strncpy(buf, contents[ino], BLOCK_SIZE);
-            treedisk->write(treedisk, ino, 0, (void*)buf);
+            filesys->write(filesys, ino, 0, (void*)buf);
         } else {
             struct stat st;
             char* file_name = &contents[ino][1];
@@ -80,7 +84,7 @@ int main() {
 
             fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, (int)st.st_size);
             for (uint b = 0; b * BLOCK_SIZE < st.st_size; b++)
-                treedisk->write(treedisk, ino, b, (void*)(buf + b * BLOCK_SIZE));
+                filesys->write(filesys, ino, b, (void*)(buf + b * BLOCK_SIZE));
         }
     }
 
@@ -118,18 +122,18 @@ int getsize() { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
 
 int setsize() { assert(0); }
 
-int ramread(inode_intf bs, uint ino, block_no offset, block_t *block) {
+int ramread(inode_intf bs, uint ino, block_no offset, block_t* block) {
     memcpy(block, fs + offset * BLOCK_SIZE, BLOCK_SIZE);
     return 0;
 }
 
-int ramwrite(inode_intf bs, uint ino, block_no offset, block_t *block) {
+int ramwrite(inode_intf bs, uint ino, block_no offset, block_t* block) {
     memcpy(fs + offset * BLOCK_SIZE, block, BLOCK_SIZE);
     return 0;
 }
 
 inode_intf ramdisk_init() {
-    inode_store_t *ramdisk = malloc(sizeof(*ramdisk));
+    inode_store_t* ramdisk = malloc(sizeof(*ramdisk));
 
     ramdisk->read = (void*)ramread;
     ramdisk->write = (void*)ramwrite;

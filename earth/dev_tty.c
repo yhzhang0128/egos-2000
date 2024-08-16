@@ -40,13 +40,12 @@ void uart_getc(char* c) {
     }
 }
 
-int tty_write(char* buf, uint len) {
+void tty_write(char* buf, uint len) {
     for (uint i = 0; i < len; i++) uart_putc(buf[i]);
-    return len;
 }
 
 void tty_init() {
-    earth->tty_read = uart_getc;
-    earth->tty_write = tty_write;
+    earth->tty_read      = uart_getc;
+    earth->tty_write     = tty_write;
     earth->format_to_str = vsprintf;
 }

@@ -28,9 +28,8 @@ struct process{
 
 int  proc_alloc();
 void proc_free(int);
-void proc_coresinfo ();
-void proc_set_idle (uint);
 void proc_set_ready (int);
 void proc_set_running (int);
 void proc_set_runnable (int);
 void proc_set_pending (int);
+void core_set_idle (uint);

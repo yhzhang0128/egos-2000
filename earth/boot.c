@@ -15,8 +15,8 @@ void disk_init();
 void mmu_init();
 void intr_init(uint core_id);
 
-struct grass *grass = (void*)GRASS_STRUCT_BASE;
-struct earth *earth = (void*)EARTH_STRUCT_BASE;
+struct grass* grass = (void*)GRASS_STRUCT_BASE;
+struct earth* earth = (void*)EARTH_STRUCT_BASE;
 
 void grass_entry();
 void kernel_entry(uint);
@@ -35,7 +35,7 @@ void boot() {
     }
 
     if (earth->booted_core_cnt == 0) {
-        /* The first booted core needs to do some more job */
+        /* The first booted core needs to do some more work */
         earth->booted_core_cnt = 1;
 
         tty_init();
@@ -54,6 +54,7 @@ void boot() {
         asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (GRASS_MODE << 11) | (1 << 18)));
 
         asm("csrw mepc, %0" ::"r"(grass_entry));
+        asm("mv a0, %0" ::"r"(core_id));
         asm("mret");
     } else {
         SUCCESS("--- Core #%u starts running ---", core_id);

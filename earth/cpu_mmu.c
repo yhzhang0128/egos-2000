@@ -79,12 +79,13 @@ void soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define OS_RWX   (0xC0 | 0xF)
-#define USER_RWX (0xC0 | 0x1F)
-static uint *root, *leaf;
-
-/* 32 is a number large enough for demo purpose */
-static uint* pid_to_pagetable_base[32];
+#define OS_RWX       (0xC0 | 0xF)
+#define USER_RWX     (0xC0 | 0x1F)
+#define MAX_NPROCESS 256
+static uint* root;
+static uint* leaf;
+static uint* pid_to_pagetable_base[MAX_NPROCESS];
+/* Assume at most MAX_NPROCESS unique processes for simplicity */
 
 void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
     uint vpn1 = addr >> 22;
@@ -111,9 +112,9 @@ void pagetable_identity_mapping(int pid) {
     /* Allocate the root page table and set the page table base (satp) */
     uint ppage_id;
     earth->mmu_alloc(&ppage_id, (void**)&root);
-    page_info_table[ppage_id].pid = pid;
     memset(root, 0, PAGE_SIZE);
-    pid_to_pagetable_base[pid] = root;
+    page_info_table[ppage_id].pid = pid;
+    pid_to_pagetable_base[pid]    = root;
 
     /* Allocate the leaf page tables */
     for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
@@ -126,6 +127,7 @@ void pagetable_identity_mapping(int pid) {
         setup_identity_region( pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
         setup_identity_region( pid, ETHMAC_CSR_BASE,  1, OS_RWX);   /* ETHMAC CSR */
         setup_identity_region( pid, ETHMAC_TX_BUFFER, 1, OS_RWX);   /* ETHMAC TX buffer */
+        setup_identity_region( pid, ETHMAC_RX_BUFFER, 1, OS_RWX);   /* ETHMAC RX buffer */
     } else {
         /* Student's code goes here (networking) */
 
@@ -137,7 +139,7 @@ void pagetable_identity_mapping(int pid) {
 }
 
 void page_table_map(int pid, uint vpage_no, uint ppage_id) {
-    if (pid >= 32) FATAL("page_table_map: pid too large");
+    if (pid >= MAX_NPROCESS) FATAL("page_table_map: pid too large");
 
     /* Student's code goes here (page table translation). */
 
@@ -188,13 +190,9 @@ void mmu_init() {
 
     /* Student's code goes here (PMP memory protection). */
 
-    /* Setup PMP TOR region 0x00000000 - 0x20000000 as r/w/x */
+    /* Setup PMP NAPOT region 0x80000000 - 0x80400000 as r/-/x */
 
-    /* Setup PMP NAPOT region 0x20400000 - 0x20800000 as r/-/x */
-
-    /* Setup PMP NAPOT region 0x20800000 - 0x20C00000 as r/-/- */
-
-    /* Setup PMP NAPOT region 0x80000000 - 0x80004000 as r/w/- */
+    /* Setup PMP NAPOT region 0x80400000 - 0x80800000 as r/w/x */
 
     /* Student's code ends here. */
 
@@ -212,10 +210,10 @@ void mmu_init() {
         pagetable_identity_mapping(0);
         asm("csrw satp, %0" ::"r"(((uint)root >> 12) | (1 << 31)));
 
-        earth->mmu_map = page_table_map;
+        earth->mmu_map    = page_table_map;
         earth->mmu_switch = page_table_switch;
     } else {
-        earth->mmu_map = soft_tlb_map;
+        earth->mmu_map    = soft_tlb_map;
         earth->mmu_switch = soft_tlb_switch;
     }
 }

@@ -1,3 +1,5 @@
+egos-2000 has a simple memory layout which is reflected by the macros in egos.h
+
 | Base        | Top         | Size           | Description                                        |
 |-------------|-------------|----------------|----------------------------------------------------|
 | 0x2000_0000 | 0x203F_FFFF | Flash ROM, 4MB | FPGA binary of the LiteX+VexRiscv processor        |

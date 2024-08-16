@@ -4,10 +4,10 @@
 #define SYSCALL_MSG_LEN    1024
 
 void exit(int status);
+int term_read(char* buf, uint len);
+void term_write(char* str, uint len);
 int dir_lookup(int dir_ino, char* name);
 int file_read(int file_ino, uint offset, char* block);
-int term_read(char *buf, uint len);
-void term_write(char *str, uint len);
 
 enum grass_servers {
     GPID_ALL = -1,
