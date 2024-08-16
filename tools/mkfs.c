@@ -59,14 +59,14 @@ int main() {
     /* Make the file system into char fs[] */
     inode_intf ramdisk = ramdisk_init();
     assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
-    inode_intf treedisk = treedisk_init(ramdisk, 0);
+    inode_intf filesys = treedisk_init(ramdisk, 0);
 
     char buf[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE];
     for (uint ino = 0; ino < NINODE; ino++) {
         if (contents[ino][0] != '#') {
             fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
             strncpy(buf, contents[ino], BLOCK_SIZE);
-            treedisk->write(treedisk, ino, 0, (void*)buf);
+            filesys->write(filesys, ino, 0, (void*)buf);
         } else {
             struct stat st;
             char* file_name = &contents[ino][1];
@@ -78,7 +78,7 @@ int main() {
 
             fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, (int)st.st_size);
             for (uint b = 0; b * BLOCK_SIZE < st.st_size; b++)
-                treedisk->write(treedisk, ino, b, (void*)(buf + b * BLOCK_SIZE));
+                filesys->write(filesys, ino, b, (void*)(buf + b * BLOCK_SIZE));
         }
     }
 
