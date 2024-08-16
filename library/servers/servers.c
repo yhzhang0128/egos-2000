@@ -73,7 +73,7 @@ int term_read(char* buf, uint len) {
 void term_write(char *str, uint len) {
     earth->tty_write(str, len);
 }
-#else /* terminal server for user applications */
+#else /* terminal read/write for user applications */
 int term_read(char *buf, uint len) {
     struct term_request req;
     struct term_reply reply;
