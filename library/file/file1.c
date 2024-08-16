@@ -49,13 +49,13 @@ struct treedisk_snapshot {
 /* The state of a virtual inode store, which is identified by an inode number.
  */
 struct treedisk_state {
-    inode_store_t* below;            /* inode store below */
-    uint below_ino;            /* inode number to use for the inode store below */
-    uint ninodes;            /* number of inodes in the treedisk */
+    inode_store_t* below;  /* inode store below */
+    uint below_ino;        /* inode number to use for the inode store below */
+    uint ninodes;          /* number of inodes in the treedisk */
 };
 
-static uint log_rpb;                    /* log2(REFS_PER_BLOCK) */
-static block_t null_block;            /* a block filled with null bytes */
+static uint log_rpb;       /* log2(REFS_PER_BLOCK) */
+static block_t null_block; /* a block filled with null bytes */
 
 static void panic(const char* s){
 #ifdef MKFS
