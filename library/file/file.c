@@ -10,16 +10,16 @@
  * a so-called "inode number", which indexes into an array of inodes.  The 
  * interface is as follows:
  *
- *		void treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int ninodes)
- *			Initializes the underlying inode store "below" with a file system
- *			stored within inode below_ino. If "below" is a simple
- * 			non-virtualized inode store like the disk server, below_ino is
- * 			probably 0. The file system consists of one "superblock", a number
- * 			of blocks containing inodes, and the remaining blocks explained
- * 			below. The file system can support up to ninodes inodes.
+ *        void treedisk_create(inode_store_t *below, unsigned int below_ino, unsigned int ninodes)
+ *            Initializes the underlying inode store "below" with a file system
+ *            stored within inode below_ino. If "below" is a simple
+ *             non-virtualized inode store like the disk server, below_ino is
+ *             probably 0. The file system consists of one "superblock", a number
+ *             of blocks containing inodes, and the remaining blocks explained
+ *             below. The file system can support up to ninodes inodes.
  *
- *		inode_store_t *treedisk_init(inode_store_t *below, unsigned int below_ino)
- *			Opens a virtual inode store within inode below_ino of the inode store below.
+ *        inode_store_t *treedisk_init(inode_store_t *below, unsigned int below_ino)
+ *            Opens a virtual inode store within inode below_ino of the inode store below.
  *
  * The layout of the file system is described in the file "file.h".
  */
@@ -49,13 +49,13 @@ struct treedisk_snapshot {
 /* The state of a virtual inode store, which is identified by an inode number.
  */
 struct treedisk_state {
-    inode_store_t *below;			/* inode store below */
-    uint below_ino;			/* inode number to use for the inode store below */
-    uint ninodes;			/* number of inodes in the treedisk */
+    inode_store_t *below;            /* inode store below */
+    uint below_ino;            /* inode number to use for the inode store below */
+    uint ninodes;            /* number of inodes in the treedisk */
 };
 
 static uint log_rpb;                    /* log2(REFS_PER_BLOCK) */
-static block_t null_block;			/* a block filled with null bytes */
+static block_t null_block;            /* a block filled with null bytes */
 
 static void panic(const char *s){
 #ifdef MKFS
@@ -333,7 +333,7 @@ static int treedisk_write(inode_store_t *this_bs, uint ino, block_no offset, blo
 inode_store_t *treedisk_init(inode_store_t *below, uint below_ino){
     /* Figure out the log of the number of references per block.
      */
-    if (log_rpb == 0) {		/* first time only */
+    if (log_rpb == 0) {        /* first time only */
         do {
             log_rpb++;
         } while (((REFS_PER_BLOCK - 1) >> log_rpb) != 0);

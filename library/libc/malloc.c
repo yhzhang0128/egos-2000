@@ -16,13 +16,13 @@ static char* brk = &__heap_start;
  * If malloc() finds this region to be too small, it will call _sbrk().
  */
 
-char *_sbrk(int size) {
+char* _sbrk(int size) {
     if (brk + size > (char*)&__heap_end) {
         earth->tty_write("_sbrk: heap grows too large\r\n", 29);
         *(int*)(0) = 1; /* Trigger a memory exception */
     }
 
-    char *old_brk = brk;
+    char* old_brk = brk;
     brk += size;
     return old_brk;
 }

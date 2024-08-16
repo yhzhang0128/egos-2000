@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdarg.h>    /* Define type va_list */
+#include <stdarg.h>    /* Define type va_list for format_to_str*/
 
 typedef unsigned char      uchar;
 typedef unsigned short     ushort;
@@ -48,8 +48,8 @@ struct grass {
     void (*sys_recv)(int from, int* sender, char* buf, uint size);
 };
 
-extern struct earth *earth;
-extern struct grass *grass;
+extern struct earth* earth;
+extern struct grass* grass;
 
 #define NCORES             4
 #define release(x)         __sync_lock_release(&x)
@@ -70,7 +70,7 @@ extern struct grass *grass;
 #define EARTH_STRUCT_BASE  0x80200000 /* struct earth              */
 #define RAM_START          0x80000000 /* 2MB egos code and data    */
 
-#define BOARD_FLASH_ROM    0x20400000 /* 4MB disk image, only used on the Arty board */
+#define BOARD_FLASH_ROM    0x20400000 /* 4MB disk image on ROM, only on the Arty board */
 
 /* Memory-mapped I/O regions */
 #define ETHMAC_CSR_BASE    0xF0002000
@@ -86,9 +86,10 @@ extern struct grass *grass;
 #define REGB(base, offset) (ACCESS((uchar*)(base + offset)))
 
 /* Printing functionalities defined in library/libc/print.c */
-int INFO(const char *format, ...);
-int FATAL(const char *format, ...);
-int SUCCESS(const char *format, ...);
-int CRITICAL(const char *format, ...);
-#define printf   my_printf
-int my_printf(const char *format, ...);
+#define printf my_printf
+int my_printf(const char* format, ...);
+
+int INFO(const char* format, ...);
+int FATAL(const char* format, ...);
+int SUCCESS(const char* format, ...);
+int CRITICAL(const char* format, ...);
