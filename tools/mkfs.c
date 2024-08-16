@@ -30,10 +30,9 @@ char* egos_binaries[] = {"./qemu/egos.bin",
 #0: /              #1: /home                #2: /home/yunhao  #3: /home/rvr
 #4: /home/yacqub   #5: /home/yunhao/README  #6: /bin          #7: /bin/cat
 #8: /bin/cd        #9: /bin/clock           #10:/bin/crash1   #11:/bin/crash2
-#12:/bin/echo      #13:/bin/ls              #14:/bin/mt       #15:/bin/pwd
-#16:/bin/udp_hello
+#12:/bin/echo      #13:/bin/ls              #14:/bin/pwd      #15:/bin/udp_hello
 */
-#define NINODE 17
+#define NINODE 16
 char* contents[] = {
                     "./   0 ../   0 home/   1 bin/   6 ",
                     "./   1 ../   0 yunhao/   2 rvr/   3 yacqub/   4 ",
@@ -41,7 +40,7 @@ char* contents[] = {
                     "./   3 ../   1 ",
                     "./   4 ../   1 ",
                     "With only 2000 lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory translation, interrupt handling, preemptive scheduler, system call, file system, shell, a UDP/Ethernet demo, several user commands, and the `mkfs/mkrom` tools.",
-                    "./   6 ../   0 cat   7 cd   8 clock    9 crash1  10 crash2  11 echo  12 ls  13 mt  14 pwd  15 udp_hello  16",
+                    "./   6 ../   0 cat   7 cd   8 clock    9 crash1  10 crash2  11 echo  12 ls  13 pwd  14 udp_hello  15",
                     "#../build/release/cat.elf",
                     "#../build/release/cd.elf",
                     "#../build/release/clock.elf",
@@ -49,7 +48,6 @@ char* contents[] = {
                     "#../build/release/crash2.elf",
                     "#../build/release/echo.elf",
                     "#../build/release/ls.elf",
-                    "#../build/release/mt.elf",
                     "#../build/release/pwd.elf",
                     "#../build/release/udp_hello.elf"};
 
