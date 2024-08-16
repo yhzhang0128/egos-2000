@@ -6,6 +6,8 @@
  */
 
 #include "egos.h"
+#include "servers.h"
+#include "string.h"
 #include <unistd.h>
 
 /* earth->vsprintf is the C library vsprintf, which converts
@@ -13,14 +15,15 @@
  * a string. The string is passed to earth->tty_write() for printing.
  */
 
-#define LOG(x, y)  earth->tty_write(x, sizeof(x)); \
-                   va_list args; \
+#define LOG(x, y)  va_list args; \
                    va_start(args, format); \
-                   char str_to_print[256]; \
-                   uint len = earth->format_to_str(str_to_print, format, args); \
-                   earth->tty_write(str_to_print, len); \
-                   va_end(args); \
-                   earth->tty_write(y, sizeof(y));
+                   char str_formatted[256], str_to_print[256]; \
+                   uint len = earth->format_to_str(str_formatted, format, args); \
+                   strcpy(str_to_print, x); \
+                   strcat(str_to_print, str_formatted); \
+                   strcat(str_to_print, y); \
+                   term_write(str_to_print, (sizeof(x) - 1) + len + (sizeof(y) - 1)); \
+                   va_end(args);
 
 int my_printf(const char *format, ...) { LOG("", ""); }
 

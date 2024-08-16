@@ -15,18 +15,18 @@ static void sys_spawn(uint base);
 static int app_spawn(struct proc_request *req);
 
 int main() {
-    SUCCESS("Enter kernel process GPID_PROCESS");    
-
+    SUCCESS("Enter kernel process GPID_PROCESS");
+    
     int sender, shell_waiting;
     char buf[SYSCALL_MSG_LEN];
 
+    sys_spawn(SYS_TERM_EXEC_START);
+    grass->sys_recv(GPID_TERMINAL, NULL, buf, SYSCALL_MSG_LEN);
+    INFO("sys_process receives: %s", buf);
+
     sys_spawn(SYS_FILE_EXEC_START);
     grass->sys_recv(GPID_FILE, NULL, buf, SYSCALL_MSG_LEN);
-    INFO("sys_proc receives: %s", buf);
-
-    sys_spawn(SYS_DIR_EXEC_START);
-    grass->sys_recv(GPID_DIR, NULL, buf, SYSCALL_MSG_LEN);
-    INFO("sys_proc receives: %s", buf);
+    INFO("sys_process receives: %s", buf);
 
     sys_spawn(SYS_SHELL_EXEC_START);
 
@@ -40,7 +40,7 @@ int main() {
             reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
 
             /* Handling background processes */
-            shell_waiting = (req->argv[req->argc - 1][0] != '&');
+            shell_waiting = (req->argv[req->argc - 1][0] != '&') && (reply->type == CMD_OK);
             if (!shell_waiting && reply->type == CMD_OK)
                 INFO("process %d running in the background", app_pid);
             grass->sys_send(GPID_SHELL, (void*)reply, sizeof(*reply));
@@ -57,7 +57,7 @@ int main() {
             grass->proc_free(GPID_ALL);
             break;
         default:
-            FATAL("sys_proc: invalid request %d", req->type);
+            FATAL("sys_process: invalid request %d", req->type);
         }
     }
 }
@@ -77,7 +77,7 @@ static int app_spawn(struct proc_request *req) {
 }
 
 static int sys_proc_base;
-char* sysproc_names[] = {"sys_proc", "sys_file", "sys_dir", "sys_shell"};
+char* sysproc_names[] = {"sys_process", "sys_terminal", "sys_file", "sys_shell"};
 
 static void sys_proc_read(uint block_no, char* dst) {
     earth->disk_read(sys_proc_base + block_no, 1, dst);

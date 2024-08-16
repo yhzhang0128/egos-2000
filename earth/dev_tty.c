@@ -10,41 +10,43 @@
 #include "egos.h"
 #include <stdio.h>
 
-/* UART functions defined in earth/bus_uart.c */
-void uart_getc(int* c);
-void uart_putc(int c);
+#define LITEX_UART_TXFULL   4UL
+#define LITEX_UART_RXEMPTY  8UL
+#define LITEX_UART_EVPEND   16UL
+
+#define SIFIVE_UART_TXDATA  0UL
+#define SIFIVE_UART_RXDATA  4UL
+
+void uart_putc(char c) {
+    if (earth->platform == ARTY) {
+        while (REGW(UART_BASE, LITEX_UART_TXFULL));
+        REGW(UART_BASE, 0) = c;
+        REGW(UART_BASE, LITEX_UART_EVPEND) = 1;
+    } else {
+        while ((REGW(UART_BASE, SIFIVE_UART_TXDATA) & (1 << 31)));
+        REGW(UART_BASE, SIFIVE_UART_TXDATA) = c;
+    }
+}
+
+void uart_getc(char* c) {
+    if (earth->platform == ARTY) {
+        while(REGW(UART_BASE, LITEX_UART_RXEMPTY));
+        *c = REGW(UART_BASE, 0) & 0xFF;
+        REGW(UART_BASE, LITEX_UART_EVPEND) = 2;
+    } else {
+        int ch;
+        while ((ch = REGW(UART_BASE, SIFIVE_UART_RXDATA)) & (1 << 31));
+        *c = ch & 0xFF;
+    }
+}
 
 int tty_write(char* buf, uint len) {
     for (uint i = 0; i < len; i++) uart_putc(buf[i]);
     return len;
 }
 
-int tty_read(char* buf, uint len) {
-    for (int i = 0, c; i < len - 1; i++) {
-        uart_getc(&c);
-        buf[i] = (char)c;
-
-        switch (c) {
-        case 0x03:  /* Ctrl+C    */
-            buf[0] = 0;
-        case 0x0d:  /* Enter     */
-            buf[i] = 0;
-            tty_write("\r\n", 2);
-            return c == 0x03? 0 : i;
-        case 0x7f:  /* Backspace */
-            c = 0;
-            if (i) tty_write("\b \b", 3);
-            i = i ? i - 2 : i - 1;
-        }
-        if (c) tty_write((void*)&c, 1);
-    }
-
-    buf[len - 1] = 0;
-    return len - 1;
-}
-
 void tty_init() {
-    earth->tty_read = tty_read;
+    earth->tty_read = uart_getc;
     earth->tty_write = tty_write;
     earth->format_to_str = vsprintf;
 }

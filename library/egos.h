@@ -20,7 +20,7 @@ struct earth {
     void (*mmu_switch)(int pid);
 
     /* Devices interface */
-    int  (*tty_read)(char* buf, uint len);
+    void (*tty_read)(char* c);
     int  (*tty_write)(char* buf, uint len);
     int  (*format_to_str)(char* str_output, const char* format, va_list arg);
 

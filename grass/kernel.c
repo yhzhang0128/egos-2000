@@ -76,6 +76,7 @@ static void intr_entry(uint id) {
 
     /* Do not interrupt kernel processes since IO can be stateful */
     if (id == INTR_ID_TIMER && (PROC_IDLE || curr_pid >= GPID_SHELL)) proc_yield();
+    else earth->timer_reset(core_in_kernel);
 }
 
 static void proc_yield() {

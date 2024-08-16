@@ -203,7 +203,7 @@ void mmu_init() {
     printf("Enter 0: page tables\r\nEnter 1: software TLB\r\n");
 
     char buf[2];
-    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(buf, 2));
+    for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(&buf[0]));
     earth->translation = (buf[0] == '0') ? PAGE_TABLE : SOFT_TLB;
     INFO("%s translation is chosen", earth->translation == PAGE_TABLE ? "Page table" : "Software");
 
