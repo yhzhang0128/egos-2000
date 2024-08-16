@@ -19,7 +19,7 @@ char spi_transfer(char byte) {
     /* "transfer" means sending a byte and then receiving a byte */
     uint rxdata;
     if (earth->platform == ARTY) {
-        REGW(SPI_BASE, LITEX_SPI_MOSI) = byte;
+        REGW(SPI_BASE, LITEX_SPI_MOSI)    = byte;
         REGW(SPI_BASE, LITEX_SPI_CONTROL) = (8 * (1 << 8) | (1));
         while ((REGW(SPI_BASE, LITEX_SPI_STATUS) & 1) != 1);
         rxdata = REGW(SPI_BASE, LITEX_SPI_MISO);

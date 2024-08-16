@@ -21,7 +21,7 @@ struct earth {
 
     /* Devices interface */
     void (*tty_read)(char* c);
-    int  (*tty_write)(char* buf, uint len);
+    void (*tty_write)(char* buf, uint len);
     int  (*format_to_str)(char* str_output, const char* format, va_list arg);
 
     void (*disk_read)(uint block_no, uint nblocks, char* dst);
@@ -73,9 +73,9 @@ extern struct grass *grass;
 #define BOARD_FLASH_ROM    0x20400000 /* 4MB disk image, only used on the Arty board */
 
 /* Memory-mapped I/O regions */
+#define ETHMAC_CSR_BASE    0xF0002000
 #define ETHMAC_RX_BUFFER   0x90000000
 #define ETHMAC_TX_BUFFER   0x90001000
-#define ETHMAC_CSR_BASE    0xF0002000
 #define SPI_BASE           (earth->platform == ARTY? 0xF0008800UL : 0x10050000UL)
 #define UART_BASE          (earth->platform == ARTY? 0xF0001000UL : 0x10010000UL)
 #define CLINT_BASE         (earth->platform == ARTY? 0xF0010000UL : 0x02000000UL)

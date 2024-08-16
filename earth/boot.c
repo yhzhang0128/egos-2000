@@ -15,8 +15,8 @@ void disk_init();
 void mmu_init();
 void intr_init(uint core_id);
 
-struct grass *grass = (void*)GRASS_STRUCT_BASE;
-struct earth *earth = (void*)EARTH_STRUCT_BASE;
+struct grass* grass = (void*)GRASS_STRUCT_BASE;
+struct earth* earth = (void*)EARTH_STRUCT_BASE;
 
 void grass_entry();
 void kernel_entry(uint);
@@ -35,7 +35,7 @@ void boot() {
     }
 
     if (earth->booted_core_cnt == 0) {
-        /* The first booted core needs to do some more job */
+        /* The first booted core needs to do some more work */
         earth->booted_core_cnt = 1;
 
         tty_init();
