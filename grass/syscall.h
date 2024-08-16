@@ -6,7 +6,7 @@ enum syscall_type {
 	SYS_UNUSED,
 	SYS_RECV,
 	SYS_SEND,
-	SYS_NCALLS
+	SYS_NSYSCALL /* egos-2000 has only 2 system calls */
 };
 
 struct sys_msg {

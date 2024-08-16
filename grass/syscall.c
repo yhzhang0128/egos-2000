@@ -9,7 +9,7 @@
 #include "syscall.h"
 #include <string.h>
 
-static struct syscall *sc = (struct syscall*)SYSCALL_ARG;
+static struct syscall* sc = (struct syscall*)SYSCALL_ARG;
 
 void sys_send(int receiver, char* msg, uint size) {
     if (size > SYSCALL_MSG_LEN) FATAL("sys_send: msg size larger than SYSCALL_MSG_LEN");

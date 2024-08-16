@@ -54,6 +54,7 @@ void boot() {
         asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) | (GRASS_MODE << 11) | (1 << 18)));
 
         asm("csrw mepc, %0" ::"r"(grass_entry));
+        asm("mv a0, %0" ::"r"(core_id));
         asm("mret");
     } else {
         SUCCESS("--- Core #%u starts running ---", core_id);
