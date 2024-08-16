@@ -6,7 +6,7 @@
  */
 
 #include "egos.h"
-#include "file0.h"
+#include "inode.h"
 #include <string.h>
 #include <stdlib.h>
 
