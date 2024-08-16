@@ -16,8 +16,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "disk.h"
-#include "file.h"
+#include "inode.h"
 
 #define EGOS_BIN_NUM 5
 char* egos_binaries[] = {"./qemu/egos.bin",

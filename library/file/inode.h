@@ -14,7 +14,7 @@
  *
  *      int getsize(inode_store_t *this_bs, unsigned int ino)
  *          returns the size of the inode store at the given inode number
- *			(inode numbers start at 0)
+ *            (inode numbers start at 0)
  *
  *      int setsize(inode_store_t *this_bs, unsigned int ino, block_no newsize)
  *          set the size of the inode store at the given inode number
@@ -51,5 +51,6 @@ typedef struct inode_store {
 typedef inode_store_t *inode_intf;    /* inode store interface */
 
 inode_intf fs_disk_init();
+
 inode_intf treedisk_init(inode_intf below, uint below_ino);
 int treedisk_create(inode_intf below, uint below_ino, uint ninodes);

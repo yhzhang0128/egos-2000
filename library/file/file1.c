@@ -21,7 +21,7 @@
  *        inode_store_t *treedisk_init(inode_store_t *below, unsigned int below_ino)
  *            Opens a virtual inode store within inode below_ino of the inode store below.
  *
- * The layout of the file system is described in the file "file.h".
+ * The layout of the file system is described in the file "file1.h".
  */
 
 #include <stdlib.h>
@@ -34,10 +34,10 @@
 #include "egos.h"
 #endif
 
-#include "file.h"
+#include "file1.h"
 
 /* Temporary information about the file system and a particular inode.
- * Convenient for all operations. See "file.h" for field details.
+ * Convenient for all operations. See "file1.h" for field details.
  */
 struct treedisk_snapshot {
     union treedisk_block superblock; 

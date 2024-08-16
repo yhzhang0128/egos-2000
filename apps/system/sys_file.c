@@ -7,7 +7,7 @@
  */
 
 #include "app.h"
-#include "file.h"
+#include "inode.h"
 #include <string.h>
 
 int main() {
