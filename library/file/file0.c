@@ -1,3 +1,10 @@
+/*
+ * (C) 2024, Cornell University
+ * All rights reserved.
+ *
+ * Description: a dummy file system illustrating the concept of "inode"
+ */
+
 #include "egos.h"
 #include "file0.h"
 #include <string.h>

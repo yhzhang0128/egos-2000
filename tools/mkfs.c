@@ -56,11 +56,16 @@ inode_intf ramdisk_init();
 
 int main() {
     /* Make the file system into char fs[] */
-    inode_intf ramdisk = ramdisk_init();
-    assert(mydisk_create(ramdisk, 0, NINODES) >= 0);
-    inode_intf filesys = mydisk_init(ramdisk, 0);
-    //assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
-    //inode_intf filesys = treedisk_init(ramdisk, 0);
+    inode_intf filesys, ramdisk = ramdisk_init();
+
+    if (FILESYS == 0) {
+        assert(mydisk_create(ramdisk, 0, NINODES) >= 0);
+        filesys = mydisk_init(ramdisk, 0);
+    } else {
+        assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
+        filesys = treedisk_init(ramdisk, 0);
+    }
+    fprintf(stderr, "MKFS: using file system: %s\n", FILESYS == 0? "mydisk" : "treedisk");
 
     char buf[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE];
     for (uint ino = 0; ino < NINODE; ino++) {

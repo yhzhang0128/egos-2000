@@ -14,8 +14,7 @@ int main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
     /* Initialize the file system interface */
-    inode_intf fs = mydisk_init(fs_disk_init(), 0);
-    //inode_intf fs = treedisk_init(fs_disk_init(), 0);
+    inode_intf fs = (FILESYS == 0)? mydisk_init(fs_disk_init(), 0) : treedisk_init(fs_disk_init(), 0);
 
     /* Send a notification to GPID_PROCESS */
     char buf[SYSCALL_MSG_LEN];
