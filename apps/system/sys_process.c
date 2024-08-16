@@ -31,15 +31,14 @@ int main() {
     sys_spawn(SYS_SHELL_EXEC_START);
 
     while (1) {
-        struct proc_request *req = (void*)buf;
-        struct proc_reply *reply = (void*)buf;
+        struct proc_request* req = (void*)buf;
+        struct proc_reply* reply = (void*)buf;
         grass->sys_recv(GPID_ALL, &sender, buf, SYSCALL_MSG_LEN);
 
         switch (req->type) {
         case PROC_SPAWN:
-            reply->type = app_spawn(req) < 0 ? CMD_ERROR : CMD_OK;
+            reply->type = app_spawn(req);
 
-            /* Handling background processes */
             shell_waiting = (req->argv[req->argc - 1][0] != '&') && (reply->type == CMD_OK);
             if (!shell_waiting && reply->type == CMD_OK)
                 INFO("process %d running in the background", app_pid);
@@ -62,18 +61,20 @@ int main() {
     }
 }
 
-static void app_read(uint off, char* dst) { file_read(app_ino, off, dst); }
+static void app_read(uint off, char* dst) {
+    file_read(app_ino, off, dst);
+}
 
-static int app_spawn(struct proc_request *req) {
+static int app_spawn(struct proc_request* req) {
     int bin_ino = dir_lookup(0, "bin/");
-    if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return -1;
+    if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return CMD_ERROR;
     int argc = req->argv[req->argc - 1][0] == '&'? req->argc - 1 : req->argc;
 
     app_pid = grass->proc_alloc();
     elf_load(app_pid, app_read, argc, (void**)req->argv);
     grass->proc_set_ready(app_pid);
 
-    return 0;
+    return CMD_OK;
 }
 
 static int sys_proc_base;

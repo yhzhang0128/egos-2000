@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    /* Read and print the first block of the file */
+    /* Read and print the first block of the inode */
     char buf[BLOCK_SIZE];
     file_read(file_ino, 0, buf);
     printf("%s", buf);
