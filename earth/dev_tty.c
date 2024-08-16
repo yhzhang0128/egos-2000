@@ -45,7 +45,7 @@ void tty_write(char* buf, uint len) {
 }
 
 void tty_init() {
-    earth->tty_read = uart_getc;
-    earth->tty_write = tty_write;
+    earth->tty_read      = uart_getc;
+    earth->tty_write     = tty_write;
     earth->format_to_str = vsprintf;
 }

@@ -36,7 +36,7 @@ void disk_write(uint block_no, uint nblocks, char* src) {
 }
 
 void disk_init() {
-    earth->disk_read = disk_read;
+    earth->disk_read  = disk_read;
     earth->disk_write = disk_write;
 
     type = (sd_init() == 0) ? SD_CARD : FLASH_ROM;
