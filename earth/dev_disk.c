@@ -43,9 +43,40 @@ void disk_init() {
     if (type == FLASH_ROM) CRITICAL("Failed at initializing SD card; Use FLASH ROM instead");
 }
 
-/* SPI functions defined in earth/bus_spi.c */
-char spi_transfer(char);
-char spi_set_clock(uint);
+/* Two helper functions for the SPI bus */
+#define LITEX_SPI_CONTROL    0UL
+#define LITEX_SPI_STATUS     4UL
+#define LITEX_SPI_MOSI       8UL
+#define LITEX_SPI_MISO      12UL
+#define LITEX_SPI_CS        16UL
+#define LITEX_SPI_CLKDIV    24UL
+
+#define SIFIVE_SPI_CSDEF    20UL
+#define SIFIVE_SPI_CSMODE   24UL
+#define SIFIVE_SPI_TXDATA   72UL
+#define SIFIVE_SPI_RXDATA   76UL
+
+char spi_transfer(char byte) {
+    /* "transfer" means sending a byte and then receiving a byte */
+    uint rxdata;
+    if (earth->platform == ARTY) {
+        REGW(SPI_BASE, LITEX_SPI_MOSI)    = byte;
+        REGW(SPI_BASE, LITEX_SPI_CONTROL) = (8 * (1 << 8) | (1));
+        while ((REGW(SPI_BASE, LITEX_SPI_STATUS) & 1) != 1);
+        rxdata = REGW(SPI_BASE, LITEX_SPI_MISO);
+    } else {
+        while (REGW(SPI_BASE, SIFIVE_SPI_TXDATA) & (1 << 31));
+        REGW(SPI_BASE, SIFIVE_SPI_TXDATA) = byte;
+        while ((rxdata = REGW(SPI_BASE, SIFIVE_SPI_RXDATA)) & (1 << 31));
+    }
+    return (char)(rxdata & 0xFF);
+}
+
+void spi_set_clock(uint freq) {
+    #define CPU_CLOCK_RATE 100000000  /* 100MHz */
+    uint div = CPU_CLOCK_RATE / freq + 1;
+    REGW(SPI_BASE, LITEX_SPI_CLKDIV) = div;
+}
 
 /* Send SD card commands through the SPI bus */
 static char sd_exec_cmd(char* cmd) {
@@ -118,19 +149,17 @@ static void sd_write(uint offset, char* src) {
         FATAL("SD card write ack with status 0x%.2x", reply);
 }
 
+/* Initialize the SD card during bootup */
 static int sd_init() {
     /* Configure the SPI controller */
     INFO("Set the CS pin to HIGH and toggle clock");
 
     if (earth->platform == ARTY) {
         spi_set_clock(400000);
-        #define LITEX_SPI_CS      16UL
         REGW(SPI_BASE, LITEX_SPI_CS) = 0;
         for (uint i = 0; i < 1000; i++) spi_transfer(0xFF);
         REGW(SPI_BASE, LITEX_SPI_CS) = 1;
     } else {
-        #define SIFIVE_SPI_CSDEF  20UL
-        #define SIFIVE_SPI_CSMODE 24UL
         REGW(SPI_BASE, SIFIVE_SPI_CSMODE) = 1;
         for (uint i = 0; i < 1000; i++) spi_transfer(0xFF);
         REGW(SPI_BASE, SIFIVE_SPI_CSDEF) = 1;
