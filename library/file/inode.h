@@ -52,5 +52,8 @@ typedef inode_store_t *inode_intf;    /* inode store interface */
 
 inode_intf fs_disk_init();
 
+inode_intf mydisk_init(inode_intf below, uint below_ino);
+int mydisk_create(inode_intf below, uint below_ino, uint ninodes);
+
 inode_intf treedisk_init(inode_intf below, uint below_ino);
 int treedisk_create(inode_intf below, uint below_ino, uint ninodes);

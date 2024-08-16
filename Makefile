@@ -5,6 +5,7 @@
 BOARD = a7_35t
 QEMU = qemu-system-riscv32
 
+
 # GNU toolchain binaries from SiFive
 RISCV_CC = riscv64-unknown-elf-gcc -march=rv32ima
 OBJDUMP = riscv64-unknown-elf-objdump
@@ -45,7 +46,7 @@ $(USRAPP_ELFS): $(RELEASE)/%.elf : apps/user/%.c $(APPS_DEPS)
 install: egos
 	@echo "$(GREEN)-------- Create the Disk Image --------$(END)"
 	$(OBJCOPY) -O binary $(RELEASE)/egos.elf tools/qemu/egos.bin
-	$(CC) tools/mkfs.c library/file/file.c -DMKFS $(INCLUDE) -o tools/mkfs; cd tools; ./mkfs
+	$(CC) tools/mkfs.c library/file/file*.c -DMKFS $(INCLUDE) -o tools/mkfs; cd tools; ./mkfs
 	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
 	$(CC) tools/mkrom.c -DCPU_BIN_FILE="\"fpga/vexriscv/vexriscv_cpu_$(BOARD).bin\"" -o tools/mkrom
 	cd tools; ./mkrom
