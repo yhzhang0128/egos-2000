@@ -16,12 +16,12 @@ RELEASE     = build/release
 APPS_DEPS   = apps/*.* library/egos.h library/*/* Makefile
 EGOS_DEPS   = earth/* grass/* library/egos.h library/*/* Makefile
 
-FILESYS     = 1
 LDFLAGS     = -nostdlib -lc -lgcc
 INCLUDE     = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/servers
 CFLAGS      = -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
-DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
+FILESYS     = 1
 COMMON      = $(CFLAGS) $(INCLUDE) -DFILESYS=$(FILESYS)
+DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/user/*.c)))
 SYSAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/system/*.c)))

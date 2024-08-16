@@ -65,7 +65,7 @@ int main() {
         assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
         filesys = treedisk_init(ramdisk, 0);
     }
-    fprintf(stderr, "MKFS: using file system: %s\n", FILESYS == 0? "mydisk" : "treedisk");
+    fprintf(stderr, "MKFS is using file system: %s\n", FILESYS == 0? "mydisk" : "treedisk");
 
     char buf[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE];
     for (uint ino = 0; ino < NINODE; ino++) {
