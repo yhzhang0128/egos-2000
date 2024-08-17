@@ -7,6 +7,7 @@
 
 #include "egos.h"
 #include "servers.h"
+#include "syscall.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,7 +15,9 @@ static int sender;
 static char buf[SYSCALL_MSG_LEN];
 
 void exit(int status) {
-    grass->sys_exit(status);
+    struct proc_request req;
+    req.type = PROC_EXIT;
+    sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
     while(1);
 }
 
@@ -37,8 +40,8 @@ int file_read(int file_ino, uint offset, char* block) {
     req.ino = file_ino;
     req.offset = offset;
 
-    grass->sys_send(GPID_FILE, (void*)&req, sizeof(req));
-    grass->sys_recv(GPID_FILE, &sender, buf, SYSCALL_MSG_LEN);
+    sys_send(GPID_FILE, (void*)&req, sizeof(req));
+    sys_recv(GPID_FILE, &sender, buf, SYSCALL_MSG_LEN);
     
     struct file_reply* reply = (void*)buf;
     memcpy(block, reply->block.bytes, BLOCK_SIZE);
@@ -46,7 +49,28 @@ int file_read(int file_ino, uint offset, char* block) {
     return reply->status == FILE_OK? 0 : -1;
 }
 
-#ifdef KERNEL /* terminal read/write for the kernel */
+#ifndef KERNEL /* terminal read/write for user applications */
+
+int term_read(char* buf, uint len) {
+    struct term_request req;
+    struct term_reply reply;
+    req.type = TERM_INPUT;
+    req.len = len;
+    sys_send(GPID_TERMINAL, (void*)&req, sizeof(req));
+    sys_recv(GPID_TERMINAL, NULL, (void*)&reply, sizeof(reply));
+    memcpy(buf, reply.buf, reply.len);
+    return reply.len;
+}
+
+void term_write(char* str, uint len) {
+    struct term_request req;
+    req.type = TERM_OUTPUT;
+    req.len = len;
+    memcpy(req.buf, str, len);
+    sys_send(GPID_TERMINAL, (void*)&req, sizeof(req));
+}
+
+#else /* terminal read/write for the kernel */
 
 int term_read(char* buf, uint len) {
     char c;
@@ -73,27 +97,6 @@ int term_read(char* buf, uint len) {
 
 void term_write(char* str, uint len) {
     earth->tty_write(str, len);
-}
-
-#else /* terminal read/write for user applications */
-
-int term_read(char* buf, uint len) {
-    struct term_request req;
-    struct term_reply reply;
-    req.type = TERM_INPUT;
-    req.len = len;
-    grass->sys_send(GPID_TERMINAL, (void*)&req, sizeof(req));
-    grass->sys_recv(GPID_TERMINAL, NULL, (void*)&reply, sizeof(reply));
-    memcpy(buf, reply.buf, reply.len);
-    return reply.len;
-}
-
-void term_write(char* str, uint len) {
-    struct term_request req;
-    req.type = TERM_OUTPUT;
-    req.len = len;
-    memcpy(req.buf, str, len);
-    grass->sys_send(GPID_TERMINAL, (void*)&req, sizeof(req));
 }
 
 #endif
