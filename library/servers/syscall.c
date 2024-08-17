@@ -30,9 +30,3 @@ void sys_recv(int from, int* sender, char* buf, uint size) {
     memcpy(buf, sc->msg.content, size);
     if (sender) *sender = sc->msg.sender;
 }
-
-void sys_exit(int status) {
-    struct proc_request req;
-    req.type = PROC_EXIT;
-    sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
-}

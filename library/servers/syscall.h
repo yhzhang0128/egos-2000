@@ -21,6 +21,5 @@ struct syscall {
     struct sys_msg msg;      /* Data of the system call */
 };
 
-void sys_exit(int status);
 void sys_send(int receiver, char* msg, uint size);
 void sys_recv(int from, int* sender, char* buf, uint size);

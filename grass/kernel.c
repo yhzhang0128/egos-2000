@@ -68,12 +68,14 @@ static void excp_entry(uint id) {
 
 static void intr_entry(uint id) {
     if (id == INTR_ID_CTRL_C && curr_pid >= GPID_USER_START) {
-        /* User process killed by ctrl+c interrupt */
-        INFO("process %d killed by interrupt", curr_pid);
-        proc_set[curr_proc_idx].mepc = (uint)sys_exit;
+        /* Student's code goes here (device interrupt). */
+
+        /* After handling keyboard input using the UART interrupt,
+         * catch CTRL+C input here and kill the current process */
+
+        /* Student's code ends here. */
     }
 
-    /* Do not interrupt kernel processes since IO can be stateful */
     if (id == INTR_ID_TIMER && (CORE_IDLE || curr_pid >= GPID_SHELL)) {
         proc_yield();
     } else {
