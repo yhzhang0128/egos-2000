@@ -190,8 +190,6 @@ void mmu_init() {
 
     /* Student's code goes here (PMP memory protection). */
 
-    /* Setup PMP NAPOT region 0x80000000 - 0x80400000 as r/-/x */
-
     /* Setup PMP NAPOT region 0x80400000 - 0x80800000 as r/w/x */
 
     /* Student's code ends here. */
