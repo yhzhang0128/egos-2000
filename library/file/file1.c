@@ -116,8 +116,9 @@ static block_no treedisk_alloc_block(struct treedisk_state* ts, struct treedisk_
     /* Read the freelist block and scan for a free block reference.
      */
     union treedisk_block freelistblock;
-    (*ts->below->read)(ts->below, ts->below_ino, b, (block_t*) &freelistblock);
-
+    if ((*ts->below->read)(ts->below, ts->below_ino, b, (block_t *) &freelistblock) < 0) {
+        panic("treedisk_alloc_block");
+    }
     uint i;
     for (i = REFS_PER_BLOCK; --i > 0;)
         if (freelistblock.freelistblock.refs[i] != 0) {
@@ -161,6 +162,7 @@ static int treedisk_getsize(inode_store_t* this_bs, uint ino){
 /* Set the size of the file 'this_bs' to 'nblocks'.
  */
 static int treedisk_setsize(inode_store_t* this_bs, uint ino, block_no nblocks){
+    panic("treedisk_setsize not implemented");
     return -1;
 }
 
@@ -389,8 +391,9 @@ block_no setup_freelist(inode_store_t* below, uint below_ino, block_no next_free
 /* Create a new file system on the specified inode of the inode store below.
  */
 int treedisk_create(inode_store_t* below, uint below_ino, uint ninodes){
-    if (sizeof(union treedisk_block) != BLOCK_SIZE)
+    if (sizeof(union treedisk_block) != BLOCK_SIZE) {
         panic("treedisk_create: block has wrong size");
+    }
 
     /* Compute the number of inode blocks needed to store the inodes.
      */

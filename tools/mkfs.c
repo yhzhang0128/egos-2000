@@ -107,8 +107,9 @@ int main() {
         write(1, exec + st.st_size, sizeof(exec) - st.st_size);
     }
     memset(exec, 0, sizeof(exec));
-    for (uint i = 0; i < EGOS_BIN_MAX_NUM - EGOS_BIN_NUM; i++)
+    for (uint i = 0; i < EGOS_BIN_MAX_NUM - EGOS_BIN_NUM; i++) {
         write(1, exec, sizeof(exec));
+    }
 
     /* Write the file system into disk.img */
     write(1, fs, sizeof(fs));

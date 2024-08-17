@@ -46,6 +46,9 @@ static int mydisk_write(inode_store_t* this_bs, uint ino, block_no offset, block
 }
 
 inode_intf mydisk_init(inode_intf below, uint below_ino) {
+    /* This dummy file system assumes that below_ino == 0 */
+    if (below_ino != 0) return NULL;
+
     inode_store_t* this_bs = malloc(sizeof(inode_store_t));
     memset(this_bs, 0, sizeof(inode_store_t));
     this_bs->getsize = mydisk_getsize;

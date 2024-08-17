@@ -25,22 +25,23 @@
                    term_write(str_to_print, (sizeof(x) - 1) + len + (sizeof(y) - 1)); \
                    va_end(args);
 
-int my_printf(const char* format, ...) { LOG("", ""); }
+int my_printf(const char* format, ...) {
+    LOG("", "");
+}
 
-int INFO(const char* format, ...) { LOG("[INFO] ", "\r\n") }
+int INFO(const char* format, ...) {
+    LOG("[INFO] ", "\r\n")
+}
 
-int FATAL(const char* format, ...)
-{
+int FATAL(const char* format, ...) {
     LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n") /* red color */
     while(1);
 }
 
-int SUCCESS(const char* format, ...)
-{
+int SUCCESS(const char* format, ...) {
     LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n") /* green color */
 }
 
-int CRITICAL(const char* format, ...)
-{
+int CRITICAL(const char* format, ...) {
     LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n") /* yellow color */
 }
