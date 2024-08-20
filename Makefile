@@ -16,11 +16,10 @@ RELEASE     = build/release
 APPS_DEPS   = apps/*.* library/egos.h library/*/* Makefile
 EGOS_DEPS   = earth/* grass/* library/egos.h library/*/* Makefile
 
+FILESYS     = 1
 LDFLAGS     = -nostdlib -lc -lgcc
 INCLUDE     = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/syscall
 CFLAGS      = -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
-FILESYS     = 1
-COMMON      = $(CFLAGS) $(INCLUDE) -DFILESYS=$(FILESYS)
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/user/*.c)))
@@ -30,18 +29,18 @@ egos: $(USRAPP_ELFS) $(SYSAPP_ELFS) $(RELEASE)/egos.elf
 
 $(RELEASE)/egos.elf: $(EGOS_DEPS)
 	@echo "$(YELLOW)-------- Compile EGOS --------$(END)"
-	$(RISCV_CC) $(COMMON) earth/boot.s $(filter %.c, $(wildcard $^)) -Tlibrary/elf/egos.lds $(LDFLAGS) -DKERNEL -o $@
+	$(RISCV_CC) $(CFLAGS) $(INCLUDE) -DKERNEL $(filter %.s, $(wildcard $^)) $(filter %.c, $(wildcard $^)) -Tlibrary/elf/egos.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/egos.lst
 
 $(SYSAPP_ELFS): $(RELEASE)/%.elf : apps/system/%.c $(APPS_DEPS)
 	@echo "Compile app$(CYAN)" $(patsubst %.c, %, $(notdir $<)) "$(END)=>" $@
-	@$(RISCV_CC) $(COMMON) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tlibrary/elf/app.lds $(LDFLAGS) -DKERNEL -o $@
+	@$(RISCV_CC) $(CFLAGS) $(INCLUDE) -DFILESYS=$(FILESYS) -DKERNEL -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tlibrary/elf/app.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
 
 $(USRAPP_ELFS): $(RELEASE)/%.elf : apps/user/%.c $(APPS_DEPS)
 	@mkdir -p $(DEBUG) $(RELEASE)
 	@echo "Compile app$(CYAN)" $(patsubst %.c, %, $(notdir $<)) "$(END)=>" $@
-	@$(RISCV_CC) $(COMMON) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tlibrary/elf/app.lds $(LDFLAGS) -o $@
+	@$(RISCV_CC) $(CFLAGS) $(INCLUDE) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tlibrary/elf/app.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
 
 install: egos

@@ -434,8 +434,7 @@ int treedisk_create(inode_store_t* below, uint below_ino, uint ninodes){
         printf("treedisk: Created a new filesystem with %d inodes\n", ninodes);
     }
     else {
-        printf("treedisk: a filesystem already exists with %lu inodes",
-               superblock.superblock.n_inodeblocks * INODES_PER_BLOCK);
+        printf("treedisk: a filesystem already exists with %lu inodes", superblock.superblock.n_inodeblocks * INODES_PER_BLOCK);
     }
 
     return 0;
