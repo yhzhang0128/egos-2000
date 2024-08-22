@@ -7,23 +7,38 @@
 
 #include "egos.h"
 #include "servers.h"
-#include "string.h"
-#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
-/* earth->vsprintf is the C library vsprintf, which converts
- * a format and arguments (e.g., ("example int=%d", 100)) into
- * a string. The string is passed to earth->tty_write() for printing.
- */
+void format_to_str(char* out, const char* fmt, va_list args) {
+    for(out[0] = 0; *fmt != '\0'; fmt++) {
+        if (*fmt != '%') {
+            strncat(out, fmt, 1);
+        } else {
+            fmt++;
+            if (*fmt == 's') {
+                strcat(out, va_arg(args, char*));
+            } else if (*fmt == 'd') {
+                itoa(va_arg(args, int), out + strlen(out), 10);
+            }
+            /* Student's code goes here (Hello, World!) */
 
-#define LOG(x, y)  va_list args; \
-                   va_start(args, format); \
-                   char str_formatted[256], str_to_print[256]; \
-                   uint len = earth->format_to_str(str_formatted, format, args); \
-                   strcpy(str_to_print, x); \
-                   strcat(str_to_print, str_formatted); \
-                   strcat(str_to_print, y); \
-                   term_write(str_to_print, (sizeof(x) - 1) + len + (sizeof(y) - 1)); \
-                   va_end(args);
+            /* Handle format %c, %x, %u, etc. */
+            /* If not matching any pattern, simply print the '%' symbol */
+
+            /* Student's code ends here. */
+        }
+    }
+}
+
+#define LOG(prefix, suffix) char buf[512]; \
+                            strcpy(buf, prefix); \
+                            va_list args; \
+                            va_start(args, format); \
+                            format_to_str(buf + strlen(prefix), format, args); \
+                            va_end(args); \
+                            strcat(buf, suffix); \
+                            term_write(buf, strlen(buf));
 
 int my_printf(const char* format, ...) {
     LOG("", "");

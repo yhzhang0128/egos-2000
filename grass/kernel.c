@@ -109,7 +109,7 @@ static void proc_yield() {
          * with mret; Why not do proc_idle() directly? Think about it. */
 
         /* Student's code ends here. */
-        FATAL("proc_yield: no process to run on core %u", core_in_kernel);
+        FATAL("proc_yield: no process to run on core %d", core_in_kernel);
     }
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();

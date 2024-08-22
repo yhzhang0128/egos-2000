@@ -25,12 +25,12 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
             pheader = &pheader[i];
             break;
         }
-        FATAL("elf_load: Invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
+        FATAL("elf_load: Invalid p_vaddr: 0x%x", pheader->p_vaddr);
     }
 
     if (pid < GPID_USER_START) {
-        INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
-        INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
+        INFO("App file size: %d bytes", pheader->p_filesz);
+        INFO("App memory size: %d bytes", pheader->p_memsz);
     }
 
     void* base;

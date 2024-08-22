@@ -39,7 +39,7 @@ void boot() {
         earth->booted_core_cnt = 1;
 
         tty_init();
-        CRITICAL("--- Booting on %s with core #%u ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
+        CRITICAL("--- Booting on %s with core #%d ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
 
         disk_init();
         SUCCESS("Finished initializing the tty and disk devices");
@@ -57,7 +57,7 @@ void boot() {
         asm("mv a0, %0" ::"r"(core_id));
         asm("mret");
     } else {
-        SUCCESS("--- Core #%u starts running ---", core_id);
+        SUCCESS("--- Core #%d starts running ---", core_id);
         earth->booted_core_cnt++;
 
         /* Student's code goes here (multi-core and atomic instruction) */

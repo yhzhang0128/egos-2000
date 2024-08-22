@@ -183,7 +183,7 @@ static int sd_init() {
         uint payload;
         for (uint i = 0; i < 4; i++)
             ((char*)&payload)[3 - i] = spi_transfer(0xFF);
-        INFO("SD card replies cmd8 with status 0x%.2x and payload 0x%.8x", reply, payload);
+        INFO("SD card replies cmd8 with status %d and payload 0x%x", reply, payload);
 
         if ((payload & 0xFFF) != 0x1AA) FATAL("Fail to check SD card type");
     }
