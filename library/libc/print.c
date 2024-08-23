@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: system support to C library function printf()
+ * Description: formatted printing based on term_write()
  */
 
 #include "egos.h"
