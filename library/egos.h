@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdarg.h>    /* Define type va_list for format_to_str*/
-
 typedef unsigned char      uchar;
 typedef unsigned short     ushort;
 typedef unsigned int       uint;

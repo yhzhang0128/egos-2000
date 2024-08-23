@@ -9,6 +9,7 @@
 #include "servers.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 void format_to_str(char* out, const char* fmt, va_list args) {
     for(out[0] = 0; *fmt != '\0'; fmt++) {
