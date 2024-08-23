@@ -3,8 +3,6 @@
  * All rights reserved.
  *
  * Description: a simple tty device driver
- * uart_getc() and uart_putc() are implemented in bus_uart.c
- * printf-related functions are linked from the compiler's C library
  */
 
 #include "egos.h"
