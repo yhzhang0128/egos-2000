@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: entry point of applications
- * Iinitialize stack pointer and call the application main()
+ * Initialize stack pointer and call the application main()
  */
     .section .text
     .global app_entry
