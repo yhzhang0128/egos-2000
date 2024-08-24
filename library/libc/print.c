@@ -3,7 +3,8 @@
  * All rights reserved.
  *
  * Description: formatted printing (e.g., printf)
- * format_to_str() converts a format to a C string, e.g., converts ("%s-%d", "egos", 2000) to "egos-2000"
+ * format_to_str() converts a format to a C string,
+ * e.g., converts ("%s-%d", "egos", 2000) to "egos-2000"
  * term_write() prints a C string to the screen
  */
 
