@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: a simple UDP hello-world
- * This app sends the string HELLO_MSG to a destination IP/UDP port
+ * This app sends the HELLO_MSG string to a destination IP+UDP port
  * (i.e., the dest_ip and dest_udp_port variables below); This is a
  * demo of kernel-bypass networking because network communication is
  * fully handled within this app, without any help from the kernel.
@@ -29,7 +29,7 @@ static uint local_udp_port = 8001, dest_udp_port = 8002;
 
 /* Helper functions for generating checksums */
 static uint crc32(const uchar* message, uint len);
-static ushort checksum(uint r, void* buffer, uint length, int complete);
+static ushort checksum(uint r, char* ptr, uint length, int complete);
 
 /* Data structures for the memory-mapped Ethernet device */
 struct ethernet_header {
@@ -104,7 +104,7 @@ int main() {
     memcpy(eth_frame.payload, HELLO_MSG, sizeof(HELLO_MSG));
 
     /* Calculate the IP checksum */
-    eth_frame.ip.checksum = bswap_16(checksum(0, &eth_frame.ip, sizeof(struct ip_header), 1));
+    eth_frame.ip.checksum = bswap_16(checksum(0, (void*)&eth_frame.ip, sizeof(struct ip_header), 1));
 
     /* Calculate the UDP checksum */
     struct checksum_fields check = {
@@ -114,17 +114,10 @@ int main() {
         .proto  = eth_frame.ip.proto, /* IP_PROTO_UDP */
         .length = eth_frame.udp.length
     };
-    uint r = checksum(0, &check, sizeof(struct checksum_fields), 0);
-    r = checksum(r, &eth_frame.udp, sizeof(struct udp_header) + sizeof(HELLO_MSG), 1);
-    eth_frame.udp.checksum = bswap_16(r);
+    uint r = checksum(0, (void*)&check, sizeof(struct checksum_fields), 0);
+    eth_frame.udp.checksum = bswap_16(checksum(r, (void*)&eth_frame.udp, sizeof(struct udp_header) + sizeof(HELLO_MSG), 1));
 
-    /* Sending the Ethernet frame */
-    INFO("Sending a Ethernet frame of %u bytes", sizeof(struct ethernet_frame));
-    INFO("Ethernet header is          %u bytes", sizeof(struct ethernet_header));
-    INFO("IP header is                %u bytes", sizeof(struct ip_header));
-    INFO("UDP header is                %u bytes", sizeof(struct udp_header));
-    INFO("Payload is                  %u bytes", sizeof(HELLO_MSG));
-
+    /* Send the Ethernet frame */
     if (earth->platform == QEMU) {
         CRITICAL("UDP on QEMU is left to students as an exercise.");
         /* Student's code goes here (networking) */
@@ -143,7 +136,7 @@ int main() {
         /* CRC is another checksum code */
         uint crc, txlen = sizeof(struct ethernet_frame);
         crc = crc32(&txbuffer[8], txlen - 8);
-        txbuffer[txlen  ] = (crc & 0xff);
+        txbuffer[txlen]     = (crc & 0xff);
         txbuffer[txlen + 1] = (crc & 0xff00) >> 8;
         txbuffer[txlen + 2] = (crc & 0xff0000) >> 16;
         txbuffer[txlen + 3] = (crc & 0xff000000) >> 24;
@@ -177,12 +170,11 @@ static uint crc32(const uchar* message, uint len) {
    return ~crc;
 }
 
-static ushort checksum(uint r, void* buffer, uint length, int complete) {
-    uchar *ptr = (uchar*)buffer;
+static ushort checksum(uint r, char* ptr, uint length, int complete) {
     length >>= 1;
 
     for(int i = 0; i < length; i++)
-        r += ((uint)(ptr[2 * i]) << 8)|(uint)(ptr[2 * i + 1]) ;
+        r += ((uint)(ptr[2 * i]) << 8)|(uint)(ptr[2 * i + 1]);
 
     /* Add overflows */
     while(r >> 16) r = (r & 0xffff) + (r >> 16);

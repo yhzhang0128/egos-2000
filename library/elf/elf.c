@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: load an ELF-format executable file into memory
+ * Description: ELF-format executable file loader
  * Only uses the program header instead of the section headers.
  */
 
@@ -25,12 +25,12 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
             pheader = &pheader[i];
             break;
         }
-        FATAL("elf_load: Invalid p_vaddr: 0x%.8x", pheader->p_vaddr);
+        FATAL("elf_load: Invalid p_vaddr: 0x%x", pheader->p_vaddr);
     }
 
     if (pid < GPID_USER_START) {
-        INFO("App file size: 0x%.8x bytes", pheader->p_filesz);
-        INFO("App memory size: 0x%.8x bytes", pheader->p_memsz);
+        INFO("App file size: %d bytes", pheader->p_filesz);
+        INFO("App memory size: %d bytes", pheader->p_memsz);
     }
 
     void* base;

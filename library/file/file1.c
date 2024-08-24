@@ -180,7 +180,7 @@ static int treedisk_read(inode_store_t* this_bs, uint ino, block_no offset, bloc
     /* See if the offset is too big.
      */
     if (offset >= snapshot.inode->nblocks) {
-        /* printf("!!TDERR: offset too large %u %u\n", offset, snapshot.inode->nblocks); */
+        printf("!!TDERR: offset too large %u %u\n", offset, snapshot.inode->nblocks);
         return -1;
     }
 

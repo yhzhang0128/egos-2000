@@ -3,9 +3,10 @@
  * All rights reserved.
  *
  * Description: create the disk image file (disk.img)
- * The disk image should be exactly 4MB:
- *     2MB contains executables of EGOS;
+ * The disk image should be 4MB:
+ *     2MB contains the executables of EGOS and system servers;
  *     2MB is managed by a file system.
+ * This image file should be programmed to the microSD card.
  */
 
 #include <stdio.h>
@@ -56,15 +57,13 @@ inode_intf ramdisk_init();
 
 int main() {
     /* Make the file system into char fs[] */
-    inode_intf filesys, ramdisk = ramdisk_init();
-
+    inode_intf ramdisk = ramdisk_init();
     if (FILESYS == 0) {
         assert(mydisk_create(ramdisk, 0, NINODES) >= 0);
-        filesys = mydisk_init(ramdisk, 0);
     } else {
         assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
-        filesys = treedisk_init(ramdisk, 0);
     }
+    inode_intf filesys = (FILESYS == 0)? mydisk_init(ramdisk, 0) : treedisk_init(ramdisk, 0);
     fprintf(stderr, "MKFS is using file system: %s\n", FILESYS == 0? "mydisk" : "treedisk");
 
     char buf[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE];

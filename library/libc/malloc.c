@@ -13,7 +13,7 @@ static char* brk = &__heap_start;
 
 /* malloc() and free() are linked from the compiler's C library;
  * malloc() and free() manage the memory region [&__heap_start, brk).
- * If malloc() finds this region to be too small, it will call _sbrk().
+ * If malloc() finds this region too small, it will increase brk by call _sbrk().
  */
 
 char* _sbrk(int size) {

@@ -3,8 +3,8 @@
  * All rights reserved.
  *
  * Description: Kernel ≈ 2 handlers
- *     intr_entry() handles timer or keyboard ctrl+c interrupts
- *     excp_entry() handles system calls and faults (e.g., unauthorized memory access)
+ *     intr_entry() handles timer, keyboard, and other interrupts
+ *     excp_entry() handles faults (e.g., unauthorized memory access) and system calls
  */
 
 #include "egos.h"
@@ -109,7 +109,7 @@ static void proc_yield() {
          * with mret; Why not do proc_idle() directly? Think about it. */
 
         /* Student's code ends here. */
-        FATAL("proc_yield: no process to run on core %u", core_in_kernel);
+        FATAL("proc_yield: no process to run on core %d", core_in_kernel);
     }
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();

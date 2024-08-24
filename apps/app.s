@@ -2,7 +2,8 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: initialize stack pointer and call application main()
+ * Description: entry point of applications
+ * Initialize stack pointer and call the application main()
  */
     .section .text
     .global app_entry

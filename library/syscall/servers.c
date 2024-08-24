@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: user friendly interfaces of system processes
+ * Description: user-friendly interface of system processes
  */
 
 #include "egos.h"
@@ -81,14 +81,14 @@ int term_read(char* buf, uint len) {
         switch (c) {
         case 0x0d:  /* Enter     */
             buf[i] = 0;
-            earth->tty_write("\r\n", 2);
+            term_write("\r\n", 2);
             return i ? i + 1 : 0;
         case 0x7f:  /* Backspace */
             c = 0;
-            if (i) earth->tty_write("\b \b", 3);
+            if (i) term_write("\b \b", 3);
             i = i ? i - 2 : i - 1;
         }
-        if (c) earth->tty_write(&c, 1);
+        if (c) term_write(&c, 1);
     }
 
     buf[len - 1] = 0;
@@ -96,7 +96,7 @@ int term_read(char* buf, uint len) {
 }
 
 void term_write(char* str, uint len) {
-    earth->tty_write(str, len);
+    for (uint i = 0; i < len; i++) earth->tty_write(str[i]);
 }
 
 #endif

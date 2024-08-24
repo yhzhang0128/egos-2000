@@ -1,3 +1,12 @@
+/*
+ * (C) 2024, Cornell University
+ * All rights reserved.
+ *
+ * Description: the terminal system server
+ * Manage the tty device; Handle keyboard input and screen output for other apps
+ */
+
+
 #include "app.h"
 #include "string.h"
 
@@ -5,7 +14,7 @@ int main() {
 	SUCCESS("Enter kernel process GPID_TERMINAL");
 	
 	char buf[SYSCALL_MSG_LEN];
-	strcpy(buf, "Finish GPID_TERMINAL Initialization");
+	strcpy(buf, "Finish GPID_TERMINAL initialization");
 	grass->sys_send(GPID_PROCESS, buf, 36);
 
 	while (1) {

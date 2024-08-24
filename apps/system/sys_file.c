@@ -2,8 +2,8 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: the file (inode) system server
- * handling requests of reading / writing inodes
+ * Description: the file system server
+ * Manage the disk device; Handle file (inode) read and write for other apps
  */
 
 #include "app.h"

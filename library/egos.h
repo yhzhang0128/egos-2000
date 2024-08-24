@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdarg.h>    /* Define type va_list for format_to_str*/
-
 typedef unsigned char      uchar;
 typedef unsigned short     ushort;
 typedef unsigned int       uint;
@@ -21,8 +19,7 @@ struct earth {
 
     /* Devices interface */
     void (*tty_read)(char* c);
-    void (*tty_write)(char* buf, uint len);
-    int  (*format_to_str)(char* str_output, const char* format, va_list arg);
+    void (*tty_write)(char c);
 
     void (*disk_read)(uint block_no, uint nblocks, char* dst);
     void (*disk_write)(uint block_no, uint nblocks, char* src);
