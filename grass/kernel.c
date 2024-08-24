@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: Kernel ≈ 2 handlers
- *     intr_entry() handles timer, keyboard, or other interrupts
+ *     intr_entry() handles timer, keyboard, and other interrupts
  *     excp_entry() handles faults (e.g., unauthorized memory access) and system calls
  */
 
