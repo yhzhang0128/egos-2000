@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: load an ELF-format executable file into memory
+ * Description: ELF-format executable file loader
  * Only uses the program header instead of the section headers.
  */
 

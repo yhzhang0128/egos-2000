@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: a simple UDP hello-world
- * This app sends the string HELLO_MSG to a destination IP/UDP port
+ * This app sends the HELLO_MSG string to a destination IP+UDP port
  * (i.e., the dest_ip and dest_udp_port variables below); This is a
  * demo of kernel-bypass networking because network communication is
  * fully handled within this app, without any help from the kernel.

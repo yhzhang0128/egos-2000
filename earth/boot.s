@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: boot loader
+ * Description: entry point of the bootloader
  */
     .section .text.enter
     .global boot_loader

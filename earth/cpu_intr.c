@@ -2,7 +2,8 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: initialize and control CPU interrupts
+ * Description: functions for interrupts
+ * Initialize the trap entry, enable interrupts, and reset the timer
  */
 
 #include "egos.h"
@@ -40,7 +41,7 @@ void intr_init(uint core_id) {
     earth->timer_reset = timer_reset;
     mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
-    /* Setup the interrupt/exception entry function */
+    /* Setup the interrupt/exception entry function (defined in grass/kernel.s) */
     if (earth->translation == PAGE_TABLE) {
         asm("csrw mtvec, %0" ::"r"(trap_from_S_mode));
         INFO("Use direct mode and put the address of trap_from_S_mode() to mtvec");

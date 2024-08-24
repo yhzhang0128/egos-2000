@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: the inode_store interface for accessing the physical disk
+ * Description: functions for accessing the physical disk
  */
 
 #include "egos.h"

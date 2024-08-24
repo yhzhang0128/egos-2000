@@ -3,8 +3,8 @@
  * All rights reserved.
  *
  * Description: Kernel ≈ 2 handlers
- *     intr_entry() handles timer or keyboard ctrl+c interrupts
- *     excp_entry() handles system calls and faults (e.g., unauthorized memory access)
+ *     intr_entry() handles timer, keyboard, or other interrupts
+ *     excp_entry() handles faults (e.g., unauthorized memory access) and system calls
  */
 
 #include "egos.h"

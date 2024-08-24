@@ -2,10 +2,10 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: memory management unit (MMU)
+ * Description: functions for memory management unit (MMU)
  * This MMU code contains a simple memory allocation/free mechanism
  * and two memory translation mechanisms: software TLB and page table.
- * It also contains hardware-specific cache flushing functions.
+ * It also contains a hardware-specific cache flushing function.
  */
 
 #include "egos.h"

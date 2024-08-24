@@ -3,9 +3,10 @@
  * All rights reserved.
  *
  * Description: create the disk image file (disk.img)
- * The disk image should be exactly 4MB:
- *     2MB contains executables of EGOS;
+ * The disk image should be 4MB:
+ *     2MB contains the executables of EGOS and system servers;
  *     2MB is managed by a file system.
+ * This image file should be programmed to the microSD card.
  */
 
 #include <stdio.h>

@@ -2,8 +2,8 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: entry point of the kernel, which is stored in CSR mtvec;
- * when getting an interrupt or exception, the CPU sets its PC to this entry point
+ * Description: entry point of the kernel
+ * When getting an interrupt or exception, the CPU sets its PC to this entry point
  */
     .section .text
     .global trap_from_S_mode, trap_from_M_mode

@@ -2,10 +2,11 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: create the bootROM image files
- * The ROM on the Arty board has 16MB and only 8MB is used:
+ * Description: create the ROM image file (bootROM.bin)
+ * The ROM image should be 8MB:
  *     4MB holds the VexRiscv processor FPGA binary;
  *     4MB holds the disk image produced by mkfs.
+ * This image file should be programmed to the ROM chip on the Arty board.
  */
 
 #include <stdio.h>

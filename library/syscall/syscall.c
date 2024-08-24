@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: the system call interface
+ * Description: the system call interface for applications
  */
 
 #include "egos.h"

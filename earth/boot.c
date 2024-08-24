@@ -2,7 +2,8 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: Initialize TTY/disk devices and MMU/interrupt on the CPU
+ * Description: bootloader
+ * Initialize the tty device, disk device, CPU MMU, and CPU interrupts
  */
 
 #include "disk.h"

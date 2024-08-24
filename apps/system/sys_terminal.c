@@ -1,3 +1,12 @@
+/*
+ * (C) 2024, Cornell University
+ * All rights reserved.
+ *
+ * Description: the terminal system server
+ * Manage the tty device; Handle keyboard input and screen output for other apps
+ */
+
+
 #include "app.h"
 #include "string.h"
 

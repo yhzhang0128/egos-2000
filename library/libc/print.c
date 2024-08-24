@@ -2,7 +2,9 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: formatted printing based on term_write()
+ * Description: formatted printing (e.g., printf)
+ * format_to_str() converts a format to a C string, e.g., ("%s-%d", "egos", 2000) => "egos-2000"
+ * term_write() prints a C string to the screen
  */
 
 #include "egos.h"

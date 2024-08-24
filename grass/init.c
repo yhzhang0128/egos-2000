@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: grass layer initialization
- * Spawn the first system server, GPID_PROCESS (pid=1).
+ * Spawn the first process, GPID_PROCESS (pid=1).
  */
 
 #include "egos.h"

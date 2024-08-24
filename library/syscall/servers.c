@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: user friendly interfaces of system processes
+ * Description: user-friendly interface of system processes
  */
 
 #include "egos.h"
