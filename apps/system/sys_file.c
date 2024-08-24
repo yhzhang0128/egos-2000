@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: the file system server
- * Manage the disk device; Handle inode (file) read and write for other apps
+ * Manage the disk device; Handle file (inode) read and write for other apps
  */
 
 #include "app.h"
