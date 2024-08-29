@@ -35,8 +35,10 @@ void grass_entry(uint core_id) {
     for (uint i = 0; i < NCORES; i++)
         if (i != core_id) core_set_idle(i);
 
-    /* Finish using the kernel stack and thus release the lock */
-    release(earth->kernel_lock);
+    /* Student's code goes here (multi-core and atomic instruction) */
+    /* Finish using the kernel stack and thus release the kernel lock */
+
+    /* Student's code ends here. */
 
     /* Jump to the entry of process GPID_PROCESS */
     asm("mv a0, %0" ::"r"(APPS_ARG));

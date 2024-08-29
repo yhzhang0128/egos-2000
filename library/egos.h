@@ -6,11 +6,8 @@ typedef unsigned int       uint;
 typedef unsigned long long ulonglong;
 
 struct earth {
-    int boot_lock, kernel_lock, booted_core_cnt;
-
     /* CPU interface */
     void (*timer_reset)(uint core_id);
-
     void (*mmu_flush_cache)();
     void (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
     void (*mmu_free)(int pid);
@@ -20,7 +17,6 @@ struct earth {
     /* Devices interface */
     void (*tty_read)(char* c);
     void (*tty_write)(char c);
-
     void (*disk_read)(uint block_no, uint nblocks, char* dst);
     void (*disk_write)(uint block_no, uint nblocks, char* src);
 

@@ -18,12 +18,12 @@ trap_from_S_mode:
 
 trap_from_M_mode:
     /* Step1: switch to the kernel stack
-     * Step2: acquire earth->kernel_lock
+     * Step2: acquire kernel_lock
      * Step3: save all registers on the kernel stack
      * Step4: call kernel_entry()
      * Step5: restore all registers
      * Step6: switch back to the process stack
-     * Step7: release earth->kernel_lock
+     * Step7: release kernel_lock
      * Step8: invoke mret and return to the process context */
 
     /* Step1 */
@@ -32,7 +32,7 @@ trap_from_M_mode:
 
     /* Step2 */
     /* Student's code goes here (multi-core and atomic instruction) */
-    /* Acquire earth->kernel_lock; This is tricky! */
+    /* Acquire kernel_lock; This is tricky! */
     /* You may need to use sscratch */
 
     /* Student's code ends here. */
@@ -109,7 +109,7 @@ trap_from_M_mode:
 
     /* Step7 */
     /* Student's code goes here (multi-core and atomic instruction) */
-    /* Release earth->kernel_lock; This is tricky! */
+    /* Release kernel_lock; This is tricky! */
     /* You may need to use mscratch and sscratch */
 
     /* Student's code ends here. */

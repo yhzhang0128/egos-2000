@@ -105,7 +105,7 @@ static void proc_yield() {
     if (CORE_IDLE) {
         /* Student's code goes here (multi-core and atomic instruction) */
 
-        /* Release earth->kernel_lock and earth->boot_lock; Call proc_idle
+        /* Release kernel_lock and boot_lock; Call proc_idle
          * with mret; Why not do proc_idle() directly? Think about it. */
 
         /* Student's code ends here. */

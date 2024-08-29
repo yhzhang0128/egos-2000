@@ -16,6 +16,8 @@ void disk_init();
 void mmu_init();
 void intr_init(uint core_id);
 
+extern int boot_lock;
+static int booted_core_cnt;
 struct grass* grass = (void*)GRASS_STRUCT_BASE;
 struct earth* earth = (void*)EARTH_STRUCT_BASE;
 
@@ -31,14 +33,12 @@ void boot() {
     /* Disable core#0 on QEMU because it is an E31 core without S-mode */
     /* See https://www.qemu.org/docs/master/system/riscv/sifive_u.html */
     if (earth->platform == QEMU && core_id == 0) {
-        release(earth->boot_lock);
+        release(boot_lock);
         while(1);
     }
 
-    if (earth->booted_core_cnt == 0) {
+    if (booted_core_cnt++ == 0) {
         /* The first booted core needs to do some more work */
-        earth->booted_core_cnt = 1;
-
         tty_init();
         CRITICAL("--- Booting on %s with core #%d ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
 
@@ -59,16 +59,14 @@ void boot() {
         asm("mret");
     } else {
         SUCCESS("--- Core #%d starts running ---", core_id);
-        earth->booted_core_cnt++;
 
         /* Student's code goes here (multi-core and atomic instruction) */
 
         /* Initialize the MMU and interrupts on this core */
         /* Read mmu_init() and intr_init(), and decide what to do here */
 
-        /* Student's code ends here. */
-
         /* Mock a timer interrupt (#7) and enter the kernel entry */
-        kernel_entry(0x80000007);
+
+        /* Student's code ends here. */
     }
 }
