@@ -10,6 +10,9 @@
 #include "syscall.h"
 #include "process.h"
 
+extern int boot_lock;
+extern int booted_core_cnt;
+
 static void sys_proc_read(uint block_no, char* dst) {
     earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
@@ -38,6 +41,8 @@ void grass_entry(uint core_id) {
 
     /* Student's code goes here (multi-core and atomic instruction) */
     /* Finish using the kernel stack and thus release the kernel lock */
+    release(boot_lock);
+    while(booted_core_cnt != 4);
 
     /* Student's code ends here. */
 
