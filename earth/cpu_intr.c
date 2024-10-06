@@ -32,7 +32,7 @@ static void timer_reset(uint core_id) {
     mtimecmp_set(mtime_get() + QUANTUM, core_id);
 }
 
-/* Both trap functions are defined in boot.S */
+/* Both trap functions are defined in grass/kernel.s */
 void trap_from_M_mode();
 void trap_from_S_mode();
 
