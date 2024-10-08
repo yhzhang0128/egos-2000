@@ -20,6 +20,7 @@ struct page_info {
     int  pid;      /* Which process owns this page? */
     uint vpage_no; /* Which virtual page in this process maps to this physial page? */
 } page_info_table[APPS_PAGES_CNT];
+static uint MAX_USED_IDX;
 
 #define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
 #define PAGE_ID_TO_ADDR(x) (char*)APPS_PAGES_BASE + x * PAGE_SIZE
@@ -30,13 +31,14 @@ void mmu_alloc(uint* ppage_id, void** ppage_addr) {
             page_info_table[i].use = 1;
             *ppage_id              = i;
             *ppage_addr            = PAGE_ID_TO_ADDR(i);
+            if (MAX_USED_IDX <= i) MAX_USED_IDX = i + 1;
             return;
         }
     FATAL("mmu_alloc: no more free memory");
 }
 
 void mmu_free(int pid) {
-    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+    for (uint i = 0; i < MAX_USED_IDX; i++)
         if (page_info_table[i].use && page_info_table[i].pid == pid)
             memset(&page_info_table[i], 0, sizeof(struct page_info));
 }
@@ -52,14 +54,14 @@ void soft_tlb_switch(int pid) {
     if (pid == curr_vm_pid) return;
 
     /* Unmap curr_vm_pid from the user address space */
-    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+    for (uint i = 0; i < MAX_USED_IDX; i++)
         if (page_info_table[i].use && page_info_table[i].pid == curr_vm_pid)
             memcpy(PAGE_ID_TO_ADDR(i),
                    PAGE_NO_TO_ADDR(page_info_table[i].vpage_no),
                    PAGE_SIZE);
 
     /* Map pid to the user address space */
-    for (uint i = 0; i < APPS_PAGES_CNT; i++)
+    for (uint i = 0; i < MAX_USED_IDX; i++)
         if (page_info_table[i].use && page_info_table[i].pid == pid)
             memcpy(PAGE_NO_TO_ADDR(page_info_table[i].vpage_no),
                    PAGE_ID_TO_ADDR(i),
