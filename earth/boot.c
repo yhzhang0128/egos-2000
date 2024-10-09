@@ -17,7 +17,7 @@ void mmu_init();
 void intr_init(uint core_id);
 
 extern int boot_lock;
-static int booted_core_cnt;
+int booted_core_cnt;
 struct grass* grass = (void*)GRASS_STRUCT_BASE;
 struct earth* earth = (void*)EARTH_STRUCT_BASE;
 
@@ -37,7 +37,8 @@ void boot() {
         while(1);
     }
 
-    if (booted_core_cnt++ == 0) {
+    if (booted_core_cnt == 0) {
+        booted_core_cnt++;
         /* The first booted core needs to do some more work */
         tty_init();
         CRITICAL("--- Booting on %s with core #%d ---", earth->platform == ARTY? "Arty" : "QEMU", core_id);
@@ -58,7 +59,10 @@ void boot() {
         asm("mv a0, %0" ::"r"(core_id));
         asm("mret");
     } else {
-        SUCCESS("--- Core #%d starts running ---", core_id);
+        CRITICAL("--- Core #%d starts running ---", core_id);
+        booted_core_cnt++;
+        release(boot_lock);
+        while(1);
 
         /* Student's code goes here (multi-core and atomic instruction) */
 
