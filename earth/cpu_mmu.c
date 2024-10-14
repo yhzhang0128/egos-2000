@@ -176,6 +176,11 @@ void flush_cache() {
             "nop\nnop\nnop\nnop\nnop\n"
         );
     }
+    if (earth->translation == PAGE_TABLE){
+      /* Flush the TLB, which is the cache of page table entries */
+      /* See https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf#subsection.4.2.1 */
+      asm("sfence.vma zero,zero");
+    }
 }
 
 /* MMU Initialization */

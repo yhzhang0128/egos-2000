@@ -30,6 +30,7 @@ void grass_entry(uint core_id) {
     elf_load(GPID_PROCESS, sys_proc_read, 0, 0);
     proc_set_running(proc_alloc());
     earth->mmu_switch(GPID_PROCESS);
+    earth->mmu_flush_cache();
 
     /* Set other cores to idle */
     for (uint i = 0; i < NCORES; i++)

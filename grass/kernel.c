@@ -151,8 +151,9 @@ static int proc_try_send(struct process* sender) {
 
 static int proc_try_recv(struct process* receiver) {
     if (receiver->syscall.msg.status == PENDING) return -1;
-    
+
     earth->mmu_switch(receiver->pid);
+    earth->mmu_flush_cache();
     memcpy((void*)SYSCALL_ARG, &receiver->syscall, sizeof(struct syscall));
     return 0;
 }
