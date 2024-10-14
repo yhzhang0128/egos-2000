@@ -24,11 +24,6 @@ struct page_info {
 #define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
 #define PAGE_ID_TO_ADDR(x) (char*)APPS_PAGES_BASE + x * PAGE_SIZE
 
-void flush_tlb_cache() {
-    /*  See https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf#subsection.4.2.1 */
-    asm("sfence.vma zero,zero");
-}
-
 void mmu_alloc(uint* ppage_id, void** ppage_addr) {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (!page_info_table[i].use) {
@@ -141,8 +136,6 @@ void pagetable_identity_mapping(int pid) {
 
         /* Student's code ends here. */
     }
-
-    flush_tlb_cache();
 }
 
 void page_table_map(int pid, uint vpage_no, uint ppage_id) {
@@ -160,12 +153,9 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     soft_tlb_map(pid, vpage_no, ppage_id);
 
     /* Student's code ends here. */
-
-    flush_tlb_cache();
 }
 
 void page_table_switch(int pid) {
-    flush_tlb_cache();
     /* Student's code goes here (page table translation). */
 
     /* Remove the following line of code and, instead,
@@ -175,8 +165,6 @@ void page_table_switch(int pid) {
     soft_tlb_switch(pid);
 
     /* Student's code ends here. */
-
-    flush_tlb_cache();
 }
 
 void flush_cache() {
@@ -188,6 +176,8 @@ void flush_cache() {
             "nop\nnop\nnop\nnop\nnop\n"
         );
     }
+    /*  See https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf#subsection.4.2.1 */
+    asm("sfence.vma zero,zero");
 }
 
 /* MMU Initialization */
