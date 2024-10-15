@@ -14,9 +14,9 @@
 #include <unistd.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
 #include "inode.h"
 
 #define EGOS_BIN_NUM 5
@@ -26,66 +26,59 @@ char* egos_binaries[] = {"./qemu/egos.bin",
                          "../build/release/sys_file.elf",
                          "../build/release/sys_shell.elf"};
 
-/* Inode - File/Directory mappings:
-#0: /              #1: /home                #2: /home/yunhao  #3: /home/rvr
-#4: /home/yacqub   #5: /home/yunhao/README  #6: /bin          #7: /bin/cat
-#8: /bin/cd        #9: /bin/clock           #10:/bin/crash1   #11:/bin/crash2
-#12:/bin/echo      #13:/bin/ls              #14:/bin/pwd      #15:/bin/udp_hello
-*/
-#define NINODE 16
-char* contents[] = {
-                    "./   0 ../   0 home/   1 bin/   6 ",
+#define BIN_DIR_INODE 6
+char bin_dir[128] = "./   6 ../   0 ";
+char* contents[] = {"./   0 ../   0 home/   1 bin/   6 ",
                     "./   1 ../   0 yunhao/   2 rvr/   3 yacqub/   4 ",
                     "./   2 ../   1 README   5 ",
                     "./   3 ../   1 ",
                     "./   4 ../   1 ",
                     "With only 2000 lines of code, egos-2000 implements boot loader, microSD driver, tty driver, memory translation, interrupt handling, preemptive scheduler, system call, file system, shell, a UDP/Ethernet demo, several user commands, and the `mkfs/mkrom` tools.",
-                    "./   6 ../   0 cat   7 cd   8 clock    9 crash1  10 crash2  11 echo  12 ls  13 pwd  14 udp_hello  15",
-                    "#../build/release/cat.elf",
-                    "#../build/release/cd.elf",
-                    "#../build/release/clock.elf",
-                    "#../build/release/crash1.elf",
-                    "#../build/release/crash2.elf",
-                    "#../build/release/echo.elf",
-                    "#../build/release/ls.elf",
-                    "#../build/release/pwd.elf",
-                    "#../build/release/udp_hello.elf"};
+                    bin_dir};
 
-char exec[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE], fs[FILE_SYS_DISK_SIZE];
+char exec[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE], fs[FILE_SYS_DISK_SIZE], buf[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE], elf_pathname[128];
 
 inode_intf ramdisk_init();
 
 int main() {
     /* Make the file system into char fs[] */
     inode_intf ramdisk = ramdisk_init();
-    if (FILESYS == 0) {
-        assert(mydisk_create(ramdisk, 0, NINODES) >= 0);
-    } else {
-        assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
-    }
-    inode_intf filesys = (FILESYS == 0)? mydisk_init(ramdisk, 0) : treedisk_init(ramdisk, 0);
+    (FILESYS == 0)? assert(mydisk_create(ramdisk, 0, NINODES) >= 0) :
+                    assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
+    inode_intf filesys = (FILESYS == 0)? mydisk_init(ramdisk, 0) :
+                                         treedisk_init(ramdisk, 0);
     fprintf(stderr, "MKFS is using file system: %s\n", FILESYS == 0? "mydisk" : "treedisk");
 
-    char buf[EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE];
-    for (uint ino = 0; ino < NINODE; ino++) {
-        if (contents[ino][0] != '#') {
-            fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
-            strncpy(buf, contents[ino], BLOCK_SIZE);
-            filesys->write(filesys, ino, 0, (void*)buf);
-        } else {
-            struct stat st;
-            char* file_name = &contents[ino][1];
-            stat(file_name, &st);
+    for (uint ino = 0; ino < BIN_DIR_INODE; ino++) {
+        fprintf(stderr, "[INFO] Loading ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
+        strncpy(buf, contents[ino], BLOCK_SIZE);
+        filesys->write(filesys, ino, 0, (void*)buf);
+    }
 
-            freopen(file_name, "r", stdin);
+    uint app_ino = BIN_DIR_INODE + 1;
+    DIR *dp = opendir ("../build/release/user");
+    assert( dp != NULL );
+    for (struct dirent *ep = readdir (dp); ep != NULL; ep = readdir (dp))
+        if (strstr(ep->d_name, ".elf")) {
+            sprintf(elf_pathname, "../build/release/user/%s", ep->d_name);
+            struct stat st;
+            stat(elf_pathname, &st);
+
+            freopen(elf_pathname, "r", stdin);
             for (uint nread = 0; nread < st.st_size; )
                 nread += read(0, buf + nread, st.st_size - nread);
 
-            fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", ino, file_name, (int)st.st_size);
+            fprintf(stderr, "[INFO] Loading ino=%d, %s: %d bytes\n", app_ino, elf_pathname, (int)st.st_size);
             for (uint b = 0; b * BLOCK_SIZE < st.st_size; b++)
-                filesys->write(filesys, ino, b, (void*)(buf + b * BLOCK_SIZE));
+                filesys->write(filesys, app_ino, b, (void*)(buf + b * BLOCK_SIZE));
+
+            ep->d_name[strlen(ep->d_name) - 4] = 0;
+            sprintf(buf, "%s%4d ", ep->d_name, app_ino++);
+            strcat(bin_dir, buf);
         }
-    }
+    closedir (dp);
+    filesys->write(filesys, BIN_DIR_INODE, 0, (void*)bin_dir);
+    printf("[INFO] Loading ino=%d, %s\n", BIN_DIR_INODE, bin_dir);
 
     /* Write EGOS binaries into disk.img */
     freopen("disk.img", "w", stdout);

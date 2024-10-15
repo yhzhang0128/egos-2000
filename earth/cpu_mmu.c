@@ -171,15 +171,12 @@ void flush_cache() {
     if (earth->platform == ARTY) {
         /* Flush the L1 instruction cache */
         /* See https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25 */
-        asm volatile(
-            ".word(0x100F)\n"
-            "nop\nnop\nnop\nnop\nnop\n"
-        );
+        asm(".word(0x100F)\nnop\nnop\nnop\nnop\nnop\n");
     }
     if (earth->translation == PAGE_TABLE){
-      /* Flush the TLB, which is the cache of page table entries */
-      /* See https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf#subsection.4.2.1 */
-      asm("sfence.vma zero,zero");
+        /* Flush the TLB, which is the cache of page table entries */
+        /* See https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf#subsection.4.2.1 */
+        asm("sfence.vma zero,zero");
     }
 }
 
