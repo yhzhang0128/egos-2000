@@ -23,6 +23,11 @@ void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
 void proc_set_pending(int pid)  { proc_set_status(pid, PROC_PENDING_SYSCALL); }
 
 int proc_alloc() {
+    /* Student's code goes here (Preemptive Scheduler)
+     * Collect Scheduling information of proc just before it starts.
+     * Add process to MLFQ.
+     * */
+
     static uint curr_pid = 0;
     for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_UNUSED) {
@@ -40,6 +45,12 @@ void proc_free(int pid) {
         proc_set_status(pid, PROC_UNUSED);
         return;
     }
+
+    /* Student's code goes here (Preemptive Scheduler)
+     * Collect Scheduling information of proc just after it exits.
+     * Print Scheduling metrics.
+     * Remove process from all queues.
+     * */
 
     /* Free all user applications */
     for (uint i = 0; i < MAX_NPROCESS; i++)

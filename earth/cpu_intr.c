@@ -10,7 +10,6 @@
 
 #define MTIME_BASE    (CLINT_BASE + 0xBFF8)
 #define MTIMECMP_BASE (CLINT_BASE + 0x4000)
-#define QUANTUM       (earth->platform == QEMU? 500000UL : 50000000UL)
 
 static ulonglong mtime_get() {
     uint low, high;
@@ -32,6 +31,16 @@ static void timer_reset(uint core_id) {
     mtimecmp_set(mtime_get() + QUANTUM, core_id);
 }
 
+ulonglong gettime() {
+    static ulonglong last_time = 0;
+    ulonglong time = (ulonglong) mtime_get();
+    if (time < last_time) {
+        INFO("gettime() overflows");
+        last_time = time;
+    }
+    return time;
+}
+
 /* Both trap functions are defined in grass/kernel.s */
 void trap_from_M_mode();
 void trap_from_S_mode();
@@ -39,6 +48,7 @@ void trap_from_S_mode();
 void intr_init(uint core_id) {
     /* Setup the timer */
     earth->timer_reset = timer_reset;
+    earth->gettime = gettime;
     mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
     /* Setup the interrupt/exception entry function (defined in grass/kernel.s) */

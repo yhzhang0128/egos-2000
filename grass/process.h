@@ -2,6 +2,7 @@
 
 #include "elf.h"
 #include "disk.h"
+#include "syscall.h"
 
 enum proc_status {
     PROC_UNUSED,
@@ -22,6 +23,10 @@ struct process{
     struct syscall syscall;
     enum proc_status status;
     uint mepc, saved_register[SAVED_REGISTER_NUM];
+
+    /* Student's code goes here (Preemptive Scheduler)
+     * Create a simple data structure that holds scheduling attributes.
+     * */
 };
 
 #define MAX_NPROCESS  16
