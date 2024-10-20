@@ -79,9 +79,10 @@ void soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define OS_RWX       (0xC0 | 0xF)
-#define USER_RWX     (0xC0 | 0x1F)
-#define MAX_NPROCESS 256
+#define OS_RWX         (0xC0 | 0xF)
+#define USER_RWX       (0xC0 | 0x1F)
+#define MAX_NPROCESS   256
+#define USER_PID_START 5
 static uint* root;
 static uint* leaf;
 static uint* pid_to_pagetable_base[MAX_NPROCESS];
@@ -144,9 +145,32 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     /* Student's code goes here (page table translation). */
 
     /* Remove the following line of code and, instead,
-     * (1) if page tables for pid do not exist, build the tables;
-     * (2) if page tables for pid exist, update entries of the tables
+     * (1) if page tables for pid do not exist, build the tables:
+     *  (a) If the process is a system process (pid < USER_PID_START) (QEMU and ARTY)
+     *      | Start Address | # Pages | Size   | Explanation                        |
+     *      +---------------+---------+--------+------------------------------------+
+     *      | 0x08000000    | 512     | 2 MB   | Earth data, Grass code + data      |
+     *      | 0x20400000    | 1024    | 4 MB   | Board Flash ROM                    |
+     *      | 0x80000000    | 512     | 2 MB   | RAM start (Egos code + data)       |
+     *      | 0x80200000    | 1       | 4 KB   | Earth struct                       |
+     *      | 0x80201000    | 1       | 4 KB   | Grass struct                       |
+     *      | 0x80400000    | 512     | 2 MB   | Egos stack                         |
+     *      | 0x80600000    | 1       | 4 KB   | Apps argc/argv                     |
+     *      | 0x80601000    | 1       | 4 KB   | Syscall arg struct                 |
+     *      | 0x80800000    | 512     | 2 MB   | App stack and base                 |
      *
+     *
+     *  (b) If the process is a user process (QEMU and ARTY)
+     *      | Start Address | # Pages | Size   | Explanation                        |
+     *      +---------------+---------+--------+------------------------------------+
+     *      | 0x08000000    | 512     | 2 MB   | Earth data, Grass code + data      |
+     *      | 0x80000000    | 512     | 2 MB   | RAM start (Egos code + data)       |
+     *      | 0x80400000    | 512     | 2 MB   | Egos stack                         |
+     *      | 0x80200000    | 1       | 4 KB   | Earth struct                       |
+     *      | 0x80201000    | 1       | 4 KB   | Grass struct                       |
+     *      | 0x80800000    | 512     | 2 MB   | App stack and base                 |
+     *
+     * (2) if page tables for pid exist, find the PTE and  update entries of the tables
      * Feel free to modify and call the two helper functions:
      * pagetable_identity_mapping() and setup_identity_region()
      */
