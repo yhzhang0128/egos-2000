@@ -142,11 +142,6 @@ static int proc_try_send(struct process* sender) {
 
             dst->syscall.msg.status = RECEIVED;
             dst->syscall.msg.sender = sender->pid;
-          /* Student's code goes here (page table translation)
-           * sender->syscall's address space belongs to sender->pid's address space,
-           * In this case it needs to be translated to the dst->pid's address space
-           * before the message can be copied.
-           */
             memcpy(dst->syscall.msg.content, sender->syscall.msg.content, SYSCALL_MSG_LEN);
             return 0;
         }
@@ -157,11 +152,6 @@ static int proc_try_send(struct process* sender) {
 static int proc_try_recv(struct process* receiver) {
     if (receiver->syscall.msg.status == PENDING) return -1;
 
-    /* Student's code goes here (page table translatiion)
-     * receiver->syscall's address space belongs to receiver->pid's address space,
-     * In this case it needs to be translated to the kernel's address space before
-     * the message can be copied to SYSCALL_ARG.
-     */
     earth->mmu_switch(receiver->pid);
     earth->mmu_flush_cache();
     memcpy((void*)SYSCALL_ARG, &receiver->syscall, sizeof(struct syscall));
