@@ -23,7 +23,7 @@ void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
 void proc_set_pending(int pid)  { proc_set_status(pid, PROC_PENDING_SYSCALL); }
 
 int proc_alloc() {
-    /* Student's code goes here (Preemptive Scheduler)
+    /* Student's code goes here (preemptive scheduler)
      * Collect information (e.g., spawning time) for the
      * new process and initialize the MLFQ data structures. */
 
@@ -41,7 +41,7 @@ int proc_alloc() {
 }
 
 void proc_free(int pid) {
-    /* Student's code goes here (Preemptive Scheduler)
+    /* Student's code goes here (preemptive scheduler)
      * Collect information (e.g., termination time) for process pid,
      * and print out scheduling metrics. Cleanup MLFQ data structures */
 

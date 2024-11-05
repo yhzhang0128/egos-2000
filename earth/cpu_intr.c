@@ -41,7 +41,7 @@ void intr_init(uint core_id) {
     earth->timer_reset = timer_reset;
     mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
-    /* Student's code goes here (Preemptive Scheduler)*/
+    /* Student's code goes here (preemptive scheduler)*/
 
     /* Student's code ends here. */
 
