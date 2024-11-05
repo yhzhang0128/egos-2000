@@ -23,6 +23,12 @@ void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
 void proc_set_pending(int pid)  { proc_set_status(pid, PROC_PENDING_SYSCALL); }
 
 int proc_alloc() {
+    /* Student's code goes here (Preemptive Scheduler)
+     * Collect information (e.g., spawning time) for the
+     * new process and initialize the MLFQ data structures. */
+
+    /* Student's code ends here. */
+
     static uint curr_pid = 0;
     for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_UNUSED) {
@@ -35,6 +41,12 @@ int proc_alloc() {
 }
 
 void proc_free(int pid) {
+    /* Student's code goes here (Preemptive Scheduler)
+     * Collect information (e.g., termination time) for process pid,
+     * and print out scheduling metrics. Cleanup MLFQ data structures */
+
+    /* Student's code ends here. */
+
     if (pid != GPID_ALL) {
         earth->mmu_free(pid);
         proc_set_status(pid, PROC_UNUSED);

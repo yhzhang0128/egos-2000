@@ -22,6 +22,11 @@ struct process{
     struct syscall syscall;
     enum proc_status status;
     uint mepc, saved_register[SAVED_REGISTER_NUM];
+
+    /* Student's code goes here (Preemptive Scheduler)
+     * Create data structures that hold scheduling attributes. */
+
+    /* Student's code ends here. */
 };
 
 #define MAX_NPROCESS  16
