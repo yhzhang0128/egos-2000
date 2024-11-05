@@ -8,8 +8,6 @@ typedef unsigned long long ulonglong;
 struct earth {
     /* CPU interface */
     void (*timer_reset)(uint core_id);
-    unsigned long long (*gettime)();
-
     void (*mmu_flush_cache)();
     void (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
     void (*mmu_free)(int pid);
@@ -48,8 +46,6 @@ extern struct grass* grass;
 #define NCORES             4
 #define release(x)         __sync_lock_release(&x)
 #define acquire(x)         while(__sync_lock_test_and_set(&x, 1) != 0);
-
-#define QUANTUM       (earth->platform == QEMU? 500000UL : 50000000UL)
 
 /* Memory regions */
 #define PAGE_SIZE          4096

@@ -10,6 +10,7 @@
 
 #define MTIME_BASE    (CLINT_BASE + 0xBFF8)
 #define MTIMECMP_BASE (CLINT_BASE + 0x4000)
+#define QUANTUM       (earth->platform == QEMU? 500000UL : 50000000UL)
 
 static ulonglong mtime_get() {
     uint low, high;
