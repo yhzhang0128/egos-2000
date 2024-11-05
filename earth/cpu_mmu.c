@@ -79,9 +79,9 @@ void soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define OS_RWX         (0xC0 | 0xF)
-#define USER_RWX       (0xC0 | 0x1F)
-#define MAX_NPROCESS   256
+#define OS_RWX       (0xC0 | 0xF)
+#define USER_RWX     (0xC0 | 0x1F)
+#define MAX_NPROCESS 256
 static uint* root;
 static uint* leaf;
 static uint* pid_to_pagetable_base[MAX_NPROCESS];
@@ -145,31 +145,24 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
 
     /* Remove the following line of code and, instead,
      * (1) if page tables for pid do not exist, build the tables:
-     *  (a) If the process is a system process (pid < GPID_USER_START) (QEMU and ARTY)
-     *      | Start Address | # Pages | Size   | Explanation                        |
-     *      +---------------+---------+--------+------------------------------------+
-     *      | 0x20400000    | 1024    | 4 MB   | Board Flash ROM                    |
-     *      | 0x80000000    | 512     | 2 MB   | RAM start (Egos code + data)       |
-     *      | 0x80200000    | 1       | 4 KB   | Earth struct                       |
-     *      | 0x80201000    | 1       | 4 KB   | Grass struct                       |
-     *      | 0x80400000    | 512     | 2 MB   | Egos stack                         |
-     *      | 0x80600000    | 1       | 4 KB   | Apps argc/argv                     |
-     *      | 0x80601000    | 1       | 4 KB   | Syscall arg struct                 |
-     *      | 0x80800000    | 512     | 2 MB   | App stack and base                 |
+     *  (a) If the process is a system process (pid < GPID_USER_START)
+     *      | Start Address | # Pages | Size   | Explanation                         |
+     *      +---------------+---------+--------+-------------------------------------+
+     *      | 0x80000000    | 1024    | 4 MB   | EGOS region (code+data+heap+stack)  |
+     *      | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack)  |
+     *      | 0x80800000    | 63488   | 248 MB | Initially free pages for allocation |
+     *      | CLINT_BASE    | 16      | 64 KB  | Memory-mapped registers for timer   |
+     *      | UART_BASE     | 1       | 4 KB   | Memory-mapped registers for TTY     |
+     *      | SPI_BASE      | 1       | 4 KB   | Memory-mapped registers for SD card |
      *
+     *  (b) If the process is a user process (pid >= GPID_USER_START)
+     *      | Start Address | # Pages | Size   | Explanation                         |
+     *      +---------------+---------+--------+-------------------------------------+
+     *      | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack)  |
      *
-     *  (b) If the process is a user process (QEMU and ARTY)
-     *      | Start Address | # Pages | Size   | Explanation                        |
-     *      +---------------+---------+--------+------------------------------------+
-     *      | 0x80000000    | 512     | 2 MB   | RAM start (Egos code + data)       |
-     *      | 0x80200000    | 1       | 4 KB   | Earth struct                       |
-     *      | 0x80201000    | 1       | 4 KB   | Grass struct                       |
-     *      | 0x80400000    | 512     | 2 MB   | Egos stack                         |
-     *      | 0x80800000    | 512     | 2 MB   | App stack and base                 |
-     *
-     * (2) if page tables for pid exist, find the PTE and  update entries of the tables
-     * Feel free to modify and call the two helper functions:
-     * pagetable_identity_mapping() and setup_identity_region()
+     * (2) if page tables for pid exist, find the PTE and update entries of the tables;
+     * Feel free to modify and call the two helper functions: setup_identity_region()
+     * and pagetable_identity_mapping().
      */
     soft_tlb_map(pid, vpage_no, ppage_id);
 
