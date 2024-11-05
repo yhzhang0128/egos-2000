@@ -2,7 +2,6 @@
 
 #include "elf.h"
 #include "disk.h"
-#include "syscall.h"
 
 enum proc_status {
     PROC_UNUSED,
