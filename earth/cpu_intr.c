@@ -43,6 +43,8 @@ void intr_init(uint core_id) {
 
     /* Student's code goes here (Preemptive Scheduler)*/
 
+    /* Student's code ends here. */
+
     /* Setup the interrupt/exception entry function (defined in grass/kernel.s) */
     if (earth->translation == PAGE_TABLE) {
         asm("csrw mtvec, %0" ::"r"(trap_from_S_mode));

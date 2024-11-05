@@ -25,8 +25,9 @@ struct process{
     uint mepc, saved_register[SAVED_REGISTER_NUM];
 
     /* Student's code goes here (Preemptive Scheduler)
-     * Create a simple data structure that holds scheduling attributes.
-     * */
+     * Create data structures that hold scheduling attributes for MLFQ. */
+
+    /* Student's code ends here. */
 };
 
 #define MAX_NPROCESS  16
