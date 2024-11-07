@@ -87,6 +87,10 @@ static void proc_yield() {
     /* Set the current process status to RUNNABLE if it was RUNNING */
     if (!CORE_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
+  /* Student's code goes here (preemptive scheduler)
+   * Capture current process's info before it is scheduled out.
+   * Replace the loop to find the next process with your sheduler logic.
+   * */
     /* Find the next process to run */
     int next_idx = MAX_NPROCESS;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
@@ -98,6 +102,8 @@ static void proc_yield() {
             break;
         }
     }
+
+    /* Student's code ends here*/
 
     /* Context switch */
     curr_proc_idx = next_idx;
@@ -113,6 +119,11 @@ static void proc_yield() {
     }
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();
+
+    /* Student's code goes here (preemptive scheduler)
+     * Update the new process's scheduling information. */
+
+    /* Student's code ends here. */
 
     /* Student's code goes here (PMP, page table translation, and multi-core). */
 
