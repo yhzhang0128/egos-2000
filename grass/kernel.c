@@ -88,7 +88,6 @@ static void proc_yield() {
     if (!CORE_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
     /* Student's code goes here (preemptive scheduler)
-     * Measure and record scheduling metrics for the current process before it yields.
      * Replace the loop to find the next process with your sheduler logic. */
 
     /* Find the next process to run */
@@ -102,6 +101,9 @@ static void proc_yield() {
             break;
         }
     }
+
+    /* Measure and record scheduling metrics for the current process before it
+     * yields. */
 
     /* Student's code ends here*/
 
