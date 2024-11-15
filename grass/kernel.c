@@ -87,6 +87,9 @@ static void proc_yield() {
     /* Set the current process status to RUNNABLE if it was RUNNING */
     if (!CORE_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
+    /* Student's code goes here (preemptive scheduler)
+     * Replace the loop to find the next process with your sheduler logic. */
+
     /* Find the next process to run */
     int next_idx = MAX_NPROCESS;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
@@ -98,6 +101,11 @@ static void proc_yield() {
             break;
         }
     }
+
+    /* Measure and record scheduling metrics for the current process before it
+     * yields; Measure and record scheduling metrics for the next process. */
+
+    /* Student's code ends here*/
 
     /* Context switch */
     curr_proc_idx = next_idx;
