@@ -103,7 +103,7 @@ static void proc_yield() {
     }
 
     /* Measure and record scheduling metrics for the current process before it
-     * yields. */
+     * yields; Measure and record scheduling metrics for the next process. */
 
     /* Student's code ends here*/
 
@@ -121,11 +121,6 @@ static void proc_yield() {
     }
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();
-
-    /* Student's code goes here (preemptive scheduler)
-     * Measure and record scheduling metrics for the next process. */
-
-    /* Student's code ends here. */
 
     /* Student's code goes here (PMP, page table translation, and multi-core). */
 
