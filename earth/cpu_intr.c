@@ -43,8 +43,7 @@ void intr_init(uint core_id) {
 
     /* Student's code goes here (preemptive scheduler)
      * Add an interface function timer_read in struct earth for reading the
-     * mtime register. And initialize timer_read here.
-     * */
+     * mtime register. And initialize timer_read here. */
 
     /* Student's code ends here. */
 
