@@ -11,17 +11,17 @@ CFLAGS      = -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections 
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 all:
-	@echo "$(YELLOW)-------- Compile Hello, World! --------$(END)"
-	$(RISCV_CC) $(CFLAGS) hello.s hello.c -Thello.lds $(LDFLAGS) -o hello.elf
-	$(OBJDUMP) $(DEBUG_FLAGS) hello.elf > hello.lst
-	$(OBJCOPY) -O binary hello.elf hello.bin
+	@echo "$(YELLOW)-------- Compile Multi-threading --------$(END)"
+	$(RISCV_CC) $(CFLAGS) thread.s thread.c -Tthread.lds $(LDFLAGS) -o thread.elf
+	$(OBJDUMP) $(DEBUG_FLAGS) thread.elf > thread.lst
+	$(OBJCOPY) -O binary thread.elf thread.bin
 
 qemu: all
-	@echo "$(YELLOW)-------- Run Hello-World on QEMU --------$(END)"
-	$(QEMU) -nographic -machine sifive_u -smp 2 -bios hello.bin
+	@echo "$(YELLOW)-------- Run Multi-threading on QEMU --------$(END)"
+	$(QEMU) -nographic -machine sifive_u -smp 2 -bios thread.bin
 
 clean:
-	rm hello.bin hello.lst hello.elf
+	rm -f thread.bin thread.lst thread.elf
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
