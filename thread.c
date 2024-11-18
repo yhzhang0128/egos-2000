@@ -1,14 +1,9 @@
 void terminal_write(const char *str, int len) {
     for (int i = 0; i < len; i++) {
-        while ( *(int*)(0x10010000UL) & (1 << 31) );
-        *(int*)(0x10010000UL) = str[i];
+        *(char*)(0x10000000UL) = str[i];
     }
 }
 
-/* Uncomment this code block
- * when implementing formatted output 
- */
-/*
 #include <string.h>  // for strlen() and strcat()
 #include <stdlib.h>  // for itoa()
 #include <stdarg.h>  // for va_start(), va_end() and va_arg()
@@ -38,12 +33,7 @@ int printf(const char* format, ...) {
 
     return 0;
 }
-*/
 
-/* Uncomment this code block
- * when implementing dynamic memory allocation 
- */
-/*
 extern char __heap_start, __heap_max;
 static char* brk = &__heap_start;
 char* _sbrk(int size) {
@@ -56,16 +46,9 @@ char* _sbrk(int size) {
     brk += size;
     return old_brk;
 }
-*/
 
 int main() {
-    char* msg = "Hello, World!\n\r";
-    terminal_write(msg, 15);
-
-    /* Uncomment this line of code
-     * when implementing formatted output 
-     */
-    /* printf("%s-%d is awesome!", "egos", 2000); */
+    printf("Start to implement multi-threading!\n\r");
 
     return 0;
 }
