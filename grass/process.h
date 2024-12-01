@@ -24,7 +24,7 @@ struct process{
     uint mepc, saved_register[SAVED_REGISTER_NUM];
 
     /* Student's code goes here (preemptive scheduler)
-     * Create data structures that hold scheduling attributes. */
+     * Create data structures that hold scheduling information. */
 
     /* Student's code ends here. */
 };

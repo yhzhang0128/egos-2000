@@ -6,7 +6,7 @@
  * When getting an interrupt or exception, the CPU sets its program counter to this entry point
  */
     .section .text
-    .global trap_from_S_mode, trap_from_M_mode
+    .global trap_from_S_mode, trap_entry
 
 trap_from_S_mode:
     /* Set mstatus.MPRV to enable page table translation in M mode */
@@ -16,7 +16,7 @@ trap_from_S_mode:
     csrs mstatus, t0
     csrr t0, mscratch
 
-trap_from_M_mode:
+trap_entry:
     /* Step1: switch to the kernel stack
      * Step2: acquire kernel_lock
      * Step3: save all registers on the kernel stack

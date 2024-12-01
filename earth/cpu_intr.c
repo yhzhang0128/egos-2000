@@ -33,7 +33,7 @@ static void timer_reset(uint core_id) {
 }
 
 /* Both trap functions are defined in grass/kernel.s */
-void trap_from_M_mode();
+void trap_entry();
 void trap_from_S_mode();
 
 void intr_init(uint core_id) {
@@ -48,12 +48,13 @@ void intr_init(uint core_id) {
     /* Student's code ends here. */
 
     /* Setup the interrupt/exception entry function (defined in grass/kernel.s) */
-    if (earth->translation == PAGE_TABLE) {
+    if (earth->translation == SOFT_TLB) {
+        asm("csrw mtvec, %0" ::"r"(trap_entry));
+        INFO("Use direct mode and put the address of trap_entry() to mtvec");
+    } else {
         asm("csrw mtvec, %0" ::"r"(trap_from_S_mode));
         INFO("Use direct mode and put the address of trap_from_S_mode() to mtvec");
-    } else {
-        asm("csrw mtvec, %0" ::"r"(trap_from_M_mode));
-        INFO("Use direct mode and put the address of trap_from_M_mode() to mtvec");
+        /* trap_from_S_mode does a bit more than trap_entry for page table translation */
     }
 
     /* Enable timer interrupt */
