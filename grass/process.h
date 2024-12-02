@@ -31,6 +31,7 @@ struct process{
 
 #define MAX_NPROCESS  16
 
+ulonglong mtime_get();
 int  proc_alloc();
 void proc_free(int);
 void proc_set_ready (int);
