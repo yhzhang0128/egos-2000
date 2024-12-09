@@ -96,9 +96,9 @@ Info : sector 190 took 229 ms
 Info : sector 191 took 243 ms  # It will pause at this point for a while
 Info : Found flash device 'micron n25q128' (ID 0x0018ba20)
 
-real	1m37.926s
-user	0m7.109s
-sys	0m20.089s
+real    1m37.926s
+user    0m7.109s
+sys     0m20.089s
 
 ```
 
