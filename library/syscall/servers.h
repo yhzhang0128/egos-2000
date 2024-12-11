@@ -11,12 +11,12 @@ int file_read(int file_ino, uint offset, char* block);
 
 enum grass_servers {
     GPID_ALL = -1,
-    GPID_UNUSED,
-    GPID_PROCESS,
-    GPID_TERMINAL,
-    GPID_FILE,
-    GPID_SHELL,
-    GPID_USER_START
+    GPID_UNUSED,    /* 0 */
+    GPID_PROCESS,   /* 1 */
+    GPID_TERMINAL,  /* 2 */
+    GPID_FILE,      /* 3 */
+    GPID_SHELL,     /* 4 */
+    GPID_USER_START /* 5 */
 };
 
 /* GPID_PROCESS */
