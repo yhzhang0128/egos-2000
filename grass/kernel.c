@@ -53,7 +53,7 @@ static void excp_entry(uint id) {
     if (id >= EXCP_ID_ECALL_U && id <= EXCP_ID_ECALL_M) {
         proc_set[curr_proc_idx].mepc += 4;
         memcpy(&proc_set[curr_proc_idx].syscall, (void*)SYSCALL_ARG, sizeof(struct syscall));
-        proc_set[curr_proc_idx].syscall.msg.status = PENDING;
+        proc_set[curr_proc_idx].syscall.status = PENDING;
         proc_try_syscall(&proc_set[curr_proc_idx]);
         proc_yield();
         return;
@@ -143,22 +143,22 @@ static void proc_yield() {
 static int proc_try_send(struct process* sender) {
     for (uint i = 0; i < MAX_NPROCESS; i++) {
         struct process* dst = &proc_set[i];
-        if (dst->pid == sender->syscall.msg.receiver && dst->status != PROC_UNUSED) {
-            /* Destination is not receiving, or will not take msg from sender */
-            if (! (dst->syscall.type == SYS_RECV && dst->syscall.msg.status == PENDING) ) return -1;
-            if (! (dst->syscall.msg.sender == GPID_ALL || dst->syscall.msg.sender == sender->pid) ) return -1;
+        if (dst->pid == sender->syscall.receiver && dst->status != PROC_UNUSED) {
+            /* Return -1 if dst is not receiving, or will not take msg from sender */
+            if (! (dst->syscall.type == SYS_RECV && dst->syscall.status == PENDING) ) return -1;
+            if (! (dst->syscall.sender == GPID_ALL || dst->syscall.sender == sender->pid) ) return -1;
 
-            dst->syscall.msg.status = RECEIVED;
-            dst->syscall.msg.sender = sender->pid;
-            memcpy(dst->syscall.msg.content, sender->syscall.msg.content, SYSCALL_MSG_LEN);
+            dst->syscall.status = DONE;
+            dst->syscall.sender = sender->pid;
+            memcpy(dst->syscall.content, sender->syscall.content, SYSCALL_MSG_LEN);
             return 0;
         }
     }
-    FATAL("proc_try_send: process %d sending to unknown process %d", sender->pid, sender->syscall.msg.receiver);
+    FATAL("proc_try_send: process %d sending to unknown process %d", sender->pid, sender->syscall.receiver);
 }
 
 static int proc_try_recv(struct process* receiver) {
-    if (receiver->syscall.msg.status == PENDING) return -1;
+    if (receiver->syscall.status == PENDING) return -1;
 
     earth->mmu_switch(receiver->pid);
     earth->mmu_flush_cache();
