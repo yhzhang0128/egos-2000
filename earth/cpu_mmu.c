@@ -118,16 +118,16 @@ void pagetable_identity_mapping(int pid) {
 
     /* Allocate the leaf page tables */
     for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
-        setup_identity_region(pid, i, 1024, OS_RWX);    /* RAM   */
-    setup_identity_region(pid, CLINT_BASE, 16, OS_RWX); /* CLINT */
-    setup_identity_region(pid, UART_BASE, 1,  OS_RWX);  /* UART  */
-    setup_identity_region(pid, SPI_BASE,   1,  OS_RWX); /* SPI   */
+        setup_identity_region(pid, i,          1024, OS_RWX); /* RAM   */
+        setup_identity_region(pid, CLINT_BASE, 16,   OS_RWX); /* CLINT */
+        setup_identity_region(pid, UART_BASE,  1,    OS_RWX); /* UART  */
+        setup_identity_region(pid, SPI_BASE,   1,    OS_RWX); /* SPI   */
 
     if (earth->platform == ARTY) {
-        setup_identity_region( pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
-        setup_identity_region( pid, ETHMAC_CSR_BASE,  1, OS_RWX);   /* ETHMAC CSR */
-        setup_identity_region( pid, ETHMAC_TX_BUFFER, 1, OS_RWX);   /* ETHMAC TX buffer */
-        setup_identity_region( pid, ETHMAC_RX_BUFFER, 1, OS_RWX);   /* ETHMAC RX buffer */
+        setup_identity_region( pid, BOARD_FLASH_ROM,  1024, OS_RWX); /* ROM */
+        setup_identity_region( pid, ETHMAC_CSR_BASE,  1,    OS_RWX); /* ETHMAC CSR */
+        setup_identity_region( pid, ETHMAC_TX_BUFFER, 1,    OS_RWX); /* ETHMAC TX buffer */
+        setup_identity_region( pid, ETHMAC_RX_BUFFER, 1,    OS_RWX); /* ETHMAC RX buffer */
     } else {
         /* Student's code goes here (networking) */
 
