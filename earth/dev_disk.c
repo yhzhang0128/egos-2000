@@ -43,13 +43,13 @@ void disk_init() {
 
 /* Two helper functions for the SPI bus */
 #define LITEX_SPI_CONTROL 0UL
-#define LITEX_SPI_STATUS 4UL
-#define LITEX_SPI_MOSI 8UL
-#define LITEX_SPI_MISO 12UL
-#define LITEX_SPI_CS 16UL
-#define LITEX_SPI_CLKDIV 24UL
+#define LITEX_SPI_STATUS  4UL
+#define LITEX_SPI_MOSI    8UL
+#define LITEX_SPI_MISO    12UL
+#define LITEX_SPI_CS      16UL
+#define LITEX_SPI_CLKDIV  24UL
 
-#define SIFIVE_SPI_CSDEF 20UL
+#define SIFIVE_SPI_CSDEF  20UL
 #define SIFIVE_SPI_CSMODE 24UL
 #define SIFIVE_SPI_TXDATA 72UL
 #define SIFIVE_SPI_RXDATA 76UL

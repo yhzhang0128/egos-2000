@@ -78,8 +78,8 @@ void soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define OS_RWX (0xC0 | 0xF)
-#define USER_RWX (0xC0 | 0x1F)
+#define OS_RWX       (0xC0 | 0xF)
+#define USER_RWX     (0xC0 | 0x1F)
 #define MAX_NPROCESS 256
 static uint* root;
 static uint* leaf;

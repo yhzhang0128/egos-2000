@@ -22,8 +22,8 @@ struct process proc_set[MAX_NPROCESS + 1]; /* proc_set[0..MAX_NPROCESS-1] are
 void core_set_idle(uint core) { core_curr_proc[core] = MAX_NPROCESS; }
 
 #define curr_proc_idx core_curr_proc[core_in_kernel]
-#define curr_pid proc_set[curr_proc_idx].pid
-#define curr_status proc_set[curr_proc_idx].status
+#define curr_pid      proc_set[curr_proc_idx].pid
+#define curr_status   proc_set[curr_proc_idx].status
 
 static void intr_entry(uint);
 static void excp_entry(uint);
@@ -46,8 +46,8 @@ void kernel_entry(uint mcause) {
            SAVED_REGISTER_SIZE);
 }
 
-#define INTR_ID_CTRL_C 2
-#define INTR_ID_TIMER 7
+#define INTR_ID_CTRL_C  2
+#define INTR_ID_TIMER   7
 #define EXCP_ID_ECALL_U 8
 #define EXCP_ID_ECALL_M 11
 static void proc_yield();

@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define DUMMY_INO_MAX_SIZE 128
+#define DUMMY_INO_MAX_SIZE       128
 #define DUMMY_INO_DISK_OFFSET(x) x* DUMMY_INO_MAX_SIZE
 
 static int mydisk_getsize(inode_store_t* this_bs, uint ino) {

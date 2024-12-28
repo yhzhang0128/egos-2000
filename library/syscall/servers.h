@@ -20,7 +20,7 @@ enum grass_servers {
 };
 
 /* GPID_PROCESS */
-#define CMD_NARGS 16
+#define CMD_NARGS   16
 #define CMD_ARG_LEN 32
 struct proc_request {
     enum { PROC_SPAWN, PROC_EXIT, PROC_KILLALL } type;

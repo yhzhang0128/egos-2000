@@ -33,7 +33,7 @@
 #pragma once
 #include "inode.h"
 
-#define REFS_PER_BLOCK (BLOCK_SIZE / sizeof(block_no))
+#define REFS_PER_BLOCK   (BLOCK_SIZE / sizeof(block_no))
 #define INODES_PER_BLOCK (BLOCK_SIZE / sizeof(struct treedisk_inode))
 
 /* Contents of the "superblock".  There is only one of these.

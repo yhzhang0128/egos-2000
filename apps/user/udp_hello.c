@@ -16,7 +16,7 @@
 
 /* Mac address, IP address, and UDP port */
 #define LOCAL_MAC {0x10, 0xe2, 0xd5, 0x00, 0x00, 0x00}
-#define DEST_MAC {0x98, 0x48, 0x27, 0x51, 0x53, 0x1e}
+#define DEST_MAC  {0x98, 0x48, 0x27, 0x51, 0x53, 0x1e}
 
 #define IPTOINT(a, b, c, d) ((a << 24) | (b << 16) | (c << 8) | d)
 static uint local_ip       = IPTOINT(192, 168, 1, 50);
@@ -152,9 +152,9 @@ int main() {
         txbuffer[txlen + 3] = (crc & 0xff000000) >> 24;
         txlen += 4;
 
-#define ETHMAC_CSR_START_WRITE 0x18
-#define ETHMAC_CSR_READY 0x1C
-#define ETHMAC_CSR_SLOT_WRITE 0x24
+#define ETHMAC_CSR_START_WRITE    0x18
+#define ETHMAC_CSR_READY          0x1C
+#define ETHMAC_CSR_SLOT_WRITE     0x24
 #define ETHMAC_CSR_SLOT_LEN_WRITE 0x28
 
         while (!(REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_READY)));
