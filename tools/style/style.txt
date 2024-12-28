@@ -1,0 +1,23 @@
+# On Ubuntu:
+#   > wget https://apt.llvm.org/llvm.sh
+#   > chmod +x llvm.sh
+#   > sudo ./llvm.sh 18
+#   > sudo apt install clang-format-18
+#   > sudo ln -s /usr/bin/clang-format-18 /usr/bin/clang-format
+#   > clang-format --version
+#   Ubuntu clang-format version 18.1.8
+#   > cd egos-2000
+#   > tools/style/clang-format
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+---
+Language: Cpp
+SortIncludes: false
+PointerAlignment: Left
+DerivePointerAlignment: false
+AlignConsecutiveMacros: true
+AlignConsecutiveAssignments: true
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true

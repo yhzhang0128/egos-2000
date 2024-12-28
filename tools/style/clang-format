@@ -1,4 +1,4 @@
-clang-format -style=file:tools/format/style.txt -i \
+clang-format -style=file:tools/style/style.txt -i \
 ./apps/user/udp_hello.c \
 ./apps/user/ls.c \
 ./apps/user/cat.c \
