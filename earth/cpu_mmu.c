@@ -22,24 +22,20 @@ struct page_info {
                       page? */
 } page_info_table[APPS_PAGES_CNT];
 
-#define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
-#define PAGE_ID_TO_ADDR(x) (char*)APPS_PAGES_BASE + x* PAGE_SIZE
-
-void mmu_alloc(uint* ppage_id, void** ppage_addr) {
+uint mmu_alloc() {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (!page_info_table[i].use) {
             page_info_table[i].use = 1;
-            *ppage_id              = i;
-            *ppage_addr            = PAGE_ID_TO_ADDR(i);
-            return;
+            return i;
         }
     FATAL("mmu_alloc: no more free memory");
 }
 
 void mmu_free(int pid) {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
-        if (page_info_table[i].use && page_info_table[i].pid == pid)
+        if (page_info_table[i].use && page_info_table[i].pid == pid) {
             memset(&page_info_table[i], 0, sizeof(struct page_info));
+        }
 }
 
 /* Software TLB Translation */
@@ -94,8 +90,8 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
         leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000);
     } else {
         /* Leaf has not been allocated */
-        uint ppage_id;
-        earth->mmu_alloc(&ppage_id, (void**)&leaf);
+        uint ppage_id                 = earth->mmu_alloc();
+        leaf                          = (void*)PAGE_ID_TO_ADDR(ppage_id);
         page_info_table[ppage_id].pid = pid;
         memset(leaf, 0, PAGE_SIZE);
         root[vpn1] = ((uint)leaf >> 2) | 0x1;
@@ -109,8 +105,8 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
 
 void pagetable_identity_mapping(int pid) {
     /* Allocate the root page table and set the page table base (satp) */
-    uint ppage_id;
-    earth->mmu_alloc(&ppage_id, (void**)&root);
+    uint ppage_id = earth->mmu_alloc();
+    root          = (void*)PAGE_ID_TO_ADDR(ppage_id);
     memset(root, 0, PAGE_SIZE);
     page_info_table[ppage_id].pid = pid;
     pid_to_pagetable_base[pid]    = root;

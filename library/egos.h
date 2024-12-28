@@ -8,7 +8,7 @@ typedef unsigned long long ulonglong;
 struct earth {
     /* CPU & memory management interface */
     void (*timer_reset)(uint core_id);
-    void (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
+    uint (*mmu_alloc)();
     void (*mmu_free)(int pid);
     void (*mmu_map)(int pid, uint vpage_no, uint ppage_id);
     void (*mmu_switch)(int pid);
@@ -48,7 +48,6 @@ extern struct grass* grass;
 #define acquire(x) while (__sync_lock_test_and_set(&x, 1) != 0);
 
 /* Memory regions */
-#define PAGE_SIZE         4096
 #define RAM_END           0x81000000 /* 16MB memory in total     */
 #define APPS_PAGES_BASE   0x80800000 /* 8MB⬆️ free for mmu_alloc */
 #define APPS_STACK_TOP    0x80800000 /* 2MB⬇️ app stack          */
@@ -60,6 +59,11 @@ extern struct grass* grass;
 #define EARTH_STRUCT_BASE 0x80200000 /* struct earth             */
 #define RAM_START         0x80000000 /* 2MB⬆️ egos code and data */
 #define BOARD_FLASH_ROM   0x20400000 /* 4MB⬆️ disk image on the Arty board ROM */
+
+/* Memory page access macros */
+#define PAGE_SIZE          4096
+#define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
+#define PAGE_ID_TO_ADDR(x) ((char*)APPS_PAGES_BASE + x * PAGE_SIZE)
 
 /* Memory-mapped I/O regions */
 #define ETHMAC_CSR_BASE  0xF0002000

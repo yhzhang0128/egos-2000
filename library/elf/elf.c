@@ -33,35 +33,36 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
         INFO("App memory size: %d bytes", pheader->p_memsz);
     }
 
-    void* base;
-    uint code_start = APPS_ENTRY >> 12;
-    uint ppage_id, block_offset = pheader->p_offset / BLOCK_SIZE;
+    uint ppage_id;
+    uint code_start   = APPS_ENTRY >> 12;
+    uint block_offset = pheader->p_offset / BLOCK_SIZE;
 
     /* Setup pages for text, rodata, data and bss sections */
     for (uint off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
         if (off % PAGE_SIZE == 0) {
-            earth->mmu_alloc(&ppage_id, &base);
+            ppage_id = earth->mmu_alloc();
             earth->mmu_map(pid, code_start++, ppage_id);
         }
-        reader(block_offset++, (char*)base + (off % PAGE_SIZE));
+        reader(block_offset++, PAGE_ID_TO_ADDR(ppage_id) + (off % PAGE_SIZE));
     }
     uint last_page_filled = pheader->p_filesz % PAGE_SIZE;
     uint last_page_nzeros = PAGE_SIZE - last_page_filled;
     if (last_page_filled)
-        memset((char*)base + last_page_filled, 0, last_page_nzeros);
+        memset(PAGE_ID_TO_ADDR(ppage_id) + last_page_filled, 0,
+               last_page_nzeros);
 
     while (code_start < ((APPS_ENTRY + pheader->p_memsz) >> 12)) {
-        earth->mmu_alloc(&ppage_id, &base);
+        ppage_id = earth->mmu_alloc();
         earth->mmu_map(pid, code_start++, ppage_id);
-        memset((char*)base, 0, PAGE_SIZE);
+        memset(PAGE_ID_TO_ADDR(ppage_id), 0, PAGE_SIZE);
     }
 
     /* Setup two pages for main() args (argc/argv) and syscall args */
     uint args_start = APPS_ARG >> 12;
-    earth->mmu_alloc(&ppage_id, &base);
+    ppage_id        = earth->mmu_alloc();
     earth->mmu_map(pid, args_start++, ppage_id);
 
-    int* argc_addr = (int*)base;
+    int* argc_addr = (int*)PAGE_ID_TO_ADDR(ppage_id);
     int* argv_addr = argc_addr + 1;
     int* args_addr = argv_addr + CMD_NARGS;
 
@@ -70,14 +71,14 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     for (uint i = 0; i < argc; i++)
         argv_addr[i] = APPS_ARG + 4 + 4 * CMD_NARGS + i * CMD_ARG_LEN;
 
-    earth->mmu_alloc(&ppage_id, &base);
+    ppage_id = earth->mmu_alloc();
     earth->mmu_map(pid, args_start++, ppage_id);
 
     /* Setup two pages for user stack (should be enough for demo purpose) */
     uint stack_start = (APPS_STACK_TOP - PAGE_SIZE * 2) >> 12;
-    earth->mmu_alloc(&ppage_id, &base);
+    ppage_id         = earth->mmu_alloc();
     earth->mmu_map(pid, stack_start++, ppage_id);
 
-    earth->mmu_alloc(&ppage_id, &base);
+    ppage_id = earth->mmu_alloc();
     earth->mmu_map(pid, stack_start++, ppage_id);
 }
