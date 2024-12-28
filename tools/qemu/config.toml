@@ -3,7 +3,7 @@
   firmware = "tools/qemu/egos.bin"
 
 [memory]
-  size = "256M"
+  size = "16M"
 
 [smp-opts]
   cpus = "5"

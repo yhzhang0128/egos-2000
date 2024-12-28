@@ -50,8 +50,8 @@ extern struct grass* grass;
 /* Memory regions */
 /* clang-format off */
 #define PAGE_SIZE         4096
-#define RAM_END           0x90000000 /* 256MB memory in total     */
-#define APPS_PAGES_BASE   0x80800000 /* 248MB initially free      */
+#define RAM_END           0x81000000 /* 16MB memory in total      */
+#define APPS_PAGES_BASE   0x80800000 /* 8MB free for mmu_alloc    */
 
 #define APPS_STACK_TOP    0x80800000 /* 2MB app stack             */
 #define SYSCALL_ARG       0x80601000 /* struct syscall            */
