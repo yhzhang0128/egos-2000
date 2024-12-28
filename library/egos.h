@@ -6,13 +6,13 @@ typedef unsigned int uint;
 typedef unsigned long long ulonglong;
 
 struct earth {
-    /* CPU interface */
+    /* CPU & memory management interface */
     void (*timer_reset)(uint core_id);
-    void (*mmu_flush_cache)();
     void (*mmu_alloc)(uint* ppage_id, void** ppage_addr);
     void (*mmu_free)(int pid);
     void (*mmu_map)(int pid, uint vpage_no, uint ppage_id);
     void (*mmu_switch)(int pid);
+    void (*mmu_flush_cache)();
 
     /* Devices interface */
     void (*tty_read)(char* c);
@@ -26,10 +26,6 @@ struct earth {
 };
 
 struct grass {
-    /* Shell environment variables */
-    int workdir_ino;
-    char workdir[128];
-
     /* Process control interface */
     int (*proc_alloc)();
     void (*proc_free)(int pid);
@@ -38,6 +34,10 @@ struct grass {
     /* System call interface */
     void (*sys_send)(int receiver, char* msg, uint size);
     void (*sys_recv)(int from, int* sender, char* buf, uint size);
+
+    /* Shell environment variables */
+    int workdir_ino;
+    char workdir[128];
 };
 
 extern struct earth* earth;

@@ -8,7 +8,7 @@ clang-format -style=file:tools/format/style.txt -i \
 ./apps/user/cd.c \
 ./apps/user/crash1.c \
 ./apps/user/echo.c \
-./apps/system/sys_process.c \
+./apps/system/sys_proc.c \
 ./apps/system/sys_shell.c \
 ./apps/system/sys_file.c \
 ./apps/system/sys_terminal.c \
