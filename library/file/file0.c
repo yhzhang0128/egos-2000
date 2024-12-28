@@ -10,8 +10,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define DUMMY_INO_MAX_SIZE       128
-#define DUMMY_INO_DISK_OFFSET(x) x * DUMMY_INO_MAX_SIZE
+#define DUMMY_INO_MAX_SIZE 128
+#define DUMMY_INO_DISK_OFFSET(x) x* DUMMY_INO_MAX_SIZE
 
 static int mydisk_getsize(inode_store_t* this_bs, uint ino) {
     inode_intf below = this_bs->state;
@@ -21,16 +21,19 @@ static int mydisk_getsize(inode_store_t* this_bs, uint ino) {
     return *((int*)ino_size_block.bytes);
 }
 
-static int mydisk_setsize(inode_store_t* this_bs, uint ino, block_no nblocks){
+static int mydisk_setsize(inode_store_t* this_bs, uint ino, block_no nblocks) {
     return -1;
 }
 
-static int mydisk_read(inode_store_t* this_bs, uint ino, block_no offset, block_t* block){
+static int mydisk_read(inode_store_t* this_bs, uint ino, block_no offset,
+                       block_t* block) {
     inode_intf below = this_bs->state;
-    return (below->read)(below, 0, DUMMY_INO_DISK_OFFSET(ino) + offset + 1, block);
+    return (below->read)(below, 0, DUMMY_INO_DISK_OFFSET(ino) + offset + 1,
+                         block);
 }
 
-static int mydisk_write(inode_store_t* this_bs, uint ino, block_no offset, block_t* block){
+static int mydisk_write(inode_store_t* this_bs, uint ino, block_no offset,
+                        block_t* block) {
     inode_intf below = this_bs->state;
     uint disk_offset = DUMMY_INO_DISK_OFFSET(ino);
 
@@ -59,6 +62,4 @@ inode_intf mydisk_init(inode_intf below, uint below_ino) {
     return this_bs;
 }
 
-int mydisk_create(inode_intf below, uint below_ino, uint ninodes) {
-    return 0;
-}
+int mydisk_create(inode_intf below, uint below_ino, uint ninodes) { return 0; }

@@ -3,9 +3,9 @@
 #include "servers.h"
 
 enum syscall_type {
-	SYS_UNUSED,
-	SYS_RECV,  /* 1 */
-	SYS_SEND,  /* 2 */
+    SYS_UNUSED,
+    SYS_RECV, /* 1 */
+    SYS_SEND, /* 2 */
 };
 
 struct syscall {
@@ -13,7 +13,7 @@ struct syscall {
     int sender;             /* sender process ID    */
     int receiver;           /* receiver process ID  */
     char content[SYSCALL_MSG_LEN];
-    enum {PENDING, DONE} status;
+    enum { PENDING, DONE } status;
 };
 
 void sys_send(int receiver, char* msg, uint size);

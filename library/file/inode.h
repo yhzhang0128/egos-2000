@@ -20,13 +20,13 @@
  *          set the size of the inode store at the given inode number
  *          returns the old size
  *
- *      int read(inode_store_t *this_bs, unsigned int ino, block_no offset, block_t *block)
- *          read the block at the given inode number and offset and return in *block
- *          returns 0
+ *      int read(inode_store_t *this_bs, unsigned int ino, block_no offset,
+ * block_t *block) read the block at the given inode number and offset and
+ * return in *block returns 0
  *
- *      int write(inode_store_t *this_bs, unsigned int ino, block_no offset, block_t *block)
- *          write *block to the block at the given inode number and offset
- *          returns 0
+ *      int write(inode_store_t *this_bs, unsigned int ino, block_no offset,
+ * block_t *block) write *block to the block at the given inode number and
+ * offset returns 0
  *
  * All these return -1 upon error (typically after printing the
  * reason for the error).
@@ -38,17 +38,19 @@
 #pragma once
 #include "disk.h"
 
-#define NINODES  128
+#define NINODES 128
 
 typedef struct inode_store {
-    int (*getsize)(struct inode_store *this_bs, uint ino);
-    int (*setsize)(struct inode_store *this_bs, uint ino, block_no newsize);
-    int (*read)(struct inode_store *this_bs, uint ino, block_no offset, block_t *block);
-    int (*write)(struct inode_store *this_bs, uint ino, block_no offset, block_t *block);
-    void *state;
+    int (*getsize)(struct inode_store* this_bs, uint ino);
+    int (*setsize)(struct inode_store* this_bs, uint ino, block_no newsize);
+    int (*read)(struct inode_store* this_bs, uint ino, block_no offset,
+                block_t* block);
+    int (*write)(struct inode_store* this_bs, uint ino, block_no offset,
+                 block_t* block);
+    void* state;
 } inode_store_t;
 
-typedef inode_store_t *inode_intf;    /* inode store interface */
+typedef inode_store_t* inode_intf; /* inode store interface */
 
 inode_intf fs_disk_init();
 

@@ -32,8 +32,8 @@ int main() {
 
     /* Student's code ends here. */
     CRITICAL("Welcome to the egos-2000 shell!");
-    
-    char buf[256] = "cd";  /* Enter the home directory first */
+
+    char buf[256] = "cd"; /* Enter the home directory first */
     while (1) {
         struct proc_request req;
         struct proc_reply reply;
@@ -42,7 +42,8 @@ int main() {
             /* Student's code goes here (multi-core and atomic instruction) */
 
             /* Add proc_coresinfo() from kernel.c into the grass interface */
-            /* Invoke the function here to show which process is running on each core */
+            /* Invoke the function here to show which process is running on each
+             * core */
 
             /* Student's code ends here. */
 
@@ -55,13 +56,15 @@ int main() {
                 INFO("sys_shell: too many arguments or argument too long");
             } else {
                 grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
-                grass->sys_recv(GPID_PROCESS, NULL, (void*)&reply, sizeof(reply));
+                grass->sys_recv(GPID_PROCESS, NULL, (void*)&reply,
+                                sizeof(reply));
 
                 if (reply.type != CMD_OK)
                     INFO("sys_shell: command causes an error");
                 else if (req.argv[req.argc - 1][0] != '&')
                     /* Wait for foreground command to terminate */
-                    grass->sys_recv(GPID_PROCESS, NULL, (void*)&reply, sizeof(reply));
+                    grass->sys_recv(GPID_PROCESS, NULL, (void*)&reply,
+                                    sizeof(reply));
             }
         }
 

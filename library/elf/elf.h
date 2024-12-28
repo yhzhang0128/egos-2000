@@ -1,14 +1,14 @@
 #pragma once
 
 struct elf32_header {
-    uchar  e_ident[16];
+    uchar e_ident[16];
     ushort e_type;
     ushort e_machine;
-    uint   e_version;
-    uint   e_entry;
-    uint   e_phoff;
-    uint   e_shoff;
-    uint   e_flags;
+    uint e_version;
+    uint e_entry;
+    uint e_phoff;
+    uint e_shoff;
+    uint e_flags;
     ushort e_ehsize;
     ushort e_phentsize;
     ushort e_phnum;

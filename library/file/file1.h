@@ -33,14 +33,14 @@
 #pragma once
 #include "inode.h"
 
-#define REFS_PER_BLOCK    (BLOCK_SIZE / sizeof(block_no))
-#define INODES_PER_BLOCK  (BLOCK_SIZE / sizeof(struct treedisk_inode))
+#define REFS_PER_BLOCK (BLOCK_SIZE / sizeof(block_no))
+#define INODES_PER_BLOCK (BLOCK_SIZE / sizeof(struct treedisk_inode))
 
 /* Contents of the "superblock".  There is only one of these.
  */
 struct treedisk_superblock {
-    block_no n_inodeblocks;        /* # blocks with inodes */
-    block_no free_list;            /* pointer to first block on free list */
+    block_no n_inodeblocks; /* # blocks with inodes */
+    block_no free_list;     /* pointer to first block on free list */
 };
 
 /* An inode describes a file (= virtual inode store).  "nblocks" contains
@@ -50,8 +50,8 @@ struct treedisk_superblock {
  * not is maintained elsewhere.
  */
 struct treedisk_inode {
-    block_no root;               /* block number of root node */
-    block_no nblocks;            /* total size of the file */
+    block_no root;    /* block number of root node */
+    block_no nblocks; /* total size of the file */
 };
 
 /* An inode block is filled with inodes.

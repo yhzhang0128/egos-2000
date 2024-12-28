@@ -22,8 +22,8 @@ void grass_entry(uint core_id) {
     grass->proc_alloc     = proc_alloc;
     grass->proc_set_ready = proc_set_ready;
 
-    grass->sys_send       = sys_send;
-    grass->sys_recv       = sys_recv;
+    grass->sys_send = sys_send;
+    grass->sys_recv = sys_recv;
 
     /* Load the first system server GPID_PROCESS */
     INFO("Load kernel process #%d: sys_process", GPID_PROCESS);
@@ -43,5 +43,5 @@ void grass_entry(uint core_id) {
 
     /* Jump to the entry of process GPID_PROCESS */
     asm("mv a0, %0" ::"r"(APPS_ARG));
-    asm("jr %0" :: "r" (APPS_ENTRY));
+    asm("jr %0" ::"r"(APPS_ENTRY));
 }

@@ -12,11 +12,11 @@
 
 static int app_ino, app_pid;
 static void sys_spawn(uint base);
-static int app_spawn(struct proc_request *req);
+static int app_spawn(struct proc_request* req);
 
 int main() {
     SUCCESS("Enter kernel process GPID_PROCESS");
-    
+
     int sender, shell_waiting;
     char buf[SYSCALL_MSG_LEN];
 
@@ -39,7 +39,8 @@ int main() {
         case PROC_SPAWN:
             reply->type = app_spawn(req);
 
-            shell_waiting = (req->argv[req->argc - 1][0] != '&') && (reply->type == CMD_OK);
+            shell_waiting =
+                (req->argv[req->argc - 1][0] != '&') && (reply->type == CMD_OK);
             if (!shell_waiting && reply->type == CMD_OK)
                 INFO("process %d running in the background", app_pid);
             grass->sys_send(GPID_SHELL, (void*)reply, sizeof(*reply));
@@ -61,14 +62,12 @@ int main() {
     }
 }
 
-static void app_read(uint off, char* dst) {
-    file_read(app_ino, off, dst);
-}
+static void app_read(uint off, char* dst) { file_read(app_ino, off, dst); }
 
 static int app_spawn(struct proc_request* req) {
     int bin_ino = dir_lookup(0, "bin/");
     if ((app_ino = dir_lookup(bin_ino, req->argv[0])) < 0) return CMD_ERROR;
-    int argc = req->argv[req->argc - 1][0] == '&'? req->argc - 1 : req->argc;
+    int argc = req->argv[req->argc - 1][0] == '&' ? req->argc - 1 : req->argc;
 
     app_pid = grass->proc_alloc();
     elf_load(app_pid, app_read, argc, (void**)req->argv);
@@ -78,7 +77,8 @@ static int app_spawn(struct proc_request* req) {
 }
 
 static int sys_proc_base;
-char* sysproc_names[] = {"sys_process", "sys_terminal", "sys_file", "sys_shell"};
+char* sysproc_names[] = {"sys_process", "sys_terminal", "sys_file",
+                         "sys_shell"};
 
 static void sys_proc_read(uint block_no, char* dst) {
     earth->disk_read(sys_proc_base + block_no, 1, dst);

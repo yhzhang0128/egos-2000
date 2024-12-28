@@ -8,16 +8,16 @@
 
 #include "egos.h"
 
-#define MTIME_BASE    (CLINT_BASE + 0xBFF8)
+#define MTIME_BASE (CLINT_BASE + 0xBFF8)
 #define MTIMECMP_BASE (CLINT_BASE + 0x4000)
-#define QUANTUM       (earth->platform == QEMU? 500000UL : 50000000UL)
+#define QUANTUM (earth->platform == QEMU ? 500000UL : 50000000UL)
 
 ulonglong mtime_get() {
     uint low, high;
     do {
         high = REGW(MTIME_BASE, 4);
         low  = REGW(MTIME_BASE, 0);
-    }  while ( REGW(MTIME_BASE, 4) != high );
+    } while (REGW(MTIME_BASE, 4) != high);
 
     return (((ulonglong)high) << 32) | low;
 }
@@ -32,24 +32,18 @@ static void timer_reset(uint core_id) {
     mtimecmp_set(mtime_get() + QUANTUM, core_id);
 }
 
-/* Both trap functions are defined in grass/kernel.s */
-void trap_entry();
-void trap_from_S_mode();
-
 void intr_init(uint core_id) {
-    /* Setup the timer */
+    /* Initialize the timer */
     earth->timer_reset = timer_reset;
     mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
-    /* Setup the interrupt/exception entry function (defined in grass/kernel.s) */
-    if (earth->translation == SOFT_TLB) {
-        asm("csrw mtvec, %0" ::"r"(trap_entry));
-        INFO("Use direct mode and put the address of trap_entry() to mtvec");
-    } else {
-        asm("csrw mtvec, %0" ::"r"(trap_from_S_mode));
-        INFO("Use direct mode and put the address of trap_from_S_mode() to mtvec");
-        /* trap_from_S_mode does a bit more than trap_entry for page table translation */
-    }
+    /* Setup the interrupt/exception handling entry */
+    void trap_entry(); /* (defined in grass/kernel.s) */
+    void trap_entry_using_page_table_translation();
+    asm("csrw mtvec, %0" ::"r"((earth->translation != PAGE_TABLE)
+                                   ? trap_entry
+                                   : trap_entry_using_page_table_translation));
+    INFO("Use direct mode and put the address of the trap entry into mtvec");
 
     /* Enable timer interrupt */
     asm("csrw mip, %0" ::"r"(0));

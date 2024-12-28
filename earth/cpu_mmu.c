@@ -16,13 +16,14 @@
 /* Memory allocation and free */
 #define APPS_PAGES_CNT (RAM_END - APPS_PAGES_BASE) / PAGE_SIZE
 struct page_info {
-    int  use;      /* Is this page free or allocated? */
-    int  pid;      /* Which process owns this page? */
-    uint vpage_no; /* Which virtual page in this process maps to this physial page? */
+    int use;       /* Is this page free or allocated? */
+    int pid;       /* Which process owns this page? */
+    uint vpage_no; /* Which virtual page in this process maps to this physial
+                      page? */
 } page_info_table[APPS_PAGES_CNT];
 
 #define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
-#define PAGE_ID_TO_ADDR(x) (char*)APPS_PAGES_BASE + x * PAGE_SIZE
+#define PAGE_ID_TO_ADDR(x) (char*)APPS_PAGES_BASE + x* PAGE_SIZE
 
 void mmu_alloc(uint* ppage_id, void** ppage_addr) {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
@@ -55,15 +56,13 @@ void soft_tlb_switch(int pid) {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (page_info_table[i].use && page_info_table[i].pid == curr_vm_pid)
             memcpy(PAGE_ID_TO_ADDR(i),
-                   PAGE_NO_TO_ADDR(page_info_table[i].vpage_no),
-                   PAGE_SIZE);
+                   PAGE_NO_TO_ADDR(page_info_table[i].vpage_no), PAGE_SIZE);
 
     /* Map pid to the user address space */
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (page_info_table[i].use && page_info_table[i].pid == pid)
             memcpy(PAGE_NO_TO_ADDR(page_info_table[i].vpage_no),
-                   PAGE_ID_TO_ADDR(i),
-                   PAGE_SIZE);
+                   PAGE_ID_TO_ADDR(i), PAGE_SIZE);
 
     curr_vm_pid = pid;
 }
@@ -79,8 +78,8 @@ void soft_tlb_switch(int pid) {
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define OS_RWX       (0xC0 | 0xF)
-#define USER_RWX     (0xC0 | 0x1F)
+#define OS_RWX (0xC0 | 0xF)
+#define USER_RWX (0xC0 | 0x1F)
 #define MAX_NPROCESS 256
 static uint* root;
 static uint* leaf;
@@ -120,19 +119,23 @@ void pagetable_identity_mapping(int pid) {
     for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
         setup_identity_region(pid, i, 1024, OS_RWX);    /* RAM   */
     setup_identity_region(pid, CLINT_BASE, 16, OS_RWX); /* CLINT */
-    setup_identity_region(pid, UART_BASE, 1,  OS_RWX);  /* UART  */
-    setup_identity_region(pid, SPI_BASE,   1,  OS_RWX); /* SPI   */
+    setup_identity_region(pid, UART_BASE, 1, OS_RWX);   /* UART  */
+    setup_identity_region(pid, SPI_BASE, 1, OS_RWX);    /* SPI   */
 
     if (earth->platform == ARTY) {
-        setup_identity_region( pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
-        setup_identity_region( pid, ETHMAC_CSR_BASE,  1, OS_RWX);   /* ETHMAC CSR */
-        setup_identity_region( pid, ETHMAC_TX_BUFFER, 1, OS_RWX);   /* ETHMAC TX buffer */
-        setup_identity_region( pid, ETHMAC_RX_BUFFER, 1, OS_RWX);   /* ETHMAC RX buffer */
+        setup_identity_region(pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
+        setup_identity_region(pid, ETHMAC_CSR_BASE, 1, OS_RWX); /* ETHMAC CSR */
+        setup_identity_region(pid, ETHMAC_TX_BUFFER, 1,
+                              OS_RWX); /* ETHMAC TX buffer */
+        setup_identity_region(pid, ETHMAC_RX_BUFFER, 1,
+                              OS_RWX); /* ETHMAC RX buffer */
     } else {
         /* Student's code goes here (networking) */
 
         /* Create page tables for the GEM region of the sifive_u machine */
-        /* Reference: https://github.com/qemu/qemu/blob/stable-9.0/hw/riscv/sifive_u.c#L86 */
+        /* Reference:
+         * https://github.com/qemu/qemu/blob/stable-9.0/hw/riscv/sifive_u.c#L86
+         */
 
         /* Student's code ends here. */
     }
@@ -146,23 +149,25 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     /* Remove the following line of code and, instead,
      * (1) if page tables for pid do not exist, build the tables:
      *  (a) If the process is a system process (pid < GPID_USER_START)
-     *      | Start Address | # Pages | Size   | Explanation                         |
+     *      | Start Address | # Pages | Size   | Explanation |
      *      +---------------+---------+--------+-------------------------------------+
-     *      | 0x80000000    | 1024    | 4 MB   | EGOS region (code+data+heap+stack)  |
-     *      | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack)  |
-     *      | 0x80800000    | 63488   | 248 MB | Initially free pages for allocation |
-     *      | CLINT_BASE    | 16      | 64 KB  | Memory-mapped registers for timer   |
-     *      | UART_BASE     | 1       | 4 KB   | Memory-mapped registers for TTY     |
-     *      | SPI_BASE      | 1       | 4 KB   | Memory-mapped registers for SD card |
+     *      | 0x80000000    | 1024    | 4 MB   | EGOS region
+     * (code+data+heap+stack)  | | 0x80400000    | 1024    | 4 MB   | Apps
+     * region (code+data+heap+stack)  | | 0x80800000    | 63488   | 248 MB |
+     * Initially free pages for allocation | | CLINT_BASE    | 16      | 64 KB
+     * | Memory-mapped registers for timer   | | UART_BASE     | 1       | 4 KB
+     * | Memory-mapped registers for TTY     | | SPI_BASE      | 1       | 4 KB
+     * | Memory-mapped registers for SD card |
      *
      *  (b) If the process is a user process (pid >= GPID_USER_START)
-     *      | Start Address | # Pages | Size   | Explanation                         |
+     *      | Start Address | # Pages | Size   | Explanation |
      *      +---------------+---------+--------+-------------------------------------+
-     *      | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack)  |
+     *      | 0x80400000    | 1024    | 4 MB   | Apps region
+     * (code+data+heap+stack)  |
      *
-     * (2) if page tables for pid exist, find the PTE and update entries of the tables;
-     * Feel free to modify and call the two helper functions: setup_identity_region()
-     * and pagetable_identity_mapping().
+     * (2) if page tables for pid exist, find the PTE and update entries of the
+     * tables; Feel free to modify and call the two helper functions:
+     * setup_identity_region() and pagetable_identity_mapping().
      */
     soft_tlb_map(pid, vpage_no, ppage_id);
 
@@ -184,25 +189,29 @@ void page_table_switch(int pid) {
 void flush_cache() {
     if (earth->platform == ARTY) {
         /* Flush the L1 instruction cache */
-        /* See https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25 */
+        /* See
+         * https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25
+         */
         asm(".word(0x100F)\nnop\nnop\nnop\nnop\nnop\n");
     }
-    if (earth->translation == PAGE_TABLE){
+    if (earth->translation == PAGE_TABLE) {
         /* Flush the TLB, which is the cache of page table entries */
-        /* See https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf#subsection.4.2.1 */
+        /* See
+         * https://riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf#subsection.4.2.1
+         */
         asm("sfence.vma zero,zero");
     }
 }
 
 /* MMU Initialization */
 void mmu_init() {
-    earth->mmu_free = mmu_free;
-    earth->mmu_alloc = mmu_alloc;
+    earth->mmu_free        = mmu_free;
+    earth->mmu_alloc       = mmu_alloc;
     earth->mmu_flush_cache = flush_cache;
 
     /* Setup a PMP region for the whole 4GB address space */
-    asm("csrw pmpaddr0, %0" : : "r" (0x40000000));
-    asm("csrw pmpcfg0, %0" : : "r" (0xF));
+    asm("csrw pmpaddr0, %0" : : "r"(0x40000000));
+    asm("csrw pmpcfg0, %0" : : "r"(0xF));
 
     /* Student's code goes here (PMP memory protection). */
 
@@ -217,7 +226,8 @@ void mmu_init() {
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(&buf[0]));
     earth->translation = (buf[0] == '0') ? PAGE_TABLE : SOFT_TLB;
-    INFO("%s translation is chosen", earth->translation == PAGE_TABLE ? "Page table" : "Software");
+    INFO("%s translation is chosen",
+         earth->translation == PAGE_TABLE ? "Page table" : "Software");
 
     if (earth->translation == PAGE_TABLE) {
         /* Setup an identity mapping using page tables */

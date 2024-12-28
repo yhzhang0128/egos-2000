@@ -16,7 +16,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     char buf[BLOCK_SIZE];
     reader(0, buf);
 
-    struct elf32_header* header = (void*) buf;
+    struct elf32_header* header          = (void*)buf;
     struct elf32_program_header* pheader = (void*)(buf + header->e_phoff);
 
     for (uint i = 0; i < header->e_phnum; i++) {

@@ -12,12 +12,13 @@ enum proc_status {
     PROC_PENDING_SYSCALL
 };
 
-#define SAVED_REGISTER_NUM  (32-3) /* zero, gp and tp are the 3 registers not saved */
-                                   /* zero is always zero; gp/tp are not used in egos-2000 */
-#define SAVED_REGISTER_SIZE SAVED_REGISTER_NUM * sizeof(uint)
+#define SAVED_REGISTER_NUM (32 - 3)
+/* zero, gp and tp are the 3 registers not saved */
+/* zero is always zero; gp/tp are not used in egos-2000 */
+#define SAVED_REGISTER_SIZE SAVED_REGISTER_NUM * 4
 #define SAVED_REGISTER_ADDR (void*)(EGOS_STACK_TOP - SAVED_REGISTER_SIZE)
 
-struct process{
+struct process {
     int pid;
     struct syscall syscall;
     enum proc_status status;
@@ -29,13 +30,13 @@ struct process{
     /* Student's code ends here. */
 };
 
-#define MAX_NPROCESS  16
+#define MAX_NPROCESS 16
 
 ulonglong mtime_get();
-int  proc_alloc();
+int proc_alloc();
 void proc_free(int);
-void proc_set_ready (int);
-void proc_set_running (int);
-void proc_set_runnable (int);
-void proc_set_pending (int);
-void core_set_idle (uint);
+void proc_set_ready(int);
+void proc_set_running(int);
+void proc_set_runnable(int);
+void proc_set_pending(int);
+void core_set_idle(uint);

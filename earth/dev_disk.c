@@ -9,10 +9,7 @@
 #include "disk.h"
 #include <string.h>
 
-enum disk_type {
-    SD_CARD,
-    FLASH_ROM
-};
+enum disk_type { SD_CARD, FLASH_ROM };
 static enum disk_type type;
 
 static int sd_init();
@@ -40,21 +37,22 @@ void disk_init() {
     earth->disk_write = disk_write;
 
     type = (sd_init() == 0) ? SD_CARD : FLASH_ROM;
-    if (type == FLASH_ROM) CRITICAL("Failed at initializing SD card; Use FLASH ROM instead");
+    if (type == FLASH_ROM)
+        CRITICAL("Failed at initializing SD card; Use FLASH ROM instead");
 }
 
 /* Two helper functions for the SPI bus */
-#define LITEX_SPI_CONTROL    0UL
-#define LITEX_SPI_STATUS     4UL
-#define LITEX_SPI_MOSI       8UL
-#define LITEX_SPI_MISO      12UL
-#define LITEX_SPI_CS        16UL
-#define LITEX_SPI_CLKDIV    24UL
+#define LITEX_SPI_CONTROL 0UL
+#define LITEX_SPI_STATUS 4UL
+#define LITEX_SPI_MOSI 8UL
+#define LITEX_SPI_MISO 12UL
+#define LITEX_SPI_CS 16UL
+#define LITEX_SPI_CLKDIV 24UL
 
-#define SIFIVE_SPI_CSDEF    20UL
-#define SIFIVE_SPI_CSMODE   24UL
-#define SIFIVE_SPI_TXDATA   72UL
-#define SIFIVE_SPI_RXDATA   76UL
+#define SIFIVE_SPI_CSDEF 20UL
+#define SIFIVE_SPI_CSMODE 24UL
+#define SIFIVE_SPI_TXDATA 72UL
+#define SIFIVE_SPI_RXDATA 76UL
 
 char spi_transfer(char byte) {
     /* "transfer" means sending a byte and then receiving a byte */
@@ -73,8 +71,8 @@ char spi_transfer(char byte) {
 }
 
 void spi_set_clock(uint freq) {
-    #define CPU_CLOCK_RATE 100000000  /* 100MHz */
-    uint div = CPU_CLOCK_RATE / freq + 1;
+#define CPU_CLOCK_RATE 100000000 /* 100MHz */
+    uint div                         = CPU_CLOCK_RATE / freq + 1;
     REGW(SPI_BASE, LITEX_SPI_CLKDIV) = div;
 }
 
@@ -107,7 +105,7 @@ static void sd_read(uint offset, char* dst) {
     while (spi_transfer(0xFF) != 0xFF);
 
     /* Send read request with cmd17 */
-    char *arg = (void*)&offset;
+    char* arg = (void*)&offset;
     char reply, cmd17[] = {0x51, arg[3], arg[2], arg[1], arg[0], 0xFF};
 
     if (reply = sd_exec_cmd(cmd17))
@@ -129,7 +127,7 @@ static void sd_write(uint offset, char* src) {
     while (spi_transfer(0xFF) != 0xFF);
 
     /* Send write request with cmd24 */
-    char *arg = (void*)&offset;
+    char* arg = (void*)&offset;
     char reply, cmd24[] = {0x58, arg[3], arg[2], arg[1], arg[0], 0xFF};
     if (reply = sd_exec_cmd(cmd24))
         FATAL("SD card replies cmd24 with status %.2x", reply);
@@ -173,7 +171,7 @@ static int sd_init() {
 
     INFO("Check SD card type and voltage with cmd8");
     char cmd8[] = {0x48, 0x00, 0x00, 0x01, 0xAA, 0x87};
-    reply = sd_exec_cmd(cmd8);
+    reply       = sd_exec_cmd(cmd8);
 
     if (reply & 0x04) {
         /* Illegal command */

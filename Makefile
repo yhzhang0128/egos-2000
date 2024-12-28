@@ -44,12 +44,10 @@ $(USRAPP_ELFS): $(RELEASE)/user/%.elf : apps/user/%.c $(APPS_DEPS)
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
 
 install: egos
-	@echo "$(GREEN)-------- Create the Disk Image --------$(END)"
+	@echo "$(GREEN)-------- Create the Disk & BootROM Image --------$(END)"
 	$(OBJCOPY) -O binary $(RELEASE)/egos.elf tools/qemu/egos.bin
-	$(CC) tools/mkfs.c library/file/file$(FILESYS).c -DMKFS -DFILESYS=$(FILESYS) $(INCLUDE) -o tools/mkfs; cd tools; ./mkfs
-	@echo "$(YELLOW)-------- Create the BootROM Image --------$(END)"
-	$(CC) tools/mkrom.c -DCPU_BIN_FILE="\"fpga/vexriscv/vexriscv_cpu_$(BOARD).bin\"" -o tools/mkrom
-	cd tools; ./mkrom
+	$(CC) tools/mkfs.c library/file/file$(FILESYS).c -DMKFS -DFILESYS=$(FILESYS) -DCPU_BIN_FILE="\"fpga/vexriscv/vexriscv_cpu_$(BOARD).bin\"" $(INCLUDE) -o tools/mkfs
+	cd tools; rm -f disk.img bootROM.bin; ./mkfs
 
 qemu: install
 	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"

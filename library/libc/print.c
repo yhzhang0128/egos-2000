@@ -15,7 +15,7 @@
 #include <stdarg.h>
 
 void format_to_str(char* out, const char* fmt, va_list args) {
-    for(out[0] = 0; *fmt != '\0'; fmt++) {
+    for (out[0] = 0; *fmt != '\0'; fmt++) {
         if (*fmt != '%') {
             strncat(out, fmt, 1);
         } else {
@@ -35,26 +35,23 @@ void format_to_str(char* out, const char* fmt, va_list args) {
     }
 }
 
-#define LOG(prefix, suffix) char buf[512]; \
-                            strcpy(buf, prefix); \
-                            va_list args; \
-                            va_start(args, format); \
-                            format_to_str(buf + strlen(prefix), format, args); \
-                            va_end(args); \
-                            strcat(buf, suffix); \
-                            term_write(buf, strlen(buf));
+#define LOG(prefix, suffix)                                                    \
+    char buf[512];                                                             \
+    strcpy(buf, prefix);                                                       \
+    va_list args;                                                              \
+    va_start(args, format);                                                    \
+    format_to_str(buf + strlen(prefix), format, args);                         \
+    va_end(args);                                                              \
+    strcat(buf, suffix);                                                       \
+    term_write(buf, strlen(buf));
 
-int my_printf(const char* format, ...) {
-    LOG("", "");
-}
+int my_printf(const char* format, ...) { LOG("", ""); }
 
-int INFO(const char* format, ...) {
-    LOG("[INFO] ", "\r\n")
-}
+int INFO(const char* format, ...) { LOG("[INFO] ", "\r\n") }
 
 int FATAL(const char* format, ...) {
     LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n") /* red color */
-    while(1);
+    while (1);
 }
 
 int SUCCESS(const char* format, ...) {

@@ -10,7 +10,7 @@
 
 int main(int argc, char** argv) {
     if (argc == 1) {
-        int home_ino = dir_lookup(0, "home/");
+        int home_ino       = dir_lookup(0, "home/");
         grass->workdir_ino = dir_lookup(home_ino, "yunhao/");
         strcpy(grass->workdir, "/home/yunhao");
         return 0;
@@ -36,6 +36,6 @@ int main(int argc, char** argv) {
         while (grass->workdir[len] != '/') grass->workdir[len--] = 0;
         if (len) grass->workdir[len] = 0;
     }
-    
+
     return 0;
 }

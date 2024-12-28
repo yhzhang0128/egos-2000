@@ -1,0 +1,13 @@
+# clang-format version 18.1.8
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+---
+Language: Cpp
+SortIncludes: false
+PointerAlignment: Left
+DerivePointerAlignment: false
+AlignConsecutiveAssignments: true
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true

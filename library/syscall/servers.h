@@ -1,7 +1,7 @@
 #pragma once
 
 #include "inode.h"
-#define SYSCALL_MSG_LEN    1024
+#define SYSCALL_MSG_LEN 1024
 
 void exit(int status);
 int term_read(char* buf, uint len);
@@ -20,27 +20,20 @@ enum grass_servers {
 };
 
 /* GPID_PROCESS */
-#define CMD_NARGS       16
-#define CMD_ARG_LEN     32
+#define CMD_NARGS 16
+#define CMD_ARG_LEN 32
 struct proc_request {
-    enum {
-          PROC_SPAWN,
-          PROC_EXIT,
-          PROC_KILLALL
-    } type;
+    enum { PROC_SPAWN, PROC_EXIT, PROC_KILLALL } type;
     int argc;
     char argv[CMD_NARGS][CMD_ARG_LEN];
 };
 
 struct proc_reply {
-    enum {
-          CMD_OK,
-          CMD_ERROR
-    } type;
+    enum { CMD_OK, CMD_ERROR } type;
 };
 
 /* GPID_TERMINAL */
-#define TERM_BUF_SIZE   512
+#define TERM_BUF_SIZE 512
 struct term_request {
     enum { TERM_INPUT, TERM_OUTPUT } type;
     uint len;
@@ -55,9 +48,9 @@ struct term_reply {
 /* GPID_FILE */
 struct file_request {
     enum {
-          FILE_UNUSED,
-          FILE_READ,
-          FILE_WRITE,
+        FILE_UNUSED,
+        FILE_READ,
+        FILE_WRITE,
     } type;
     uint ino;
     uint offset;
