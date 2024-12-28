@@ -44,7 +44,7 @@ extern struct earth* earth;
 extern struct grass* grass;
 
 #define NCORES             4
-#define release(x)         x = 0;
+#define release(x)         __sync_lock_release(&x);
 #define acquire(x)         while(__sync_lock_test_and_set(&x, 1) != 0);
 
 /* Memory regions */

@@ -50,6 +50,9 @@ void boot() {
         intr_init(core_id);
         SUCCESS("Finished initializing the MMU, timer and interrupts");
 
+        release(boot_lock);
+        while(1);
+
         uint mstatus, M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
         uint GRASS_MODE = (earth->translation == SOFT_TLB)? M_MODE : S_MODE;
         asm("csrr %0, mstatus" : "=r"(mstatus));
