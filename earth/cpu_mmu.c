@@ -103,7 +103,7 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
         leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | flag;
 }
 
-void pagetable_identity_mapping(int pid) {
+void pagetable_identity_map(int pid) {
     /* Allocate the root page table and set the page table base (satp) */
     uint ppage_id = earth->mmu_alloc();
     root          = (void*)PAGE_ID_TO_ADDR(ppage_id);
@@ -163,7 +163,7 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      *
      * (2) if page tables for pid exist, find the PTE and update entries of the
      * tables; Feel free to modify and call the two helper functions:
-     * setup_identity_region() and pagetable_identity_mapping().
+     * setup_identity_region() and pagetable_identity_map().
      */
     soft_tlb_map(pid, vpage_no, ppage_id);
 
@@ -227,7 +227,7 @@ void mmu_init() {
 
     if (earth->translation == PAGE_TABLE) {
         /* Setup an identity mapping using page tables */
-        pagetable_identity_mapping(0);
+        pagetable_identity_map(0);
         asm("csrw satp, %0" ::"r"(((uint)root >> 12) | (1 << 31)));
 
         earth->mmu_map    = page_table_map;
