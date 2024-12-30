@@ -142,29 +142,29 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
 
     /* Student's code goes here (page table translation). */
 
+    /* clang-format off */
     /* Remove the following line of code and, instead,
      * (1) if page tables for pid do not exist, build the tables:
      *  (a) If the process is a system process (pid < GPID_USER_START)
-     *      | Start Address | # Pages | Size   | Explanation |
+     *      | Start Address | # Pages | Size   | Explanation                         |
      *      +---------------+---------+--------+-------------------------------------+
-     *      | 0x80000000    | 1024    | 4 MB   | EGOS region
-     * (code+data+heap+stack)  | | 0x80400000    | 1024    | 4 MB   | Apps
-     * region (code+data+heap+stack)  | | 0x80800000    | 63488   | 248 MB |
-     * Initially free pages for allocation | | CLINT_BASE    | 16      | 64 KB
-     * | Memory-mapped registers for timer   | | UART_BASE     | 1       | 4 KB
-     * | Memory-mapped registers for TTY     | | SPI_BASE      | 1       | 4 KB
-     * | Memory-mapped registers for SD card |
+     *      | 0x80000000    | 1024    | 4 MB   | EGOS region (code+data+heap+stack)  |
+     *      | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack)  |
+     *      | 0x80800000    | 2048    | 8 MB   | Initially free pages for allocation |
+     *      | CLINT_BASE    | 16      | 64 KB  | Memory-mapped registers for timer   |
+     *      | UART_BASE     | 1       | 4 KB   | Memory-mapped registers for TTY     |
+     *      | SPI_BASE      | 1       | 4 KB   | Memory-mapped registers for SD card |
      *
      *  (b) If the process is a user process (pid >= GPID_USER_START)
-     *      | Start Address | # Pages | Size   | Explanation |
+     *      | Start Address | # Pages | Size   | Explanation                         |
      *      +---------------+---------+--------+-------------------------------------+
-     *      | 0x80400000    | 1024    | 4 MB   | Apps region
-     * (code+data+heap+stack)  |
+     *      | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack)  |
      *
-     * (2) if page tables for pid exist, find the PTE and update entries of the
-     * tables; Feel free to modify and call the two helper functions:
-     * setup_identity_region() and pagetable_identity_map().
+     * (2) if page tables for pid exist, find the PTE and update entries of the tables;
+     * Feel free to modify and call the two helper functions: setup_identity_region()
+     * and pagetable_identity_mapping().
      */
+    /* clang-format on */
     soft_tlb_map(pid, vpage_no, ppage_id);
 
     /* Student's code ends here. */
