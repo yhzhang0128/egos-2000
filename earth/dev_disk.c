@@ -9,39 +9,6 @@
 #include "disk.h"
 #include <string.h>
 
-enum disk_type { SD_CARD, FLASH_ROM };
-static enum disk_type type;
-
-static int sd_init();
-static void sd_read(uint offset, char* dst);
-static void sd_write(uint offset, char* src);
-
-void disk_read(uint block_no, uint nblocks, char* dst) {
-    if (type == SD_CARD) {
-        for (uint i = 0; i < nblocks; i++)
-            sd_read(block_no + i, dst + BLOCK_SIZE * i);
-    } else {
-        char* src = (char*)BOARD_FLASH_ROM + block_no * BLOCK_SIZE;
-        memcpy(dst, src, nblocks * BLOCK_SIZE);
-    }
-}
-
-void disk_write(uint block_no, uint nblocks, char* src) {
-    if (type == FLASH_ROM) FATAL("disk_write: Writing to ROM");
-    for (uint i = 0; i < nblocks; i++)
-        sd_write(block_no + i, src + BLOCK_SIZE * i);
-}
-
-void disk_init() {
-    earth->disk_read  = disk_read;
-    earth->disk_write = disk_write;
-
-    type = (sd_init() == 0) ? SD_CARD : FLASH_ROM;
-    if (type == FLASH_ROM)
-        CRITICAL("Failed at initializing SD card; Use FLASH ROM instead");
-}
-
-/* Two helper functions for the SPI bus */
 #define LITEX_SPI_CONTROL 0UL
 #define LITEX_SPI_STATUS  4UL
 #define LITEX_SPI_MOSI    8UL
@@ -54,6 +21,7 @@ void disk_init() {
 #define SIFIVE_SPI_TXDATA 72UL
 #define SIFIVE_SPI_RXDATA 76UL
 
+/* Two helper functions for the SPI bus */
 char spi_transfer(char byte) {
     /* "transfer" means sending a byte and then receiving a byte */
     uint rxdata;
@@ -196,4 +164,42 @@ static int sd_init() {
         spi_set_clock(20000000);
     }
     return 0;
+}
+
+static enum disk_type { SD_CARD, FLASH_ROM } type;
+
+/* Disk read and write interface functions for struct earth */
+void disk_read(uint block_no, uint nblocks, char* dst) {
+    if (type == SD_CARD) {
+        /* Student's code goes here (serial device driver).
+         * Replace the loop below by reading multiple SD
+         * card blocks using a single SD card command, cmd18 */
+        for (uint i = 0; i < nblocks; i++)
+            sd_read(block_no + i, dst + BLOCK_SIZE * i);
+
+        /* Student's code ends here. */
+    } else {
+        char* src = (char*)BOARD_FLASH_ROM + block_no * BLOCK_SIZE;
+        memcpy(dst, src, nblocks * BLOCK_SIZE);
+    }
+}
+
+void disk_write(uint block_no, uint nblocks, char* src) {
+    if (type == FLASH_ROM) FATAL("disk_write: Writing to ROM");
+
+    /* Student's code goes here (serial device driver).
+     * Replace the loop below by writing multiple SD
+     * card blocks using a single SD card command, cmd25 */
+    for (uint i = 0; i < nblocks; i++)
+        sd_write(block_no + i, src + BLOCK_SIZE * i);
+
+    /* Student's code ends here. */
+}
+
+void disk_init() {
+    earth->disk_read  = disk_read;
+    earth->disk_write = disk_write;
+
+    type = (sd_init() == 0) ? SD_CARD : FLASH_ROM;
+    if (type == FLASH_ROM) CRITICAL("Use FLASH_ROM instead of SD_CARD");
 }

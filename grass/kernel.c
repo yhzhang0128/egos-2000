@@ -127,7 +127,7 @@ static void proc_yield() {
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();
 
-    /* Student's code goes here (PMP, page table translation, and multi-core).
+    /* Student's code goes here (protection, virtual memory, and multi-core).
      */
 
     /* Modify mstatus.MPP to enter machine or user mode during mret
@@ -136,7 +136,7 @@ static void proc_yield() {
 
     /* Student's code ends here. */
 
-    /* Setup the entry point for newly created processes */
+    /* Setup the entry point for a newly created process */
     if (curr_status == PROC_READY) {
         /* Set argc, argv and initial program counter */
         proc_set[curr_proc_idx].saved_register[8] = APPS_ARG;
@@ -191,8 +191,7 @@ static void proc_try_syscall(struct process* proc) {
         rc = proc_try_send(proc);
         break;
     default:
-        FATAL("proc_try_syscall: got unknown syscall type=%d",
-              proc->syscall.type);
+        FATAL("proc_try_syscall: unknown syscall type=%d", proc->syscall.type);
     }
 
     (rc == 0) ? proc_set_runnable(proc->pid) : proc_set_pending(proc->pid);
@@ -200,9 +199,14 @@ static void proc_try_syscall(struct process* proc) {
 
 void proc_coresinfo() {
     /* Student's code goes here (multi-core and atomic instruction) */
-
-    /* Print out the pid of the process running on each core;
-     * Add this function into the grass interface so that shell can invoke it */
-
+    /* Feel free to improve the printing below. */
+    INFO("==============Core ID / Process ID==============");
+    for (uint i = 0; i < NCORES; i++) {
+        if (core_curr_proc[i] == MAX_NPROCESS)
+            INFO("Core #%d is idle", i);
+        else
+            INFO("Core #%d is running pid=%d %s", i,
+                 proc_set[core_curr_proc[i]].pid);
+    }
     /* Student's code ends here. */
 }

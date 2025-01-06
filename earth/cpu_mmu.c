@@ -120,11 +120,9 @@ void pagetable_identity_map(int pid) {
 
     if (earth->platform == ARTY) {
         setup_identity_region(pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
-        setup_identity_region(pid, ETHMAC_CSR_BASE, 1, OS_RWX); /* ETHMAC CSR */
-        setup_identity_region(pid, ETHMAC_TX_BUFFER, 1,
-                              OS_RWX); /* ETHMAC TX buffer */
-        setup_identity_region(pid, ETHMAC_RX_BUFFER, 1,
-                              OS_RWX); /* ETHMAC RX buffer */
+        setup_identity_region(pid, ETHMAC_CSR_BASE, 1, OS_RWX);
+        setup_identity_region(pid, ETHMAC_TX_BUFFER, 1, OS_RWX);
+        setup_identity_region(pid, ETHMAC_RX_BUFFER, 1, OS_RWX);
     } else {
         /* Student's code goes here (networking) */
 
@@ -140,7 +138,7 @@ void pagetable_identity_map(int pid) {
 void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     if (pid >= MAX_NPROCESS) FATAL("page_table_map: pid too large");
 
-    /* Student's code goes here (page table translation). */
+    /* Student's code goes here (virtual memory). */
 
     /* clang-format off */
     /* Remove the following line of code and, instead,
@@ -171,7 +169,7 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
 }
 
 void page_table_switch(int pid) {
-    /* Student's code goes here (page table translation). */
+    /* Student's code goes here (virtual memory). */
 
     /* Remove the following line of code and, instead,
      * modify the page table base register (satp) similar to
