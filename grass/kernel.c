@@ -199,14 +199,8 @@ static void proc_try_syscall(struct process* proc) {
 
 void proc_coresinfo() {
     /* Student's code goes here (multi-core and atomic instruction) */
-    /* Feel free to improve the printing below. */
-    INFO("==============Core ID / Process ID==============");
-    for (uint i = 0; i < NCORES; i++) {
-        if (core_curr_proc[i] == MAX_NPROCESS)
-            INFO("Core #%d is idle", i);
-        else
-            INFO("Core #%d is running pid=%d %s", i,
-                 proc_set[core_curr_proc[i]].pid);
-    }
+    /* Print out the pid of the process running on each core;
+     * Add this function into the grass interface so that shell can invoke it */
+
     /* Student's code ends here. */
 }

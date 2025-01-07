@@ -3,12 +3,22 @@
 
 # BOARD can be a7_35t or a7_100t
 BOARD       = a7_35t
+TOOLCHAIN   = SIFIVE
 QEMU        = qemu-system-riscv32
 
+ifeq ($(TOOLCHAIN), GNU)
+# The official GNU toolchain binaries
+# https://github.com/riscv-collab/riscv-gnu-toolchain
+RISCV_CC    = riscv32-unknown-elf-gcc -march=rv32ima_zicsr
+OBJDUMP     = riscv32-unknown-elf-objdump
+OBJCOPY     = riscv32-unknown-elf-objcopy
+else
 # GNU toolchain binaries from SiFive
+# https://github.com/sifive/freedom-tools/releases
 RISCV_CC    = riscv64-unknown-elf-gcc -march=rv32ima
 OBJDUMP     = riscv64-unknown-elf-objdump
 OBJCOPY     = riscv64-unknown-elf-objcopy
+endif
 
 DEBUG       = build/debug
 RELEASE     = build/release
