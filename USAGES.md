@@ -20,8 +20,7 @@ Setup your working directory and name it as `$EGOS`.
 > cd $EGOS
 > git clone https://github.com/yhzhang0128/egos-2000.git
 ```
-
-Download the [GNU toolchain binaries from xPack](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/tag/v14.2.0-3) to `$EGOS` and compile egos-2000.
+Download the [pre-built binaries of the RISC-V GNU compiler toolchain](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/tag/v14.2.0-3) from xPack to `$EGOS` and compile egos-2000.
 
 ```shell
 > cd $EGOS
@@ -34,7 +33,7 @@ Download the [GNU toolchain binaries from xPack](https://github.com/xpack-dev-to
 
 ## Step2: Run egos-2000 on the QEMU emulator
 
-Download the pre-built binaries of QEMU from [xPack](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v7.2.5-1).
+Download the [pre-built binaries of QEMU](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v7.2.5-1) from xPack.
 
 ```shell
 > cd $EGOS
@@ -55,21 +54,6 @@ Enter 0: page tables
 Enter 1: software TLB
 ```
 
-Instead, you can compile and install the latest QEMU from its [official repository](https://github.com/qemu/qemu), which takes a few minutes.
-```shell
-> cd $EGOS
-> git clone https://github.com/qemu/qemu.git
-> mkdir qemu/build
-> cd qemu/build
-> ../configure --target-list=riscv32-softmmu
-> make
-...
-> export PATH=$EGOS/qemu/build:$PATH
-> cd $EGOS/egos-2000
-> make qemu
-```
-
-
 ## Step3: Run egos-2000 on the Arty board
 
 You can use the Arty A7-35t or A7-100t board
@@ -78,7 +62,7 @@ To use a microSD card on the board, you can program the microSD card with `disk.
 
 ### Step3.1: MacOS or Linux
 
-Download [OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to `$EGOS`
+Download [xPack OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to `$EGOS`
 and program `bootROM.bin` to the on-board ROM.
 
 ```shell
