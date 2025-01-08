@@ -21,12 +21,12 @@ Setup your working directory and name it as `$EGOS`.
 > git clone https://github.com/yhzhang0128/egos-2000.git
 ```
 
-Download the [GNU toolchain from SiFive](https://github.com/sifive/freedom-tools/releases/tag/v2020.04.0-Toolchain.Only) to `$EGOS` and compile egos-2000.
+Download the [GNU toolchain binaries from xPack](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/tag/v14.2.0-3) to `$EGOS` and compile egos-2000.
 
 ```shell
 > cd $EGOS
-> tar -zxvf riscv64-unknown-elf-gcc-8.3.0-2020.04.1-x86_64-xxx-xxx.tar.gz
-> export PATH=$PATH:$EGOS/riscv64-unknown...../bin
+> tar -zxvf xpack-riscv-none-elf-gcc-14.2.0-3-{linux,darwin}-{x64,arm64}.tar.gz
+> export PATH=$PATH:$EGOS/xpack-riscv-none-elf-gcc-14.2.0-3/bin
 > cd $EGOS/egos-2000
 > make
 ......

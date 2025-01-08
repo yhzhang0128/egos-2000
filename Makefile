@@ -2,22 +2,22 @@
 # All rights reserved.
 
 # BOARD can be a7_35t or a7_100t
+TOOLCHAIN   = XPACK
 BOARD       = a7_35t
-TOOLCHAIN   = SIFIVE
 QEMU        = qemu-system-riscv32
 
-ifeq ($(TOOLCHAIN), SIFIVE)
-# GNU toolchain binaries from SiFive
-# https://github.com/sifive/freedom-tools/releases
-RISCV_CC    = riscv64-unknown-elf-gcc -march=rv32ima
-OBJDUMP     = riscv64-unknown-elf-objdump
-OBJCOPY     = riscv64-unknown-elf-objcopy
+ifeq ($(TOOLCHAIN), XPACK)
+# Pre-compiled GNU toolchain binaries from xPack
+# https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases
+RISCV_CC    = riscv-none-elf-gcc
+OBJDUMP     = riscv-none-elf-objdump
+OBJCOPY     = riscv-none-elf-objcopy
 endif
 
 ifeq ($(TOOLCHAIN), GNU)
-# The official GNU toolchain binaries
+# The official GNU toolchain
 # https://github.com/riscv-collab/riscv-gnu-toolchain
-RISCV_CC    = riscv32-unknown-elf-gcc -march=rv32ima_zicsr
+RISCV_CC    = riscv32-unknown-elf-gcc
 OBJDUMP     = riscv32-unknown-elf-objdump
 OBJCOPY     = riscv32-unknown-elf-objcopy
 endif
@@ -31,7 +31,7 @@ EGOS_DEPS   = earth/* grass/* library/egos.h library/*/* Makefile
 FILESYS     = 1
 LDFLAGS     = -nostdlib -lc -lgcc
 INCLUDE     = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/syscall
-CFLAGS      = -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
+CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 SYSAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/system/*.c)))
