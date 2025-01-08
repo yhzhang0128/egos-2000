@@ -32,27 +32,6 @@ Download the [GNU toolchain binaries from xPack](https://github.com/xpack-dev-to
 ......
 ```
 
-After this step, `build/release` holds the ELF format executables and `build/debug` holds the human readable assembly files.
-While using the pre-built binaries is easier, you can also compile and install the [official GNU toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) yourself.
-
-```shell
-# Prepare the environment
-> sudo apt-get install autoconf automake autotools-dev curl python3 python3-pip libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev ninja-build git cmake libglib2.0-dev
-> cd $EGOS
-> mkdir riscv32-unknown-elf-gcc
-> export PATH=$PATH:$EGOS/riscv32-unknown-elf-gcc/bin
-
-# Compile and install the GNU toolchain
-> git clone git@github.com:riscv-collab/riscv-gnu-toolchain.git
-> cd riscv-gnu-toolchain
-> ./configure --with-arch=rv32imac --with-abi=ilp32 --prefix=$EGOS/riscv32-unknown-elf-gcc
-> make
-......
-# Compile egos-2000 with the official GNU toolchain
-> cd $EGOS/egos-2000
-> make TOOLCHAIN=GNU
-```
-
 ## Step2: Run egos-2000 on the QEMU emulator
 
 Download the pre-built binaries of QEMU from [xPack](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v7.2.5-1).
