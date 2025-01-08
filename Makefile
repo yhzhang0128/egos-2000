@@ -2,10 +2,11 @@
 # All rights reserved.
 
 # BOARD can be a7_35t or a7_100t
-TOOLCHAIN   = XPACK
 BOARD       = a7_35t
 QEMU        = qemu-system-riscv32
 
+# TOOLCHAIN can be XPACK or GNU
+TOOLCHAIN   = XPACK
 ifeq ($(TOOLCHAIN), XPACK)
 # Pre-compiled GNU toolchain binaries from xPack
 # https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases

@@ -24,10 +24,12 @@ void format_to_str(char* out, const char* fmt, va_list args) {
                 strcat(out, va_arg(args, char*));
             } else if (*fmt == 'd') {
                 itoa(va_arg(args, int), out + strlen(out), 10);
+            } else if (*fmt == 'x') {
+                itoa(va_arg(args, int), out + strlen(out), 16);
             }
             /* Student's code goes here (Hello, World!) */
 
-            /* Handle format %c, %x, %u, etc. */
+            /* Handle format %c, %u, %p, %ld, %lx etc. */
             /* If not matching any pattern, simply print the '%' symbol */
 
             /* Student's code ends here. */

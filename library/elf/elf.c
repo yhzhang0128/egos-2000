@@ -13,53 +13,49 @@
 #include <string.h>
 
 void elf_load(int pid, elf_reader reader, int argc, void** argv) {
-    char buf[BLOCK_SIZE];
-    reader(0, buf);
+    /* Load the ELF header */
+    char hbuf[BLOCK_SIZE], buf[BLOCK_SIZE];
+    reader(0, hbuf);
+    struct elf32_header* header          = (void*)hbuf;
+    struct elf32_program_header* pheader = (void*)(hbuf + header->e_phoff);
 
-    struct elf32_header* header          = (void*)buf;
-    struct elf32_program_header* pheader = (void*)(buf + header->e_phoff);
-
+    /* Load the code and data from the ELF-format binary file */
     for (uint i = 0; i < header->e_phnum; i++) {
-        if (pheader[i].p_memsz == 0) continue;
-        if (pheader[i].p_vaddr == APPS_ENTRY) {
-            pheader = &pheader[i];
-            break;
+        uint addr = pheader[i].p_vaddr;
+        if (addr < RAM_START) continue;
+
+        uint memsz  = pheader[i].p_memsz;
+        uint filesz = pheader[i].p_filesz;
+        if (pid < GPID_USER_START)
+            INFO("Load 0x%x bytes to 0x%x", filesz, addr);
+
+        uint ppage_id;
+        uint curr_pageno  = addr / PAGE_SIZE;
+        uint end_pageno   = (addr + memsz) / PAGE_SIZE;
+        uint curr_blockno = pheader[i].p_offset / BLOCK_SIZE;
+        for (uint off = 0; off < filesz; off += BLOCK_SIZE) {
+            /* Allocate one page (4KB) for every 8 blocks (512 bytes) */
+            if (off % PAGE_SIZE == 0) {
+                ppage_id = earth->mmu_alloc();
+                earth->mmu_map(pid, curr_pageno++, ppage_id);
+                memset(PAGE_ID_TO_ADDR(ppage_id), 0, PAGE_SIZE);
+            }
+            uint size =
+                (off + BLOCK_SIZE < filesz) ? BLOCK_SIZE : (filesz - off);
+            reader(curr_blockno++, buf);
+            memcpy(PAGE_ID_TO_ADDR(ppage_id) + (off % PAGE_SIZE), buf, size);
         }
-        FATAL("elf_load: Invalid p_vaddr: 0x%x", pheader->p_vaddr);
-    }
 
-    if (pid < GPID_USER_START) {
-        INFO("App file size: %d bytes", pheader->p_filesz);
-        INFO("App memory size: %d bytes", pheader->p_memsz);
-    }
-
-    uint ppage_id;
-    uint code_start   = APPS_ENTRY >> 12;
-    uint block_offset = pheader->p_offset / BLOCK_SIZE;
-
-    /* Setup pages for text, rodata, data and bss sections */
-    for (uint off = 0; off < pheader->p_filesz; off += BLOCK_SIZE) {
-        if (off % PAGE_SIZE == 0) {
+        while (curr_pageno < end_pageno) {
             ppage_id = earth->mmu_alloc();
-            earth->mmu_map(pid, code_start++, ppage_id);
+            earth->mmu_map(pid, curr_pageno++, ppage_id);
+            memset(PAGE_ID_TO_ADDR(ppage_id), 0, PAGE_SIZE);
         }
-        reader(block_offset++, PAGE_ID_TO_ADDR(ppage_id) + (off % PAGE_SIZE));
-    }
-    uint last_page_filled = pheader->p_filesz % PAGE_SIZE;
-    uint last_page_nzeros = PAGE_SIZE - last_page_filled;
-    if (last_page_filled)
-        memset(PAGE_ID_TO_ADDR(ppage_id) + last_page_filled, 0,
-               last_page_nzeros);
-
-    while (code_start < ((APPS_ENTRY + pheader->p_memsz) >> 12)) {
-        ppage_id = earth->mmu_alloc();
-        earth->mmu_map(pid, code_start++, ppage_id);
-        memset(PAGE_ID_TO_ADDR(ppage_id), 0, PAGE_SIZE);
     }
 
     /* Setup two pages for main() args (argc/argv) and syscall args */
-    uint args_start = APPS_ARG >> 12;
-    ppage_id        = earth->mmu_alloc();
+    uint args_start = APPS_ARG / PAGE_SIZE;
+    uint ppage_id   = earth->mmu_alloc();
     earth->mmu_map(pid, args_start++, ppage_id);
 
     int* argc_addr = (int*)PAGE_ID_TO_ADDR(ppage_id);
@@ -74,11 +70,12 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     ppage_id = earth->mmu_alloc();
     earth->mmu_map(pid, args_start++, ppage_id);
 
-    /* Setup two pages for user stack (should be enough for demo purpose) */
-    uint stack_start = (APPS_STACK_TOP - PAGE_SIZE * 2) >> 12;
-    ppage_id         = earth->mmu_alloc();
-    earth->mmu_map(pid, stack_start++, ppage_id);
-
-    ppage_id = earth->mmu_alloc();
-    earth->mmu_map(pid, stack_start++, ppage_id);
+#define APPS_STACK_NPAGES 2
+#define APPS_STACK_SIZE   APPS_STACK_NPAGES* PAGE_SIZE
+    /* Setup 2 pages for user stack (should be enough for demo purpose) */
+    uint stack_start = (APPS_STACK_TOP - APPS_STACK_SIZE) / PAGE_SIZE;
+    for (uint i = 0; i < APPS_STACK_NPAGES; i++) {
+        ppage_id = earth->mmu_alloc();
+        earth->mmu_map(pid, stack_start++, ppage_id);
+    }
 }
