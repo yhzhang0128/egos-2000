@@ -14,16 +14,16 @@
 #include <string.h>
 
 uint core_in_kernel;
-uint core_curr_proc[NCORES + 1];
-struct process proc_set[MAX_NPROCESS + 1]; /* proc_set[0..MAX_NPROCESS-1] are
-                                              actual processes */
+uint core_to_proc_idx[NCORES];
+struct process proc_set[MAX_NPROCESS + 1];
+/* proc_set[0..MAX_NPROCESS-1] are actual processes */
 /* proc_set[MAX_NPROCESS] is a place holder for idle cores */
-#define CORE_IDLE (curr_proc_idx == MAX_NPROCESS)
-void core_set_idle(uint core) { core_curr_proc[core] = MAX_NPROCESS; }
 
-#define curr_proc_idx core_curr_proc[core_in_kernel]
+#define curr_proc_idx core_to_proc_idx[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
 #define curr_status   proc_set[curr_proc_idx].status
+#define CORE_IDLE     (curr_proc_idx == MAX_NPROCESS)
+void core_set_idle(uint core) { core_to_proc_idx[core] = MAX_NPROCESS; }
 
 static void intr_entry(uint);
 static void excp_entry(uint);
@@ -31,14 +31,14 @@ static void excp_entry(uint);
 void kernel_entry(uint mcause) {
     /* With the kernel lock, only one core can enter this point at any time */
     asm("csrr %0, mhartid" : "=r"(core_in_kernel));
+    if (earth->platform == QEMU) core_in_kernel--; /* QEMU has core ID #1..#4 */
 
     /* Save process context */
     asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
     memcpy(proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_ADDR,
            SAVED_REGISTER_SIZE);
 
-    uint id = mcause & 0x3FF;
-    (mcause & (1 << 31)) ? intr_entry(id) : excp_entry(id);
+    (mcause & (1 << 31)) ? intr_entry(mcause & 0x3FF) : excp_entry(mcause);
 
     /* Restore process context */
     asm("csrw mepc, %0" ::"r"(proc_set[curr_proc_idx].mepc));
@@ -75,8 +75,7 @@ static void excp_entry(uint id) {
 
 static void intr_entry(uint id) {
     if (id == INTR_ID_TIMER) {
-        if (CORE_IDLE || curr_pid >= GPID_USER_START) proc_yield();
-        earth->timer_reset(core_in_kernel);
+        proc_yield();
         return;
     }
 
@@ -114,10 +113,11 @@ static void proc_yield() {
 
     /* Context switch */
     curr_proc_idx = next_idx;
+    earth->timer_reset(core_in_kernel);
     if (CORE_IDLE) {
         /* Student's code goes here (multi-core and atomic instruction) */
 
-        /* Release kernel_lock and boot_lock; Reset timer and call proc_idle
+        /* Release the boot lock and the kernel lock; Jump to proc_idle
          * using mret; Why not call proc_idle() directly? Think about it. */
 
         /* Student's code ends here. */

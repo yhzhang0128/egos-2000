@@ -30,13 +30,13 @@ struct process {
     /* Student's code ends here. */
 };
 
-#define MAX_NPROCESS 16
-
 ulonglong mtime_get();
+void core_set_idle(uint);
+
+#define MAX_NPROCESS 16
 int proc_alloc();
 void proc_free(int);
 void proc_set_ready(int);
 void proc_set_running(int);
 void proc_set_runnable(int);
 void proc_set_pending(int);
-void core_set_idle(uint);

@@ -37,10 +37,6 @@ struct grass {
     /* System call interface */
     void (*sys_send)(int receiver, char* msg, uint size);
     void (*sys_recv)(int from, int* sender, char* buf, uint size);
-
-    /* Shell environment variables */
-    int workdir_ino;
-    char workdir[128];
 };
 
 extern struct earth* earth;

@@ -25,12 +25,6 @@ int parse_request(char* buf, struct proc_request* req) {
 }
 
 int main() {
-    /* Student's code goes here (multi-core and atomic instruction) */
-
-    /* Release the boot lock so that other cores can start running */
-    /* Wait for all cores to finish booting up */
-
-    /* Student's code ends here. */
     CRITICAL("Welcome to the egos-2000 shell!");
 
     char buf[256] = "cd"; /* Enter the home directory first */
@@ -69,7 +63,7 @@ int main() {
         }
 
         do {
-            printf("\x1B[1;32m➜ \x1B[1;36m%s\x1B[1;0m ", grass->workdir);
+            printf("\x1B[1;32m➜ \x1B[1;36m%s\x1B[1;0m ", workdir);
         } while (term_read(buf, TERM_BUF_SIZE) == 0);
     }
 }

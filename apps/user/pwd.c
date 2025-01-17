@@ -8,6 +8,6 @@
 #include "app.h"
 
 int main(int argc, char** argv) {
-    printf("%s\r\n", grass->workdir);
+    printf("%s\r\n", workdir);
     return 0;
 }

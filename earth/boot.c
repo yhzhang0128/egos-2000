@@ -55,7 +55,6 @@ void boot() {
         mstatus = (mstatus & ~(3 << 11)) | (GRASS_MODE << 11);
         asm("csrw mstatus, %0" ::"r"(mstatus));
         asm("csrw mepc, %0" ::"r"(grass_entry));
-        asm("mv a0, %0" ::"r"(core_id));
         asm("mret");
     } else {
         SUCCESS("--- Core #%d starts running ---", core_id);
@@ -65,7 +64,8 @@ void boot() {
         /* Initialize the MMU and interrupts on this core */
         /* Read mmu_init() and intr_init(), and decide what to do here */
 
-        /* Mock a timer interrupt (#7) and enter the kernel entry */
+        /* Set core to idle, release the boot and kernel locks, and jump
+         * to proc_idle using mret. */
 
         /* Student's code ends here. */
     }

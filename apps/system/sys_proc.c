@@ -14,8 +14,19 @@ static int app_ino, app_pid;
 static void sys_spawn(uint base);
 static int app_spawn(struct proc_request* req);
 
-int main() {
+struct multicore {
+    /* see earth/boot.s */
+    int boot_lock, kernel_lock, booted_core_cnt;
+};
+
+int main(int unused, struct multicore* locks) {
     SUCCESS("Enter kernel process GPID_PROCESS");
+
+    /* Student's code goes here (multi-core and atomic instruction)
+     * Release the boot lock and the kernel lock so that other cores
+     * can start to run; Wait for all cores to finish booting up */
+
+    /* Student's code ends here. */
 
     int sender, shell_waiting;
     char buf[SYSCALL_MSG_LEN];
