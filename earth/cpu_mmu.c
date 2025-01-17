@@ -158,11 +158,10 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      *  (b) If the process is a user process (pid >= GPID_USER_START)
      *      | Start Address | # Pages | Size   | Explanation                         |
      *      +---------------+---------+--------+-------------------------------------+
-     *      | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack)  |
+     *      | 0x80602000    | 1       | 4 KB   | Work dir (see apps/app.h)           |
      *
-     * (2) if page tables for pid exist, find the PTE and update entries of the tables;
-     * Feel free to modify and call the two helper functions: setup_identity_region()
-     * and pagetable_identity_mapping().
+     * (2) After building the page tables for pid (or if page tables for pid exist),
+     *     find the PTE and update entries of the tables mapping vpage_no to ppage_id.
      */
     /* clang-format on */
     soft_tlb_map(pid, vpage_no, ppage_id);
@@ -173,10 +172,8 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
 void page_table_switch(int pid) {
     /* Student's code goes here (virtual memory). */
 
-    /* Remove the following line of code and, instead,
-     * modify the page table base register (satp) similar to
-     * the code in mmu_init(); Remember to use the pid argument
-     */
+    /* Remove the following line of code and, instead, modify the page table
+     * base register (satp) similar to the code in mmu_init(). */
     soft_tlb_switch(pid);
 
     /* Student's code ends here. */

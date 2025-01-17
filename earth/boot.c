@@ -64,8 +64,8 @@ void boot() {
         /* Initialize the MMU and interrupts on this core */
         /* Read mmu_init() and intr_init(), and decide what to do here */
 
-        /* Set core to idle, release the boot and kernel locks, and jump
-         * to proc_idle using mret. */
+        /* Set core to idle, reset the timer, release the boot and kernel
+         * locks, and then wait for the timer interrupt with while(1); */
 
         /* Student's code ends here. */
     }

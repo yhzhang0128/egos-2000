@@ -33,11 +33,9 @@ int main() {
         struct proc_reply reply;
 
         if (strcmp(buf, "coresinfo") == 0) {
-            /* Student's code goes here (multi-core and atomic instruction) */
-
-            /* Add proc_coresinfo() from kernel.c into the grass interface */
-            /* Invoke the function here to show which process is running on each
-             * core */
+            /* Student's code goes here (multi-core and atomic instruction)
+             * Add proc_coresinfo() from kernel.c into the grass interface;
+             * Invoke proc_coresinfo() to show the pid running on each core */
 
             /* Student's code ends here. */
 

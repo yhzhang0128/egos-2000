@@ -14,7 +14,9 @@
 #include <string.h>
 
 uint core_in_kernel;
-uint core_to_proc_idx[NCORES];
+uint core_to_proc_idx[NCORES + 1];
+/* QEMU has cores with ID #1 .. #NCORES */
+/* Arty has cores with ID #0 .. #NCORES-1 */
 struct process proc_set[MAX_NPROCESS + 1];
 /* proc_set[0..MAX_NPROCESS-1] are actual processes */
 /* proc_set[MAX_NPROCESS] is a place holder for idle cores */
@@ -31,7 +33,6 @@ static void excp_entry(uint);
 void kernel_entry(uint mcause) {
     /* With the kernel lock, only one core can enter this point at any time */
     asm("csrr %0, mhartid" : "=r"(core_in_kernel));
-    if (earth->platform == QEMU) core_in_kernel--; /* QEMU has core ID #1..#4 */
 
     /* Save process context */
     asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
@@ -117,8 +118,8 @@ static void proc_yield() {
     if (CORE_IDLE) {
         /* Student's code goes here (multi-core and atomic instruction) */
 
-        /* Release the boot lock and the kernel lock; Jump to proc_idle
-         * using mret; Why not call proc_idle() directly? Think about it. */
+        /* Release the kernel lock; Enable interrupts by modifying mstatus;
+         * Wait for the timer interrupt with while(1); */
 
         /* Student's code ends here. */
         FATAL("proc_yield: no process to run on core %d", core_in_kernel);
@@ -129,9 +130,8 @@ static void proc_yield() {
     /* Student's code goes here (protection, virtual memory, and multi-core).
      */
 
-    /* Modify mstatus.MPP to enter machine or user mode during mret
-     * depending on whether curr_pid is a grass server or a user app
-     */
+    /* Modify mstatus.MPP to enter machine, supervisor, or user mode
+     * after mret depending on whether curr_pid is a kernel process. */
 
     /* Student's code ends here. */
 
