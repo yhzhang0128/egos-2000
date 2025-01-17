@@ -6,7 +6,7 @@
  * When getting an interrupt or exception, the CPU sets its program counter to this entry point
  */
     .section .text
-    .global trap_entry, trap_entry_using_page_table_translation
+    .global trap_entry
 
 trap_entry:
     /* Step1: acquire the kernel lock (P8 only)
