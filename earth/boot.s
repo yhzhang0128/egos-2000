@@ -5,7 +5,7 @@
  * Description: entry point of the bootloader
  */
     .section .text.enter
-    .global boot_loader, boot_lock, kernel_lock
+    .global boot_loader, boot_lock, kernel_lock, booted_core_cnt
 
 boot_loader:
     la t0, boot_lock          /* Load the address of boot_lock */
@@ -20,5 +20,6 @@ boot_loader:
     call boot
 
 .bss
-    boot_lock: .word 0
-    kernel_lock: .word 0
+    boot_lock:       .word 0
+    kernel_lock:     .word 0
+    booted_core_cnt: .word 0

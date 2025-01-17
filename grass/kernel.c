@@ -55,37 +55,37 @@ static void proc_try_syscall(struct process* proc);
 
 static void excp_entry(uint id) {
     if (id >= EXCP_ID_ECALL_U && id <= EXCP_ID_ECALL_M) {
-        proc_set[curr_proc_idx].mepc += 4;
-        memcpy(&proc_set[curr_proc_idx].syscall, (void*)SYSCALL_ARG,
+        /* Copy the system call arguments from user space to the kernel */
+        uint syscall_paddr = earth->mmu_translate(curr_pid, SYSCALL_ARG);
+        memcpy(&proc_set[curr_proc_idx].syscall, (void*)syscall_paddr,
                sizeof(struct syscall));
+
+        proc_set[curr_proc_idx].mepc += 4;
         proc_set[curr_proc_idx].syscall.status = PENDING;
         proc_try_syscall(&proc_set[curr_proc_idx]);
         proc_yield();
         return;
     }
-    /* Student's code goes here (system call and memory exception). */
-
-    /* Kill the process if curr_pid is a user application */
+    /* Student's code goes here (system call and memory exception).
+     * Kill the process if curr_pid is a user application */
 
     /* Student's code ends here. */
     FATAL("excp_entry: kernel got exception %d", id);
 }
 
 static void intr_entry(uint id) {
-    if (id == INTR_ID_CTRL_C && curr_pid >= GPID_USER_START) {
-        /* Student's code goes here (device interrupt). */
-
-        /* After handling keyboard input using the UART interrupt,
-         * catch CTRL+C input here and kill the current process */
-
-        /* Student's code ends here. */
-    }
-
-    if (id == INTR_ID_TIMER && (CORE_IDLE || curr_pid >= GPID_SHELL)) {
-        proc_yield();
-    } else {
+    if (id == INTR_ID_TIMER) {
+        if (CORE_IDLE || curr_pid >= GPID_USER_START) proc_yield();
         earth->timer_reset(core_in_kernel);
+        return;
     }
+
+    /* Student's code goes here (ethernet & tcp/ip).
+     * Handle Ethernet device interrupt */
+
+    /* Student's code ends here. */
+
+    FATAL("excp_entry: kernel got interrupt %d", id);
 }
 
 static void proc_yield() {
@@ -114,12 +114,11 @@ static void proc_yield() {
 
     /* Context switch */
     curr_proc_idx = next_idx;
-    earth->timer_reset(core_in_kernel);
     if (CORE_IDLE) {
         /* Student's code goes here (multi-core and atomic instruction) */
 
-        /* Release kernel_lock and boot_lock; Call proc_idle
-         * with mret; Why not do proc_idle() directly? Think about it. */
+        /* Release kernel_lock and boot_lock; Reset timer and call proc_idle
+         * using mret; Why not call proc_idle() directly? Think about it. */
 
         /* Student's code ends here. */
         FATAL("proc_yield: no process to run on core %d", core_in_kernel);
@@ -162,6 +161,7 @@ static int proc_try_send(struct process* sender) {
 
             dst->syscall.status = DONE;
             dst->syscall.sender = sender->pid;
+            /* Copy the system call arguments within the kernel PCB */
             memcpy(dst->syscall.content, sender->syscall.content,
                    SYSCALL_MSG_LEN);
             return 0;
@@ -174,9 +174,11 @@ static int proc_try_send(struct process* sender) {
 static int proc_try_recv(struct process* receiver) {
     if (receiver->syscall.status == PENDING) return -1;
 
+    /* Copy the system call results from the kernel back to user space */
     earth->mmu_switch(receiver->pid);
     earth->mmu_flush_cache();
-    memcpy((void*)SYSCALL_ARG, &receiver->syscall, sizeof(struct syscall));
+    uint syscall_paddr = earth->mmu_translate(receiver->pid, SYSCALL_ARG);
+    memcpy((void*)syscall_paddr, &receiver->syscall, sizeof(struct syscall));
     return 0;
 }
 

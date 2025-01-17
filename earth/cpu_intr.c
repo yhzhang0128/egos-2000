@@ -38,12 +38,9 @@ void intr_init(uint core_id) {
     mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
     /* Setup the interrupt/exception handling entry */
-    void trap_entry(); /* (defined in grass/kernel.s) */
-    void trap_entry_using_page_table_translation();
-    asm("csrw mtvec, %0" ::"r"((earth->translation != PAGE_TABLE)
-                                   ? trap_entry
-                                   : trap_entry_using_page_table_translation));
-    INFO("Use direct mode and put the address of the trap entry into mtvec");
+    void trap_entry(); /* (see grass/kernel.s) */
+    asm("csrw mtvec, %0" ::"r"(trap_entry));
+    INFO("Use direct mode and put the address of the trap_entry into mtvec");
 
     /* Enable timer interrupt */
     asm("csrw mip, %0" ::"r"(0));

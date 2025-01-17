@@ -63,6 +63,8 @@ void soft_tlb_switch(int pid) {
     curr_vm_pid = pid;
 }
 
+uint soft_tlb_translate(int pid, uint vaddr) { return vaddr; }
+
 /* Page Table Translation
  *
  * The code below creates an identity mapping using RISC-V Sv32;
@@ -180,6 +182,17 @@ void page_table_switch(int pid) {
     /* Student's code ends here. */
 }
 
+uint page_table_translate(int pid, uint vaddr) {
+    /* Student's code goes here (virtual memory). */
+
+    /* Remove the following line of code and, instead,
+     * walk through the page tables of process pid and
+     * return the physical address mapped from vaddr */
+    return soft_tlb_translate(pid, vaddr);
+
+    /* Student's code ends here. */
+}
+
 void flush_cache() {
     if (earth->platform == ARTY) {
         /* Flush the L1 instruction cache */
@@ -228,10 +241,12 @@ void mmu_init() {
         pagetable_identity_map(0);
         asm("csrw satp, %0" ::"r"(((uint)root >> 12) | (1 << 31)));
 
-        earth->mmu_map    = page_table_map;
-        earth->mmu_switch = page_table_switch;
+        earth->mmu_map       = page_table_map;
+        earth->mmu_switch    = page_table_switch;
+        earth->mmu_translate = page_table_translate;
     } else {
-        earth->mmu_map    = soft_tlb_map;
-        earth->mmu_switch = soft_tlb_switch;
+        earth->mmu_map       = soft_tlb_map;
+        earth->mmu_switch    = soft_tlb_switch;
+        earth->mmu_translate = soft_tlb_translate;
     }
 }

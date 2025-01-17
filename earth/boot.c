@@ -16,8 +16,6 @@ void disk_init();
 void mmu_init();
 void intr_init(uint core_id);
 
-extern int boot_lock;
-static int booted_core_cnt;
 struct grass* grass = (void*)GRASS_STRUCT_BASE;
 struct earth* earth = (void*)EARTH_STRUCT_BASE;
 
@@ -34,6 +32,7 @@ void boot() {
     /* See https://www.qemu.org/docs/master/system/riscv/sifive_u.html */
     if (earth->platform == QEMU && core_id == 0) {
         release(boot_lock);
+        release(kernel_lock);
         while (1);
     }
 
@@ -53,9 +52,8 @@ void boot() {
         uint mstatus, M_MODE = 3, S_MODE = 1; /* U_MODE = 0 */
         uint GRASS_MODE = (earth->translation == SOFT_TLB) ? M_MODE : S_MODE;
         asm("csrr %0, mstatus" : "=r"(mstatus));
-        asm("csrw mstatus, %0" ::"r"((mstatus & ~(3 << 11)) |
-                                     (GRASS_MODE << 11) | (1 << 18)));
-
+        mstatus = (mstatus & ~(3 << 11)) | (GRASS_MODE << 11);
+        asm("csrw mstatus, %0" ::"r"(mstatus));
         asm("csrw mepc, %0" ::"r"(grass_entry));
         asm("mv a0, %0" ::"r"(core_id));
         asm("mret");

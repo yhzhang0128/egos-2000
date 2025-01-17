@@ -6,13 +6,16 @@ typedef unsigned int uint;
 typedef unsigned long long ulonglong;
 
 struct earth {
-    /* CPU & memory management interface */
-    void (*timer_reset)(uint core_id);
+    /* Basic memory & CPU interface */
     uint (*mmu_alloc)();
     void (*mmu_free)(int pid);
+    void (*mmu_flush_cache)();
+    void (*timer_reset)(uint core_id);
+
+    /* Virtual memory interface */
     void (*mmu_map)(int pid, uint vpage_no, uint ppage_id);
     void (*mmu_switch)(int pid);
-    void (*mmu_flush_cache)();
+    uint (*mmu_translate)(int pid, uint vaddr);
 
     /* Devices interface */
     void (*tty_read)(char* c);
@@ -42,9 +45,10 @@ struct grass {
 
 extern struct earth* earth;
 extern struct grass* grass;
+extern int boot_lock, kernel_lock, booted_core_cnt;
 
 #define NCORES     4
-#define release(x) __sync_lock_release(&x)
+#define release(x) __sync_lock_release(&x);
 #define acquire(x) while (__sync_lock_test_and_set(&x, 1) != 0);
 
 /* Memory regions */

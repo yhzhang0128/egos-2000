@@ -9,26 +9,25 @@
     .global trap_entry, trap_entry_using_page_table_translation
 
 trap_entry:
-    /* Step1: switch to the kernel stack
-     * Step2: acquire kernel_lock (only for multicore in P8)
+    /* Step1: acquire the kernel lock (P8 only)
+     * Step2: switch to the kernel stack
      * Step3: save all the registers on the kernel stack
      * Step4: call kernel_entry()
      * Step5: restore all the registers
      * Step6: switch back to the process stack
-     * Step7: release kernel_lock (only for multicore in P8)
+     * Step7: release the kernel lock (P8 only)
      * Step8: invoke mret and return to the process context */
 
     /* Step1 */
-    csrw mscratch, sp
-    li sp, 0x80400000
-
-    /* Step2 */
-    /* Ignore this step before you start to do P8 */
     /* Student's code goes here (multi-core and atomic instruction)  */
     /* Acquire kernel_lock and make sure not to modify any registers, */
-    /* so you may need to use sscratch just like Step1 used mscratch. */
+    /* so you may need to use sscratch just like Step2 uses mscratch. */
 
     /* Student's code ends here. */
+
+    /* Step2 */
+    csrw mscratch, sp
+    li sp, 0x80400000
 
     /* Step3 */
     addi sp, sp, -116  /* sp == SAVED_REGISTER_ADDR */
@@ -101,22 +100,11 @@ trap_entry:
     lw sp, 112(sp)
 
     /* Step7 */
-    /* Ignore this step before you start to do P8 */
     /* Student's code goes here (multi-core and atomic instruction) */
     /* Release kernel_lock and make sure not to modify any registers, */
-    /* so you may need to use sscratch just like Step1 used mscratch. */
+    /* so you may need to use sscratch just like Step2 used mscratch. */
 
     /* Student's code ends here. */
 
     /* Step8 */
     mret
-
-/* Ignore the code below before you start to do P4 */
-trap_entry_using_page_table_translation:
-    /* Set mstatus.MPRV to enable page table translation in M mode  */
-    /* If mstatus.MPP is U mode, set to S mode for kernel privilege */
-    csrw mscratch, t0
-    li t0, 0x20800
-    csrs mstatus, t0
-    csrr t0, mscratch
-    j trap_entry
