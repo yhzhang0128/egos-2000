@@ -32,7 +32,14 @@ void grass_entry() {
     earth->mmu_flush_cache();
 
     /* Jump to the entry of process GPID_PROCESS */
+    uint mstatus, M_MODE = 3, U_MODE = 0;
+    uint GRASS_MODE = (earth->translation == SOFT_TLB) ? M_MODE : U_MODE;
+    asm("csrr %0, mstatus" : "=r"(mstatus));
+    mstatus = (mstatus & ~(3 << 11)) | (GRASS_MODE << 11);
+    asm("csrw mstatus, %0" ::"r"(mstatus));
+
+    asm("csrw mepc, %0" ::"r"(APPS_ENTRY));
     asm("mv a0, %0" ::"r"(APPS_ARG));
     asm("mv a1, %0" ::"r"(&boot_lock));
-    asm("jr %0" ::"r"(APPS_ENTRY));
+    asm("mret");
 }

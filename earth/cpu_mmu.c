@@ -76,7 +76,6 @@ uint soft_tlb_translate(int pid, uint vaddr) { return vaddr; }
  * tables and mmu_switch() will modify satp (page table base register)
  */
 
-#define OS_RWX       (0xC0 | 0xF)
 #define USER_RWX     (0xC0 | 0x1F)
 #define MAX_NPROCESS 256
 static uint* root;
@@ -115,16 +114,16 @@ void pagetable_identity_map(int pid) {
 
     /* Allocate the leaf page tables */
     for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
-        setup_identity_region(pid, i, 1024, OS_RWX);    /* RAM   */
-    setup_identity_region(pid, CLINT_BASE, 16, OS_RWX); /* CLINT */
-    setup_identity_region(pid, UART_BASE, 1, OS_RWX);   /* UART  */
-    setup_identity_region(pid, SPI_BASE, 1, OS_RWX);    /* SPI   */
+        setup_identity_region(pid, i, 1024, USER_RWX);    /* RAM   */
+    setup_identity_region(pid, CLINT_BASE, 16, USER_RWX); /* CLINT */
+    setup_identity_region(pid, UART_BASE, 1, USER_RWX);   /* UART  */
+    setup_identity_region(pid, SPI_BASE, 1, USER_RWX);    /* SPI   */
 
     if (earth->platform == ARTY) {
-        setup_identity_region(pid, BOARD_FLASH_ROM, 1024, OS_RWX); /* ROM */
-        setup_identity_region(pid, ETHMAC_CSR_BASE, 1, OS_RWX);
-        setup_identity_region(pid, ETHMAC_TX_BUFFER, 1, OS_RWX);
-        setup_identity_region(pid, ETHMAC_RX_BUFFER, 1, OS_RWX);
+        setup_identity_region(pid, BOARD_FLASH_ROM, 1024, USER_RWX); /* ROM */
+        setup_identity_region(pid, ETHMAC_CSR_BASE, 1, USER_RWX);
+        setup_identity_region(pid, ETHMAC_TX_BUFFER, 1, USER_RWX);
+        setup_identity_region(pid, ETHMAC_RX_BUFFER, 1, USER_RWX);
     } else {
         /* Student's code goes here (networking) */
 
