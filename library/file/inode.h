@@ -12,19 +12,19 @@
  * 'init' function that returns a inode_store_t *.  The inode_store_t * is
  * a pointer to a structure that contains the following seven methods:
  *
- *      int getsize(inode_store_t *this_bs, unsigned int ino)
+ *      int getsize(inode_store_t *self, unsigned int ino)
  *          returns the size of the inode store at the given inode number
  *            (inode numbers start at 0)
  *
- *      int setsize(inode_store_t *this_bs, unsigned int ino, block_no newsize)
+ *      int setsize(inode_store_t *self, unsigned int ino, block_no newsize)
  *          set the size of the inode store at the given inode number
  *          returns the old size
  *
- *      int read(inode_store_t *this_bs, unsigned int ino, block_no offset,
+ *      int read(inode_store_t *self, unsigned int ino, block_no offset,
  * block_t *block) read the block at the given inode number and offset and
  * return in *block returns 0
  *
- *      int write(inode_store_t *this_bs, unsigned int ino, block_no offset,
+ *      int write(inode_store_t *self, unsigned int ino, block_no offset,
  * block_t *block) write *block to the block at the given inode number and
  * offset returns 0
  *
@@ -41,11 +41,11 @@
 #define NINODES 128
 
 typedef struct inode_store {
-    int (*getsize)(struct inode_store* this_bs, uint ino);
-    int (*setsize)(struct inode_store* this_bs, uint ino, block_no newsize);
-    int (*read)(struct inode_store* this_bs, uint ino, block_no offset,
+    int (*getsize)(struct inode_store* self, uint ino);
+    int (*setsize)(struct inode_store* self, uint ino, block_no newsize);
+    int (*read)(struct inode_store* self, uint ino, block_no offset,
                 block_t* block);
-    int (*write)(struct inode_store* this_bs, uint ino, block_no offset,
+    int (*write)(struct inode_store* self, uint ino, block_no offset,
                  block_t* block);
     void* state;
 } inode_store_t;

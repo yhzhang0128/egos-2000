@@ -157,20 +157,20 @@ static block_no treedisk_alloc_block(struct treedisk_state* ts,
     return free_blockno;
 }
 
-/* Retrieve the number of blocks in the file referenced by 'this_bs'.  This
+/* Retrieve the number of blocks in the file referenced by 'self'.  This
  * information is maintained in the inode itself.
  */
-static int treedisk_getsize(inode_store_t* this_bs, uint ino) {
-    struct treedisk_state* ts = this_bs->state;
+static int treedisk_getsize(inode_store_t* self, uint ino) {
+    struct treedisk_state* ts = self->state;
     struct treedisk_snapshot snapshot;
     if (treedisk_get_snapshot(&snapshot, ts, ino) < 0) return -1;
 
     return snapshot.inode->nblocks;
 }
 
-/* Set the size of the file 'this_bs' to 'nblocks'.
+/* Set the size of the file 'self' to 'nblocks'.
  */
-static int treedisk_setsize(inode_store_t* this_bs, uint ino,
+static int treedisk_setsize(inode_store_t* self, uint ino,
                             block_no nblocks) {
     panic("treedisk_setsize not implemented");
     return -1;
@@ -178,9 +178,9 @@ static int treedisk_setsize(inode_store_t* this_bs, uint ino,
 
 /* Read a block at the given block number 'offset' and return in *block.
  */
-static int treedisk_read(inode_store_t* this_bs, uint ino, block_no offset,
+static int treedisk_read(inode_store_t* self, uint ino, block_no offset,
                          block_t* block) {
-    struct treedisk_state* ts = this_bs->state;
+    struct treedisk_state* ts = self->state;
 
     /* Get info from underlying file system.
      */
@@ -234,9 +234,9 @@ static int treedisk_read(inode_store_t* this_bs, uint ino, block_no offset,
 
 /* Write *block at the given block number 'offset'.
  */
-static int treedisk_write(inode_store_t* this_bs, uint ino, block_no offset,
+static int treedisk_write(inode_store_t* self, uint ino, block_no offset,
                           block_t* block) {
-    struct treedisk_state* ts = this_bs->state;
+    struct treedisk_state* ts = self->state;
     uint dirty_inode          = 0;
 
     /* Get info from underlying file system.
@@ -362,14 +362,14 @@ inode_store_t* treedisk_init(inode_store_t* below, uint below_ino) {
 
     /* Return a block interface to this inode.
      */
-    inode_store_t* this_bs = malloc(sizeof(inode_store_t));
-    memset(this_bs, 0, sizeof(inode_store_t));
-    this_bs->state   = ts;
-    this_bs->getsize = treedisk_getsize;
-    this_bs->setsize = treedisk_setsize;
-    this_bs->read    = treedisk_read;
-    this_bs->write   = treedisk_write;
-    return this_bs;
+    inode_store_t* self = malloc(sizeof(inode_store_t));
+    memset(self, 0, sizeof(inode_store_t));
+    self->state   = ts;
+    self->getsize = treedisk_getsize;
+    self->setsize = treedisk_setsize;
+    self->read    = treedisk_read;
+    self->write   = treedisk_write;
+    return self;
 }
 
 /*************************************************************************
