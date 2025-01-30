@@ -9,29 +9,27 @@
  * maintains one or more "inodes", each representing an array of blocks.
  * A physical disk would typically just have one inode (inode 0), while
  * a virtualized disk may have many.  Each inode store module has an
- * 'init' function that returns a inode_store_t *.  The inode_store_t * is
- * a pointer to a structure that contains the following seven methods:
+ * 'init' function that returns a inode_intf.  The inode_intf is
+ * a pointer to a structure that contains the following four methods:
  *
- *      int getsize(inode_store_t *self, unsigned int ino)
- *          returns the size of the inode store at the given inode number
- *            (inode numbers start at 0)
+ * int getsize(inode_intf self, unsigned int ino)
+ *     returns the size of the inode store at the given inode number
+ *     (inode numbers start at 0)
  *
- *      int setsize(inode_store_t *self, unsigned int ino, block_no newsize)
- *          set the size of the inode store at the given inode number
- *          returns the old size
+ * int setsize(inode_intf self, unsigned int ino, uint newsize)
+ *     sets the size of the inode store at the given inode number
+ *     returns the old size
  *
- *      int read(inode_store_t *self, unsigned int ino, block_no offset,
- * block_t *block) read the block at the given inode number and offset and
- * return in *block returns 0
+ * int read(inode_intf self, unsigned int ino, uint offset, block_t *block)
+ *     reads the block at the given inode number and offset and return in *block
  *
- *      int write(inode_store_t *self, unsigned int ino, block_no offset,
- * block_t *block) write *block to the block at the given inode number and
- * offset returns 0
+ * int write(inode_intf self, unsigned int ino, uint offset, block_t *block)
+ *     writes *block to the block at the given inode number and offset
  *
- * All these return -1 upon error (typically after printing the
- * reason for the error).
+ * All these return -1 upon error (typically after printing the eason for
+ * the error) and return 0 upon success.
  *
- * An inode_store_t * also maintains a void* pointer called 'state' to internal
+ * An inode_intf also maintains a void* pointer called 'state' to internal
  * state the inode store module needs to keep.
  */
 
@@ -39,18 +37,15 @@
 #include "disk.h"
 
 #define NINODES 128
+typedef struct inode_store* inode_intf; /* inode store interface */
 
-typedef struct inode_store {
-    int (*getsize)(struct inode_store* self, uint ino);
-    int (*setsize)(struct inode_store* self, uint ino, block_no newsize);
-    int (*read)(struct inode_store* self, uint ino, block_no offset,
-                block_t* block);
-    int (*write)(struct inode_store* self, uint ino, block_no offset,
-                 block_t* block);
+struct inode_store {
+    int (*getsize)(inode_intf self, uint ino);
+    int (*setsize)(inode_intf self, uint ino, uint newsize);
+    int (*read)(inode_intf self, uint ino, uint offset, block_t* block);
+    int (*write)(inode_intf self, uint ino, uint offset, block_t* block);
     void* state;
-} inode_store_t;
-
-typedef inode_store_t* inode_intf; /* inode store interface */
+};
 
 inode_intf fs_disk_init();
 

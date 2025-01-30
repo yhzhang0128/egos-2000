@@ -33,6 +33,7 @@
 #pragma once
 #include "inode.h"
 
+typedef unsigned int block_no; /* index of a block */
 #define REFS_PER_BLOCK   (BLOCK_SIZE / sizeof(block_no))
 #define INODES_PER_BLOCK (BLOCK_SIZE / sizeof(struct treedisk_inode))
 

@@ -5,61 +5,71 @@
  * Description: a dummy file system illustrating the concept of "inode"
  */
 
+#ifdef MKFS
+#include <stdio.h>
+#include <sys/types.h>
+#else
 #include "egos.h"
+#endif
 #include "inode.h"
-#include <string.h>
 #include <stdlib.h>
 
-#define DUMMY_INO_MAX_SIZE       128
-#define DUMMY_INO_DISK_OFFSET(x) x* DUMMY_INO_MAX_SIZE
+#define DUMMY_DISK_OFFSET(ino, offset) ino * 128 + offset
 
-static int mydisk_getsize(inode_store_t* self, uint ino) {
+int mydisk_read(inode_intf self, uint ino, uint offset, block_t* block) {
+    /* Student's code goes here (file system).
+     * Read block #offset of inode #ino into block. */
     inode_intf below = self->state;
-
-    block_t ino_size_block;
-    (below->read)(below, 0, DUMMY_INO_DISK_OFFSET(ino), &ino_size_block);
-    return *((int*)ino_size_block.bytes);
+    return (below->read)(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
+    /* Student's code ends here. */
 }
 
-static int mydisk_setsize(inode_store_t* self, uint ino, block_no nblocks) {
-    return -1;
+int mydisk_write(inode_intf self, uint ino, uint offset, block_t* block) {
+    /* Student's code goes here (file system).
+     * Write block into block #offset of inode #ino. */
+    inode_intf below = self->state;
+    return (below->write)(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
+    /* Student's code ends here. */
 }
 
-static int mydisk_read(inode_store_t* self, uint ino, block_no offset,
-                       block_t* block) {
-    inode_intf below = self->state;
-    return (below->read)(below, 0, DUMMY_INO_DISK_OFFSET(ino) + offset + 1,
-                         block);
+int mydisk_getsize(inode_intf self, uint ino) {
+    /* Student's code goes here (file system).
+     * Get the size of inode #ino. */
+#ifdef MKFS
+    fprintf(stderr, "mydisk_getsize not implemented");
+    while (1);
+#else
+    FATAL("mydisk_getsize not implemented");
+#endif
+    /* Student's code ends here. */
 }
 
-static int mydisk_write(inode_store_t* self, uint ino, block_no offset,
-                        block_t* block) {
-    inode_intf below = self->state;
-    uint disk_offset = DUMMY_INO_DISK_OFFSET(ino);
-
-    if (mydisk_getsize(self, ino) <= offset) {
-        /* Update inode size to offset + 1 */
-        block_t ino_size_block;
-        int* new_size = (int*)ino_size_block.bytes;
-        *new_size     = offset + 1;
-        (below->write)(below, 0, disk_offset, &ino_size_block);
-    }
-
-    return (below->write)(below, 0, disk_offset + offset + 1, block);
+int mydisk_setsize(inode_intf self, uint ino, uint nblocks) {
+    /* Student's code goes here (file system).
+     * Set the size of inode #ino to nblocks. */
+#ifdef MKFS
+    fprintf(stderr, "mydisk_setsize not implemented");
+    while (1);
+#else
+    FATAL("mydisk_setsize not implemented");
+#endif
+    /* Student's code ends here. */
 }
 
 inode_intf mydisk_init(inode_intf below, uint below_ino) {
-    /* This dummy file system assumes that below_ino == 0 */
-    if (below_ino != 0) return NULL;
-
-    inode_store_t* self = malloc(sizeof(inode_store_t));
-    memset(self, 0, sizeof(inode_store_t));
-    self->getsize = mydisk_getsize;
-    self->setsize = mydisk_setsize;
-    self->read    = mydisk_read;
-    self->write   = mydisk_write;
-    self->state   = below;
+    inode_intf self = malloc(sizeof(struct inode_store));
+    self->getsize   = mydisk_getsize;
+    self->setsize   = mydisk_setsize;
+    self->read      = mydisk_read;
+    self->write     = mydisk_write;
+    self->state     = below;
     return self;
 }
 
-int mydisk_create(inode_intf below, uint below_ino, uint ninodes) { return 0; }
+int mydisk_create(inode_intf below, uint below_ino, uint ninodes) {
+    /* Student's code goes here (file system).
+     * Initialize the on-disk data structures for your file system. */
+
+    /* Student's code ends here. */
+    return 0;
+}

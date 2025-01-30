@@ -12,8 +12,6 @@
 #define SYS_FILE_EXEC_START  EGOS_BIN_MAX_NBLOCK * 3
 #define SYS_SHELL_EXEC_START EGOS_BIN_MAX_NBLOCK * 4
 
-typedef unsigned int block_no; /* index of a block */
-
 typedef struct block {
     char bytes[BLOCK_SIZE];
 } block_t;
