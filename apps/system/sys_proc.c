@@ -22,9 +22,10 @@ struct multicore {
 int main(int unused, struct multicore* locks) {
     SUCCESS("Enter kernel process GPID_PROCESS");
 
-    /* Student's code goes here (multi-core and atomic instruction)
-     * Release the boot lock and the kernel lock, so other cores
-     * can start to run; Wait for all 4 cores to finish boot-up. */
+    /* Student's code goes here (Multicore & Locks). */
+
+    /* Release the boot lock and the kernel lock, so the other cores
+     * can start to run; Wait for all the 4 cores to finish boot-up. */
 
     /* Student's code ends here. */
 

@@ -9,19 +9,19 @@
     .global trap_entry
 
 trap_entry:
-    /* Step1: acquire the kernel lock (P8 only)
+    /* Step1: acquire the kernel lock (only for P8)
      * Step2: switch to the kernel stack
      * Step3: save all the registers on the kernel stack
      * Step4: call kernel_entry()
      * Step5: restore all the registers
      * Step6: switch back to the process stack
-     * Step7: release the kernel lock (P8 only)
+     * Step7: release the kernel lock (only for P8)
      * Step8: invoke mret and return to the process context */
 
     /* Step1 */
-    /* Student's code goes here (multi-core and atomic instruction)  */
-    /* Acquire kernel_lock and make sure not to modify any registers, */
-    /* so you may need to use sscratch just like Step2 uses mscratch. */
+    /* Student's code goes here (Multicore & Locks). */
+    /* Acquire the kernel lock and make sure not to modify any registers, */
+    /* so you may need to use sscratch just like how Step2 uses mscratch. */
 
     /* Student's code ends here. */
 
@@ -100,9 +100,9 @@ trap_entry:
     lw sp, 112(sp)
 
     /* Step7 */
-    /* Student's code goes here (multi-core and atomic instruction) */
-    /* Release kernel_lock and make sure not to modify any registers, */
-    /* so you may need to use sscratch just like Step2 used mscratch. */
+    /* Student's code goes here (Multicore & Locks). */
+    /* Release the kernel lock and make sure not to modify any registers, */
+    /* so you may need to use sscratch just like how Step2 uses mscratch. */
 
     /* Student's code ends here. */
 

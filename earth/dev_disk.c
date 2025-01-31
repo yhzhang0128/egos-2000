@@ -171,8 +171,9 @@ static enum disk_type { SD_CARD, FLASH_ROM } type;
 /* Disk read and write interface functions for struct earth */
 void disk_read(uint block_no, uint nblocks, char* dst) {
     if (type == SD_CARD) {
-        /* Student's code goes here (serial device driver).
-         * Replace the loop below by reading multiple SD
+        /* Student's code goes here (Serial Device Driver). */
+
+        /* Replace the loop below by reading multiple SD
          * card blocks using a single SD card command, cmd18 */
         for (uint i = 0; i < nblocks; i++)
             sd_read(block_no + i, dst + BLOCK_SIZE * i);
@@ -187,8 +188,9 @@ void disk_read(uint block_no, uint nblocks, char* dst) {
 void disk_write(uint block_no, uint nblocks, char* src) {
     if (type == FLASH_ROM) FATAL("disk_write: Writing to ROM");
 
-    /* Student's code goes here (serial device driver).
-     * Replace the loop below by writing multiple SD
+    /* Student's code goes here (Serial Device Driver). */
+
+    /* Replace the loop below by writing multiple SD
      * card blocks using a single SD card command, cmd25 */
     for (uint i = 0; i < nblocks; i++)
         sd_write(block_no + i, src + BLOCK_SIZE * i);

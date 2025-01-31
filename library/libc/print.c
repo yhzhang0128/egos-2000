@@ -27,9 +27,9 @@ void format_to_str(char* out, const char* fmt, va_list args) {
             } else if (*fmt == 'x') {
                 itoa(va_arg(args, int), out + strlen(out), 16);
             }
-            /* Student's code goes here (Hello, World!) */
+            /* Student's code goes here (Hello, World!). */
 
-            /* Handle format %c, %u, %p, %ld, %lx etc. */
+            /* Handle format %c, %u, %p, %ld, %lx, etc. */
             /* If not matching any pattern, simply print the '%' symbol */
 
             /* Student's code ends here. */

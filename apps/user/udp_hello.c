@@ -126,15 +126,14 @@ int main() {
     /* Send the Ethernet frame */
     if (earth->platform == QEMU) {
         CRITICAL("UDP on QEMU is left to students as an exercise.");
-        /* Student's code goes here (networking) */
+        /* Student's code goes here (Ethernet & TCP/IP). */
 
         /* Understand the Gigabit Ethernet Controller (GEM) on QEMU
          * and send the UDP network packet through GEM */
 
         /* Reference#1: GEM in the sifive_u machine:
          * https://github.com/qemu/qemu/blob/stable-9.0/include/hw/riscv/sifive_u.h#L54
-         */
-        /* Reference#2: GEM memory-mapped I/O registers:
+         * Reference#2: GEM memory-mapped I/O registers:
          * https://github.com/qemu/qemu/blob/stable-9.0/hw/net/cadence_gem.c#L1422
          */
 

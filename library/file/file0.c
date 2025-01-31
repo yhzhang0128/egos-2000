@@ -17,24 +17,27 @@
 #define DUMMY_DISK_OFFSET(ino, offset) ino * 128 + offset
 
 int mydisk_read(inode_intf self, uint ino, uint offset, block_t* block) {
-    /* Student's code goes here (file system).
-     * Read block #offset of inode #ino into block. */
+    /* Student's code goes here (File System). */
+
+    /* Replace the code below with your own file system read logic. */
     inode_intf below = self->state;
     return (below->read)(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
     /* Student's code ends here. */
 }
 
 int mydisk_write(inode_intf self, uint ino, uint offset, block_t* block) {
-    /* Student's code goes here (file system).
-     * Write block into block #offset of inode #ino. */
+    /* Student's code goes here (File System). */
+
+    /* Replace the code below with your own file system write logic. */
     inode_intf below = self->state;
     return (below->write)(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
     /* Student's code ends here. */
 }
 
 int mydisk_getsize(inode_intf self, uint ino) {
-    /* Student's code goes here (file system).
-     * Get the size of inode #ino. */
+    /* Student's code goes here (File System). */
+
+    /* Get the size of inode #ino. */
 #ifdef MKFS
     fprintf(stderr, "mydisk_getsize not implemented");
     while (1);
@@ -45,8 +48,9 @@ int mydisk_getsize(inode_intf self, uint ino) {
 }
 
 int mydisk_setsize(inode_intf self, uint ino, uint nblocks) {
-    /* Student's code goes here (file system).
-     * Set the size of inode #ino to nblocks. */
+    /* Student's code goes here (File System). */
+
+    /* Set the size of inode #ino to nblocks. */
 #ifdef MKFS
     fprintf(stderr, "mydisk_setsize not implemented");
     while (1);
@@ -67,8 +71,9 @@ inode_intf mydisk_init(inode_intf below, uint below_ino) {
 }
 
 int mydisk_create(inode_intf below, uint below_ino, uint ninodes) {
-    /* Student's code goes here (file system).
-     * Initialize the on-disk data structures for your file system. */
+    /* Student's code goes here (File System). */
+
+    /* Initialize the on-disk data structures for your file system. */
 
     /* Student's code ends here. */
     return 0;

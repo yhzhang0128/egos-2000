@@ -125,9 +125,9 @@ void pagetable_identity_map(int pid) {
         setup_identity_region(pid, ETHMAC_TX_BUFFER, 1, USER_RWX);
         setup_identity_region(pid, ETHMAC_RX_BUFFER, 1, USER_RWX);
     } else {
-        /* Student's code goes here (networking) */
+        /* Student's code goes here (Ethernet & TCP/IP). */
 
-        /* Create page tables for the GEM region of the sifive_u machine */
+        /* Create page tables for the GEM I/O region of the sifive_u machine */
         /* Reference:
          * https://github.com/qemu/qemu/blob/stable-9.0/hw/riscv/sifive_u.c#L86
          */
@@ -139,7 +139,7 @@ void pagetable_identity_map(int pid) {
 void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     if (pid >= MAX_NPROCESS) FATAL("page_table_map: pid too large");
 
-    /* Student's code goes here (virtual memory). */
+    /* Student's code goes here (Virtual Memory). */
 
     /* clang-format off */
     /* Remove the following line of code and, instead,
@@ -160,8 +160,7 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      *      | 0x80602000    | 1       | 4 KB   | Work dir (see apps/app.h)           |
      *
      * (2) After building the page tables for pid (or if page tables for pid exist),
-     *     find the PTE and update entries of the tables mapping vpage_no to ppage_id.
-     */
+     *     find the PTE and update entries of the tables mapping vpage_no to ppage_id. */
     /* clang-format on */
     soft_tlb_map(pid, vpage_no, ppage_id);
 
@@ -169,7 +168,7 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
 }
 
 void page_table_switch(int pid) {
-    /* Student's code goes here (virtual memory). */
+    /* Student's code goes here (Virtual Memory). */
 
     /* Remove the following line of code and, instead, modify the page table
      * base register (satp) similar to the code in mmu_init(). */
@@ -179,11 +178,10 @@ void page_table_switch(int pid) {
 }
 
 uint page_table_translate(int pid, uint vaddr) {
-    /* Student's code goes here (virtual memory). */
+    /* Student's code goes here (Virtual Memory). */
 
-    /* Remove the following line of code and, instead,
-     * walk through the page tables of process pid and
-     * return the physical address mapped from vaddr */
+    /* Remove the following line of code and, instead, walk through the page
+     * tables of process pid and return the paddr mapped from vaddr. */
     return soft_tlb_translate(pid, vaddr);
 
     /* Student's code ends here. */
@@ -216,7 +214,7 @@ void mmu_init() {
     asm("csrw pmpaddr0, %0" : : "r"(0x40000000));
     asm("csrw pmpcfg0, %0" : : "r"(0xF));
 
-    /* Student's code goes here (PMP memory protection). */
+    /* Student's code goes here (System Call & Protection). */
 
     /* Setup PMP NAPOT region 0x80400000 - 0x80800000 as r/w/x */
 

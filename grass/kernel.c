@@ -67,8 +67,9 @@ static void excp_entry(uint id) {
         proc_yield();
         return;
     }
-    /* Student's code goes here (system call and memory exception).
-     * Kill the process if curr_pid is a user application */
+    /* Student's code goes here (System Call & Protection). */
+
+    /* Kill the process if curr_pid is a user application. */
 
     /* Student's code ends here. */
     FATAL("excp_entry: kernel got exception %d", id);
@@ -80,8 +81,9 @@ static void intr_entry(uint id) {
         return;
     }
 
-    /* Student's code goes here (ethernet & tcp/ip).
-     * Handle Ethernet device interrupt */
+    /* Student's code goes here (Ethernet & TCP/IP). */
+
+    /* Handle the Ethernet device interrupt. */
 
     /* Student's code ends here. */
 
@@ -92,8 +94,9 @@ static void proc_yield() {
     /* Set the current process status to RUNNABLE if it was RUNNING */
     if (!CORE_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
-    /* Student's code goes here (preemptive scheduler)
-     * Replace the loop to find the next process with your sheduler logic. */
+    /* Student's code goes here (Preemptive Scheduler). */
+
+    /* Replace this loop to find the next process with your sheduler logic. */
 
     /* Find the next process to run */
     int next_idx = MAX_NPROCESS;
@@ -110,16 +113,16 @@ static void proc_yield() {
     /* Measure and record scheduling metrics for the current process before it
      * yields; Measure and record scheduling metrics for the next process. */
 
-    /* Student's code ends here*/
+    /* Student's code ends here. */
 
     /* Context switch */
     curr_proc_idx = next_idx;
     earth->timer_reset(core_in_kernel);
     if (CORE_IDLE) {
-        /* Student's code goes here (multi-core and atomic instruction) */
+        /* Student's code goes here (Multicore & Locks). */
 
         /* Release the kernel lock; Enable interrupts by modifying mstatus;
-         * Wait for the timer interrupt with while(1); */
+         * Wait for the timer interrupt with while(1). */
 
         /* Student's code ends here. */
         FATAL("proc_yield: no process to run on core %d", core_in_kernel);
@@ -127,8 +130,7 @@ static void proc_yield() {
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();
 
-    /* Student's code goes here (protection, virtual memory, and multi-core).
-     */
+    /* Student's code goes here (System Call & Protection). */
 
     /* Modify mstatus.MPP to enter machine, supervisor, or user mode
      * after mret depending on whether curr_pid is a kernel process. */
@@ -200,9 +202,10 @@ static void proc_try_syscall(struct process* proc) {
 }
 
 void proc_coresinfo() {
-    /* Student's code goes here (multi-core and atomic instruction) */
-    /* Print out the pid of the process running on each core;
-     * Add this function into the grass interface so that shell can invoke it */
+    /* Student's code goes here (Multicore & Locks). */
+
+    /* Print the pid of the process running on each core; Add this
+     * function into the grass interface so that shell can invoke it. */
 
     /* Student's code ends here. */
 }

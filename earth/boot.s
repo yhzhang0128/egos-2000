@@ -12,8 +12,8 @@ boot_loader:
     li t1, 1
     amoswap.w.aq t1, t1, (t0) /* Acquire boot_lock */
     bnez t1, boot_loader
-    /* Student's code goes here (multi-core and atomic instruction) */
-    /* Acquire kernel_lock */
+    /* Student's code goes here (Multicore & Locks). */
+    /* Acquire the kernel lock. */
 
     /* Student's code ends here. */
     li sp, 0x80400000

@@ -54,7 +54,7 @@ void boot() {
     } else {
         SUCCESS("--- Core #%d starts running ---", core_id);
 
-        /* Student's code goes here (multi-core and atomic instruction) */
+        /* Student's code goes here (Multicore & Locks). */
 
         /* Initialize the MMU and interrupts on this core */
         /* Read mmu_init() and intr_init(), and decide what to do here */
