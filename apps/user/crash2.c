@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: a program corrupting the memory of other processes
- * Students are asked to modify the grass kernel so that this
+ * Students are asked to modify the kernel so that this
  * program terminates gracefully without harming other processes.
  */
 

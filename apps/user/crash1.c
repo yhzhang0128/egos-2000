@@ -3,8 +3,8 @@
  * All rights reserved.
  *
  * Description: a program causing a memory exception
- * Students are asked to modify the grass kernel so that this
- * program terminates gracefully without crashing the grass kernel.
+ * Students are asked to modify the kernel so that this
+ * program terminates gracefully without crashing the kernel.
  */
 
 #include "app.h"

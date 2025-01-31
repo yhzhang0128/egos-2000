@@ -19,22 +19,19 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     struct elf32_header* header          = (void*)hbuf;
     struct elf32_program_header* pheader = (void*)(hbuf + header->e_phoff);
 
-    /* Load the code and data from the ELF-format binary file */
+    /* Load the code and data from the ELF-format binary executable file */
     for (uint i = 0; i < header->e_phnum; i++) {
         uint addr = pheader[i].p_vaddr;
         if (addr < RAM_START) continue;
 
-        uint memsz  = pheader[i].p_memsz;
-        uint filesz = pheader[i].p_filesz;
-        if (pid < GPID_USER_START)
-            INFO("Load 0x%x bytes to 0x%x", filesz, addr);
-
-        uint ppage_id;
+        uint memsz        = pheader[i].p_memsz;
+        uint filesz       = pheader[i].p_filesz;
         uint curr_pageno  = addr / PAGE_SIZE;
         uint end_pageno   = (addr + memsz) / PAGE_SIZE;
         uint curr_blockno = pheader[i].p_offset / BLOCK_SIZE;
         for (uint off = 0; off < filesz; off += BLOCK_SIZE) {
             /* Allocate one page (4KB) for every 8 blocks (512 bytes) */
+            uint ppage_id;
             if (off % PAGE_SIZE == 0) {
                 ppage_id = earth->mmu_alloc();
                 earth->mmu_map(pid, curr_pageno++, ppage_id);
@@ -47,13 +44,18 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
         }
 
         while (curr_pageno < end_pageno) {
-            ppage_id = earth->mmu_alloc();
+            uint ppage_id = earth->mmu_alloc();
             earth->mmu_map(pid, curr_pageno++, ppage_id);
             memset(PAGE_ID_TO_ADDR(ppage_id), 0, PAGE_SIZE);
         }
+
+        if (pid < GPID_USER_START) {
+            /* Debug printing for kernel processes */
+            INFO("Loaded 0x%x bytes to 0x%x", filesz, addr);
+        }
     }
 
-    /* Setup two pages for main() args (argc/argv) and syscall args */
+    /* Setup two pages for main() args (argc/argv) and system call args */
     uint args_start = APPS_ARG / PAGE_SIZE;
     uint ppage_id   = earth->mmu_alloc();
     earth->mmu_map(pid, args_start++, ppage_id);
@@ -65,14 +67,15 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
     *argc_addr = argc;
     if (argv) memcpy(args_addr, argv, argc * CMD_ARG_LEN);
     for (uint i = 0; i < argc; i++)
-        argv_addr[i] = APPS_ARG + 4 + 4 * CMD_NARGS + i * CMD_ARG_LEN;
+        argv_addr[i] = APPS_ARG + sizeof(uint) /* argc */ +
+                       sizeof(void*) * CMD_NARGS /* argv */ + i * CMD_ARG_LEN;
 
     ppage_id = earth->mmu_alloc();
     earth->mmu_map(pid, args_start++, ppage_id);
 
+    /* Setup 2 pages for user stack (should be enough for demo purpose) */
 #define APPS_STACK_NPAGES 2
 #define APPS_STACK_SIZE   APPS_STACK_NPAGES* PAGE_SIZE
-    /* Setup 2 pages for user stack (should be enough for demo purpose) */
     uint stack_start = (APPS_STACK_TOP - APPS_STACK_SIZE) / PAGE_SIZE;
     for (uint i = 0; i < APPS_STACK_NPAGES; i++) {
         ppage_id = earth->mmu_alloc();
