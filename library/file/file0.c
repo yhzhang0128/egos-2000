@@ -21,7 +21,7 @@ int mydisk_read(inode_intf self, uint ino, uint offset, block_t* block) {
 
     /* Replace the code below with your own file system read logic. */
     inode_intf below = self->state;
-    return (below->read)(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
+    return below->read(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
     /* Student's code ends here. */
 }
 
@@ -30,7 +30,7 @@ int mydisk_write(inode_intf self, uint ino, uint offset, block_t* block) {
 
     /* Replace the code below with your own file system write logic. */
     inode_intf below = self->state;
-    return (below->write)(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
+    return below->write(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
     /* Student's code ends here. */
 }
 
