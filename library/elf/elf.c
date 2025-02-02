@@ -49,8 +49,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
         }
 
         /* Debug printing for kernel processes */
-        if (pid < GPID_USER_START)
-            INFO("Load 0x%x bytes to 0x%x", filesz, addr);
+        if (pid <= GPID_SHELL) INFO("Load 0x%x bytes to 0x%x", filesz, addr);
     }
 
     /* Setup two pages for main() args (argc/argv) and system call args */

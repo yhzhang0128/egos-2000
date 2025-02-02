@@ -6,7 +6,7 @@
  * When getting an interrupt or exception, the CPU sets its program counter to this entry point
  */
     .section .text
-    .global trap_entry
+    .global trap_entry, kernel_lock
 
 trap_entry:
     /* Step1: acquire the kernel lock (only for P8)
@@ -108,3 +108,6 @@ trap_entry:
 
     /* Step8 */
     mret
+
+.bss
+    kernel_lock:     .word 0

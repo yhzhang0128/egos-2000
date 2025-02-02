@@ -16,16 +16,16 @@ static int app_spawn(struct proc_request* req);
 
 struct multicore {
     /* see earth/boot.s */
-    int boot_lock, kernel_lock, booted_core_cnt;
+    int boot_lock, booted_core_cnt;
 };
 
-int main(int unused, struct multicore* locks) {
+int main(int unused, struct multicore* boot) {
     SUCCESS("Enter kernel process GPID_PROCESS");
 
     /* Student's code goes here (Multicore & Locks). */
 
-    /* Release the boot lock and the kernel lock, so the other cores
-     * can start to run; Wait for all the 4 cores to finish boot-up. */
+    /* Release the boot lock, so the other 3 cores start
+     * to run; Wait for all the 4 cores to finish booting. */
 
     /* Student's code ends here. */
 

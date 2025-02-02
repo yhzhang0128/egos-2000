@@ -19,6 +19,7 @@ void intr_init(uint core_id);
 struct grass* grass = (void*)GRASS_STRUCT_BASE;
 struct earth* earth = (void*)EARTH_STRUCT_BASE;
 
+void hang();
 void grass_entry();
 void kernel_entry(uint);
 
@@ -32,8 +33,7 @@ void boot() {
     /* See https://www.qemu.org/docs/master/system/riscv/sifive_u.html */
     if (earth->platform == QEMU && core_id == 0) {
         release(boot_lock);
-        release(kernel_lock);
-        while (1);
+        hang();
     }
 
     if (booted_core_cnt++ == 0) {
@@ -59,8 +59,8 @@ void boot() {
         /* Initialize the MMU and interrupts on this core */
         /* Read mmu_init() and intr_init(), and decide what to do here */
 
-        /* Set core to idle, reset the timer, release the boot and kernel
-         * locks, and then wait for the timer interrupt with while(1); */
+        /* Set the core to idle in PCB, reset the timer, release the boot lock,
+         * and wait for a timer interrupt in **user** mode by jumping to hang() */
 
         /* Student's code ends here. */
     }
