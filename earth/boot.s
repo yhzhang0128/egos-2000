@@ -5,7 +5,7 @@
  * Description: entry point of the bootloader
  */
     .section .text.enter
-    .global boot_loader, boot_lock, kernel_lock, booted_core_cnt
+    .global boot_loader, hang, boot_lock, kernel_lock, booted_core_cnt
 
 boot_loader:
     la t0, boot_lock          /* Load the address of boot_lock */
@@ -18,6 +18,9 @@ boot_loader:
     /* Student's code ends here. */
     li sp, 0x80400000
     call boot
+
+hang:
+    call hang
 
 .bss
     boot_lock:       .word 0

@@ -122,7 +122,7 @@ static void proc_yield() {
         /* Student's code goes here (Multicore & Locks). */
 
         /* Release the kernel lock; Enable interrupts by modifying mstatus;
-         * Wait for the timer interrupt with while(1). */
+         * Wait for the next timer interrupt by calling hang() in boot.s. */
 
         /* Student's code ends here. */
         FATAL("proc_yield: no process to run on core %d", core_in_kernel);
