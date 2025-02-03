@@ -1,3 +1,5 @@
+📢 [Feb 3, 2025] The first draft of the [EGOS book](https://egos.fun/book/overview.html) has been released which contains 9 course projects.
+
 ## Vision
 
 This project's vision is to help **every** student read **all** the code of a teaching operating system.
