@@ -60,7 +60,8 @@ void boot() {
         /* Read mmu_init() and intr_init(), and decide what to do here */
 
         /* Set the core to idle in PCB, reset the timer, release the boot lock,
-         * and wait for a timer interrupt in **user** mode by jumping to hang() */
+         * and wait for a timer interrupt in **user** mode by jumping to hang()
+         */
 
         /* Student's code ends here. */
     }

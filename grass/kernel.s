@@ -30,7 +30,7 @@ trap_entry:
     li sp, 0x80400000
 
     /* Step3 */
-    addi sp, sp, -116  /* sp == SAVED_REGISTER_ADDR */
+    addi sp, sp, -128  /* sp == SAVED_REGISTER_ADDR */
     sw ra, 0(sp)
     sw t0, 4(sp)
     sw t1, 8(sp)
