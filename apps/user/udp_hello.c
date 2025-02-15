@@ -20,20 +20,11 @@
 
 #define IPTOINT(a, b, c, d) ((a << 24) | (b << 16) | (c << 8) | d)
 static uint local_ip       = IPTOINT(192, 168, 1, 50);
+static uint local_udp_port = 8001;
 static uint dest_ip        = IPTOINT(192, 168, 0, 212);
-static uint local_udp_port = 8001, dest_udp_port = 8002;
+static uint dest_udp_port  = 8002;
 
-/* bswap converts little-ending encoding to big-ending encoding */
-#define bswap_16(x) (ushort)((ushort)((x) << 8) | ((ushort)(x) >> 8))
-#define bswap_32(x)                                                            \
-    (uint)(((uint)(x) >> 24) | (((uint)(x) >> 8) & 0xff00) |                   \
-           (((uint)(x) << 8) & 0xff0000) | ((uint)(x) << 24))
-
-/* Helper functions for generating checksums */
-static uint crc32(const uchar* message, uint len);
-static ushort checksum(uint r, char* ptr, uint length, int complete);
-
-/* Data structures for the memory-mapped Ethernet device */
+/* Data structures for the Ethernet frame */
 struct ethernet_header {
     uchar destmac[6];
     uchar srcmac[6];
@@ -75,6 +66,10 @@ struct checksum_fields {
     ushort length;
 } __attribute__((packed));
 
+/* Helper functions for checksum */
+static uint crc32(const uchar* message, uint len);
+static ushort checksum(uint r, char* ptr, uint length, int complete);
+
 int main() {
     /* Initialize the ethernet_frame data structure */
     /* clang-format off */
@@ -82,24 +77,24 @@ int main() {
         .eth = {
             .srcmac          = LOCAL_MAC,
             .destmac         = DEST_MAC,
-            .ethertype       = bswap_16(0x0800) /* ETHERTYPE_IP */
+            .ethertype       = __builtin_bswap16(0x0800) /* ETHERTYPE_IP */
         },
         .ip = {
             .version         = 0x45, /* IP_IPV4 */
             .diff_services   = 0,
-            .total_length    = bswap_16(sizeof(struct ip_header) + sizeof(struct udp_header) + sizeof(HELLO_MSG)),
-            .identification  = bswap_16(0),
-            .fragment_offset = bswap_16(0x4000), /* IP_DONT_FRAGMENT */
+            .total_length    = __builtin_bswap16(sizeof(struct ip_header) + sizeof(struct udp_header) + sizeof(HELLO_MSG)),
+            .identification  = __builtin_bswap16(0),
+            .fragment_offset = __builtin_bswap16(0x4000), /* IP_DONT_FRAGMENT */
             .ttl             = 64,
             .proto           = 0x11, /* IP_PROTO_UDP */
             .checksum        = 0, /* to be calculated later */
-            .src_ip          = bswap_32(local_ip),
-            .dst_ip          = bswap_32(dest_ip)
+            .src_ip          = __builtin_bswap32(local_ip),
+            .dst_ip          = __builtin_bswap32(dest_ip)
         },
         .udp = {
-            .src_port        = bswap_16(local_udp_port),
-            .dst_port        = bswap_16(dest_udp_port),
-            .length          = bswap_16(sizeof(struct udp_header) + sizeof(HELLO_MSG)),
+            .src_port        = __builtin_bswap16(local_udp_port),
+            .dst_port        = __builtin_bswap16(dest_udp_port),
+            .length          = __builtin_bswap16(sizeof(struct udp_header) + sizeof(HELLO_MSG)),
             .checksum        = 0 /* to be calculated later */
         }
     };
@@ -108,24 +103,23 @@ int main() {
     memcpy(eth_frame.payload, HELLO_MSG, sizeof(HELLO_MSG));
 
     /* Calculate the IP checksum */
-    eth_frame.ip.checksum = bswap_16(
+    eth_frame.ip.checksum = __builtin_bswap16(
         checksum(0, (void*)&eth_frame.ip, sizeof(struct ip_header), 1));
 
     /* Calculate the UDP checksum */
     struct checksum_fields check = {.src_ip = eth_frame.ip.src_ip,
                                     .dst_ip = eth_frame.ip.dst_ip,
                                     .zero   = 0,
-                                    .proto =
-                                        eth_frame.ip.proto, /* IP_PROTO_UDP */
+                                    .proto  = eth_frame.ip.proto,
                                     .length = eth_frame.udp.length};
     uint r = checksum(0, (void*)&check, sizeof(struct checksum_fields), 0);
-    eth_frame.udp.checksum =
-        bswap_16(checksum(r, (void*)&eth_frame.udp,
-                          sizeof(struct udp_header) + sizeof(HELLO_MSG), 1));
+    eth_frame.udp.checksum = __builtin_bswap16(
+        checksum(r, (void*)&eth_frame.udp,
+                 sizeof(struct udp_header) + sizeof(HELLO_MSG), 1));
 
     /* Send the Ethernet frame */
     if (earth->platform == QEMU) {
-        CRITICAL("UDP on QEMU is left to students as an exercise.");
+        CRITICAL("Ethernet/UDP on QEMU is left to students as an exercise.");
         /* Student's code goes here (Ethernet & TCP/IP). */
 
         /* Understand the Gigabit Ethernet Controller (GEM) on QEMU
@@ -157,10 +151,10 @@ int main() {
 #define ETHMAC_CSR_SLOT_LEN_WRITE 0x28
 
         while (!(REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_READY)));
-        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_WRITE) =
-            0; /* ETHMAC provides 2 TX slots */
-               /* TX slot#0 is at 0x90001000 (txbuffer) */
-               /* TX slot#1 is at 0x90001800 (not used here) */
+        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_WRITE) = 0;
+        /* ETHMAC provides 2 TX slots */
+        /* TX slot#0 is at 0x90001000 (txbuffer) */
+        /* TX slot#1 is at 0x90001800 (not used here) */
         REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_LEN_WRITE) = txlen;
         REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_START_WRITE)    = 1;
     }

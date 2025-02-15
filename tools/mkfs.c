@@ -31,7 +31,6 @@ char* egos_binaries[] = {"./qemu/egos.bin", "../build/release/sys_proc.elf",
                          "../build/release/sys_file.elf",
                          "../build/release/sys_shell.elf"};
 
-#define BIN_DIR_INODE 6
 char bin_dir[256] = "./   6 ../   0 ";
 char* contents[]  = {
     "./   0 ../   0 home/   1 bin/   6 ",
@@ -39,13 +38,14 @@ char* contents[]  = {
     "./   2 ../   1 README   5 ",
     "./   3 ../   1 ",
     "./   4 ../   1 ",
-    "With only 2000 lines of code, egos-2000 implements boot loader, microSD "
-     "driver, tty driver, memory translation, interrupt handling, preemptive "
-     "scheduler, system call, file system, shell, a UDP/Ethernet demo, several "
-     "user commands, and the `mkfs/mkrom` tools.",
+    "With only 2000 lines of code, egos-2000 implements boot loader, SD card "
+     "driver, tty driver, virtual memory with page tables, interrupt and "
+     "exception handling, preemptive scheduler, system call, file system, "
+     "shell, an Ethernet/UDP demo, several user commands, and the mkfs tool. "
+     "Moreover, the EGOS book (https://egos.fun) contains 9 course projects.",
     bin_dir};
-
-#define SIZE_2MB 2 * 1024 * 1024
+#define BIN_DIR_INODE 6
+#define SIZE_2MB      2 * 1024 * 1024
 
 char inode[SIZE_2MB], tmp[512];
 char vexriscv[SIZE_2MB * 2], exec[SIZE_2MB], fs[SIZE_2MB];

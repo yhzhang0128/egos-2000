@@ -140,8 +140,8 @@ static void proc_yield() {
     /* Setup the entry point for a newly created process */
     if (curr_status == PROC_READY) {
         /* Set argc, argv and initial program counter */
-        proc_set[curr_proc_idx].saved_register[8] = APPS_ARG;
-        proc_set[curr_proc_idx].saved_register[9] = APPS_ARG + 4;
+        proc_set[curr_proc_idx].saved_register[0] = APPS_ARG;
+        proc_set[curr_proc_idx].saved_register[1] = APPS_ARG + 4;
         proc_set[curr_proc_idx].mepc              = APPS_ENTRY;
     }
     proc_set_running(curr_pid);
