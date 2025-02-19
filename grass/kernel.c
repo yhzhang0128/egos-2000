@@ -122,7 +122,7 @@ static void proc_yield() {
         /* Student's code goes here (Multicore & Locks). */
 
         /* Release the kernel lock; Enable interrupts by modifying mstatus;
-         * Wait for the next timer interrupt by calling hang() in boot.s. */
+         * Wait for a timer interrupt with the wfi instruction. */
 
         /* Student's code ends here. */
         FATAL("proc_yield: no process to run on core %d", core_in_kernel);
@@ -130,10 +130,8 @@ static void proc_yield() {
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();
 
-    /* Student's code goes here (System Call & Protection). */
-
-    /* Modify mstatus.MPP to enter machine, supervisor, or user mode
-     * after mret depending on whether curr_pid is a kernel process. */
+    /* Student's code goes here (System Call & Protection | Multicore & Locks).
+     * Modify mstatus.MPP to enter machine or user mode after mret. */
 
     /* Student's code ends here. */
 
