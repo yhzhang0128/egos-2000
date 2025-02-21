@@ -3,9 +3,8 @@
  * All rights reserved.
  *
  * Description: Kernel ≈ 2 handlers
- *     intr_entry() handles timer, keyboard, and other interrupts
- *     excp_entry() handles faults (e.g., unauthorized memory access) and system
- * calls
+ *   intr_entry() handles timer, keyboard, and other interrupts
+ *   excp_entry() handles system calls and faults (e.g., invalid memory access)
  */
 
 #include "egos.h"
@@ -63,6 +62,7 @@ static void excp_entry(uint id) {
 
         proc_set[curr_proc_idx].mepc += 4;
         proc_set[curr_proc_idx].syscall.status = PENDING;
+        proc_set_pending(curr_pid);
         proc_try_syscall(&proc_set[curr_proc_idx]);
         proc_yield();
         return;
@@ -91,7 +91,6 @@ static void intr_entry(uint id) {
 }
 
 static void proc_yield() {
-    /* Set the current process status to RUNNABLE if it was RUNNING */
     if (!CORE_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
     /* Student's code goes here (Preemptive Scheduler). */
@@ -115,11 +114,10 @@ static void proc_yield() {
 
     /* Student's code ends here. */
 
-    /* Context switch */
     curr_proc_idx = next_idx;
     earth->timer_reset(core_in_kernel);
     if (CORE_IDLE) {
-        /* Student's code goes here (Multicore & Locks). */
+        /* Student's code goes here (System Call | Multicore & Locks) */
 
         /* Release the kernel lock; Enable interrupts by modifying mstatus;
          * Wait for a timer interrupt with the wfi instruction. */
@@ -130,8 +128,9 @@ static void proc_yield() {
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();
 
-    /* Student's code goes here (System Call & Protection | Multicore & Locks).
-     * Modify mstatus.MPP to enter machine or user mode after mret. */
+    /* Student's code goes here (Protection | Multicore & Locks). */
+
+    /* Modify mstatus.MPP to enter machine or user mode after mret. */
 
     /* Student's code ends here. */
 
@@ -145,7 +144,7 @@ static void proc_yield() {
     proc_set_running(curr_pid);
 }
 
-static int proc_try_send(struct process* sender) {
+static void proc_try_send(struct process* sender) {
     for (uint i = 0; i < MAX_NPROCESS; i++) {
         struct process* dst = &proc_set[i];
         if (dst->pid == sender->syscall.receiver &&
@@ -154,49 +153,48 @@ static int proc_try_send(struct process* sender) {
              * sender */
             if (!(dst->syscall.type == SYS_RECV &&
                   dst->syscall.status == PENDING))
-                return -1;
+                return;
             if (!(dst->syscall.sender == GPID_ALL ||
                   dst->syscall.sender == sender->pid))
-                return -1;
+                return;
 
             dst->syscall.status = DONE;
             dst->syscall.sender = sender->pid;
             /* Copy the system call arguments within the kernel PCB */
             memcpy(dst->syscall.content, sender->syscall.content,
                    SYSCALL_MSG_LEN);
-            return 0;
+            return;
         }
     }
     FATAL("proc_try_send: process %d sending to unknown process %d",
           sender->pid, sender->syscall.receiver);
 }
 
-static int proc_try_recv(struct process* receiver) {
-    if (receiver->syscall.status == PENDING) return -1;
+static void proc_try_recv(struct process* receiver) {
+    if (receiver->syscall.status == PENDING) return;
 
     /* Copy the system call results from the kernel back to user space */
     earth->mmu_switch(receiver->pid);
     earth->mmu_flush_cache();
     uint syscall_paddr = earth->mmu_translate(receiver->pid, SYSCALL_ARG);
     memcpy((void*)syscall_paddr, &receiver->syscall, sizeof(struct syscall));
-    return 0;
+
+    /* Set the sender and receiver back to RUNNABLE */
+    proc_set_runnable(receiver->pid);
+    proc_set_runnable(receiver->syscall.sender);
 }
 
 static void proc_try_syscall(struct process* proc) {
-    int rc;
-
     switch (proc->syscall.type) {
     case SYS_RECV:
-        rc = proc_try_recv(proc);
+        proc_try_recv(proc);
         break;
     case SYS_SEND:
-        rc = proc_try_send(proc);
+        proc_try_send(proc);
         break;
     default:
         FATAL("proc_try_syscall: unknown syscall type=%d", proc->syscall.type);
     }
-
-    (rc == 0) ? proc_set_runnable(proc->pid) : proc_set_pending(proc->pid);
 }
 
 void proc_coresinfo() {
