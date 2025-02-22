@@ -7,7 +7,7 @@ OBJDUMP     = riscv-none-elf-objdump
 OBJCOPY     = riscv-none-elf-objcopy
 
 LDFLAGS     = -nostdlib -lc -lgcc
-CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
+CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option -fno-builtin
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 all:
