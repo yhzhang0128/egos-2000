@@ -43,10 +43,10 @@ int printf(const char* format, ...) {
  * when implementing dynamic memory allocation
  */
 /*
-extern char __heap_start, __heap_max;
+extern char __heap_start, __heap_end;
 static char* brk = &__heap_start;
 char* _sbrk(int size) {
-    if (brk + size > (char*)&__heap_max) {
+    if (brk + size > (char*)&__heap_end) {
         terminal_write("_sbrk: heap grows too large\r\n", 29);
         return NULL;
     }
