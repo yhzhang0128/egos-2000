@@ -1,4 +1,4 @@
-# (C) 2024, Cornell University
+# (C) 2025, Cornell University
 # All rights reserved.
 
 QEMU        = qemu-system-riscv32
@@ -7,12 +7,12 @@ OBJDUMP     = riscv-none-elf-objdump
 OBJCOPY     = riscv-none-elf-objcopy
 
 LDFLAGS     = -nostdlib -lc -lgcc
-CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
+CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option -fno-builtin
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 all:
 	@echo "$(YELLOW)-------- Compile Multi-threading --------$(END)"
-	$(RISCV_CC) $(CFLAGS) thread.s context.s thread.c -Tthread.lds $(LDFLAGS) -o thread.elf
+	$(RISCV_CC) $(CFLAGS) thread.s context.s thread.c queue.c -Tthread.lds $(LDFLAGS) -o thread.elf
 	$(OBJDUMP) $(DEBUG_FLAGS) thread.elf > thread.lst
 	$(OBJCOPY) -O binary thread.elf thread.bin
 
