@@ -1,6 +1,6 @@
 void terminal_write(const char *str, int len) {
     for (int i = 0; i < len; i++) {
-        *(char*)(0x10000000UL) = str[i];
+        *(char*)(0x10000000) = str[i];
     }
 }
 
