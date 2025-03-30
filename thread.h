@@ -6,17 +6,20 @@ void  ctx_start(void **sp_old, void *sp_new);
 void ctx_switch(void **sp_old, void *sp_new);
 
 /* Student's code goes here (Cooperative Threads). */
-/* Define data structures for thread control block (TCB) */
+enum thread_status {
+	THREAD_RUNNING,
+/* Define possible status of a thread */
 
-/* Student's code ends here. */
-
-struct cv {
-/* Student's code goes here (Cooperative Threads). */
-/* Define data structures for conditional variables */
-
-/* Student's code ends here. */
 };
 
+struct thread {
+    int id;
+    void* sp;
+    enum thread_status status;
+/* Define the data structure for thread control block (TCB) */
+
+};
+/* Student's code ends here. */
 
 /**
  * ctx_entry(): Executing in the context of a newly spawned thread. The thread will
@@ -70,6 +73,13 @@ void thread_yield();
  * exiting thread.
  */
 void thread_exit();
+
+/* Student's code goes here (Cooperative Threads). */
+struct cv {
+/* Define data structures for conditional variables */
+
+};
+/* Student's code ends here. */
 
 /**
  * cv_wait(struct cv *condition): Directly analogous to [thread_yield], except
