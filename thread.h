@@ -1,10 +1,6 @@
 #include "queue.h"
 #define STACK_SIZE   (16 * 1024) // 16 KB stack for children
 
-/* ctx_start and ctx_switch are defined in context.s */
-void  ctx_start(void **sp_old, void *sp_new);
-void ctx_switch(void **sp_old, void *sp_new);
-
 /* Student's code goes here (Cooperative Threads). */
 enum thread_status {
 	THREAD_RUNNING,
@@ -97,3 +93,10 @@ void cv_wait(struct cv *condition);
  * cv_signal(struct cv *condition): Make at most one thread waiting on [cv] runnable.
  */
 void cv_signal(struct cv *condition);
+
+/* ctx_start and ctx_switch are defined in context.s */
+void  ctx_start(void **sp_old, void *sp_new);
+void ctx_switch(void **sp_old, void *sp_new);
+
+/* _end is defined in thread.s */
+void _end();
