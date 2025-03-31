@@ -77,7 +77,9 @@ void cv_wait(struct cv *condition);
 
 /**
  * cv_signal(struct cv *condition): Remove a thread (if exists) from the conditional
- * variable and add it back to the TCB so that it can be scheduled later.
+ * variable and add it back to the TCB so that it can be scheduled later. However,
+ * cv_signal should not switch the CPU context to another thread (i.e., the current
+ * thread should continue to run).
  */
 void cv_signal(struct cv *condition);
 
