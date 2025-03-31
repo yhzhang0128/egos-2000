@@ -19,14 +19,14 @@ struct thread {
 
 /**
  * ctx_entry(): Executing in the context of a newly spawned thread. The thread will
- * set up its own state (point its own TCB entry as currently running) and then run
- * its work function held in its TCB entry. Once the thread finishes its work, it will
- * return to this function and exit (by calling thread_exit)
+ * set up its own state (e.g., point its own TCB entry as currently running) and then
+ * run its entry function held in its TCB entry. Once the thread finishes its work, it
+ * will return to this function and exit (by calling thread_exit).
  */
 void ctx_entry();
 
 /**
- * thread_init(): Initialize the threading data structures, which includes
+ * thread_init(): Initialize the data structures for multi-threading, which includes
  * allocating a TCB entry for the main thread.
  */
 void thread_init();
@@ -36,37 +36,29 @@ void thread_init();
  * with a [stack_size] byte stack, and schedule it to run.
  *
  * Let T denote the thread that called thread_create.
- * Let T' denote the spawned child thread
+ * Let T' denote the spawned child thread.
  *
  * In thread_create, T will allocate a TCB entry for T' along with T' stack,
- * and then T will schedule T' to run using ctx_start. T' will then call ctx_entry.
+ * and then T will schedule T' to run using ctx_start.
  *
- * When some thread T* context switches back to T, T will return back to thread_create,
- * will set itself as the currently running thread, and possibly clean up T* if T* has
- * terminated.
+ * When some thread T'' context switches back to T, T will return back to thread_create,
+ * and possibly clean up T'' if T'' has terminated.
  */
 void thread_create(void (*entry)(void *arg), void *arg, int stack_size);
 
 /**
- * thread_yield(): The current thread will schedule another runnable thread, unless
- * there are no other runnable threads, in which the current thread will return
- * back to its work function
+ * thread_yield(): Try to switch to another thread using ctx_switch. If no other thread
+ * can be switched to, continue to run the current thread (if it is still runnable).
  *
- * The thread T that calls thread_yield will schedule T' to run, then run T'
- * using ctx_switch.
- *
- * Once some thread T* context switches back to T, T will return back to thread_yield
- * and cleanup T* if T* has terminated.
+ * Once some thread T' context switches back to T, T will return back to thread_yield
+ * and cleanup T' if T' has terminated.
  */
 void thread_yield();
 
 /**
- * thread_exit(): The current thread will set itself to no longer be scheduled (ZOMBIE),
- * and will then schedule another runnable thread. If no other runnable thread
- * exists, the current thread will exit() (which just infinitely loops).
- *
- * The thread that was scheduled will then free the memory associated with the
- * exiting thread.
+ * thread_exit(): The current thread will set its status ZOMBIE (cannot be scheduled),
+ * and yield to another runnable thread. If no other runnable thread exists, call the
+ * _end() in thread.s which just infinitely loops.
  */
 void thread_exit();
 
@@ -78,19 +70,14 @@ struct cv {
 /* Student's code ends here. */
 
 /**
- * cv_wait(struct cv *condition): Directly analogous to [thread_yield], except
- * that the thread T which called [cv_wait] will wait on the condition variable [cv],
- * and attempt to schedule another thread. If there are no runnable threads, the
- * system is deadlocked and will exit() (which infinitely loops).
- *
- * T cannot be scheduled, and can only be scheduled when another thread T* calls
- * [cv_signal] on the same condition variable. Once T is context switched back to,
- * it will possibly clean up the previous thread.
+ * cv_wait(struct cv *condition): Remove the current thread from the TCB and add it
+ * to the conditional variable. Try to yield to a runnable thread in the TCB.
  */
 void cv_wait(struct cv *condition);
 
 /**
- * cv_signal(struct cv *condition): Make at most one thread waiting on [cv] runnable.
+ * cv_signal(struct cv *condition): Remove a thread (if exists) from the conditional
+ * variable and add it back to the TCB so that it can be scheduled later.
  */
 void cv_signal(struct cv *condition);
 
