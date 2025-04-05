@@ -37,6 +37,12 @@ struct grass {
     /* System call interface */
     void (*sys_send)(int receiver, char* msg, uint size);
     void (*sys_recv)(int from, int* sender, char* buf, uint size);
+
+    /* Student's code goes here (System Call | Multicore & Locks). */
+
+    /* Add interface functions for process sleep and multicore information. */
+
+    /* Student's code ends here. */
 };
 
 extern struct earth* earth;

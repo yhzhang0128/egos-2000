@@ -22,10 +22,11 @@ void proc_set_runnable(int pid) { proc_set_status(pid, PROC_RUNNABLE); }
 void proc_set_pending(int pid) { proc_set_status(pid, PROC_PENDING_SYSCALL); }
 
 int proc_alloc() {
-    /* Student's code goes here (Preemptive Scheduler). */
+    /* Student's code goes here (Preemptive Scheduler | System Call). */
 
-    /* Collect information (e.g., spawning time) for the
-     * new process and initialize the MLFQ data structures. */
+    /* Collect information (e.g., spawning time) for the new process
+     * and initialize the MLFQ data structures. Initialize fields of
+     * struct process added for process sleep. */
 
     static uint curr_pid = 0;
     for (uint i = 0; i < MAX_NPROCESS; i++)

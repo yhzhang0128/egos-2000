@@ -8,7 +8,8 @@
     .section .text
     .global app_entry
 app_entry:
-    lw a0, 0(a0) /* a0 holds APPS_ARG, the address of integer argc */
+    /* a0 holds APPS_ARG, the address of argc (see kernel.c for details) */
+    lw a0, 0(a0)
     li sp,0x80800000
     call main
     call exit

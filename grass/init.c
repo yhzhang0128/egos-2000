@@ -23,6 +23,12 @@ void grass_entry() {
     grass->proc_set_ready = proc_set_ready;
     grass->sys_send       = sys_send;
     grass->sys_recv       = sys_recv;
+    /* Student's code goes here (System Call | Multicore & Locks). */
+
+    /* Initialize the grass interface functions for process sleep
+     * and displaying multicore process information. */
+
+    /* Student's code ends here. */
 
     /* Load the first system server GPID_PROCESS */
     INFO("Load kernel process #%d: sys_process", GPID_PROCESS);

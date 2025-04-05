@@ -19,8 +19,8 @@ void sys_send(int receiver, char* msg, uint size) {
 }
 
 void sys_recv(int from, int* sender, char* buf, uint size) {
-    sc->sender = from;
     sc->type   = SYS_RECV;
+    sc->sender = from;
     asm("ecall");
     memcpy(buf, sc->content, size);
     if (sender) *sender = sc->sender;

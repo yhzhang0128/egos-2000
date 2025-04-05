@@ -4,6 +4,7 @@
 #define SYSCALL_MSG_LEN 1024
 
 void exit(int status);
+void sleep(ulonglong nticks);
 int term_read(char* buf, uint len);
 void term_write(char* str, uint len);
 int dir_lookup(int dir_ino, char* name);
@@ -22,11 +23,15 @@ enum grass_servers {
 /* GPID_PROCESS */
 #define CMD_NARGS   16
 #define CMD_ARG_LEN 32
+/* Student's code goes here (System Call & Protection). */
+
+/* Update struct proc_request for process sleep. */
 struct proc_request {
     enum { PROC_SPAWN, PROC_EXIT, PROC_KILLALL } type;
     int argc;
     char argv[CMD_NARGS][CMD_ARG_LEN];
 };
+/* Student's code ends here. */
 
 struct proc_reply {
     enum { CMD_OK, CMD_ERROR } type;

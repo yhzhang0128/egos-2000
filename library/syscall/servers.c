@@ -21,6 +21,16 @@ void exit(int status) {
     while (1);
 }
 
+void sleep(ulonglong nticks) {
+    /* Student's code goes here (System Call & Protection). */
+
+    /* Send a message to GPID_PROCESS for process sleep. For simplicity,
+     * you can assume that GPID_PROCESS will be scheduled and handle the
+     * message before the kernel re-schedules the current process. */
+
+    /* Student's code ends here. */
+}
+
 /* To understand directory management, read tools/mkfs.c */
 int dir_lookup(int dir_ino, char* name) {
     char buf[BLOCK_SIZE];

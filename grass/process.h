@@ -20,11 +20,11 @@ struct process {
     int pid;
     struct syscall syscall;
     enum proc_status status;
-    uint mepc, saved_register[SAVED_REGISTER_NUM];
+    uint mepc, saved_registers[SAVED_REGISTER_NUM];
 
-    /* Student's code goes here (Preemptive Scheduler). */
+    /* Student's code goes here (Preemptive Scheduler | System Call). */
 
-    /* Create data structures that hold scheduling information. */
+    /* Add new fields for scheduling metrics, MLFQ, or process sleep. */
 
     /* Student's code ends here. */
 };
@@ -39,3 +39,6 @@ void proc_set_ready(int);
 void proc_set_running(int);
 void proc_set_runnable(int);
 void proc_set_pending(int);
+
+void proc_coresinfo();
+void proc_sleep(int pid, ulonglong nticks);

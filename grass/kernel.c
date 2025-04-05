@@ -16,6 +16,7 @@ uint core_in_kernel;
 uint core_to_proc_idx[NCORES + 1];
 /* QEMU has cores with ID #1 .. #NCORES */
 /* Arty has cores with ID #0 .. #NCORES-1 */
+
 struct process proc_set[MAX_NPROCESS + 1];
 /* proc_set[0..MAX_NPROCESS-1] are actual processes */
 /* proc_set[MAX_NPROCESS] is a place holder for idle cores */
@@ -23,6 +24,7 @@ struct process proc_set[MAX_NPROCESS + 1];
 #define curr_proc_idx core_to_proc_idx[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
 #define curr_status   proc_set[curr_proc_idx].status
+#define curr_saved    proc_set[curr_proc_idx].saved_registers
 #define CORE_IDLE     (curr_proc_idx == MAX_NPROCESS)
 void core_set_idle(uint core) { core_to_proc_idx[core] = MAX_NPROCESS; }
 
@@ -33,20 +35,17 @@ void kernel_entry(uint mcause) {
     /* With the kernel lock, only one core can enter this point at any time */
     asm("csrr %0, mhartid" : "=r"(core_in_kernel));
 
-    /* Save process context */
+    /* Save the process context */
     asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
-    memcpy(proc_set[curr_proc_idx].saved_register, SAVED_REGISTER_ADDR,
-           SAVED_REGISTER_SIZE);
+    memcpy(curr_saved, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
 
     (mcause & (1 << 31)) ? intr_entry(mcause & 0x3FF) : excp_entry(mcause);
 
-    /* Restore process context */
+    /* Restore the process context */
     asm("csrw mepc, %0" ::"r"(proc_set[curr_proc_idx].mepc));
-    memcpy(SAVED_REGISTER_ADDR, proc_set[curr_proc_idx].saved_register,
-           SAVED_REGISTER_SIZE);
+    memcpy(SAVED_REGISTER_ADDR, curr_saved, SAVED_REGISTER_SIZE);
 }
 
-#define INTR_ID_CTRL_C  2
 #define INTR_ID_TIMER   7
 #define EXCP_ID_ECALL_U 8
 #define EXCP_ID_ECALL_M 11
@@ -76,10 +75,7 @@ static void excp_entry(uint id) {
 }
 
 static void intr_entry(uint id) {
-    if (id == INTR_ID_TIMER) {
-        proc_yield();
-        return;
-    }
+    if (id == INTR_ID_TIMER) return proc_yield();
 
     /* Student's code goes here (Ethernet & TCP/IP). */
 
@@ -93,9 +89,10 @@ static void intr_entry(uint id) {
 static void proc_yield() {
     if (!CORE_IDLE && curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
-    /* Student's code goes here (Preemptive Scheduler). */
+    /* Student's code goes here (Preemptive Scheduler | System Call). */
 
-    /* Replace this loop to find the next process with your sheduler logic. */
+    /* Replace the loop below to find the next process to schedule with MLFQ.
+     * Do not schedule a process that should still be sleeping at this time. */
 
     /* Find the next process to run */
     int next_idx = MAX_NPROCESS;
@@ -137,9 +134,9 @@ static void proc_yield() {
     /* Setup the entry point for a newly created process */
     if (curr_status == PROC_READY) {
         /* Set argc, argv and initial program counter */
-        proc_set[curr_proc_idx].saved_register[0] = APPS_ARG;
-        proc_set[curr_proc_idx].saved_register[1] = APPS_ARG + 4;
-        proc_set[curr_proc_idx].mepc              = APPS_ENTRY;
+        curr_saved[0]                = APPS_ARG;
+        curr_saved[1]                = APPS_ARG + 4;
+        proc_set[curr_proc_idx].mepc = APPS_ENTRY;
     }
     proc_set_running(curr_pid);
 }
@@ -149,8 +146,7 @@ static void proc_try_send(struct process* sender) {
         struct process* dst = &proc_set[i];
         if (dst->pid == sender->syscall.receiver &&
             dst->status != PROC_UNUSED) {
-            /* Return -1 if dst is not receiving, or will not take msg from
-             * sender */
+            /* Return if dst is not receiving or not taking msg from sender. */
             if (!(dst->syscall.type == SYS_RECV &&
                   dst->syscall.status == PENDING))
                 return;
@@ -160,26 +156,25 @@ static void proc_try_send(struct process* sender) {
 
             dst->syscall.status = DONE;
             dst->syscall.sender = sender->pid;
-            /* Copy the system call arguments within the kernel PCB */
+            /* Copy the system call arguments within the kernel PCB. */
             memcpy(dst->syscall.content, sender->syscall.content,
                    SYSCALL_MSG_LEN);
             return;
         }
     }
-    FATAL("proc_try_send: process %d sending to unknown process %d",
-          sender->pid, sender->syscall.receiver);
+    FATAL("proc_try_send: unknown receiver pid=%d", sender->syscall.receiver);
 }
 
 static void proc_try_recv(struct process* receiver) {
     if (receiver->syscall.status == PENDING) return;
 
-    /* Copy the system call results from the kernel back to user space */
+    /* Copy the system call results from the kernel back to user space. */
     earth->mmu_switch(receiver->pid);
     earth->mmu_flush_cache();
     uint syscall_paddr = earth->mmu_translate(receiver->pid, SYSCALL_ARG);
     memcpy((void*)syscall_paddr, &receiver->syscall, sizeof(struct syscall));
 
-    /* Set the sender and receiver back to RUNNABLE */
+    /* Set the receiver and sender back to RUNNABLE. */
     proc_set_runnable(receiver->pid);
     proc_set_runnable(receiver->syscall.sender);
 }
@@ -195,6 +190,14 @@ static void proc_try_syscall(struct process* proc) {
     default:
         FATAL("proc_try_syscall: unknown syscall type=%d", proc->syscall.type);
     }
+}
+
+void proc_sleep(int pid, ulonglong nticks) {
+    /* Student's code goes here (System Call & Protection). */
+
+    /* Update the struct process of process pid for process sleep. */
+
+    /* Student's code ends here. */
 }
 
 void proc_coresinfo() {

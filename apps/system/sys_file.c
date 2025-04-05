@@ -35,9 +35,8 @@ int main() {
             reply->status = r == 0 ? FILE_OK : FILE_ERROR;
             grass->sys_send(sender, (void*)reply, sizeof(*reply));
             break;
-        case FILE_WRITE:
         default:
-            /* This part is left to students as an exercise */
+            /* The FILE_WRITE case is left to students as an exercise. */
             FATAL("sys_file: request%d not implemented", req->type);
         }
     }
