@@ -21,7 +21,7 @@ void exit(int status) {
     while (1);
 }
 
-void sleep(ulonglong nticks) {
+void sleep(uint usec) {
     /* Student's code goes here (System Call & Protection). */
 
     /* Send a message to GPID_PROCESS for process sleep. For simplicity,

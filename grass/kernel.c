@@ -192,7 +192,7 @@ static void proc_try_syscall(struct process* proc) {
     }
 }
 
-void proc_sleep(int pid, ulonglong nticks) {
+void proc_sleep(int pid, uint usec) {
     /* Student's code goes here (System Call & Protection). */
 
     /* Update the struct process of process pid for process sleep. */

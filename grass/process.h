@@ -41,4 +41,4 @@ void proc_set_runnable(int);
 void proc_set_pending(int);
 
 void proc_coresinfo();
-void proc_sleep(int pid, ulonglong nticks);
+void proc_sleep(int pid, uint usec);

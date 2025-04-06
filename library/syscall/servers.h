@@ -4,7 +4,7 @@
 #define SYSCALL_MSG_LEN 1024
 
 void exit(int status);
-void sleep(ulonglong nticks);
+void sleep(uint usec);
 int term_read(char* buf, uint len);
 void term_write(char* str, uint len);
 int dir_lookup(int dir_ino, char* name);
