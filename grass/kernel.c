@@ -169,8 +169,6 @@ static void proc_try_recv(struct process* receiver) {
     if (receiver->syscall.status == PENDING) return;
 
     /* Copy the system call results from the kernel back to user space. */
-    earth->mmu_switch(receiver->pid);
-    earth->mmu_flush_cache();
     uint syscall_paddr = earth->mmu_translate(receiver->pid, SYSCALL_ARG);
     memcpy((void*)syscall_paddr, &receiver->syscall, sizeof(struct syscall));
 

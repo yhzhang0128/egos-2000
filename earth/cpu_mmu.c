@@ -33,9 +33,8 @@ uint mmu_alloc() {
 
 void mmu_free(int pid) {
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
-        if (page_info_table[i].use && page_info_table[i].pid == pid) {
+        if (page_info_table[i].use && page_info_table[i].pid == pid)
             memset(&page_info_table[i], 0, sizeof(struct page_info));
-        }
 }
 
 /* Software TLB Translation */
@@ -63,7 +62,10 @@ void soft_tlb_switch(int pid) {
     curr_vm_pid = pid;
 }
 
-uint soft_tlb_translate(int pid, uint vaddr) { return vaddr; }
+uint soft_tlb_translate(int pid, uint vaddr) {
+    soft_tlb_switch(pid);
+    return vaddr;
+}
 
 /* Page Table Translation
  *
