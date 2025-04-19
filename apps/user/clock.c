@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
         silent = 1;
     }
 
-    for (uint i = 0; 1; i++) {
+    for (uint i = 0; i<60; i++) {
         for (uint j = 0; j < 5000000; j++);
         if (!silent) printf("clock: tick#%d\r\n", i);
     }
