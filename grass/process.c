@@ -5,11 +5,11 @@
  * Description: helper functions for managing processes
  */
 
-#include "egos.h"
-#include "syscall.h"
 #include "process.h"
 
-extern struct process proc_set[MAX_NPROCESS];
+extern uint core_in_kernel;
+extern uint core_to_proc_idx[NCORES + 1];
+extern struct process proc_set[MAX_NPROCESS + 1];
 
 static void proc_set_status(int pid, enum proc_status status) {
     for (uint i = 0; i < MAX_NPROCESS; i++)
@@ -59,6 +59,41 @@ void proc_free(int pid) {
             earth->mmu_free(proc_set[i].pid);
             proc_set[i].status = PROC_UNUSED;
         }
+
+    /* Student's code ends here. */
+}
+
+void proc_sleep(int pid, uint usec) {
+    /* Student's code goes here (System Call & Protection). */
+
+    /* Update the struct process of process pid for process sleep. */
+
+    /* Student's code ends here. */
+}
+
+void proc_coresinfo() {
+    /* Student's code goes here (Multicore & Locks). */
+
+    /* Print the pid of the process running on each core; Add this
+     * function into the grass interface so that shell can invoke it. */
+
+    /* Student's code ends here. */
+}
+
+void mlfq_reset_level() {
+    static ulonglong MLFQ_last_reset_time = 0;
+    /* Student's code goes here (Preemptive Scheduler). */
+
+    /* Reset the level of all processes every RESET_RATE microseconds. */
+
+    /* Student's code ends here. */
+}
+
+void mlfq_update_level(struct process* p, ulonglong runtime) {
+    /* Student's code goes here (Preemptive Scheduler). */
+
+    /* Update the struct process for process p if p is a user process
+     * and it has used the CPU for another runtime microseconds. */
 
     /* Student's code ends here. */
 }

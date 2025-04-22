@@ -6,9 +6,8 @@
  * Spawn the first process, GPID_PROCESS (pid=1).
  */
 
-#include "egos.h"
-#include "syscall.h"
 #include "process.h"
+#include "elf.h"
 
 static void sys_proc_read(uint block_no, char* dst) {
     earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);

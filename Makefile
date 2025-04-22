@@ -5,22 +5,18 @@
 BOARD       = a7_35t
 QEMU        = qemu-system-riscv32
 
-# TOOLCHAIN can be XPACK or GNU
-TOOLCHAIN   = XPACK
-ifeq ($(TOOLCHAIN), XPACK)
-# Pre-compiled GNU toolchain binaries from xPack
-# https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases
-RISCV_CC    = riscv-none-elf-gcc
-OBJDUMP     = riscv-none-elf-objdump
-OBJCOPY     = riscv-none-elf-objcopy
-endif
-
 ifeq ($(TOOLCHAIN), GNU)
 # The official GNU toolchain
 # https://github.com/riscv-collab/riscv-gnu-toolchain
 RISCV_CC    = riscv32-unknown-elf-gcc
 OBJDUMP     = riscv32-unknown-elf-objdump
 OBJCOPY     = riscv32-unknown-elf-objcopy
+else
+# Pre-compiled GNU toolchain binaries from xPack
+# https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases
+RISCV_CC    = riscv-none-elf-gcc
+OBJDUMP     = riscv-none-elf-objdump
+OBJCOPY     = riscv-none-elf-objcopy
 endif
 
 DEBUG       = build/debug

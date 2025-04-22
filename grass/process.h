@@ -1,7 +1,7 @@
 #pragma once
 
-#include "elf.h"
-#include "disk.h"
+#include "egos.h"
+#include "syscall.h"
 
 enum proc_status {
     PROC_UNUSED,
@@ -12,6 +12,7 @@ enum proc_status {
     PROC_PENDING_SYSCALL
 };
 
+#define MAX_NPROCESS        16
 #define SAVED_REGISTER_NUM  32
 #define SAVED_REGISTER_SIZE SAVED_REGISTER_NUM * 4
 #define SAVED_REGISTER_ADDR (void*)(EGOS_STACK_TOP - SAVED_REGISTER_SIZE)
@@ -32,7 +33,6 @@ struct process {
 ulonglong mtime_get();
 void core_set_idle(uint);
 
-#define MAX_NPROCESS 16
 int proc_alloc();
 void proc_free(int);
 void proc_set_ready(int);
@@ -42,3 +42,10 @@ void proc_set_pending(int);
 
 void proc_coresinfo();
 void proc_sleep(int pid, uint usec);
+
+#define MLFQ_NLEVELS          3
+#define MLFQ_RESET_RATE       5000000          /* 5 seconds */
+#define MLFQ_LEVEL_RUNTIME(x) (x + 1) * 100000 /* e.g., 100ms for level-0 */
+
+void mlfq_reset_level();
+void mlfq_update_level(struct process* p, ulonglong runtime);

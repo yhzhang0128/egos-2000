@@ -6,10 +6,7 @@
  * Initialize the tty device, disk device, CPU MMU, and CPU interrupts
  */
 
-#include "disk.h"
 #include "egos.h"
-#include "elf.h"
-#include <string.h>
 
 void tty_init();
 void disk_init();

@@ -7,8 +7,6 @@
  *   excp_entry() handles system calls and faults (e.g., invalid memory access)
  */
 
-#include "egos.h"
-#include "syscall.h"
 #include "process.h"
 #include <string.h>
 
@@ -66,7 +64,7 @@ static void excp_entry(uint id) {
         proc_yield();
         return;
     }
-    /* Student's code goes here (System Call & Protection). */
+    /* Student's code goes here (System Call & Protection | Virtual Memory). */
 
     /* Kill the process if curr_pid is a user application. */
 
@@ -91,7 +89,9 @@ static void proc_yield() {
 
     /* Student's code goes here (Preemptive Scheduler | System Call). */
 
-    /* Replace the loop below to find the next process to schedule with MLFQ.
+    /* Measure and record scheduling metrics for the current process. */
+
+    /* Modify the loop below to find the next process to schedule using MLFQ.
      * Do not schedule a process that should still be sleeping at this time. */
 
     /* Find the next process to run */
@@ -106,8 +106,7 @@ static void proc_yield() {
         }
     }
 
-    /* Measure and record scheduling metrics for the current process before it
-     * yields; Measure and record scheduling metrics for the next process. */
+    /* Measure and record scheduling metrics for the next process. */
 
     /* Student's code ends here. */
 
@@ -188,21 +187,4 @@ static void proc_try_syscall(struct process* proc) {
     default:
         FATAL("proc_try_syscall: unknown syscall type=%d", proc->syscall.type);
     }
-}
-
-void proc_sleep(int pid, uint usec) {
-    /* Student's code goes here (System Call & Protection). */
-
-    /* Update the struct process of process pid for process sleep. */
-
-    /* Student's code ends here. */
-}
-
-void proc_coresinfo() {
-    /* Student's code goes here (Multicore & Locks). */
-
-    /* Print the pid of the process running on each core; Add this
-     * function into the grass interface so that shell can invoke it. */
-
-    /* Student's code ends here. */
 }

@@ -9,8 +9,6 @@
  */
 
 #include "egos.h"
-#include "disk.h"
-#include "servers.h"
 #include <string.h>
 
 /* Memory allocation and free */
