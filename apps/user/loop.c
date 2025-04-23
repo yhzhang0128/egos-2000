@@ -2,23 +2,17 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: a simple clock
+ * Description: a simple loop
  */
 
 #include "app.h"
 #include <string.h>
+#include <stdlib.h>
 
 int main(int argc, char** argv) {
-    int silent = 0;
-    if ((argc == 2) &&
-        (strcmp(argv[1], "-s") == 0 || strcmp(argv[1], "--silent") == 0)) {
-        silent = 1;
+    for (uint i = 0; argc == 1 ? 1 : (i < atoi(argv[1])); i++) {
+        for (uint j = 0; j < 10000000; j++);
+        if (argc != 1) printf("loop #%d\r\n", i);
     }
-
-    for (uint i = 0; i < 60; i++) {
-        for (uint j = 0; j < 5000000; j++);
-        if (!silent) printf("loop #%d\r\n", i + 1);
-    }
-
     return 0;
 }

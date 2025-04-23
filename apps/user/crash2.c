@@ -18,4 +18,5 @@ int main() {
      * Otherwise, the following message will be printed
      */
     SUCCESS("Crash2 succeeds in corrupting the memory of other processes");
+    return 0;
 }

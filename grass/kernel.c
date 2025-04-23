@@ -89,12 +89,10 @@ static void proc_yield() {
 
     /* Student's code goes here (Preemptive Scheduler | System Call). */
 
-    /* Measure and record scheduling metrics for the current process. */
-
-    /* Modify the loop below to find the next process to schedule using MLFQ.
+    /* Measure and record scheduling metrics for the current process.
+     * Modify the loop below to find the next process to schedule using MLFQ.
      * Do not schedule a process that should still be sleeping at this time. */
 
-    /* Find the next process to run */
     int next_idx = MAX_NPROCESS;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
         struct process* p = &proc_set[(curr_proc_idx + i) % MAX_NPROCESS];
