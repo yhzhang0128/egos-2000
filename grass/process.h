@@ -42,10 +42,5 @@ void proc_set_pending(int);
 
 void proc_coresinfo();
 void proc_sleep(int pid, uint usec);
-
-#define MLFQ_NLEVELS          3
-#define MLFQ_RESET_RATE       5000000          /* 5 seconds */
-#define MLFQ_LEVEL_RUNTIME(x) (x + 1) * 100000 /* e.g., 100ms for level-0 */
-
 void mlfq_reset_level();
 void mlfq_update_level(struct process* p, ulonglong runtime);

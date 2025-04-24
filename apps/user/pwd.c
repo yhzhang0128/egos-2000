@@ -7,7 +7,4 @@
 
 #include "app.h"
 
-int main(int argc, char** argv) {
-    printf("%s\r\n", workdir);
-    return 0;
-}
+int main(int argc, char** argv) { printf("%s\r\n", workdir); }

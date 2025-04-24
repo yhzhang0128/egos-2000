@@ -20,6 +20,7 @@ struct earth {
     /* Devices interface */
     void (*tty_read)(char* c);
     void (*tty_write)(char c);
+    uint (*tty_input_empty)();
     void (*disk_read)(uint block_no, uint nblocks, char* dst);
     void (*disk_write)(uint block_no, uint nblocks, char* src);
 

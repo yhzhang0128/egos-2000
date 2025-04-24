@@ -13,6 +13,12 @@
 
 #define SIFIVE_UART_TXDATA 0UL
 #define SIFIVE_UART_RXDATA 4UL
+#define SIFIVE_UART_IP     20UL
+
+uint uart_rx_empty() {
+    return (earth->platform == ARTY) ? REGW(UART_BASE, LITEX_UART_RXEMPTY)
+                                     : !(REGW(UART_BASE, SIFIVE_UART_IP) & 2);
+}
 
 void uart_getc(char* c) {
     if (earth->platform == ARTY) {
@@ -38,6 +44,7 @@ void uart_putc(char c) {
 }
 
 void tty_init() {
-    earth->tty_read  = uart_getc;
-    earth->tty_write = uart_putc;
+    earth->tty_read        = uart_getc;
+    earth->tty_write       = uart_putc;
+    earth->tty_input_empty = uart_rx_empty;
 }
