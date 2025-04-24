@@ -15,6 +15,7 @@ IndentWidth: 4
 Language: Cpp
 SortIncludes: false
 PointerAlignment: Left
+InsertNewlineAtEOF: true
 DerivePointerAlignment: false
 AlignConsecutiveMacros: true
 AlignConsecutiveAssignments: true
