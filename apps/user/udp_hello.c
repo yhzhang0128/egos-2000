@@ -2,11 +2,11 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: a simple UDP hello-world
- * This app sends the HELLO_MSG string to a destination IP+UDP port
- * (i.e., the dest_ip and dest_udp_port variables below); This is a
- * demo of kernel-bypass networking because network communication is
- * fully handled within this app, without any help from the kernel.
+ * Description: a simple UDP hello world
+ * This app sends the HELLO_MSG string below to a destination IP+UDP
+ * port (i.e, the dest_ip and dest_udp_port below); This app is an
+ * example of kernel-bypass networking because network communication
+ * is fully handled within this app while the kernel is not involved.
  */
 
 #include "app.h"
@@ -14,7 +14,7 @@
 
 #define HELLO_MSG "Hello from egos-2000!\n\r"
 
-/* Mac address, IP address, and UDP port */
+/* Define the Mac addresses, IP addresses and UDP ports. */
 #define LOCAL_MAC {0x10, 0xe2, 0xd5, 0x00, 0x00, 0x00}
 #define DEST_MAC  {0x98, 0x48, 0x27, 0x51, 0x53, 0x1e}
 
@@ -24,7 +24,7 @@ static uint local_udp_port = 8001;
 static uint dest_ip        = IPTOINT(192, 168, 0, 212);
 static uint dest_udp_port  = 8002;
 
-/* Data structures for the Ethernet frame */
+/* Define the data structures for an Ethernet frame. */
 struct ethernet_header {
     uchar destmac[6];
     uchar srcmac[6];
@@ -66,12 +66,12 @@ struct checksum_fields {
     ushort length;
 } __attribute__((packed));
 
-/* Helper functions for checksum */
+/* Declare two helper functions. */
 static uint crc32(const uchar* message, uint len);
 static ushort checksum(uint r, char* ptr, uint length, int complete);
 
 int main() {
-    /* Initialize the ethernet_frame data structure */
+    /* Initialize an Ethernet frame. */
     /* clang-format off */
     struct ethernet_frame eth_frame = {
         .eth = {
@@ -87,7 +87,6 @@ int main() {
             .fragment_offset = __builtin_bswap16(0x4000), /* IP_DONT_FRAGMENT */
             .ttl             = 64,
             .proto           = 0x11, /* IP_PROTO_UDP */
-            .checksum        = 0, /* to be calculated later */
             .src_ip          = __builtin_bswap32(local_ip),
             .dst_ip          = __builtin_bswap32(dest_ip)
         },
@@ -95,18 +94,17 @@ int main() {
             .src_port        = __builtin_bswap16(local_udp_port),
             .dst_port        = __builtin_bswap16(dest_udp_port),
             .length          = __builtin_bswap16(sizeof(struct udp_header) + sizeof(HELLO_MSG)),
-            .checksum        = 0 /* to be calculated later */
         }
     };
     /* clang-format on */
     if (sizeof(HELLO_MSG) & 1) FATAL("Please send a message with even length");
     memcpy(eth_frame.payload, HELLO_MSG, sizeof(HELLO_MSG));
 
-    /* Calculate the IP checksum */
+    /* Calculate the IP checksum. */
     eth_frame.ip.checksum = __builtin_bswap16(
         checksum(0, (void*)&eth_frame.ip, sizeof(struct ip_header), 1));
 
-    /* Calculate the UDP checksum */
+    /* Calculate the UDP checksum. */
     struct checksum_fields check = {.src_ip = eth_frame.ip.src_ip,
                                     .dst_ip = eth_frame.ip.dst_ip,
                                     .zero   = 0,
@@ -117,13 +115,13 @@ int main() {
         checksum(r, (void*)&eth_frame.udp,
                  sizeof(struct udp_header) + sizeof(HELLO_MSG), 1));
 
-    /* Send the Ethernet frame */
+    /* Send out the Ethernet frame. */
     if (earth->platform == QEMU) {
-        CRITICAL("Ethernet/UDP on QEMU is left to students as an exercise.");
+        CRITICAL("Networking on QEMU is left to students as an exercise.");
         /* Student's code goes here (Ethernet & TCP/IP). */
 
         /* Understand the Gigabit Ethernet Controller (GEM) on QEMU
-         * and send the UDP network packet through GEM */
+         * and send the UDP network packet through the emulated GEM. */
 
         /* Reference#1: GEM in the sifive_u machine:
          * https://github.com/qemu/qemu/blob/stable-9.0/include/hw/riscv/sifive_u.h#L54
@@ -136,7 +134,7 @@ int main() {
         char* txbuffer = (void*)(ETHMAC_TX_BUFFER);
         memcpy(txbuffer, &eth_frame, sizeof(struct ethernet_frame));
 
-        /* CRC is another checksum code */
+        /* CRC is another checksum for the ETHMAC device on the Arty board. */
         uint crc, txlen = sizeof(struct ethernet_frame);
         crc                 = crc32(&txbuffer[8], txlen - 8);
         txbuffer[txlen]     = (crc & 0xff);
@@ -152,12 +150,14 @@ int main() {
 
         while (!(REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_READY)));
         REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_WRITE) = 0;
-        /* ETHMAC provides 2 TX slots */
-        /* TX slot#0 is at 0x90001000 (txbuffer) */
-        /* TX slot#1 is at 0x90001800 (not used here) */
+        /* ETHMAC provides 2 TX slots. */
+        /* TX slot#0 is at 0x90001000 (txbuffer). */
+        /* TX slot#1 is at 0x90001800 (not used). */
         REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_LEN_WRITE) = txlen;
         REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_START_WRITE)    = 1;
     }
+
+    return 0;
 }
 
 static uint crc32(const uchar* message, uint len) {
@@ -183,8 +183,7 @@ static ushort checksum(uint r, char* ptr, uint length, int complete) {
     while (r >> 16) r = (r & 0xffff) + (r >> 16);
 
     if (complete) {
-        r = ~r;
-        r &= 0xffff;
+        r = (~r) & 0xffff;
         if (r == 0) r = 0xffff;
     }
     return r;

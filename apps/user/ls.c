@@ -10,19 +10,19 @@
 
 int main(int argc, char** argv) {
     if (argc > 1) {
-        INFO("ls: ls with args not implemented");
+        INFO("ls: ls with args is not implemented");
         return -1;
     }
 
-    /* Read the directory content */
+    /* Read the directory content. */
     char buf[BLOCK_SIZE];
     file_read(workdir_ino, 0, buf);
 
-    /* Remove the inode numbers from the string */
+    /* Remove the inode numbers from the string. */
     for (uint i = 1; i < strlen(buf); i++)
         if (buf[i - 1] == ' ' && buf[i] >= '0' && buf[i] <= '9') buf[i] = ' ';
 
-    /* Print the directory content */
+    /* Print out the directory content. */
     printf("%s\r\n", buf);
     return 0;
 }

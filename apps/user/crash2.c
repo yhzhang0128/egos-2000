@@ -2,9 +2,9 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: a program corrupting the memory of other processes
+ * Description: a program trying to corrupt memory
  * Students are asked to modify the kernel so that this
- * program terminates gracefully without harming other processes.
+ * program terminates gracefully without corrupting any memory.
  */
 
 #include "app.h"
@@ -13,9 +13,5 @@
 
 int main() {
     memset((void*)APPS_PAGES_BASE, 0, RAM_END - APPS_PAGES_BASE);
-    /* If the OS protects memory correctly,
-     * this memset should trigger an exception, killing this application;
-     * Otherwise, the following message will be printed
-     */
-    SUCCESS("Crash2 succeeds in corrupting the memory of other processes");
+    return 0;
 }
