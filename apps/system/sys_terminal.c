@@ -3,7 +3,7 @@
  * All rights reserved.
  *
  * Description: the terminal system server
- * Manage the tty device; Handle keyboard input and screen output for other apps
+ * Manage the TTY device; Handle keyboard and screen I/O for user apps.
  */
 
 #include "app.h"
@@ -23,8 +23,7 @@ int main() {
         grass->sys_recv(GPID_ALL, &sender, (void*)req, SYSCALL_MSG_LEN);
 
         if (req->len > TERM_BUF_SIZE)
-            FATAL("sys_terminal: request from process %d exceeds TERM_BUF_SIZE",
-                  sender);
+            FATAL("sys_terminal: request len %d>TERM_BUF_SIZE", req->len);
 
         switch (req->type) {
         case TERM_INPUT:

@@ -3,7 +3,6 @@ clang-format -style=file:tools/style/style.txt -i \
 ./apps/user/ls.c \
 ./apps/user/cat.c \
 ./apps/user/loop.c \
-./apps/user/pwd.c \
 ./apps/user/crash2.c \
 ./apps/user/cd.c \
 ./apps/user/crash1.c \

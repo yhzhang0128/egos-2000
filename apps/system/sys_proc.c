@@ -2,7 +2,8 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: the system server for spawning and killing processes
+ * Description: the process management system server
+ * Handle the creation and termination of other processes.
  */
 
 #include "app.h"
@@ -15,8 +16,7 @@ static void sys_spawn(uint base);
 static int app_spawn(struct proc_request* req);
 
 struct multicore {
-    /* see earth/boot.s */
-    int boot_lock, booted_core_cnt;
+    int boot_lock, booted_core_cnt; /* See earth/boot.s */
 };
 
 int main(int unused, struct multicore* boot) {
@@ -24,7 +24,7 @@ int main(int unused, struct multicore* boot) {
 
     /* Student's code goes here (Multicore & Locks). */
 
-    /* Release the boot lock, so the other 3 cores start
+    /* Release the boot lock, so the other 3 cores can start
      * to run; Wait for all the 4 cores to finish booting. */
 
     /* Student's code ends here. */
@@ -70,7 +70,7 @@ int main(int unused, struct multicore* boot) {
             break;
         /* Student's code goes here (System Call & Protection). */
 
-        /* Add a case here handling process sleep. */
+        /* Add a case which handles process sleep. */
 
         /* Student's code ends here. */
         default:
@@ -93,19 +93,18 @@ static int app_spawn(struct proc_request* req) {
     return CMD_OK;
 }
 
-static int sys_proc_base;
-char* sysproc_names[] = {"sys_process", "sys_terminal", "sys_file",
-                         "sys_shell"};
+static int sys_apps_base;
+char* sys_apps[] = {"sys_process", "sys_terminal", "sys_file", "sys_shell"};
 
 static void sys_proc_read(uint block_no, char* dst) {
-    earth->disk_read(sys_proc_base + block_no, 1, dst);
+    earth->disk_read(sys_apps_base + block_no, 1, dst);
 }
 
 static void sys_spawn(uint base) {
     int pid = grass->proc_alloc();
-    INFO("Load kernel process #%d: %s", pid, sysproc_names[pid - 1]);
+    INFO("Load kernel process #%d: %s", pid, sys_apps[pid - 1]);
 
-    sys_proc_base = base;
+    sys_apps_base = base;
     elf_load(pid, sys_proc_read, 0, NULL);
     grass->proc_set_ready(pid);
 }

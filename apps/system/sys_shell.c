@@ -27,7 +27,7 @@ int parse_request(char* buf, struct proc_request* req) {
 int main() {
     CRITICAL("Welcome to the egos-2000 shell!");
 
-    char buf[256] = "cd"; /* Enter the home directory first */
+    char buf[256] = "cd"; /* Enter the home directory first. */
     while (1) {
         struct proc_request req;
         struct proc_reply reply;
@@ -35,14 +35,18 @@ int main() {
         if (strcmp(buf, "coresinfo") == 0) {
             /* Student's code goes here (Multicore & Locks). */
 
-            /* Add proc_coresinfo() from kernel.c into the grass interface;
-             * Invoke proc_coresinfo() to show the pid running on each core */
+            /* Add proc_coresinfo() from process.c into the grass interface;
+             * Invoke proc_coresinfo() to show the pid running on each core. */
 
             /* Student's code ends here. */
 
         } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
             grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+        } else if (strcmp(buf, "clear") == 0) {
+            printf("\e[1;1H\e[2J");
+        } else if (strcmp(buf, "pwd") == 0) {
+            printf("%s\r\n", workdir);
         } else {
             req.type = PROC_SPAWN;
             if (0 != parse_request(buf, &req)) {
@@ -53,9 +57,9 @@ int main() {
                                 sizeof(reply));
 
                 if (reply.type != CMD_OK)
-                    INFO("sys_shell: command causes an error");
+                    INFO("sys_shell: command %s not found", req.argv[0]);
                 else if (req.argv[req.argc - 1][0] != '&')
-                    /* Wait for foreground command to terminate */
+                    /* Wait for the foreground command to terminate. */
                     grass->sys_recv(GPID_PROCESS, NULL, (void*)&reply,
                                     sizeof(reply));
             }
