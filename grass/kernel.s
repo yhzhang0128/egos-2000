@@ -3,20 +3,21 @@
  * All rights reserved.
  *
  * Description: entry point of the kernel
- * When getting an interrupt or exception, the CPU sets its program counter to this entry point
+ * When receiving an interrupt or exception, the CPU sets
+ * its program counter to the first instruction of trap_entry.
  */
     .section .text
     .global trap_entry, kernel_lock
 
 trap_entry:
-    /* Step1: acquire the kernel lock (only for P8)
-     * Step2: switch to the kernel stack
-     * Step3: save all the registers on the kernel stack
-     * Step4: call kernel_entry()
-     * Step5: restore all the registers
-     * Step6: switch back to the process stack
-     * Step7: release the kernel lock (only for P8)
-     * Step8: invoke mret and return to the process context */
+    /* Step1: Acquire the kernel lock (only for multicore).
+     * Step2: Switch to the kernel stack.
+     * Step3: Save all the registers on the kernel stack.
+     * Step4: Call kernel_entry().
+     * Step5: Restore all the registers.
+     * Step6: Switch back to the process stack.
+     * Step7: Release the kernel lock (only for multicore).
+     * Step8: Invoke mret, returning to the process context. */
 
     /* Step1 */
     /* Student's code goes here (Multicore & Locks). */
@@ -30,7 +31,7 @@ trap_entry:
     li sp, 0x80400000
 
     /* Step3 */
-    addi sp, sp, -128 /* sp == SAVED_REGISTER_ADDR */
+    addi sp, sp, -128 /* now, sp == SAVED_REGISTER_ADDR */
     sw a0,  0(sp)
     sw a1,  4(sp)
     sw a2,  8(sp)

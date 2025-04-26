@@ -2,7 +2,7 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: a simple tty device driver
+ * Description: a simple TTY device driver
  */
 
 #include "egos.h"
