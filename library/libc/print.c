@@ -2,10 +2,10 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: formatted printing (e.g., printf)
- * format_to_str() converts a format to a C string,
- * e.g., converts ("%s-%d", "egos", 2000) to "egos-2000"
- * term_write() prints a C string to the screen
+ * Description: formatted printing
+ * format_to_str() converts a format into a C string:
+ * e.g., converts ("%s-%d", "egos", 2000) to "egos-2000".
+ * term_write() prints the converted C string to the screen.
  */
 
 #include "egos.h"
@@ -29,8 +29,7 @@ void format_to_str(char* out, const char* fmt, va_list args) {
             }
             /* Student's code goes here (Hello, World!). */
 
-            /* Handle format %c, %u, %p, %ld, %lx, etc. */
-            /* If not matching any pattern, simply print the '%' symbol */
+            /* Handle format %c, %u, %p, %lld, %llu and %llx. */
 
             /* Student's code ends here. */
         }
@@ -52,14 +51,14 @@ int my_printf(const char* format, ...) { LOG("", ""); }
 int INFO(const char* format, ...) { LOG("[INFO] ", "\r\n") }
 
 int FATAL(const char* format, ...) {
-    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n") /* red color */
+    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n") /* \x1B[1;31m means red. */
     while (1);
 }
 
 int SUCCESS(const char* format, ...) {
-    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n") /* green color */
+    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n") /* \x1B[1;32m means green. */
 }
 
 int CRITICAL(const char* format, ...) {
-    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n") /* yellow color */
+    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n") /* \x1B[1;33m means yellow. */
 }

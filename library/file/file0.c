@@ -2,7 +2,7 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: a dummy file system illustrating the concept of "inode"
+ * Description: a simple (if not naive) file system
  */
 
 #ifdef MKFS
@@ -11,9 +11,9 @@
 #else
 #include "egos.h"
 #endif
+
 #include "inode.h"
 #include <stdlib.h>
-
 #define DUMMY_DISK_OFFSET(ino, offset) ino * 128 + offset
 
 int mydisk_read(inode_intf self, uint ino, uint offset, block_t* block) {
@@ -22,6 +22,7 @@ int mydisk_read(inode_intf self, uint ino, uint offset, block_t* block) {
     /* Replace the code below with your own file system read logic. */
     inode_intf below = self->state;
     return below->read(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
+
     /* Student's code ends here. */
 }
 
@@ -31,13 +32,14 @@ int mydisk_write(inode_intf self, uint ino, uint offset, block_t* block) {
     /* Replace the code below with your own file system write logic. */
     inode_intf below = self->state;
     return below->write(below, 0, DUMMY_DISK_OFFSET(ino, offset), block);
+
     /* Student's code ends here. */
 }
 
 int mydisk_getsize(inode_intf self, uint ino) {
     /* Student's code goes here (File System). */
 
-    /* Get the size of inode #ino. */
+    /* Replace the code below with code for getting the size of an inode. */
 #ifdef MKFS
     fprintf(stderr, "mydisk_getsize not implemented");
     while (1);
@@ -50,7 +52,7 @@ int mydisk_getsize(inode_intf self, uint ino) {
 int mydisk_setsize(inode_intf self, uint ino, uint nblocks) {
     /* Student's code goes here (File System). */
 
-    /* Set the size of inode #ino to nblocks. */
+    /* Replace the code below with code for changing the size of an inode. */
 #ifdef MKFS
     fprintf(stderr, "mydisk_setsize not implemented");
     while (1);
@@ -58,6 +60,15 @@ int mydisk_setsize(inode_intf self, uint ino, uint nblocks) {
     FATAL("mydisk_setsize not implemented");
 #endif
     /* Student's code ends here. */
+}
+
+int mydisk_create(inode_intf below, uint below_ino, uint ninodes) {
+    /* Student's code goes here (File System). */
+
+    /* Initialize the on-disk data structures for your file system. */
+
+    /* Student's code ends here. */
+    return 0;
 }
 
 inode_intf mydisk_init(inode_intf below, uint below_ino) {
@@ -68,13 +79,4 @@ inode_intf mydisk_init(inode_intf below, uint below_ino) {
     self->write     = mydisk_write;
     self->state     = below;
     return self;
-}
-
-int mydisk_create(inode_intf below, uint below_ino, uint ninodes) {
-    /* Student's code goes here (File System). */
-
-    /* Initialize the on-disk data structures for your file system. */
-
-    /* Student's code ends here. */
-    return 0;
 }

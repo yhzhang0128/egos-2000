@@ -13,18 +13,18 @@
  * a pointer to a structure that contains the following four methods:
  *
  * int getsize(inode_intf self, unsigned int ino)
- *     returns the size of the inode store at the given inode number
+ *   - returns the size of the inode store at the given inode number
  *     (inode numbers start at 0)
  *
  * int setsize(inode_intf self, unsigned int ino, uint newsize)
- *     sets the size of the inode store at the given inode number
+ *   - sets the size of the inode store at the given inode number
  *     returns the old size
  *
  * int read(inode_intf self, unsigned int ino, uint offset, block_t *block)
- *     reads the block at the given inode number and offset and return in *block
+ *   - reads the block at the given inode number and offset and return in *block
  *
  * int write(inode_intf self, unsigned int ino, uint offset, block_t *block)
- *     writes *block to the block at the given inode number and offset
+ *   - writes *block to the block at the given inode number and offset
  *
  * All these return -1 upon error (typically after printing the eason for
  * the error) and return 0 upon success.
@@ -37,7 +37,7 @@
 #include "disk.h"
 
 #define NINODES 128
-typedef struct inode_store* inode_intf; /* inode store interface */
+typedef struct inode_store* inode_intf;
 
 struct inode_store {
     int (*getsize)(inode_intf self, uint ino);
@@ -49,6 +49,7 @@ struct inode_store {
 
 inode_intf fs_disk_init();
 
+/* There are 2 file systems in egos-2000 right now: mydisk and treedisk. */
 inode_intf mydisk_init(inode_intf below, uint below_ino);
 int mydisk_create(inode_intf below, uint below_ino, uint ninodes);
 

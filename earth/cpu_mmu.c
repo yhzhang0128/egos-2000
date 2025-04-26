@@ -10,7 +10,11 @@
 #include "egos.h"
 #include <string.h>
 
-#define APPS_PAGES_CNT (RAM_END - APPS_PAGES_BASE) / PAGE_SIZE
+#define PAGE_SIZE          4096
+#define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
+#define PAGE_ID_TO_ADDR(x) ((char*)APPS_PAGES_BASE + x * PAGE_SIZE)
+#define APPS_PAGES_CNT     (RAM_END - APPS_PAGES_BASE) / PAGE_SIZE
+
 struct page_info {
     int use;
     int pid;

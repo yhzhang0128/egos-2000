@@ -15,4 +15,4 @@
   format = "raw"
   file = "tools/disk.img"
 
-# QEMU (v7.0.0 or higher) supports SD card emulation for the sifive_u machine type.
+# QEMU (v7.0.0 or higher) supports SD card emulation for the sifive_u machine.

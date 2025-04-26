@@ -2,7 +2,7 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: functions for accessing the physical disk
+ * Description: wrapping disk access functions with the inode interface
  */
 
 #include "egos.h"

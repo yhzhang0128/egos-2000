@@ -1,8 +1,5 @@
 #pragma once
 
-#include "inode.h"
-#define SYSCALL_MSG_LEN 1024
-
 void exit(int status);
 void sleep(uint usec);
 int term_read(char* buf, uint len);
@@ -23,15 +20,16 @@ enum grass_servers {
 /* GPID_PROCESS */
 #define CMD_NARGS   16
 #define CMD_ARG_LEN 32
-/* Student's code goes here (System Call & Protection). */
 
-/* Update struct proc_request for process sleep. */
 struct proc_request {
+    /* Student's code goes here (System Call & Protection). */
+
+    /* Update struct proc_request to support process sleep. */
     enum { PROC_SPAWN, PROC_EXIT, PROC_KILLALL } type;
     int argc;
     char argv[CMD_NARGS][CMD_ARG_LEN];
+    /* Student's code ends here. */
 };
-/* Student's code ends here. */
 
 struct proc_reply {
     enum { CMD_OK, CMD_ERROR } type;
@@ -51,6 +49,7 @@ struct term_reply {
 };
 
 /* GPID_FILE */
+#include "disk.h"
 struct file_request {
     enum {
         FILE_UNUSED,

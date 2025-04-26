@@ -8,6 +8,7 @@ enum syscall_type {
     SYS_SEND, /* 2 */
 };
 
+#define SYSCALL_MSG_LEN 1024
 struct syscall {
     enum syscall_type type; /* SYS_SEND or SYS_RECV */
     int sender;             /* sender process ID    */
