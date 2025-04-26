@@ -2,16 +2,16 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: create the disk image (disk.img) and ROM image (bootROM.bin)
+ * Description: generate disk image (disk.img) and ROM image (bootROM.bin)
  * The disk image should be exactly 4MB:
  *     2MB holds the executables of EGOS and system servers;
  *     2MB is managed by a file system.
- * This image file should be programmed to the microSD card.
+ * This disk image should be programmed to the microSD card.
  *
  * The ROM image should be exactly 8MB:
  *     4MB holds the VexRiscv processor FPGA binary;
  *     4MB holds the disk image described above.
- * This image file should be programmed to the ROM chip on the Arty board.
+ * This ROM image should be programmed to the ROM chip on the Arty board.
  */
 
 #include <stdio.h>
@@ -64,7 +64,7 @@ int load_file(char* file_name, char* dst) {
 int main() {
     assert(EGOS_BIN_DISK_SIZE == SIZE_2MB && FILE_SYS_DISK_SIZE == SIZE_2MB);
 
-    /* Write the EGOS binaries into exec[] */
+    /* Write the kernel and system server binaries into exec[]. */
     printf("[INFO] Load %d kernel binary files\n", EGOS_BIN_NUM);
     for (uint i = 0; i < EGOS_BIN_NUM; i++) {
         int file_size = load_file(egos_binaries[i],
@@ -72,7 +72,7 @@ int main() {
         printf("[INFO] Load %s: %d bytes\n", egos_binaries[i], file_size);
     }
 
-    /* Initialize the file system using fs[] as ramdisk */
+    /* Initialize the file system using fs[] as a ramdisk. */
     printf("MKFS is using *%s*\n", FILESYS == 0 ? "mydisk" : "treedisk");
     inode_intf ramdisk_init();
     inode_intf ramdisk = ramdisk_init();
@@ -81,14 +81,14 @@ int main() {
     inode_intf filesys =
         (FILESYS == 0) ? mydisk_init(ramdisk, 0) : treedisk_init(ramdisk, 0);
 
-    /* Write to inode 0..BIN_DIR_INODE-1 */
+    /* Write to inode 0..BIN_DIR_INODE-1 in the file system. */
     for (uint ino = 0; ino < BIN_DIR_INODE; ino++) {
         printf("[INFO] Load ino=%d, %ld bytes\n", ino, strlen(contents[ino]));
         strncpy(inode, contents[ino], BLOCK_SIZE);
         filesys->write(filesys, ino, 0, (void*)inode);
     }
 
-    /* Write to one inode for every application under /bin */
+    /* Write to one inode for each user application. */
     uint app_ino = BIN_DIR_INODE + 1;
     DIR* dp      = opendir("../build/release/user");
     assert(dp != NULL);
@@ -99,12 +99,12 @@ int main() {
             printf("[INFO] Load ino=%d, %s: %d bytes\n", app_ino, ep->d_name,
                    file_size);
 
-            /* Write the ELF format application binary into inode app_ino */
+            /* Write the ELF format application binary into inode app_ino. */
             for (uint b = 0; b * BLOCK_SIZE < file_size; b++)
                 filesys->write(filesys, app_ino, b,
                                (void*)(inode + b * BLOCK_SIZE));
 
-            /* Add a file entry into directory /bin */
+            /* Add the corresponding file entry into the /bin directory. */
             ep->d_name[strlen(ep->d_name) - 4] = 0;
             sprintf(tmp, "%s%4d ", ep->d_name, app_ino++);
             strcat(bin_dir, tmp);
@@ -113,7 +113,7 @@ int main() {
     filesys->write(filesys, BIN_DIR_INODE, 0, (void*)bin_dir);
     printf("[INFO] Load ino=%d, %s\n", BIN_DIR_INODE, bin_dir);
 
-    /* Create the disk image file */
+    /* Generate the disk image file. */
     int fd    = open("disk.img", O_CREAT | O_WRONLY, 0666);
     int size1 = write(fd, exec, SIZE_2MB);
     int size2 = write(fd, fs, SIZE_2MB);
@@ -121,7 +121,7 @@ int main() {
     assert(size1 + size2 == SIZE_2MB * 2);
     printf("[INFO] Finish making the disk image (tools/disk.img)\n");
 
-    /* Create the ROM image file */
+    /* Generate the ROM image file. */
     fd = open("bootROM.bin", O_CREAT | O_WRONLY, 0666);
     assert(load_file(CPU_BIN_FILE, vexriscv) < SIZE_2MB * 2);
     int size0 = write(fd, vexriscv, SIZE_2MB * 2);

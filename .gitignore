@@ -1,4 +1,4 @@
-# binary and image files
+# Ignore binary and image files.
 mkfs
 mkrom
 build
@@ -8,6 +8,6 @@ build
 *.mcs
 *.img
 
-# clangd lsp files
+# Ignore clangd lsp files.
 .cache
 compile_commands.json

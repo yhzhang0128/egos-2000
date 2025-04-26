@@ -33,7 +33,7 @@ Download the [pre-built binaries of the RISC-V GNU compiler toolchain](https://g
 
 ## Step2: Run egos-2000 on the QEMU emulator
 
-Download the [pre-built binaries of QEMU](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v7.2.5-1) from xPack.
+Download the [pre-built binaries of QEMU](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v8.2.2-1) from xPack.
 
 ```shell
 > cd $EGOS
@@ -70,7 +70,7 @@ and program `bootROM.bin` to the on-board ROM.
 > tar -zxvf xpack-openocd-0.11.0-1-xxx-xxx.tar.gz
 > export PATH=$PATH:$EGOS/xpack-openocd-0.11.0-1-xxx-xxx/bin
 > cd $EGOS/egos-2000
-> make program
+> make program BOARD=a7_100t
 -------- Program the on-board ROM --------
 cd tools/openocd; time openocd -f 7series.txt
 ......
