@@ -7,7 +7,7 @@
 
 #include "process.h"
 
-#define MLFQ_NLEVELS          3
+#define MLFQ_NLEVELS          5
 #define MLFQ_RESET_PERIOD     10000000         /* 10 seconds */
 #define MLFQ_LEVEL_RUNTIME(x) (x + 1) * 100000 /* e.g., 100ms for level 0 */
 extern struct process proc_set[MAX_NPROCESS + 1];
