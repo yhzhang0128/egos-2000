@@ -101,7 +101,7 @@ static void proc_yield() {
     if (next_idx < MAX_NPROCESS) {
         /* [Preemptive Scheduler]
          * Measure and record scheduling metrics for the *next* process.
-         * [System Call & Protection]
+         * [System Call & Protection | Multicore & Locks]
          * Modify mstatus.MPP to enter machine or user mode after mret. */
 
     } else {

@@ -39,7 +39,6 @@ int main() {
              * Invoke proc_coresinfo() to show the pid running on each core. */
 
             /* Student's code ends here. */
-
         } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
             grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
