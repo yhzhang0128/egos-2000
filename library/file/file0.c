@@ -16,6 +16,13 @@
 #include <stdlib.h>
 #define DUMMY_DISK_OFFSET(ino, offset) ino * 128 + offset
 
+/* Student's code goes here (File System). */
+
+/* Include necessary header files; Define data structures for your file system;
+   Define helper functions; You can also put these to a separate header file. */
+
+/* Student's code ends here. */
+
 int mydisk_read(inode_intf self, uint ino, uint offset, block_t* block) {
     /* Student's code goes here (File System). */
 
@@ -72,6 +79,9 @@ int mydisk_create(inode_intf below, uint below_ino, uint ninodes) {
 }
 
 inode_intf mydisk_init(inode_intf below, uint below_ino) {
+    /* Student's code goes here (File System). */
+
+    /* Feel free to modify anything below if necessary. */
     inode_intf self = malloc(sizeof(struct inode_store));
     self->getsize   = mydisk_getsize;
     self->setsize   = mydisk_setsize;
@@ -79,4 +89,5 @@ inode_intf mydisk_init(inode_intf below, uint below_ino) {
     self->write     = mydisk_write;
     self->state     = below;
     return self;
+    /* Student's code ends here. */
 }
