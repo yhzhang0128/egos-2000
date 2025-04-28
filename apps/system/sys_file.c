@@ -37,7 +37,6 @@ int main() {
             break;
         case FILE_WRITE:
             /* The FILE_WRITE case is left to students as an exercise. */
-            FATAL("sys_file: request%d not implemented", req->type);
         default:
             FATAL("sys_file: invalid request %d", req->type);
         }

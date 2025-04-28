@@ -66,7 +66,6 @@ trap_entry:
     sw t0,  120(sp)   /* t0 holds the value of the old sp before trap_entry */
 
     /* Step4 */
-    csrr a0, mcause
     call kernel_entry
 
     /* Step5 */

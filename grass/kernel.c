@@ -27,7 +27,7 @@ void core_set_idle(uint core) { core_to_proc_idx[core] = MAX_NPROCESS; }
 static void intr_entry(uint);
 static void excp_entry(uint);
 
-void kernel_entry(uint mcause) {
+void kernel_entry() {
     /* With the kernel lock, only one core can enter this point at any time. */
     asm("csrr %0, mhartid" : "=r"(core_in_kernel));
 
@@ -35,6 +35,8 @@ void kernel_entry(uint mcause) {
     asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
     memcpy(curr_saved, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
 
+    uint mcause;
+    asm("csrr %0, mcause" : "=r"(mcause));
     (mcause & (1 << 31)) ? intr_entry(mcause & 0x3FF) : excp_entry(mcause);
 
     /* Restore the process context. */
