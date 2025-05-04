@@ -24,7 +24,7 @@ struct process {
     uint mepc, saved_registers[SAVED_REGISTER_NUM];
     /* Student's code goes here (Preemptive Scheduler | System Call). */
 
-    /* Add new fields for scheduling metrics, MLFQ, or process sleep. */
+    /* Add new fields for lifecycle statistics, MLFQ or process sleep. */
 
     /* Student's code ends here. */
 };

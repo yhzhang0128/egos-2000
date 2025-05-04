@@ -30,7 +30,7 @@ int proc_alloc() {
             proc_set[i].status = PROC_LOADING;
             /* Student's code goes here (Preemptive Scheduler | System Call). */
 
-            /* Initialize fields for scheduling metrics, MLFQ, process sleep. */
+            /* Initialization of lifecycle statistics, MLFQ or process sleep. */
 
             /* Student's code ends here. */
             return curr_pid;
@@ -42,7 +42,7 @@ int proc_alloc() {
 void proc_free(int pid) {
     /* Student's code goes here (Preemptive Scheduler). */
 
-    /* Print the scheduling metrics of the terminated process (or processes). */
+    /* Print the lifecycle statistics of the terminated process or processes. */
     if (pid != GPID_ALL) {
         earth->mmu_free(pid);
         proc_set_status(pid, PROC_UNUSED);

@@ -73,9 +73,13 @@ static void excp_entry(uint id) {
 }
 
 static void intr_entry(uint id) {
-    if (id == INTR_ID_TIMER) return proc_yield();
+    if (id != INTR_ID_TIMER) FATAL("excp_entry: kernel got interrupt %d", id);
+    /* Student's code goes here (Preemptive Scheduler). */
 
-    FATAL("excp_entry: kernel got interrupt %d", id);
+    /* Update the process lifecycle statistics. */
+
+    /* Student's code ends here. */
+    proc_yield();
 }
 
 static void proc_yield() {
@@ -84,7 +88,7 @@ static void proc_yield() {
     /* Student's code goes here (Multiple Projects). */
 
     /* [Preemptive Scheduler]
-     * Measure and record scheduling metrics for the *current* process.
+     * Measure and record lifecycle statistics for the *current* process.
      * Modify the loop below to find the next process to schedule with MLFQ.
      * [System Call & Protection]
      * Do not schedule a process that should still be sleeping at this time. */
@@ -102,7 +106,7 @@ static void proc_yield() {
 
     if (next_idx < MAX_NPROCESS) {
         /* [Preemptive Scheduler]
-         * Measure and record scheduling metrics for the *next* process.
+         * Measure and record lifecycle statistics for the *next* process.
          * [System Call & Protection | Multicore & Locks]
          * Modify mstatus.MPP to enter machine or user mode after mret. */
 
