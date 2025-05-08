@@ -10,7 +10,7 @@
 
 int main(int argc, char** argv) {
     for (uint i = 0; argc == 1 ? 1 : (i < atoi(argv[1])); i++) {
-        for (uint j = 0; j < 10000000; j++);
+        for (uint j = 0; j < 1000000; j++);
         if (argc != 1 && argc != 3) printf("loop #%d\r\n", i);
     }
     return 0;
