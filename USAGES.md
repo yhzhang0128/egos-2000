@@ -6,9 +6,10 @@ MacOS users can follow the same tutorial no matter you have an Apple chip or Int
 You can run egos-2000 on the QEMU emulator or RISC-V boards.
 Running on QEMU is easier but if you wish to run it on the boards for fun, 
 you need to purchase the following hardware:
-* Arty [A7-35T](https://www.xilinx.com/products/boards-and-kits/arty.html) or [A7-100T](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/) board
-* a microUSB cable (e.g., [microUSB-to-USB-C](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
-* a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details) and a microSD card
+* a micro USB cable (e.g., [this one](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
+* Arty [A7-35T](https://www.xilinx.com/products/boards-and-kits/arty.html), [A7-100T](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/), or
+[S7-50](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/) board
+* a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details), and a microSD card
 
 
 ## Step1: Setup the compiler and compile egos-2000
@@ -56,7 +57,7 @@ Enter 1: software TLB
 
 ## Step3: Run egos-2000 on the Arty board
 
-You can use the Arty A7-35t or A7-100t board
+You can use the Arty A7-35t, A7-100t, or S7-50 board
 and make sure to set the `BOARD` variable in `Makefile` correctly.
 To use a microSD card on the board, you can program the microSD card with `disk.img` using tools like [balena Etcher](https://www.balena.io/etcher/).
 
