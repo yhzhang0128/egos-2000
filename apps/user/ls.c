@@ -23,6 +23,6 @@ int main(int argc, char** argv) {
         if (buf[i - 1] == ' ' && buf[i] >= '0' && buf[i] <= '9') buf[i] = ' ';
 
     /* Print out the directory content. */
-    printf("%s\r\n", buf);
+    printf("%s\n\r", buf);
     return 0;
 }

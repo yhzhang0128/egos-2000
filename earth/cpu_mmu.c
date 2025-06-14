@@ -201,7 +201,7 @@ void mmu_init() {
     /* Student's code ends here. */
 
     CRITICAL("Choose a memory translation mechanism:");
-    printf("Enter 0: page tables\r\nEnter 1: software TLB\r\n");
+    printf("Enter 0: page tables\n\rEnter 1: software TLB\n\r");
 
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(&buf[0]));

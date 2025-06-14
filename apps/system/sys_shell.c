@@ -45,7 +45,7 @@ int main() {
         } else if (strcmp(buf, "clear") == 0) {
             printf("\e[1;1H\e[2J");
         } else if (strcmp(buf, "pwd") == 0) {
-            printf("%s\r\n", workdir);
+            printf("%s\n\r", workdir);
         } else {
             req.type = PROC_SPAWN;
             if (0 != parse_request(buf, &req)) {

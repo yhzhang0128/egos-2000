@@ -93,7 +93,7 @@ int term_read(char* buf, uint len) {
         switch (c) {
         case 0x0d: /* Enter     */
             buf[i] = 0;
-            term_write("\r\n", 2);
+            term_write("\n\r", 2);
             return i ? i + 1 : 0;
         case 0x7f: /* Backspace */
             c = 0;

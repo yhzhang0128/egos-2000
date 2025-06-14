@@ -18,7 +18,7 @@ static char* brk = &__heap_start;
 
 char* _sbrk(int size) {
     if (brk + size > (char*)&__heap_end) {
-        printf("_sbrk: heap grows too large\r\n");
+        printf("_sbrk: heap grows too large\n\r");
         *(int*)(0) = 1; /* Trigger a memory exception. */
     }
 

@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     char buf[BLOCK_SIZE];
     file_read(file_ino, 0, buf);
     printf("%s", buf);
-    if (buf[strlen(buf) - 1] != '\n') printf("\r\n");
+    if (buf[strlen(buf) - 1] != '\n') printf("\n\r");
 
     return 0;
 }

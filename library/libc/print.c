@@ -48,17 +48,17 @@ void format_to_str(char* out, const char* fmt, va_list args) {
 
 int my_printf(const char* format, ...) { LOG("", ""); }
 
-int INFO(const char* format, ...) { LOG("[INFO] ", "\r\n") }
+int INFO(const char* format, ...) { LOG("[INFO] ", "\n\r") }
 
 int FATAL(const char* format, ...) {
-    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\r\n") /* \x1B[1;31m means red. */
+    LOG("\x1B[1;31m[FATAL] ", "\x1B[1;0m\n\r") /* \x1B[1;31m means red. */
     while (1);
 }
 
 int SUCCESS(const char* format, ...) {
-    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\r\n") /* \x1B[1;32m means green. */
+    LOG("\x1B[1;32m[SUCCESS] ", "\x1B[1;0m\n\r") /* \x1B[1;32m means green. */
 }
 
 int CRITICAL(const char* format, ...) {
-    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\r\n") /* \x1B[1;33m means yellow. */
+    LOG("\x1B[1;33m[CRITICAL] ", "\x1B[1;0m\n\r") /* \x1B[1;33m means yellow. */
 }
