@@ -2,7 +2,10 @@
 # All rights reserved.
 
 # BOARD can be a7_35t, a7_100t, or s7_50.
+# For a7_35t, NCORE can be 1 and this single core version supports VGA.
+# Due to hardware constraints, the 4-core version does not support VGA on a7_35t.
 BOARD       = a7_35t
+NCORE       = 4
 QEMU        = qemu-system-riscv32
 
 ifeq ($(TOOLCHAIN), GNU)
@@ -55,7 +58,7 @@ $(USRAPP_ELFS): $(RELEASE)/user/%.elf : apps/user/%.c $(APPS_DEPS)
 install: egos
 	@echo "$(GREEN)-------- Create the Disk & BootROM Image --------$(END)"
 	$(OBJCOPY) -O binary $(RELEASE)/egos.elf tools/qemu/egos.bin
-	$(CC) tools/mkfs.c library/file/file$(FILESYS).c -DMKFS -DFILESYS=$(FILESYS) -DCPU_BIN_FILE="\"fpga/vexriscv/vexriscv_cpu_$(BOARD).bin\"" $(INCLUDE) -o tools/mkfs
+	$(CC) tools/mkfs.c library/file/file$(FILESYS).c -DMKFS -DFILESYS=$(FILESYS) -DCPU_BIN_FILE="\"fpga/vexriscv/vexriscv_$(BOARD)_$(NCORE)core.bin\"" $(INCLUDE) -o tools/mkfs
 	cd tools; rm -f disk.img bootROM.bin; ./mkfs
 
 qemu: install

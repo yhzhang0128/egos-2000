@@ -2,7 +2,7 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: a simple UDP hello world
+ * Description: a simple UDP demo
  * This app sends the HELLO_MSG string below to a destination IP+UDP
  * port (i.e, the dest_ip and dest_udp_port below); This app is an
  * example of kernel-bypass networking because network communication

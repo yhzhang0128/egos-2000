@@ -57,6 +57,7 @@ extern struct grass* grass;
 #define BOARD_FLASH_ROM   0x20400000 /* 4MB disk image on Arty board ROM    */
 
 /* Below is the memory-mapped I/O layout in egos-2000. */
+#define VGA_MMIO_START   0x81000000
 #define ETHMAC_CSR_BASE  0xF0002000
 #define ETHMAC_RX_BUFFER 0x90000000
 #define ETHMAC_TX_BUFFER 0x90001000

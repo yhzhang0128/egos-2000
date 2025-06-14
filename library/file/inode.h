@@ -47,8 +47,6 @@ struct inode_store {
     void* state;
 };
 
-inode_intf fs_disk_init();
-
 /* There are 2 file systems in egos-2000 right now: mydisk and treedisk. */
 inode_intf mydisk_init(inode_intf below, uint below_ino);
 int mydisk_create(inode_intf below, uint below_ino, uint ninodes);
