@@ -23,7 +23,6 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "disk.h"
 #include "inode.h"
 
 char* egos_binaries[] = {"./qemu/egos.bin",
@@ -32,6 +31,7 @@ char* egos_binaries[] = {"./qemu/egos.bin",
                          "../build/release/sys_file.elf",
                          "../build/release/sys_shell.elf",
                          "./screenshots/Bohr.bmp" /* for the VGA demo */};
+#define EGOS_BIN_NUM ((sizeof(egos_binaries) / sizeof(char*)))
 
 char bin_dir[256] = "./   6 ../   0 ";
 char* contents[]  = {
@@ -62,23 +62,38 @@ int load_file(char* file_name, char* dst) {
     return st.st_size;
 }
 
+int getsize() { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
+
+int setsize() { assert(0); }
+
+int ramread(inode_intf bs, uint ino, uint offset, block_t* block) {
+    memcpy(block, fs + offset * BLOCK_SIZE, BLOCK_SIZE);
+    return 0;
+}
+
+int ramwrite(inode_intf bs, uint ino, uint offset, block_t* block) {
+    memcpy(fs + offset * BLOCK_SIZE, block, BLOCK_SIZE);
+    return 0;
+}
+
 int main() {
     /* Write the kernel and system server binaries into exec[]. */
-    printf("[INFO] Load 6 kernel binary files\n");
-    for (uint i = 0; i < 6; i++) {
-        int file_size = load_file(egos_binaries[i],
-                                  exec + i * EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE);
-        printf("[INFO] Load %s: %d bytes\n", egos_binaries[i], file_size);
+    printf("[INFO] Load %ld kernel binary files\n", EGOS_BIN_NUM);
+    for (uint i = 0; i < EGOS_BIN_NUM; i++) {
+        int sz = load_file(egos_binaries[i], exec + i * EGOS_BIN_MAX_NBYTE);
+        printf("[INFO] Load %s: %d bytes\n", egos_binaries[i], sz);
     }
 
-    /* Initialize the file system using fs[] as a ramdisk. */
+    /* Initialize the file system using the fs[] buffer as a ramdisk. */
     printf("MKFS is using *%s*\n", FILESYS == 0 ? "mydisk" : "treedisk");
-    inode_intf ramdisk_init();
-    inode_intf ramdisk = ramdisk_init();
-    (FILESYS == 0) ? assert(mydisk_create(ramdisk, 0, NINODES) >= 0)
-                   : assert(treedisk_create(ramdisk, 0, NINODES) >= 0);
+    struct inode_store ramdisk = (struct inode_store){.read    = ramread,
+                                                      .write   = ramwrite,
+                                                      .getsize = getsize,
+                                                      .setsize = setsize};
+    (FILESYS == 0) ? assert(mydisk_create(&ramdisk, 0, NINODES) >= 0)
+                   : assert(treedisk_create(&ramdisk, 0, NINODES) >= 0);
     inode_intf filesys =
-        (FILESYS == 0) ? mydisk_init(ramdisk, 0) : treedisk_init(ramdisk, 0);
+        (FILESYS == 0) ? mydisk_init(&ramdisk, 0) : treedisk_init(&ramdisk, 0);
 
     /* Write to inode 0..BIN_DIR_INODE-1 in the file system. */
     for (uint ino = 0; ino < BIN_DIR_INODE; ino++) {
@@ -128,31 +143,6 @@ int main() {
     size2     = write(fd, fs, SIZE_2MB);
     close(fd);
     assert(size0 + size1 + size2 == SIZE_2MB * 4);
-    printf("[INFO] Finish making the bootROM binary (tools/bootROM.bin)\n");
+    printf("[INFO] Finish making the boot ROM binary (tools/bootROM.bin)\n");
     return 0;
-}
-
-int getsize() { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
-
-int setsize() { assert(0); }
-
-int ramread(inode_intf bs, uint ino, uint offset, block_t* block) {
-    memcpy(block, fs + offset * BLOCK_SIZE, BLOCK_SIZE);
-    return 0;
-}
-
-int ramwrite(inode_intf bs, uint ino, uint offset, block_t* block) {
-    memcpy(fs + offset * BLOCK_SIZE, block, BLOCK_SIZE);
-    return 0;
-}
-
-inode_intf ramdisk_init() {
-    inode_intf ramdisk = malloc(sizeof(*ramdisk));
-
-    ramdisk->read    = (void*)ramread;
-    ramdisk->write   = (void*)ramwrite;
-    ramdisk->getsize = (void*)getsize;
-    ramdisk->setsize = (void*)setsize;
-
-    return ramdisk;
 }

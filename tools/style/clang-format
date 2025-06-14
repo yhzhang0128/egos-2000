@@ -24,7 +24,6 @@ clang-format -style=file:tools/style/style.txt -i \
 ./library/libc/malloc.c \
 ./library/file/file1.c \
 ./library/file/file0.c \
-./library/file/disk.c \
 ./library/syscall/syscall.c \
 ./library/syscall/servers.c \
 ./library/elf/elf.c \

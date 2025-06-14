@@ -10,12 +10,29 @@
 #include "inode.h"
 #include <string.h>
 
+static int getsize() { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
+
+static int setsize() { FATAL("disk: cannot set size"); }
+
+static int read(inode_intf bs, uint ino, uint offset, block_t* block) {
+    earth->disk_read(FILE_SYS_DISK_START + offset, 1, block->bytes);
+    return 0;
+}
+
+static int write(inode_intf bs, uint ino, uint offset, block_t* block) {
+    earth->disk_write(FILE_SYS_DISK_START + offset, 1, block->bytes);
+    return 0;
+}
+
 int main() {
     SUCCESS("Enter kernel process GPID_FILE");
 
     /* Initialize the file system interface. */
-    inode_intf fs = (FILESYS == 0) ? mydisk_init(fs_disk_init(), 0)
-                                   : treedisk_init(fs_disk_init(), 0);
+    struct inode_store disk = (struct inode_store){
+        .read = read, .write = write, .getsize = getsize, .setsize = setsize};
+
+    inode_intf fs =
+        (FILESYS == 0) ? mydisk_init(&disk, 0) : treedisk_init(&disk, 0);
 
     /* Send a notification to GPID_PROCESS. */
     char buf[SYSCALL_MSG_LEN];
