@@ -23,13 +23,15 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "disk.h"
 #include "inode.h"
 
-#define EGOS_BIN_NUM 5
-char* egos_binaries[] = {"./qemu/egos.bin", "../build/release/sys_proc.elf",
+char* egos_binaries[] = {"./qemu/egos.bin",
+                         "../build/release/sys_proc.elf",
                          "../build/release/sys_terminal.elf",
                          "../build/release/sys_file.elf",
-                         "../build/release/sys_shell.elf"};
+                         "../build/release/sys_shell.elf",
+                         "./screenshots/Bohr.bmp" /* for the VGA demo */};
 
 char bin_dir[256] = "./   6 ../   0 ";
 char* contents[]  = {
@@ -44,8 +46,7 @@ char* contents[]  = {
      "shell, an Ethernet/UDP demo, several user commands, and the mkfs tool. "
      "Moreover, the EGOS book (https://egos.fun) contains 9 course projects.",
     bin_dir};
-#define BIN_DIR_INODE 6
-#define SIZE_2MB      2 * 1024 * 1024
+#define BIN_DIR_INODE ((sizeof(contents) / sizeof(char*)) - 1)
 
 char inode[SIZE_2MB], tmp[512];
 char vexriscv[SIZE_2MB * 2], exec[SIZE_2MB], fs[SIZE_2MB];
@@ -62,11 +63,9 @@ int load_file(char* file_name, char* dst) {
 }
 
 int main() {
-    assert(EGOS_BIN_DISK_SIZE == SIZE_2MB && FILE_SYS_DISK_SIZE == SIZE_2MB);
-
     /* Write the kernel and system server binaries into exec[]. */
-    printf("[INFO] Load %d kernel binary files\n", EGOS_BIN_NUM);
-    for (uint i = 0; i < EGOS_BIN_NUM; i++) {
+    printf("[INFO] Load 6 kernel binary files\n");
+    for (uint i = 0; i < 6; i++) {
         int file_size = load_file(egos_binaries[i],
                                   exec + i * EGOS_BIN_MAX_NBLOCK * BLOCK_SIZE);
         printf("[INFO] Load %s: %d bytes\n", egos_binaries[i], file_size);
@@ -111,7 +110,7 @@ int main() {
         }
     closedir(dp);
     filesys->write(filesys, BIN_DIR_INODE, 0, (void*)bin_dir);
-    printf("[INFO] Load ino=%d, %s\n", BIN_DIR_INODE, bin_dir);
+    printf("[INFO] Load ino=%ld, %s\n", BIN_DIR_INODE, bin_dir);
 
     /* Generate the disk image file. */
     int fd    = open("disk.img", O_CREAT | O_WRONLY, 0666);

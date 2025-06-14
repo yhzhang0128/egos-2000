@@ -1,5 +1,6 @@
 clang-format -style=file:tools/style/style.txt -i \
-./apps/user/udp_hello.c \
+./apps/user/udp_demo.c \
+./apps/user/vga_demo.c \
 ./apps/user/ls.c \
 ./apps/user/cat.c \
 ./apps/user/loop.c \
