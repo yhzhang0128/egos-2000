@@ -11,18 +11,20 @@ The [EGOS book](https://egos.fun/book/overview.html) contains 9 course projects 
 
 ```shell
 # The cloc utility is used to count the lines of code.
-> cloc egos-2000 --exclude-ext=md,txt,toml,json  # excluding text files
-...
-github.com/AlDanial/cloc v 1.94  T=0.05 s (949.3 files/s, 62349.4 lines/s)
+> cloc egos-2000 --exclude-lang=Markdown,Text,TOML,make   # excluding text files
+      71 text files.
+      49 unique files.
+      60 files ignored.
+
+github.com/AlDanial/cloc v 2.04  T=0.02 s (2506.4 files/s, 194031.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
 C                               29            424            578           1595
-C/C++ Header                     9             61             99            257
+C/C++ Header                     9             62            100            260
 Assembly                         3             15             46             94
-make                             1             15              9             54
 -------------------------------------------------------------------------------
-SUM:                            42            515            732           2000 (exactly!)
+SUM:                            41            501            724           1949
 -------------------------------------------------------------------------------
 ```
 

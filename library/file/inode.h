@@ -36,6 +36,11 @@
 #pragma once
 #include "disk.h"
 
+/* Define uint for C99 compatibility */
+#ifndef uint
+typedef unsigned int uint;
+#endif
+
 #define NINODES 128
 typedef struct inode_store* inode_intf;
 
