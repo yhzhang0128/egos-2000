@@ -40,33 +40,33 @@ USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/user/%.elf, $(notdir $(wildcard apps/us
 egos: $(USRAPP_ELFS) $(SYSAPP_ELFS) $(RELEASE)/egos.elf
 
 $(RELEASE)/egos.elf: $(EGOS_DEPS)
-	@echo "$(YELLOW)-------- Compile EGOS --------$(END)"
+	@printf "$(YELLOW)-------- Compile EGOS --------$(END)\n"
 	$(RISCV_CC) $(CFLAGS) $(INCLUDE) -DKERNEL $(filter %.s, $(wildcard $^)) $(filter %.c, $(wildcard $^)) -Tlibrary/elf/egos.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/egos.lst
 
 $(SYSAPP_ELFS): $(RELEASE)/%.elf : apps/system/%.c $(APPS_DEPS)
-	@echo "Compile app$(CYAN)" $(patsubst %.c, %, $(notdir $<)) "$(END)=>" $@
+	@printf "Compile app $(CYAN)%s$(END) => %s\n" $(patsubst %.c, %, $(notdir $<)) $@
 	@$(RISCV_CC) $(CFLAGS) $(INCLUDE) -DFILESYS=$(FILESYS) -DKERNEL -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tlibrary/elf/app.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
 
 $(USRAPP_ELFS): $(RELEASE)/user/%.elf : apps/user/%.c $(APPS_DEPS)
 	@mkdir -p $(DEBUG) $(RELEASE) $(RELEASE)/user
-	@echo "Compile app$(CYAN)" $(patsubst %.c, %, $(notdir $<)) "$(END)=>" $@
+	@printf "Compile app $(CYAN)%s$(END) => %s\n" $(patsubst %.c, %, $(notdir $<)) $@
 	@$(RISCV_CC) $(CFLAGS) $(INCLUDE) -Iapps apps/app.s $(filter %.c, $(wildcard $^)) -Tlibrary/elf/app.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(patsubst %.c, $(DEBUG)/%.lst, $(notdir $<))
 
 install: egos
-	@echo "$(GREEN)-------- Create the Disk & BootROM Image --------$(END)"
+	@printf "$(GREEN)-------- Create the Disk & BootROM Image --------$(END)\n"
 	$(OBJCOPY) -O binary $(RELEASE)/egos.elf tools/qemu/egos.bin
 	$(CC) tools/mkfs.c library/file/file$(FILESYS).c -DMKFS -DFILESYS=$(FILESYS) -DCPU_BIN_FILE="\"fpga/vexriscv/vexriscv_$(BOARD)_$(NCORE)core.bin\"" $(INCLUDE) -o tools/mkfs
 	cd tools; rm -f disk.img bootROM.bin; ./mkfs
 
 qemu: install
-	@echo "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)"
+	@printf "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)\n"
 	$(QEMU) -nographic -readconfig tools/qemu/config.toml
 
 program: install
-	@echo "$(YELLOW)-------- Program the Arty $(BOARD) on-board ROM --------$(END)"
+	@printf "$(YELLOW)-------- Program the Arty $(BOARD) on-board ROM --------$(END)\n"
 	cd tools/fpga/openocd; time openocd -f 7series_$(BOARD).txt
 
 clean:
