@@ -62,9 +62,9 @@ int load_file(char* file_name, char* dst) {
     return st.st_size;
 }
 
-int getsize() { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
+int getsize(inode_intf bs, uint ino) { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
 
-int setsize() { assert(0); }
+int setsize(inode_intf bs, uint ino, uint newsize) { assert(0); }
 
 int ramread(inode_intf bs, uint ino, uint offset, block_t* block) {
     memcpy(block, fs + offset * BLOCK_SIZE, BLOCK_SIZE);

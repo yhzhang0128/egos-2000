@@ -10,9 +10,9 @@
 #include "inode.h"
 #include <string.h>
 
-static int getsize() { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
+static int getsize(inode_intf bs, uint ino) { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
 
-static int setsize() { FATAL("disk: cannot set size"); }
+static int setsize(inode_intf bs, uint ino, uint newsize) { FATAL("disk: cannot set size"); }
 
 static int read(inode_intf bs, uint ino, uint offset, block_t* block) {
     earth->disk_read(FILE_SYS_DISK_START + offset, 1, block->bytes);
