@@ -10,16 +10,16 @@
 #include "inode.h"
 #include <string.h>
 
-static int getsize(inode_intf bs, uint ino) { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
+int getsize(inode_intf bs, uint ino) { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
 
-static int setsize(inode_intf bs, uint ino, uint newsize) { FATAL("disk: cannot set size"); }
+int setsize(inode_intf bs, uint ino, uint newsize) { FATAL("cannot set size"); }
 
-static int read(inode_intf bs, uint ino, uint offset, block_t* block) {
+int read(inode_intf bs, uint ino, uint offset, block_t* block) {
     earth->disk_read(FILE_SYS_DISK_START + offset, 1, block->bytes);
     return 0;
 }
 
-static int write(inode_intf bs, uint ino, uint offset, block_t* block) {
+int write(inode_intf bs, uint ino, uint offset, block_t* block) {
     earth->disk_write(FILE_SYS_DISK_START + offset, 1, block->bytes);
     return 0;
 }
