@@ -11,13 +11,13 @@ CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sect
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 all:
-	@echo "$(YELLOW)-------- Compile Hello, World! --------$(END)"
+	@printf "$(YELLOW)-------- Compile Hello, World! --------$(END)\n"
 	$(RISCV_CC) $(CFLAGS) hello.s hello.c -Thello.lds $(LDFLAGS) -o hello.elf
 	$(OBJDUMP) $(DEBUG_FLAGS) hello.elf > hello.lst
 	$(OBJCOPY) -O binary hello.elf hello.bin
 
 qemu: all
-	@echo "$(YELLOW)-------- Run Hello-World on QEMU --------$(END)"
+	@printf "$(YELLOW)-------- Run Hello-World on QEMU --------$(END)\n"
 	$(QEMU) -nographic -machine virt -smp 1 -bios hello.bin
 
 clean:
