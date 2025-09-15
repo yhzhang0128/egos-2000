@@ -4,8 +4,8 @@ ENTRY(app_entry)
 
 MEMORY
 {
-    code (rx) : ORIGIN = 0x80400000, LENGTH = 0x8000
-    data (rw) : ORIGIN = 0x80408000, LENGTH = 0x1F8000
+    code (rx) : ORIGIN = 0x80200000, LENGTH = 0x8000
+    data (rw) : ORIGIN = 0x80208000, LENGTH = 0xF8000
 }
 
 PHDRS
@@ -43,5 +43,5 @@ SECTIONS
           PROVIDE( __heap_start = . );
     } >data :data
 
-    PROVIDE( __heap_end = 0x80600000 );
+    PROVIDE( __heap_end = 0x80300000 );
 }

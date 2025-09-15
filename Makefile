@@ -1,10 +1,10 @@
 # (C) 2025, Cornell University
 # All rights reserved.
 
-# BOARD can be a7_35t, a7_100t, or s7_50.
-# For a7_35t, NCORE can be 1 and this single core version supports VGA.
-# Due to hardware constraints, the 4-core version does not support VGA on a7_35t.
+# BOARD can be a7_35t, a7_100t, s7_50, or tang_nano_20k.
 BOARD       = a7_35t
+# For tang_nano_20k, NCORE must be 1. For a7_35t, NCORE can be 1 or 4.
+# The single core version supports VGA while the 4-core version does not.
 NCORE       = 4
 QEMU        = qemu-system-riscv32
 

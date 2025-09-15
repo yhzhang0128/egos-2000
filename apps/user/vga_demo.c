@@ -24,7 +24,7 @@ int main() {
     for (uint i = 0; i < VRES; i++) {
         for (uint j = 0; j < HRES; j++) {
             /* Every 4 bytes from VGA_MMIO_START correspond to a pixel. */
-            uint* pix = (uint*)(VGA_MMIO_START + 4 * (i * HRES + (HRES - j)));
+            uint* pix = (uint*)(VGA_HDMI_BASE + 4 * (i * HRES + (HRES - j)));
 
             /* Only 3 bytes are used for RGB and the 4th byte is unused. */
             *pix = rgb[0] | (((uint)rgb[1]) << 8) | (((uint)rgb[2]) << 16);

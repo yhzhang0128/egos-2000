@@ -43,21 +43,21 @@ extern struct earth* earth;
 extern struct grass* grass;
 
 /* Below is the physical memory layout in egos-2000. */
-#define RAM_END           0x81000000 /* 16MB memory [0x80000000,0x81000000) */
-#define APPS_PAGES_BASE   0x80800000 /* 8MB free for mmu_alloc              */
-#define APPS_STACK_TOP    0x80800000 /* 2MB app stack (growing down)        */
-#define SHELL_WORK_DIR    0x80602000 /* current work directory for shell    */
-#define SYSCALL_ARG       0x80601000 /* struct syscall                      */
-#define APPS_ARG          0x80600000 /* main() arguments (argc and argv)    */
-#define APPS_ENTRY        0x80400000 /* 2MB app code and data               */
-#define EGOS_STACK_TOP    0x80400000 /* 2MB egos stack (growing down)       */
-#define GRASS_STRUCT_BASE 0x80201000 /* struct grass                        */
-#define EARTH_STRUCT_BASE 0x80200000 /* struct earth                        */
-#define RAM_START         0x80000000 /* 2MB egos code and data              */
+#define RAM_END           0x80600000 /* 6MB memory [0x80000000,0x80600000) */
+#define APPS_PAGES_BASE   0x80400000 /* 2MB free for mmu_alloc              */
+#define APPS_STACK_TOP    0x80400000 /* 1MB app stack (growing down)        */
+#define SHELL_WORK_DIR    0x80302000 /* current work directory for shell    */
+#define SYSCALL_ARG       0x80301000 /* struct syscall                      */
+#define APPS_ARG          0x80300000 /* main() arguments (argc and argv)    */
+#define APPS_ENTRY        0x80200000 /* 1MB app code and data               */
+#define EGOS_STACK_TOP    0x80200000 /* 1MB egos stack (growing down)       */
+#define GRASS_STRUCT_BASE 0x80101000 /* struct grass                        */
+#define EARTH_STRUCT_BASE 0x80100000 /* struct earth                        */
+#define RAM_START         0x80000000 /* 1MB egos code and data              */
 #define BOARD_FLASH_ROM   0x20400000 /* 4MB disk image on Arty board ROM    */
 
 /* Below is the memory-mapped I/O layout in egos-2000. */
-#define VGA_MMIO_START   0x81000000
+#define VGA_HDMI_BASE    0x80600000 /* 2MB video framebuffer */
 #define ETHMAC_CSR_BASE  0xF0002000
 #define ETHMAC_RX_BUFFER 0x90000000
 #define ETHMAC_TX_BUFFER 0x90001000

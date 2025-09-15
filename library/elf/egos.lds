@@ -5,7 +5,7 @@ ENTRY(boot_loader)
 MEMORY
 {
     code (rx) : ORIGIN = 0x80000000, LENGTH = 0x8000
-    data (rw) : ORIGIN = 0x80008000, LENGTH = 0x1F800
+    data (rw) : ORIGIN = 0x80008000, LENGTH = 0xF800
 }
 
 PHDRS
@@ -47,5 +47,5 @@ SECTIONS
         PROVIDE( __heap_start = . );
     } >data :data
 
-    PROVIDE( __heap_end = 0x80200000 );
+    PROVIDE( __heap_end = 0x80100000 );
 }
