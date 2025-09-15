@@ -4,13 +4,16 @@ You can use MacOS, Linux or Windows and here are the tutorial videos:
 [MacOS](https://youtu.be/VJgQFcKG0uc), [Linux](https://youtu.be/2FT7AN0wPlg) and [Windows](https://youtu.be/hCDMnGGyGqM).
 MacOS users can follow the same tutorial no matter you have an Apple chip or Intel CPU.
 You can run egos-2000 on the QEMU emulator or RISC-V boards.
-Running on QEMU is easier but if you wish to run it on the boards for fun, 
-you need to purchase the following hardware:
-* a micro USB cable (e.g., [this one](https://www.amazon.com/dp/B0744BKDRD?psc=1&ref=ppx_yo2_dt_b_product_details))
-* Arty [A7-35T](https://www.xilinx.com/products/boards-and-kits/arty.html), [A7-100T](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/), or
-[S7-50](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/) board
-* a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details), and a microSD card
+Running on QEMU is easier, but if you wish to run it on real hardware for fun, 
+you have 2 options:
+1. [Sipeed Tang Nano 20K](https://wiki.sipeed.com/hardware/en/tang/tang-nano-20k/nano-20k.html), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details), and a microSD card
+2. Arty [A7-35t](https://www.xilinx.com/products/boards-and-kits/arty.html)/[A7-100t](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/)/[S7-50](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/) board,
+a [VGA Pmod](https://digilent.com/reference/pmod/pmodvga/start),
+an [ESP32 Pmod](https://digilent.com/reference/pmod/pmodesp32/start),
+a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details), and a microSD card
 
+The option of Tang Nano 20K is cheaper, but it does not support multicore, Ethernet, or Wi-Fi.
+It supports microSD and HDMI though.
 
 ## Step1: Setup the compiler and compile egos-2000
 
@@ -55,41 +58,31 @@ Enter 0: page tables
 Enter 1: software TLB
 ```
 
-## Step3: Run egos-2000 on the Arty board
+## Step3: Run egos-2000 on a board
 
-You can use the Arty A7-35t, A7-100t, or S7-50 board
-and make sure to set the `BOARD` variable in `Makefile` correctly.
-To use a microSD card on the board, you can program the microSD card with `disk.img` using tools like [balena Etcher](https://www.balena.io/etcher/).
+You can use the Tang Nano 20K, Arty A7-35t, A7-100t, or S7-50 board.
+To use a microSD card on the board, program the microSD card with `disk.img` using tools like [balena Etcher](https://www.balena.io/etcher/).
 
 ### Step3.1: MacOS or Linux
 
-Download [xPack OpenOCD v0.11.0-1](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.11.0-1) to `$EGOS`
-and program `bootROM.bin` to the on-board ROM.
+Install openFPGALoader with [Homebrew](https://formulae.brew.sh/formula/openfpgaloader) on MacOS or [this guide](https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-Doc/flash-in-linux.html) on Linux.
+The `BOARD` in the command below can be `arty_a7_35t`, `arty_a7_100t`, `arty_s7_50`, or `tangnano20k`.
 
 ```shell
-> cd $EGOS
-> tar -zxvf xpack-openocd-0.11.0-1-xxx-xxx.tar.gz
-> export PATH=$PATH:$EGOS/xpack-openocd-0.11.0-1-xxx-xxx/bin
 > cd $EGOS/egos-2000
-> make program BOARD=a7_100t
--------- Program the on-board ROM --------
-cd tools/openocd; time openocd -f 7series.txt
+> make program BOARD=tangnano20k
+-------- Program the tangnano20k on-board ROM --------
+openFPGALoader -b tangnano20k -f tools/bootROM.bin
 ......
-Info : sector 190 took 229 ms
-Info : sector 191 took 243 ms  # It will pause at this point for a while
-Info : Found flash device 'micron n25q128' (ID 0x0018ba20)
-
-real    1m37.926s
-user    0m7.109s
-sys     0m20.089s
-
+start addr: 00000000, end_addr: 00800000
+Erasing: [==================================================] 100.00%
+Done
+Writing: [==================================================] 100.00%
+Done
 ```
 
 To connect with the egos-2000 TTY:
 
-1. Press the `PROG` red button on the left-top corner of the Arty board
-2. To restart, press the `RESET` red button on the right-top corner
-3. For Linux users, type in your shell
 ```shell
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
@@ -97,12 +90,13 @@ To connect with the egos-2000 TTY:
 [INFO] LiteX + VexRiscv (vendorid: 666)
 [INFO] Press 'b' to enter BIOS instead of EGOS
 [INFO] Loading EGOS binary from 0x2040_0000 to 0x8000_0000
-[CRITICAL] --- Booting on Arty with core #0 ---
+[CRITICAL] --- Booting on Hardware with core #0 ---
 ......
 ```
-4. For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`)
+For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`).
+Type `openFPGALoader -r` to reboot egos-2000 on your board.
 
-### Step3.2: Windows
+### Step3.2: Windows (only for the Arty boards)
 
 Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
