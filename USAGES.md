@@ -7,7 +7,7 @@ You can run egos-2000 on the QEMU emulator or RISC-V boards.
 Running on QEMU is easier, but if you wish to run it on real hardware for fun, 
 you have 2 options:
 1. [Sipeed Tang Nano 20K](https://wiki.sipeed.com/hardware/en/tang/tang-nano-20k/nano-20k.html), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details), and a microSD card
-2. Arty [A7-35t](https://www.xilinx.com/products/boards-and-kits/arty.html)/[A7-100t](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/)/[S7-50](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/) board,
+2. Arty [A7-35t](https://www.xilinx.com/products/boards-and-kits/arty.html)/[A7-100t](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/)/[S7-50](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/),
 a [VGA Pmod](https://digilent.com/reference/pmod/pmodvga/start),
 an [ESP32 Pmod](https://digilent.com/reference/pmod/pmodesp32/start),
 a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details), and a microSD card
@@ -48,10 +48,10 @@ Download the [pre-built binaries of QEMU](https://github.com/xpack-dev-tools/qem
 -------- Simulate on QEMU-RISCV --------
 qemu-system-riscv32 -nographic -readconfig tools/qemu/config.toml
 [CRITICAL] --- Booting on QEMU with core #4 ---
-[INFO] Set the CS pin to HIGH and toggle clock.
-[INFO] Set the CS pin to LOW and send cmd0 to SD card.
+[INFO] Set the CS pin to HIGH and toggle clock
+[INFO] Set the CS pin to LOW and send cmd0 to SD card
 [INFO] Check SD card type and voltage with cmd8
-[INFO] SD card replies cmd8 with status 0x01 and payload 0x000001aa
+[INFO] SD card replies cmd8 with status 1
 [SUCCESS] Finished initializing the tty and disk devices
 [CRITICAL] Choose a memory translation mechanism:
 Enter 0: page tables
@@ -87,9 +87,12 @@ To connect with the egos-2000 TTY:
 > sudo chmod 666 /dev/ttyUSB1
 > screen /dev/ttyUSB1 115200
 ......
+--============== Boot ==================--
 [INFO] LiteX + VexRiscv (vendorid: 666)
 [INFO] Press 'b' to enter BIOS instead of EGOS
-[INFO] Loading EGOS binary from 0x2040_0000 to 0x8000_0000
+[INFO] Initializing SD card
+[INFO] Reading 256 blocks (128 KB) to 0x8000_0000
+[INFO] Jumping to 0x8000_0000
 [CRITICAL] --- Booting on Hardware with core #0 ---
 ......
 ```
