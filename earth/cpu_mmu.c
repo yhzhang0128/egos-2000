@@ -127,9 +127,9 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      *   Case#1: pid < GPID_USER_START
      * | Start Address | # Pages | Size   | Explanation                        |
      * +---------------+---------+--------+------------------------------------+
-     * | 0x80000000    | 1024    | 4 MB   | EGOS region (code+data+heap+stack) |
-     * | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack) |
-     * | 0x80800000    | 2048    | 8 MB   | Memroy pages for allocation        |
+     * | 0x80000000    | 512     | 2 MB   | EGOS region (code+data+heap+stack) |
+     * | 0x80200000    | 512     | 2 MB   | Apps region (code+data+heap+stack) |
+     * | 0x80400000    | 1024    | 4 MB   | Free memory and video framebuffer  |
      * | CLINT_BASE    | 16      | 64 KB  | Memory-mapped registers for timer  |
      * | UART_BASE     | 1       | 4 KB   | Memory-mapped registers for TTY    |
      * | SPI_BASE      | 1       | 4 KB   | Memory-mapped registers for SD     |
@@ -137,7 +137,7 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      *   Case#2: pid >= GPID_USER_START
      * | Start Address | # Pages | Size   | Explanation                        |
      * +---------------+---------+--------+------------------------------------+
-     * | 0x80602000    | 1       | 4 KB   | Work dir (see apps/app.h)          |
+     * | 0x80302000    | 1       | 4 KB   | Work dir (see apps/app.h)          |
      *
      * (2) After building page tables for pid (or if page tables for pid exist),
      *     update the page tables and map vpage_no to ppage_id based on Sv32. */

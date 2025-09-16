@@ -4,7 +4,7 @@ You can use MacOS, Linux or Windows and here are the tutorial videos:
 [MacOS](https://youtu.be/VJgQFcKG0uc), [Linux](https://youtu.be/2FT7AN0wPlg) and [Windows](https://youtu.be/hCDMnGGyGqM).
 MacOS users can follow the same tutorial no matter you have an Apple chip or Intel CPU.
 You can run egos-2000 on the QEMU emulator or RISC-V boards.
-Running on QEMU is easier, but if you wish to run it on real hardware for fun, 
+Using QEMU is easier, but if you wish to run it on real hardware for fun, 
 you have 2 options:
 1. [Sipeed Tang Nano 20K](https://wiki.sipeed.com/hardware/en/tang/tang-nano-20k/nano-20k.html), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details), and a microSD card
 2. Arty [A7-35t](https://www.xilinx.com/products/boards-and-kits/arty.html)/[A7-100t](https://digilent.com/shop/arty-a7-100t-artix-7-fpga-development-board/)/[S7-50](https://digilent.com/shop/arty-s7-spartan-7-fpga-development-board/),
@@ -65,7 +65,7 @@ To use a microSD card on the board, program the microSD card with `disk.img` usi
 
 ### Step3.1: MacOS or Linux
 
-Install openFPGALoader with [Homebrew](https://formulae.brew.sh/formula/openfpgaloader) on MacOS or [this guide](https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-Doc/flash-in-linux.html) on Linux.
+Install **openFPGALoader** with [Homebrew](https://formulae.brew.sh/formula/openfpgaloader) on MacOS or [this guide](https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-Doc/flash-in-linux.html) on Linux.
 The `BOARD` in the command below can be `arty_a7_35t`, `arty_a7_100t`, `arty_s7_50`, or `tangnano20k`.
 
 ```shell
@@ -97,7 +97,7 @@ To connect with the egos-2000 TTY:
 ......
 ```
 For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`).
-To reboot egos-2000, press the white button on Tang Nano 20K or the top-right `RESET` button on the Arty boards.
+To reboot egos-2000, press one of the two white buttons on Tang Nano 20K or the top-right `RESET` button on the Arty boards.
 
 ### Step3.2: Windows (only for the Arty boards)
 

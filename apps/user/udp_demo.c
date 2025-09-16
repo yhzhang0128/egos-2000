@@ -117,7 +117,7 @@ int main() {
 
     /* Send out the Ethernet frame. */
     if (earth->platform == QEMU) {
-        CRITICAL("Networking on QEMU is left to students as an exercise.");
+        CRITICAL("Networking on QEMU is left to students as an exercise");
         /* Student's code goes here (Ethernet & TCP/IP). */
 
         /* Understand the Gigabit Ethernet Controller (GEM) on QEMU
