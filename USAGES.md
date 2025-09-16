@@ -97,7 +97,7 @@ To connect with the egos-2000 TTY:
 ......
 ```
 For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`).
-Type `openFPGALoader -r` to reboot egos-2000 on your board.
+To reboot egos-2000, press the white button on Tang Nano 20K or the top-right `RESET` button on the Arty boards.
 
 ### Step3.2: Windows (only for the Arty boards)
 
