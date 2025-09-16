@@ -2,7 +2,7 @@
 # All rights reserved.
 
 # BOARD can be arty_a7_35t, arty_a7_100t, arty_s7_50, or tangnano20k
-BOARD       = arty_a7_35t
+BOARD       = tangnano20k
 QEMU        = qemu-system-riscv32
 
 ifeq ($(TOOLCHAIN), GNU)
