@@ -16,12 +16,12 @@
 #define SIFIVE_UART_IP     20UL
 
 uint uart_rx_empty() {
-    return (earth->platform == ARTY) ? REGW(UART_BASE, LITEX_UART_RXEMPTY)
+    return (earth->platform == HARDWARE) ? REGW(UART_BASE, LITEX_UART_RXEMPTY)
                                      : !(REGW(UART_BASE, SIFIVE_UART_IP) & 2);
 }
 
 void uart_getc(char* c) {
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         while (REGW(UART_BASE, LITEX_UART_RXEMPTY));
         *c                                 = REGW(UART_BASE, 0) & 0xFF;
         REGW(UART_BASE, LITEX_UART_EVPEND) = 2;
@@ -33,7 +33,7 @@ void uart_getc(char* c) {
 }
 
 void uart_putc(char c) {
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         while (REGW(UART_BASE, LITEX_UART_TXFULL));
         REGW(UART_BASE, 0)                 = c;
         REGW(UART_BASE, LITEX_UART_EVPEND) = 1;

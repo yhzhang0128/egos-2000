@@ -109,7 +109,7 @@ void pagetable_identity_map(int pid) {
     setup_identity_region(pid, UART_BASE, 1, USER_RWX);   /* UART  */
     setup_identity_region(pid, SPI_BASE, 1, USER_RWX);    /* SPI   */
 
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         setup_identity_region(pid, BOARD_FLASH_ROM, 1024, USER_RWX);
         setup_identity_region(pid, ETHMAC_CSR_BASE, 1, USER_RWX);
         setup_identity_region(pid, ETHMAC_TX_BUFFER, 1, USER_RWX);
@@ -168,7 +168,7 @@ uint page_table_translate(int pid, uint vaddr) {
 }
 
 void flush_cache() {
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         /* Flush the L1 instruction cache. */
         /* See
          * https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25
