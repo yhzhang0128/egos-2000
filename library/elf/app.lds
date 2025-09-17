@@ -40,7 +40,7 @@ SECTIONS
     } >data :data
 
     .heap (NOLOAD) : ALIGN(8) {
-          PROVIDE( __heap_start = . );
+        PROVIDE( __heap_start = . );
     } >data :data
 
     PROVIDE( __heap_end = 0x80300000 );

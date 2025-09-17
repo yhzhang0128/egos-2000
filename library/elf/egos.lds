@@ -5,7 +5,7 @@ ENTRY(boot_loader)
 MEMORY
 {
     code (rx) : ORIGIN = 0x80000000, LENGTH = 0x8000
-    data (rw) : ORIGIN = 0x80008000, LENGTH = 0xF800
+    data (rw) : ORIGIN = 0x80008000, LENGTH = 0xF8000
 }
 
 PHDRS
