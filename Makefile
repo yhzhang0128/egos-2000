@@ -1,11 +1,8 @@
 # (C) 2025, Cornell University
 # All rights reserved.
 
-# BOARD can be a7_35t, a7_100t, or s7_50.
-# For a7_35t, NCORE can be 1 and this single core version supports VGA.
-# Due to hardware constraints, the 4-core version does not support VGA on a7_35t.
-BOARD       = a7_35t
-NCORE       = 4
+# BOARD can be arty_a7_35t, arty_a7_100t, arty_s7_50, or tangnano20k
+BOARD       = tangnano20k
 QEMU        = qemu-system-riscv32
 
 ifeq ($(TOOLCHAIN), GNU)
@@ -58,7 +55,7 @@ $(USRAPP_ELFS): $(RELEASE)/user/%.elf : apps/user/%.c $(APPS_DEPS)
 install: egos
 	@printf "$(GREEN)-------- Create the Disk & BootROM Image --------$(END)\n"
 	$(OBJCOPY) -O binary $(RELEASE)/egos.elf tools/qemu/egos.bin
-	$(CC) tools/mkfs.c library/file/file$(FILESYS).c -DMKFS -DFILESYS=$(FILESYS) -DCPU_BIN_FILE="\"fpga/vexriscv/vexriscv_$(BOARD)_$(NCORE)core.bin\"" $(INCLUDE) -o tools/mkfs
+	$(CC) tools/mkfs.c library/file/file$(FILESYS).c -DMKFS -DFILESYS=$(FILESYS) -DCPU_BIN_FILE="\"fpga/$(BOARD).bin\"" $(INCLUDE) -o tools/mkfs
 	cd tools; rm -f disk.img bootROM.bin; ./mkfs
 
 qemu: install
@@ -66,11 +63,11 @@ qemu: install
 	$(QEMU) -nographic -readconfig tools/qemu/config.toml
 
 program: install
-	@printf "$(YELLOW)-------- Program the Arty $(BOARD) on-board ROM --------$(END)\n"
-	cd tools/fpga/openocd; time openocd -f 7series_$(BOARD).txt
+	@printf "$(YELLOW)-------- Program the $(BOARD) on-board ROM --------$(END)\n"
+	openFPGALoader -b $(BOARD) -f tools/bootROM.bin
 
 clean:
-	rm -rf build earth/kernel_entry.lds tools/mkfs tools/mkrom tools/qemu/egos.bin tools/disk.img tools/bootROM.bin
+	rm -rf build tools/mkfs tools/mkrom tools/qemu/egos.bin tools/disk.img tools/bootROM.bin
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

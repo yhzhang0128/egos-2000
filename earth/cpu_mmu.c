@@ -109,7 +109,7 @@ void pagetable_identity_map(int pid) {
     setup_identity_region(pid, UART_BASE, 1, USER_RWX);   /* UART  */
     setup_identity_region(pid, SPI_BASE, 1, USER_RWX);    /* SPI   */
 
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         setup_identity_region(pid, BOARD_FLASH_ROM, 1024, USER_RWX);
         setup_identity_region(pid, ETHMAC_CSR_BASE, 1, USER_RWX);
         setup_identity_region(pid, ETHMAC_TX_BUFFER, 1, USER_RWX);
@@ -127,9 +127,9 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      *   Case#1: pid < GPID_USER_START
      * | Start Address | # Pages | Size   | Explanation                        |
      * +---------------+---------+--------+------------------------------------+
-     * | 0x80000000    | 1024    | 4 MB   | EGOS region (code+data+heap+stack) |
-     * | 0x80400000    | 1024    | 4 MB   | Apps region (code+data+heap+stack) |
-     * | 0x80800000    | 2048    | 8 MB   | Memroy pages for allocation        |
+     * | 0x80000000    | 512     | 2 MB   | EGOS region (code+data+heap+stack) |
+     * | 0x80200000    | 512     | 2 MB   | Apps region (code+data+heap+stack) |
+     * | 0x80400000    | 1024    | 4 MB   | Free memory and video framebuffer  |
      * | CLINT_BASE    | 16      | 64 KB  | Memory-mapped registers for timer  |
      * | UART_BASE     | 1       | 4 KB   | Memory-mapped registers for TTY    |
      * | SPI_BASE      | 1       | 4 KB   | Memory-mapped registers for SD     |
@@ -137,7 +137,7 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      *   Case#2: pid >= GPID_USER_START
      * | Start Address | # Pages | Size   | Explanation                        |
      * +---------------+---------+--------+------------------------------------+
-     * | 0x80602000    | 1       | 4 KB   | Work dir (see apps/app.h)          |
+     * | 0x80302000    | 1       | 4 KB   | Work dir (see apps/app.h)          |
      *
      * (2) After building page tables for pid (or if page tables for pid exist),
      *     update the page tables and map vpage_no to ppage_id based on Sv32. */
@@ -168,7 +168,7 @@ uint page_table_translate(int pid, uint vaddr) {
 }
 
 void flush_cache() {
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         /* Flush the L1 instruction cache. */
         /* See
          * https://github.com/yhzhang0128/litex/blob/egos/litex/soc/cores/cpu/vexriscv_smp/system.h#L9-L25
@@ -195,7 +195,7 @@ void mmu_init() {
 
     /* Student's code goes here (System Call & Protection). */
 
-    /* Replace the PMP region above with a NAPOT region 0x80400000 - 0x80800000
+    /* Replace the PMP region above with a NAPOT region 0x80200000 - 0x80400000
      * and set the permission for user mode access as r/w/x. */
 
     /* Student's code ends here. */

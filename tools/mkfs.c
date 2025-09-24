@@ -11,7 +11,7 @@
  * The ROM image should be exactly 8MB:
  *     4MB holds the VexRiscv processor FPGA binary;
  *     4MB holds the disk image described above.
- * This ROM image should be programmed to the ROM chip on the Arty board.
+ * This ROM image should be programmed to the ROM chip on the FPGA board.
  */
 
 #include <stdio.h>

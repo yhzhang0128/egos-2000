@@ -13,7 +13,7 @@
 uint core_in_kernel;
 uint core_to_proc_idx[NCORES + 1];
 /* QEMU has cores with ID #1 .. #NCORES. */
-/* Arty has cores with ID #0 .. #NCORES-1. */
+/* Hardware has cores with ID #0 .. #NCORES-1. */
 
 struct process proc_set[MAX_NPROCESS + 1];
 void core_set_idle(uint core) { core_to_proc_idx[core] = MAX_NPROCESS; }

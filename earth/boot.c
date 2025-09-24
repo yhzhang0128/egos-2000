@@ -24,7 +24,7 @@ void boot() {
     uint core_id, vendor_id;
     asm("csrr %0, mhartid" : "=r"(core_id));
     asm("csrr %0, mvendorid" : "=r"(vendor_id));
-    earth->platform = (vendor_id == 666) ? ARTY : QEMU;
+    earth->platform = (vendor_id == 666) ? HARDWARE : QEMU;
 
     /* Disable core#0 on QEMU because it is an E31 core without S-mode. */
     if (earth->platform == QEMU && core_id == 0) {
@@ -36,7 +36,7 @@ void boot() {
         /* The first booted core needs to do some more work. */
         tty_init();
         CRITICAL("--- Booting on %s with core #%d ---",
-                 earth->platform == ARTY ? "Arty" : "QEMU", core_id);
+                 earth->platform == HARDWARE ? "Hardware" : "QEMU", core_id);
 
         disk_init();
         SUCCESS("Finished initializing the tty and disk devices");

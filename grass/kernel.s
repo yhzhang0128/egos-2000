@@ -28,7 +28,7 @@ trap_entry:
 
     /* Step2 */
     csrw mscratch, sp
-    li sp, 0x80400000
+    li sp, 0x80200000
 
     /* Step3 */
     addi sp, sp, -128 /* now, sp == SAVED_REGISTER_ADDR */

@@ -24,7 +24,7 @@
 char spi_exchange(char byte) {
     /* The "exchange" here means sending a byte and then receiving a byte. */
     uint rxdata;
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         REGW(SPI_BASE, LITEX_SPI_MOSI)    = byte;
         REGW(SPI_BASE, LITEX_SPI_CONTROL) = (8 * (1 << 8) | (1));
         while ((REGW(SPI_BASE, LITEX_SPI_STATUS) & 1) != 1);
@@ -64,7 +64,7 @@ static char sd_exec_acmd(char* cmd) {
 
 static void sd_read(uint offset, char* dst) {
     /* QEMU uses the SD2 standard (offset is *byte* offset).
-     * Arty uses the SDHC/SDXC standard (offset is *block* offset). */
+     * Hardware uses the SDHC/SDXC standard (offset is *block* offset). */
     if (earth->platform == QEMU) offset *= BLOCK_SIZE;
 
     /* Wait until SD card is not busy. */
@@ -86,7 +86,7 @@ static void sd_read(uint offset, char* dst) {
 
 static void sd_write(uint offset, char* src) {
     /* QEMU uses the SD2 standard (offset is *byte* offset).
-     * Arty uses the SDHC/SDXC standard (offset is *block* offset). */
+     * Hardware uses the SDHC/SDXC standard (offset is *block* offset). */
     if (earth->platform == QEMU) offset *= BLOCK_SIZE;
 
     /* Wait until SD card is not busy. */
@@ -116,7 +116,7 @@ static void sd_write(uint offset, char* src) {
 static int sd_init() {
     /* Configure the SPI controller. */
     INFO("Set the CS pin to HIGH and toggle clock");
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         spi_set_clock(400000);
         REGW(SPI_BASE, LITEX_SPI_CS) = 0;
         for (uint i = 0; i < 1000; i++) spi_exchange(0xFF);
@@ -154,7 +154,7 @@ static int sd_init() {
     while (sd_exec_acmd(acmd41));
     while (spi_exchange(0xFF) != 0xFF);
 
-    if (earth->platform == ARTY) {
+    if (earth->platform == HARDWARE) {
         INFO("Set the SPI clock to 20MHz for the SD card");
         spi_set_clock(20000000);
     }
