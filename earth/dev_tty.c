@@ -10,13 +10,12 @@
 #define LITEX_UART_TXFULL  4UL
 #define LITEX_UART_RXEMPTY 8UL
 #define LITEX_UART_EVPEND  16UL
-
-#define VIRT_UART_RXEMPTY 5UL
+#define VIRT_LINE_STATUS   5UL
 
 uint uart_rx_empty() {
     return (earth->platform == HARDWARE)
                ? REGW(UART_BASE, LITEX_UART_RXEMPTY)
-               : !(REGB(UART_BASE, VIRT_UART_RXEMPTY) & 1);
+               : !(REGB(UART_BASE, VIRT_LINE_STATUS) & (1 << 0));
 }
 
 void uart_getc(char* c) {
@@ -25,7 +24,7 @@ void uart_getc(char* c) {
         *c                                 = REGW(UART_BASE, 0) & 0xFF;
         REGW(UART_BASE, LITEX_UART_EVPEND) = 2;
     } else {
-        while ((REGB(UART_BASE, VIRT_UART_RXEMPTY) & 1) == 0);
+        while (!(REGB(UART_BASE, VIRT_LINE_STATUS) & (1 << 0)));
         *c = REGW(UART_BASE, 0) & 0xFF;
     }
 }
@@ -36,6 +35,7 @@ void uart_putc(char c) {
         REGW(UART_BASE, 0)                 = c;
         REGW(UART_BASE, LITEX_UART_EVPEND) = 1;
     } else {
+        while (!(REGB(UART_BASE, VIRT_LINE_STATUS) & (1 << 5)));
         REGW(UART_BASE, 0) = c;
     }
 }
