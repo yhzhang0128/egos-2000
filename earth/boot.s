@@ -5,7 +5,7 @@
  * Description: entry point of the bootloader
  */
     .section .text.enter
-    .global boot_loader, hang, boot_lock, booted_core_cnt
+    .global boot_loader, boot_lock, booted_core_cnt
 
 boot_loader:
     la t0, boot_lock          /* Load the address of boot_lock. */
@@ -14,9 +14,6 @@ boot_loader:
     bnez t1, boot_loader
     li sp, 0x80200000
     call boot
-
-hang:
-    call hang
 
 .bss
     boot_lock:       .word 0

@@ -88,7 +88,7 @@ void proc_sleep(int pid, uint usec) {
 }
 
 void proc_coresinfo() {
-    extern uint core_to_proc_idx[NCORES + 1];
+    extern uint core_to_proc_idx[NCORES];
     /* Student's code goes here (Multicore & Locks). */
 
     /* Print out the pid of the process running on each CPU core. */

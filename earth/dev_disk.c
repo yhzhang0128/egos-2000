@@ -11,17 +11,24 @@
 
 #define SDHCI_PCI_ECAM_BASE   0x30008000
 #define SDHCI_BASE            0x40000000
+#define SDHCI_PRESENT_STATE   0x24
 #define SDHCI_SOFTWARE_RESET  0x2F
-#define SDHCI_CAPABILITIES    0x40
 #define SDHCI_INT_STAT_ENABLE 0x34
 #define SDHCI_INT_SIG_ENABLE  0x38
+#define SDHCI_CAPABILITIES    0x40
 
 static __attribute__((aligned(BLOCK_SIZE))) char aligned_buf[BLOCK_SIZE];
 
-static void sd_read(uint offset, char* dst) { FATAL("sd_read end."); }
+static void sd_read(uint offset, char* dst) {
+    /* Wait until the SD controller to be ready for a new command. */
+    while (REGW(SDHCI_BASE, SDHCI_PRESENT_STATE) & 0x3);
+
+
+    FATAL("sd_read end.");
+}
 
 static int sd_init() {
-    /* Set the PCI ECAM base address register as SDHCI_BASE */
+    /* Set the PCI ECAM base address register as SDHCI_BASE. */
     REGW(SDHCI_PCI_ECAM_BASE, 0x4)  = 0x2;
     REGW(SDHCI_PCI_ECAM_BASE, 0x10) = SDHCI_BASE;
 
@@ -29,9 +36,9 @@ static int sd_init() {
     REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) = 0x1;
     while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x1);
 
-    /* Enable only interrupts served by the SD controller */
+    /* Enable only interrupts served by the SD controller. */
     REGW(SDHCI_BASE, SDHCI_INT_STAT_ENABLE) = 0x27F003B;
-    /* Mask all SDHCI interrupt sources */
+    /* Mask all SDHCI interrupt sources. */
     REGW(SDHCI_BASE, SDHCI_INT_SIG_ENABLE) = 0x0;
 
     return 0;
@@ -57,7 +64,12 @@ void disk_read(uint block_no, uint nblocks, char* dst) {
 }
 
 void disk_write(uint block_no, uint nblocks, char* src) {
+    /* Student's code goes here (Serial Device Driver). */
+
+    /* Implement SD card write through SPI and PCIe buses. */
     FATAL("disk_write is not implemented");
+
+    /* Student's code ends here. */
 }
 
 void disk_init() {

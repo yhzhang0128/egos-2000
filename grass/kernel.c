@@ -11,13 +11,10 @@
 #include <string.h>
 
 uint core_in_kernel;
-uint core_to_proc_idx[NCORES + 1];
-/* QEMU has cores with ID #1 .. #NCORES. */
-/* Hardware has cores with ID #0 .. #NCORES-1. */
-
+uint core_to_proc_idx[NCORES];
 struct process proc_set[MAX_NPROCESS + 1];
-void core_set_idle(uint core) { core_to_proc_idx[core] = MAX_NPROCESS; }
 /* proc_set[MAX_NPROCESS] is a place holder for idle cores. */
+void core_set_idle(uint core) { core_to_proc_idx[core] = MAX_NPROCESS; }
 
 #define curr_proc_idx core_to_proc_idx[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid

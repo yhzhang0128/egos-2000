@@ -16,21 +16,13 @@ void intr_init(uint core_id);
 struct grass* grass = (void*)GRASS_STRUCT_BASE;
 struct earth* earth = (void*)EARTH_STRUCT_BASE;
 
-void hang();
 void grass_entry();
-void core_set_idle(uint core);
 
 void boot() {
     uint core_id, vendor_id;
     asm("csrr %0, mhartid" : "=r"(core_id));
     asm("csrr %0, mvendorid" : "=r"(vendor_id));
     earth->platform = (vendor_id == 666) ? HARDWARE : QEMU;
-
-    /* Disable core#0 on QEMU because it is an E31 core without S-mode. */
-    if (earth->platform == QEMU && core_id == 0) {
-        release(boot_lock);
-        hang();
-    }
 
     if (booted_core_cnt++ == 0) {
         /* The first booted core needs to do some more work. */
@@ -56,6 +48,7 @@ void boot() {
 
         /* Call function core_set_idle, reset the timer, release the boot
          * lock, and wait for a timer interrupt using the wfi instruction. */
+        void core_set_idle(uint core);
 
         /* Student's code ends here. */
     }
