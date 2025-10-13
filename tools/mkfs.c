@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include "inode.h"
 
-char* egos_binaries[] = {"./qemu/egos.bin",
+char* egos_binaries[] = {"./egos.bin",
                          "../build/release/sys_proc.elf",
                          "../build/release/sys_terminal.elf",
                          "../build/release/sys_file.elf",

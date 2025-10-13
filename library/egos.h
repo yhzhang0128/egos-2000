@@ -62,7 +62,7 @@ extern struct grass* grass;
 #define ETHMAC_RX_BUFFER 0x90000000
 #define ETHMAC_TX_BUFFER 0x90001000
 #define SPI_BASE         (earth->platform == QEMU ? 0x10050000UL : 0xF0008800UL)
-#define UART_BASE        (earth->platform == QEMU ? 0x10010000UL : 0xF0001000UL)
+#define UART_BASE        (earth->platform == QEMU ? 0x10000000UL : 0xF0001000UL)
 #define CLINT_BASE       (earth->platform == QEMU ? 0x02000000UL : 0xF0010000UL)
 
 /* Below are some common macros/declarations for I/O, multicore and printing. */

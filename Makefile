@@ -30,6 +30,7 @@ LDFLAGS     = -nostdlib -lc -lgcc
 INCLUDE     = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/syscall
 CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
+QEMU_FLAGS  = -M virt -smp 4 -m 8M -bios tools/egos.bin -device sdhci-pci -drive if=none,file=tools/disk.img,format=raw,id=MMC -device sd-card,drive=MMC
 
 SYSAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/system/*.c)))
 USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/user/%.elf, $(notdir $(wildcard apps/user/*.c)))
@@ -54,20 +55,20 @@ $(USRAPP_ELFS): $(RELEASE)/user/%.elf : apps/user/%.c $(APPS_DEPS)
 
 install: egos
 	@printf "$(GREEN)-------- Create the Disk & BootROM Image --------$(END)\n"
-	$(OBJCOPY) -O binary $(RELEASE)/egos.elf tools/qemu/egos.bin
+	$(OBJCOPY) -O binary $(RELEASE)/egos.elf tools/egos.bin
 	$(CC) tools/mkfs.c library/file/file$(FILESYS).c -DMKFS -DFILESYS=$(FILESYS) -DCPU_BIN_FILE="\"fpga/$(BOARD).bin\"" $(INCLUDE) -o tools/mkfs
 	cd tools; rm -f disk.img bootROM.bin; ./mkfs
 
 qemu: install
 	@printf "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)\n"
-	$(QEMU) -nographic -readconfig tools/qemu/config.toml
+	$(QEMU) -nographic $(QEMU_FLAGS)
 
 program: install
 	@printf "$(YELLOW)-------- Program the $(BOARD) on-board ROM --------$(END)\n"
 	openFPGALoader -b $(BOARD) -f tools/bootROM.bin
 
 clean:
-	rm -rf build tools/mkfs tools/mkrom tools/qemu/egos.bin tools/disk.img tools/bootROM.bin
+	rm -rf build tools/mkfs tools/mkrom tools/egos.bin tools/disk.img tools/bootROM.bin
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

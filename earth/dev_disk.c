@@ -9,155 +9,31 @@
 #include "disk.h"
 #include <string.h>
 
-#define LITEX_SPI_CONTROL 0UL
-#define LITEX_SPI_STATUS  4UL
-#define LITEX_SPI_MOSI    8UL
-#define LITEX_SPI_MISO    12UL
-#define LITEX_SPI_CS      16UL
-#define LITEX_SPI_CLKDIV  24UL
+#define SDHCI_PCI_ECAM_BASE   0x30008000
+#define SDHCI_BASE            0x40000000
+#define SDHCI_SOFTWARE_RESET  0x2F
+#define SDHCI_CAPABILITIES    0x40
+#define SDHCI_INT_STAT_ENABLE 0x34
+#define SDHCI_INT_SIG_ENABLE  0x38
 
-#define SIFIVE_SPI_CSDEF  20UL
-#define SIFIVE_SPI_CSMODE 24UL
-#define SIFIVE_SPI_TXDATA 72UL
-#define SIFIVE_SPI_RXDATA 76UL
+static __attribute__((aligned(BLOCK_SIZE))) char aligned_buf[BLOCK_SIZE];
 
-char spi_exchange(char byte) {
-    /* The "exchange" here means sending a byte and then receiving a byte. */
-    uint rxdata;
-    if (earth->platform == HARDWARE) {
-        REGW(SPI_BASE, LITEX_SPI_MOSI)    = byte;
-        REGW(SPI_BASE, LITEX_SPI_CONTROL) = (8 * (1 << 8) | (1));
-        while ((REGW(SPI_BASE, LITEX_SPI_STATUS) & 1) != 1);
-        rxdata = REGW(SPI_BASE, LITEX_SPI_MISO);
-    } else {
-        while (REGW(SPI_BASE, SIFIVE_SPI_TXDATA) & (1 << 31));
-        REGW(SPI_BASE, SIFIVE_SPI_TXDATA) = byte;
-        while ((rxdata = REGW(SPI_BASE, SIFIVE_SPI_RXDATA)) & (1 << 31));
-    }
-    return (char)(rxdata & 0xFF);
-}
-
-void spi_set_clock(uint freq) {
-#define CPU_CLOCK_RATE 100000000 /* 100MHz */
-    uint div                         = CPU_CLOCK_RATE / freq + 1;
-    REGW(SPI_BASE, LITEX_SPI_CLKDIV) = div;
-}
-
-static char sd_exec_cmd(char* cmd) {
-    /* Send a 6-byte SD card command through the SPI bus. */
-    for (uint i = 0; i < 6; i++) spi_exchange(cmd[i]);
-
-    for (uint reply, i = 0; i < 8000; i++)
-        if ((reply = spi_exchange(0xFF)) != 0xFF) return reply;
-
-    return 0xFF;
-}
-
-static char sd_exec_acmd(char* cmd) {
-    char cmd55[] = {0x77, 0x00, 0x00, 0x00, 0x00, 0xFF};
-    while (spi_exchange(0xFF) != 0xFF);
-    sd_exec_cmd(cmd55);
-
-    while (spi_exchange(0xFF) != 0xFF);
-    return sd_exec_cmd(cmd);
-}
-
-static void sd_read(uint offset, char* dst) {
-    /* QEMU uses the SD2 standard (offset is *byte* offset).
-     * Hardware uses the SDHC/SDXC standard (offset is *block* offset). */
-    if (earth->platform == QEMU) offset *= BLOCK_SIZE;
-
-    /* Wait until SD card is not busy. */
-    while (spi_exchange(0xFF) != 0xFF);
-
-    /* Send read request with cmd17. */
-    char* arg = (void*)&offset;
-    char reply, cmd17[] = {0x51, arg[3], arg[2], arg[1], arg[0], 0xFF};
-
-    if (reply = sd_exec_cmd(cmd17))
-        FATAL("SD card replies cmd17 with status 0x%.2x", reply);
-
-    /* Wait for the data packet and ignore the 2-byte checksum. */
-    while (spi_exchange(0xFF) != 0xFE);
-    for (uint i = 0; i < BLOCK_SIZE; i++) dst[i] = spi_exchange(0xFF);
-    spi_exchange(0xFF);
-    spi_exchange(0xFF);
-}
-
-static void sd_write(uint offset, char* src) {
-    /* QEMU uses the SD2 standard (offset is *byte* offset).
-     * Hardware uses the SDHC/SDXC standard (offset is *block* offset). */
-    if (earth->platform == QEMU) offset *= BLOCK_SIZE;
-
-    /* Wait until SD card is not busy. */
-    while (spi_exchange(0xFF) != 0xFF);
-
-    /* Send write request with cmd24. */
-    char* arg = (void*)&offset;
-    char reply, cmd24[] = {0x58, arg[3], arg[2], arg[1], arg[0], 0xFF};
-    if (reply = sd_exec_cmd(cmd24))
-        FATAL("SD card replies cmd24 with status %.2x", reply);
-
-    /* Transfer 1-byte buffer before writing block. */
-    spi_exchange(0xFF);
-
-    /* Send data packet: token + block + dummy 2-byte checksum. */
-    spi_exchange(0xFE);
-    for (uint i = 0; i < BLOCK_SIZE; i++) spi_exchange(src[i]);
-    spi_exchange(0xFF);
-    spi_exchange(0xFF);
-
-    /* Wait for SD card ack of data packet. */
-    while ((reply = spi_exchange(0xFF)) == 0xFF);
-    if ((reply & 0x1F) != 0x05)
-        FATAL("SD card write ack with status 0x%.2x", reply);
-}
+static void sd_read(uint offset, char* dst) { FATAL("sd_read end."); }
 
 static int sd_init() {
-    /* Configure the SPI controller. */
-    INFO("Set the CS pin to HIGH and toggle clock");
-    if (earth->platform == HARDWARE) {
-        spi_set_clock(400000);
-        REGW(SPI_BASE, LITEX_SPI_CS) = 0;
-        for (uint i = 0; i < 1000; i++) spi_exchange(0xFF);
-        REGW(SPI_BASE, LITEX_SPI_CS) = 1;
-    } else {
-        REGW(SPI_BASE, SIFIVE_SPI_CSMODE) = 1;
-        for (uint i = 0; i < 1000; i++) spi_exchange(0xFF);
-        REGW(SPI_BASE, SIFIVE_SPI_CSDEF) = 1;
-    }
+    /* Set the PCI ECAM base address register as SDHCI_BASE */
+    REGW(SDHCI_PCI_ECAM_BASE, 0x4)  = 0x2;
+    REGW(SDHCI_PCI_ECAM_BASE, 0x10) = SDHCI_BASE;
 
-    INFO("Set the CS pin to LOW and send cmd0 to SD card");
-    char reply, cmd0[] = {0x40, 0x00, 0x00, 0x00, 0x00, 0x95};
-    if ((reply = sd_exec_cmd(cmd0)) == 0xFF) return -1;
-    while (reply != 0x01) reply = spi_exchange(0xFF);
-    while (spi_exchange(0xFF) != 0xFF);
+    /* Reset the SD card */
+    REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) = 0x1;
+    while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x1);
 
-    INFO("Check SD card type and voltage with cmd8");
-    char cmd8[] = {0x48, 0x00, 0x00, 0x01, 0xAA, 0x87};
-    reply       = sd_exec_cmd(cmd8);
+    /* Enable only interrupts served by the SD controller */
+    REGW(SDHCI_BASE, SDHCI_INT_STAT_ENABLE) = 0x27F003B;
+    /* Mask all SDHCI interrupt sources */
+    REGW(SDHCI_BASE, SDHCI_INT_SIG_ENABLE) = 0x0;
 
-    if (reply & 0x04) {
-        FATAL("Only SD2/SDHC/SDXC cards are supported");
-    } else {
-        /* We only need the last byte of the r7 response. */
-        uint payload;
-        for (uint i = 0; i < 4; i++)
-            ((char*)&payload)[3 - i] = spi_exchange(0xFF);
-        INFO("SD card replies cmd8 with status %d", reply);
-
-        if ((payload & 0xFFF) != 0x1AA) FATAL("Fail to check SD card type");
-    }
-    while (spi_exchange(0xFF) != 0xFF);
-
-    char acmd41[] = {0x69, 0x40, 0x00, 0x00, 0x00, 0xFF};
-    while (sd_exec_acmd(acmd41));
-    while (spi_exchange(0xFF) != 0xFF);
-
-    if (earth->platform == HARDWARE) {
-        INFO("Set the SPI clock to 20MHz for the SD card");
-        spi_set_clock(20000000);
-    }
     return 0;
 }
 
@@ -181,16 +57,7 @@ void disk_read(uint block_no, uint nblocks, char* dst) {
 }
 
 void disk_write(uint block_no, uint nblocks, char* src) {
-    if (type == FLASH_ROM) FATAL("disk_write: Writing to ROM");
-
-    /* Student's code goes here (Serial Device Driver). */
-
-    /* Replace the loop below by writing multiple SD card
-     * blocks altogether using the cmd25 SD card command. */
-    for (uint i = 0; i < nblocks; i++)
-        sd_write(block_no + i, src + BLOCK_SIZE * i);
-
-    /* Student's code ends here. */
+    FATAL("disk_write is not implemented");
 }
 
 void disk_init() {
