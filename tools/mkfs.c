@@ -30,7 +30,7 @@ char* egos_binaries[] = {"./egos.bin",
                          "../build/release/sys_terminal.elf",
                          "../build/release/sys_file.elf",
                          "../build/release/sys_shell.elf",
-                         "./screenshots/Bohr.bmp" /* for the VGA demo */};
+                         "./images/Bohr.bmp" /* for the VGA demo app */};
 #define EGOS_BIN_NUM ((sizeof(egos_binaries) / sizeof(char*)))
 
 char bin_dir[256] = "./   6 ../   0 ";

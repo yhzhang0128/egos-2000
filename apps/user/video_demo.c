@@ -4,9 +4,9 @@
  *
  * Description: a simple video output demo
  * This app only runs on the FPGA boards. It reads the BMP image file
- * tools/screenshots/Bohr.bmp and displays the image through VGA/HDMI
- * video output onto a monitor. Both the image and VGA/HDMI output are
- * 800*600 pixels. The sifive_u machine in QEMU does not support video.
+ * tools/images/Bohr.bmp and displays the image through the VGA or HDMI
+ * video output onto a monitor. Both the image and VGA/HDMI are 800*600
+ * pixels. The virt machine in QEMU supports a VGA display as well.
  */
 
 #include "app.h"
@@ -16,7 +16,7 @@
 #define VRES 600
 
 int main() {
-    /* This is tools/screenshots/Bohr.bmp loaded into the boot ROM by mkfs.c. */
+    /* This is tools/images/Bohr.bmp loaded into the boot ROM by mkfs.c. */
     char* rgb = (char*)(0x20400000 + EGOS_BIN_MAX_NBYTE * 5) +
                 (56 + HRES * VRES * 3) - 3;
 

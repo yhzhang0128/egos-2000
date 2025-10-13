@@ -7,7 +7,7 @@ This project's vision is to help **every** student read **all** the code of a te
 With only **2000** lines of code, egos-2000 implements every component of a teaching operating system that runs on both QEMU and RISC-V boards.
 The [EGOS book](https://egos.fun/book/overview.html) contains 9 course projects based on egos-2000.
 
-![Fail to load an image of egos-2000.](tools/screenshots/egos-2000.jpg)
+![Fail to load an image of egos-2000.](tools/images/egos-2000.jpg)
 
 ```shell
 # The cloc utility is used to count the lines of code.
