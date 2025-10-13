@@ -14,12 +14,14 @@
 #define SDHCI_ARGUMENT         0x08
 #define SDHCI_CMD_AND_MODE     0x0C
 #define SDHCI_PRESENT_STATE    0x24
+#define SDHCI_CLKCON           0x2C
 #define SDHCI_SOFTWARE_RESET   0x2F
 #define SDHCI_INT_STAT         0x30
 #define SDHCI_INT_STAT_ENABLE  0x34
 #define SDHCI_INT_SIG_ENABLE   0x38
 
 static void sdhci_read(uint offset, char* dst) {
+    offset = 0;
     /* Wait until the SD controller to be ready for a new command. */
     while (REGW(SDHCI_BASE, SDHCI_PRESENT_STATE) & 0x3);
 
@@ -32,8 +34,9 @@ static void sdhci_read(uint offset, char* dst) {
     REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) = (1 << 16) | BLOCK_SIZE;
 
     /* Send and wait for a read request with command #17. */
-    REGW(SDHCI_BASE, SDHCI_ARGUMENT)     = offset;
-    REGW(SDHCI_BASE, SDHCI_CMD_AND_MODE) = (17 << 24) | (2 << 16) | 0x11;
+    REGW(SDHCI_BASE, SDHCI_ARGUMENT) = offset;
+    REGW(SDHCI_BASE, SDHCI_CMD_AND_MODE) =
+        (((17 << 8) | (1 << 5)) << 16) | 0x11;
     while (!(REGW(SDHCI_BASE, SDHCI_INT_STAT) & 0x1));
 
     for (int i = 0; i < 32; i++) {
@@ -42,17 +45,18 @@ static void sdhci_read(uint offset, char* dst) {
             printf("%x ", REGW(aligned_buf, i * 16 + j * 4));
         printf("\n");
     }
-    FATAL("sd_read end.");
+    FATAL("sd_read end off=%d, aligned_buf=0x%x.", offset, aligned_buf);
 }
 
 static int sdhci_init() {
     /* Set the PCI ECAM base address register as SDHCI_BASE. */
-    REGW(SDHCI_PCI_ECAM, 0x4)  = 0x2;
+    REGW(SDHCI_PCI_ECAM, 0x4)  = 0x6;
     REGW(SDHCI_PCI_ECAM, 0x10) = SDHCI_BASE;
 
-    /* Reset the SD card */
+    /* Reset the SD card and enable clock. */
     REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) = 0x1;
     while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x1);
+    REGB(SDHCI_BASE, SDHCI_CLKCON) = 0x5;
 
     /* Enable only interrupts served by the SD controller. */
     REGW(SDHCI_BASE, SDHCI_INT_STAT_ENABLE) = 0x27F003B;
