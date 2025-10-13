@@ -68,7 +68,7 @@ program: install
 	openFPGALoader -b $(BOARD) -f tools/bootROM.bin
 
 clean:
-	rm -rf build tools/mkfs tools/mkrom tools/egos.bin tools/disk.img tools/bootROM.bin
+	rm -rf build tools/egos.bin tools/mkfs tools/disk.img tools/bootROM.bin
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

@@ -18,10 +18,8 @@
 #define SDHCI_INT_STAT         0x30
 #define SDHCI_INT_STAT_ENABLE  0x34
 #define SDHCI_INT_SIG_ENABLE   0x38
-#define SDHCI_CAPABILITIES     0x40
 
 static void sdhci_read(uint offset, char* dst) {
-    INFO("SD capabilities %x", REGW(SDHCI_BASE, SDHCI_CAPABILITIES));
     /* Wait until the SD controller to be ready for a new command. */
     while (REGW(SDHCI_BASE, SDHCI_PRESENT_STATE) & 0x3);
 
@@ -177,6 +175,7 @@ void disk_read(uint block_no, uint nblocks, char* dst) {
 }
 
 void disk_write(uint block_no, uint nblocks, char* src) {
+    if (type == FLASH_ROM) FATAL("FLASH_ROM is read only");
     /* Student's code goes here (Serial Device Driver). */
 
     /* Implement SD card write with the SPI and PCIe buses. */
@@ -189,12 +188,12 @@ void disk_init() {
     earth->disk_read  = disk_read;
     earth->disk_write = disk_write;
 
-    if (earth->platform == HARDWARE) {
+    if (earth->platform == QEMU) {
+        /* QEMU uses the PCI bus and the SDHCI standard. */
+        sdhci_init();
+    } else {
         /* Hardware uses the SPI bus to control SD card. */
         type = (sdspi_init() == 0) ? SD_CARD : FLASH_ROM;
         if (type == FLASH_ROM) CRITICAL("Using FLASH_ROM instead of SD_CARD");
-    } else {
-        /* QEMU uses the PCI bus and the SDHCI standard. */
-        sdhci_init();
     }
 }
