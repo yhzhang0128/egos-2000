@@ -20,24 +20,34 @@
 #define SDHCI_INT_STAT_ENABLE  0x34
 #define SDHCI_INT_SIG_ENABLE   0x38
 
-static void sdhci_read(uint offset, char* dst) {
-    offset = 0;
+#define SDHCI_READ_DMA_MODE 0x11
+#define SDHCI_DATA_PRESENT  0x20
+
+static char sdhci_exec_cmd(uint idx, uint arg, uint mode, uchar flag) {
     /* Wait until the SD controller to be ready for a new command. */
     while (REGW(SDHCI_BASE, SDHCI_PRESENT_STATE) & 0x3);
 
     /* Clear the interrupt status register. */
     REGW(SDHCI_BASE, SDHCI_INT_STAT) = 0xFFFFFFFF;
 
+    REGW(SDHCI_BASE, SDHCI_ARGUMENT)     = arg;
+    REGW(SDHCI_BASE, SDHCI_CMD_AND_MODE) = (((idx << 8) | flag) << 16) | mode;
+
+    while (!(REGW(SDHCI_BASE, SDHCI_INT_STAT) & 0x1));
+}
+
+static void sdhci_read(uint offset, char* dst) {
     /* Prepare DMA (SDMA mode of SDHCI). */
     static __attribute__((aligned(BLOCK_SIZE))) char aligned_buf[BLOCK_SIZE];
     REGW(SDHCI_BASE, SDHCI_DMA_ADDRESS)      = (uint)aligned_buf;
     REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) = (1 << 16) | BLOCK_SIZE;
 
     /* Send and wait for a read request with command #17. */
-    REGW(SDHCI_BASE, SDHCI_ARGUMENT) = offset;
-    REGW(SDHCI_BASE, SDHCI_CMD_AND_MODE) =
-        (((17 << 8) | (1 << 5)) << 16) | 0x11;
-    while (!(REGW(SDHCI_BASE, SDHCI_INT_STAT) & 0x1));
+    sdhci_exec_cmd(17, offset, SDHCI_READ_DMA_MODE, SDHCI_DATA_PRESENT);
+    REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) = 0x2;
+    while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x2);
+    REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) = 0x4;
+    while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x4);
 
     for (int i = 0; i < 32; i++) {
         printf("#%d: ", i);
