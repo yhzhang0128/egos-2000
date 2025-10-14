@@ -2,7 +2,7 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: generate disk image (disk.img) and ROM image (bootROM.bin)
+ * Description: generate disk image (disk.img) and ROM image (fpgaROM.bin)
  * The disk image should be exactly 4MB:
  *     2MB holds the executables of EGOS and system servers;
  *     2MB is managed by a file system.
@@ -30,7 +30,7 @@ char* egos_binaries[] = {"./egos.bin",
                          "../build/release/sys_terminal.elf",
                          "../build/release/sys_file.elf",
                          "../build/release/sys_shell.elf",
-                         "./images/Bohr.bmp" /* for the VGA demo app */};
+                         "./images/Bohr.bmp" /* for the video demo app */};
 #define EGOS_BIN_NUM ((sizeof(egos_binaries) / sizeof(char*)))
 
 char bin_dir[256] = "./   6 ../   0 ";
@@ -128,21 +128,25 @@ int main() {
     printf("[INFO] Load ino=%ld, %s\n", BIN_DIR_INODE, bin_dir);
 
     /* Generate the disk image file. */
-    int fd    = open("disk.img", O_CREAT | O_WRONLY, 0666);
-    int size1 = write(fd, exec, SIZE_2MB);
-    int size2 = write(fd, fs, SIZE_2MB);
+    int fd  = open("disk.img", O_CREAT | O_WRONLY, 0666);
+    int sz1 = write(fd, exec, SIZE_2MB);
+    sz1 += write(fd, fs, SIZE_2MB);
     close(fd);
-    assert(size1 + size2 == SIZE_2MB * 2);
-    printf("[INFO] Finish making the disk image (tools/disk.img)\n");
 
-    /* Generate the ROM image file. */
-    fd = open("bootROM.bin", O_CREAT | O_WRONLY, 0666);
+    /* Generate the ROM image files. */
+    fd = open("fpgaROM.bin", O_CREAT | O_WRONLY, 0666);
     assert(load_file(CPU_BIN_FILE, vexriscv) < SIZE_2MB * 2);
-    int size0 = write(fd, vexriscv, SIZE_2MB * 2);
-    size1     = write(fd, exec, SIZE_2MB);
-    size2     = write(fd, fs, SIZE_2MB);
+    int sz2 = write(fd, vexriscv, SIZE_2MB * 2);
+    sz2 += write(fd, exec, SIZE_2MB);
+    sz2 += write(fd, fs, SIZE_2MB);
     close(fd);
-    assert(size0 + size1 + size2 == SIZE_2MB * 4);
-    printf("[INFO] Finish making the boot ROM binary (tools/bootROM.bin)\n");
+
+    fd      = open("qemuROM.bin", O_CREAT | O_WRONLY, 0666);
+    int sz3 = write(fd, exec, SIZE_2MB);
+    for (int i = 0; i < 15; i++) sz3 += write(fd, fs, SIZE_2MB);
+    close(fd);
+
+    assert(sz1 == SIZE_2MB * 2 && sz2 == SIZE_2MB * 4 && sz3 == SIZE_2MB * 16);
+    printf("[INFO] Finish making the image files\n");
     return 0;
 }

@@ -72,7 +72,7 @@ The `BOARD` in the command below can be `arty_a7_35t`, `arty_a7_100t`, `arty_s7_
 > cd $EGOS/egos-2000
 > make program BOARD=tangnano20k
 -------- Program the tangnano20k on-board ROM --------
-openFPGALoader -b tangnano20k -f tools/bootROM.bin
+openFPGALoader -b tangnano20k -f tools/fpgaROM.bin
 ......
 start addr: 00000000, end_addr: 00800000
 Erasing: [==================================================] 100.00%
@@ -108,7 +108,7 @@ You may need to register a Xilinx account, but the software is free.
 2. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window
 3. In the "Hardware" window, right click `xc7a35t` and click "Add Configuration Memory Device"
 4. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
-5. In the "Configuration file" field, choose the `bootROM.bin` file created in step 2; Note that the [tutorial video](https://youtu.be/hCDMnGGyGqM) has shown how to generate this `bootROM.bin` file using Docker in Windows
+5. In the "Configuration file" field, choose the `fpgaROM.bin` file created in step 2; Note that the [tutorial video](https://youtu.be/hCDMnGGyGqM) has shown how to generate this `fpgaROM.bin` file using Docker in Windows
 6. Click "OK" and wait for the program to finish
 
 In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](https://digilent.com/reference/software/adept/start) or reinstall the USB cable drivers following [this post](https://support.xilinx.com/s/article/59128?language=en_US).

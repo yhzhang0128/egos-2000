@@ -12,11 +12,10 @@ void tty_init();
 void disk_init();
 void mmu_init();
 void intr_init(uint core_id);
+void grass_entry(uint core_id);
 
 struct grass* grass = (void*)GRASS_STRUCT_BASE;
 struct earth* earth = (void*)EARTH_STRUCT_BASE;
-
-void grass_entry(uint core_id);
 
 void boot() {
     uint core_id, vendor_id;

@@ -1,5 +1,3 @@
-📢 The first draft of the [EGOS book](https://egos.fun/book/overview.html) has been released which contains 9 course projects.
-
 ## Vision
 
 This project's vision is to help **every** student read **all** the code of a teaching operating system.
@@ -17,12 +15,12 @@ github.com/AlDanial/cloc v 1.94  T=0.05 s (949.3 files/s, 62349.4 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-C                               29            422            572           1596
+C                               29            422            573           1592
 C/C++ Header                     9             62             99            259
 Assembly                         3             14             46             92
-make                             1             15              7             53
+make                             1             16              7             57
 -------------------------------------------------------------------------------
-SUM:                            42            513            724           2000 (exactly!)
+SUM:                            42            514            725           2000 (exactly!)
 -------------------------------------------------------------------------------
 ```
 
