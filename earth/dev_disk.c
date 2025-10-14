@@ -21,18 +21,18 @@
 #define SDHCI_INT_STAT_ENABLE  0x34
 #define SDHCI_INT_SIG_ENABLE   0x38
 
-#define SDHCI_READ_DMA_MODE 0x11
-
-static char sdhci_exec_cmd(uint idx, uint arg, uint mode, uchar flag) {
+static char sdhci_exec_cmd(uint idx, uint arg, uchar flag, uint mode) {
     /* Wait until the SD controller to be ready for a new command. */
     while (REGW(SDHCI_BASE, SDHCI_PRESENT_STATE) & 0x3);
 
     /* Clear the interrupt status register. */
     REGW(SDHCI_BASE, SDHCI_INT_STAT) = 0xFFFFFFFF;
 
+    /* Issue the command. */
     REGW(SDHCI_BASE, SDHCI_ARGUMENT)     = arg;
     REGW(SDHCI_BASE, SDHCI_CMD_AND_MODE) = (((idx << 8) | flag) << 16) | mode;
 
+    /* Wait for the command to be completed. */
     while (!(REGW(SDHCI_BASE, SDHCI_INT_STAT) & 0x1));
 }
 
@@ -42,17 +42,12 @@ static void sdhci_read(uint offset, char* dst) {
     REGW(SDHCI_BASE, SDHCI_DMA_ADDRESS)      = (uint)aligned_buf;
     REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) = (1 << 16) | BLOCK_SIZE;
 
-    /* Send and wait for a read request with command #17. */
-    sdhci_exec_cmd(17, offset, SDHCI_READ_DMA_MODE, 0x20);
+/* Send and wait for a read request with command #17. */
+#define DATA_PRESENT        0x20
+#define READ_AND_DMA_ENABLE 0x11
+    sdhci_exec_cmd(17, offset * BLOCK_SIZE, DATA_PRESENT, READ_AND_DMA_ENABLE);
 
-    for (int i = 0; i < 32; i++) {
-        printf("#%d: ", i);
-        for (int j = 0; j < 4; j++)
-            printf("%x ", REGW(aligned_buf, i * 16 + j * 4));
-        printf("\n");
-    }
-
-    FATAL("sd_read end off=%d, aligned_buf=0x%x.", offset, aligned_buf);
+    memcpy(dst, aligned_buf, BLOCK_SIZE);
 }
 
 static int sdhci_init() {
@@ -65,22 +60,17 @@ static int sdhci_init() {
     while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x1);
     REGB(SDHCI_BASE, SDHCI_CLKCON) = 0x5;
 
-    /* Enable only interrupts served by the SD controller. */
+    /* Enable interrupt status, but not interrupt signal. */
+    REGW(SDHCI_BASE, SDHCI_INT_SIG_ENABLE)  = 0x0;
     REGW(SDHCI_BASE, SDHCI_INT_STAT_ENABLE) = 0x27F003B;
-    /* Mask all SDHCI interrupt sources. */
-    REGW(SDHCI_BASE, SDHCI_INT_SIG_ENABLE) = 0x0;
 
-    /* Some dirty reverse engineering, lol. */
-    sdhci_exec_cmd(55, 0, SDHCI_READ_DMA_MODE, 0);
-    sdhci_exec_cmd(41, 0xFFF0000, SDHCI_READ_DMA_MODE, 0);
-    /* SD is now in ready_state */
-    sdhci_exec_cmd(2, 0, SDHCI_READ_DMA_MODE, 0);
-    /* SD is now in identification_state */
-    sdhci_exec_cmd(3, 0, SDHCI_READ_DMA_MODE, 2);
-    /* SD is now in standby_state */
+    /* A simplified SDHCI initialization tailored for QEMU. */
+    sdhci_exec_cmd(55, 0, 0, 0);
+    sdhci_exec_cmd(41, 0xFFF0000, 0, 0);
+    sdhci_exec_cmd(2, 0, 0, 0);
+    sdhci_exec_cmd(3, 0, 2, 0); /* 2 means getting response. */
     uint rca = REGW(SDHCI_BASE, SDHCI_RESPONSE0);
-    sdhci_exec_cmd(7, rca, SDHCI_READ_DMA_MODE, 0);
-    /* SD is now in sd_transfer_state */
+    sdhci_exec_cmd(7, rca, 0, 0);
 }
 
 #define LITEX_SPI_CONTROL 0UL

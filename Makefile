@@ -30,7 +30,6 @@ LDFLAGS     = -nostdlib -lc -lgcc
 INCLUDE     = -Ilibrary -Ilibrary/elf -Ilibrary/file -Ilibrary/libc -Ilibrary/syscall
 CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sections -fdata-sections -fdiagnostics-show-option
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
-QEMU_FLAGS  = -M virt -smp 4 -m 8M -bios tools/egos.bin -device sdhci-pci,addr=0x1 -device sd-card,drive=MMC -drive if=none,file=tools/disk.img,format=raw,id=MMC
 
 SYSAPP_ELFS = $(patsubst %.c, $(RELEASE)/%.elf, $(notdir $(wildcard apps/system/*.c)))
 USRAPP_ELFS = $(patsubst %.c, $(RELEASE)/user/%.elf, $(notdir $(wildcard apps/user/*.c)))
@@ -61,7 +60,7 @@ install: egos
 
 qemu: install
 	@printf "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)\n"
-	$(QEMU) -nographic $(QEMU_FLAGS)
+	$(QEMU) -nographic -M virt -smp 4 -m 8M -bios tools/egos.bin -device sdhci-pci,addr=0x1 -device sd-card,drive=MMC -drive if=none,file=tools/disk.img,format=raw,id=MMC
 
 program: install
 	@printf "$(YELLOW)-------- Program the $(BOARD) on-board ROM --------$(END)\n"

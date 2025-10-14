@@ -109,7 +109,9 @@ void pagetable_identity_map(int pid) {
     setup_identity_region(pid, UART_BASE, 1, USER_RWX);   /* UART  */
     setup_identity_region(pid, SPI_BASE, 1, USER_RWX);    /* SPI   */
 
-    if (earth->platform == HARDWARE) {
+    if (earth->platform == QEMU) {
+        setup_identity_region(pid, SDHCI_BASE, 1, USER_RWX);
+    } else {
         setup_identity_region(pid, BOARD_FLASH_ROM, 1024, USER_RWX);
         setup_identity_region(pid, ETHMAC_CSR_BASE, 1, USER_RWX);
         setup_identity_region(pid, ETHMAC_TX_BUFFER, 1, USER_RWX);
