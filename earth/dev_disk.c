@@ -12,6 +12,7 @@
 #define SDHCI_DMA_ADDRESS      0x00
 #define SDHCI_BLK_CNT_AND_SIZE 0x04
 #define SDHCI_ARGUMENT         0x08
+#define SDHCI_RESPONSE0        0x10
 #define SDHCI_CMD_AND_MODE     0x0C
 #define SDHCI_PRESENT_STATE    0x24
 #define SDHCI_CLKCON           0x2C
@@ -21,7 +22,6 @@
 #define SDHCI_INT_SIG_ENABLE   0x38
 
 #define SDHCI_READ_DMA_MODE 0x11
-#define SDHCI_DATA_PRESENT  0x20
 
 static char sdhci_exec_cmd(uint idx, uint arg, uint mode, uchar flag) {
     /* Wait until the SD controller to be ready for a new command. */
@@ -43,11 +43,7 @@ static void sdhci_read(uint offset, char* dst) {
     REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) = (1 << 16) | BLOCK_SIZE;
 
     /* Send and wait for a read request with command #17. */
-    sdhci_exec_cmd(17, offset, SDHCI_READ_DMA_MODE, SDHCI_DATA_PRESENT);
-    REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) = 0x2;
-    while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x2);
-    REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) = 0x4;
-    while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x4);
+    sdhci_exec_cmd(17, offset, SDHCI_READ_DMA_MODE, 0x20);
 
     for (int i = 0; i < 32; i++) {
         printf("#%d: ", i);
@@ -55,6 +51,7 @@ static void sdhci_read(uint offset, char* dst) {
             printf("%x ", REGW(aligned_buf, i * 16 + j * 4));
         printf("\n");
     }
+
     FATAL("sd_read end off=%d, aligned_buf=0x%x.", offset, aligned_buf);
 }
 
@@ -72,6 +69,18 @@ static int sdhci_init() {
     REGW(SDHCI_BASE, SDHCI_INT_STAT_ENABLE) = 0x27F003B;
     /* Mask all SDHCI interrupt sources. */
     REGW(SDHCI_BASE, SDHCI_INT_SIG_ENABLE) = 0x0;
+
+    /* Some dirty reverse engineering, lol. */
+    sdhci_exec_cmd(55, 0, SDHCI_READ_DMA_MODE, 0);
+    sdhci_exec_cmd(41, 0xFFF0000, SDHCI_READ_DMA_MODE, 0);
+    /* SD is now in ready_state */
+    sdhci_exec_cmd(2, 0, SDHCI_READ_DMA_MODE, 0);
+    /* SD is now in identification_state */
+    sdhci_exec_cmd(3, 0, SDHCI_READ_DMA_MODE, 2);
+    /* SD is now in standby_state */
+    uint rca = REGW(SDHCI_BASE, SDHCI_RESPONSE0);
+    sdhci_exec_cmd(7, rca, SDHCI_READ_DMA_MODE, 0);
+    /* SD is now in sd_transfer_state */
 }
 
 #define LITEX_SPI_CONTROL 0UL
