@@ -13,7 +13,7 @@ static void sys_proc_read(uint block_no, char* dst) {
     earth->disk_read(SYS_PROC_EXEC_START + block_no, 1, dst);
 }
 
-void grass_entry() {
+void grass_entry(uint core_id) {
     SUCCESS("Enter the grass layer");
 
     /* Initialize the grass interface. */
@@ -34,6 +34,7 @@ void grass_entry() {
     proc_set_running(proc_alloc());
     earth->mmu_switch(GPID_PROCESS);
     earth->mmu_flush_cache();
+    core_to_proc_idx[core_id] = 1;
 
     /* Jump to the first instruction of process GPID_PROCESS. */
     uint mstatus, M_MODE = 3, U_MODE = 0;

@@ -123,12 +123,6 @@ int main() {
         /* Understand the Gigabit Ethernet Controller (GEM) on QEMU
          * and send the UDP network packet through the emulated GEM. */
 
-        /* Reference#1: GEM in the sifive_u machine:
-         * https://github.com/qemu/qemu/blob/stable-9.0/include/hw/riscv/sifive_u.h#L54
-         * Reference#2: GEM memory-mapped I/O registers:
-         * https://github.com/qemu/qemu/blob/stable-9.0/hw/net/cadence_gem.c#L1422
-         */
-
         /* Student's code ends here. */
     } else {
         char* txbuffer = (void*)(ETHMAC_TX_BUFFER);

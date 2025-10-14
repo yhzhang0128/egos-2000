@@ -16,7 +16,7 @@ void intr_init(uint core_id);
 struct grass* grass = (void*)GRASS_STRUCT_BASE;
 struct earth* earth = (void*)EARTH_STRUCT_BASE;
 
-void grass_entry();
+void grass_entry(uint core_id);
 
 void boot() {
     uint core_id, vendor_id;
@@ -37,7 +37,7 @@ void boot() {
         intr_init(core_id);
         SUCCESS("Finished initializing the MMU, timer and interrupts");
 
-        grass_entry();
+        grass_entry(core_id);
     } else {
         SUCCESS("--- Core #%d starts running ---", core_id);
 
@@ -46,9 +46,8 @@ void boot() {
         /* Initialize the MMU and interrupts on this CPU core.
          * Read mmu_init() and intr_init(), and decide what to do here. */
 
-        /* Call function core_set_idle, reset the timer, release the boot
-         * lock, and wait for a timer interrupt using the wfi instruction. */
-        void core_set_idle(uint core);
+        /* Reset the timer, release the boot lock, and then hang the core
+           by waiting for a timer interrupt using the wfi instruction. */
 
         /* Student's code ends here. */
     }

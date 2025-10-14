@@ -12,8 +12,8 @@
 #define SDHCI_DMA_ADDRESS      0x00
 #define SDHCI_BLK_CNT_AND_SIZE 0x04
 #define SDHCI_ARGUMENT         0x08
-#define SDHCI_RESPONSE0        0x10
 #define SDHCI_CMD_AND_MODE     0x0C
+#define SDHCI_RESPONSE0        0x10
 #define SDHCI_PRESENT_STATE    0x24
 #define SDHCI_CLKCON           0x2C
 #define SDHCI_SOFTWARE_RESET   0x2F
@@ -42,10 +42,11 @@ static void sdhci_read(uint offset, char* dst) {
     REGW(SDHCI_BASE, SDHCI_DMA_ADDRESS)      = (uint)aligned_buf;
     REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) = (1 << 16) | BLOCK_SIZE;
 
-/* Send and wait for a read request with command #17. */
-#define DATA_PRESENT        0x20
-#define READ_AND_DMA_ENABLE 0x11
-    sdhci_exec_cmd(17, offset * BLOCK_SIZE, DATA_PRESENT, READ_AND_DMA_ENABLE);
+#define DATA_PRESENT_FLAG         0x20
+#define READ_WITH_DMA_ENABLE_MODE 0x11
+    /* Send and wait for a read request with command #17. */
+    sdhci_exec_cmd(17, offset * BLOCK_SIZE, DATA_PRESENT_FLAG,
+                   READ_WITH_DMA_ENABLE_MODE);
 
     memcpy(dst, aligned_buf, BLOCK_SIZE);
 }
@@ -64,11 +65,12 @@ static int sdhci_init() {
     REGW(SDHCI_BASE, SDHCI_INT_SIG_ENABLE)  = 0x0;
     REGW(SDHCI_BASE, SDHCI_INT_STAT_ENABLE) = 0x27F003B;
 
+#define READ_SD_RESPONSE_FLAG 0x02
     /* A simplified SDHCI initialization tailored for QEMU. */
     sdhci_exec_cmd(55, 0, 0, 0);
     sdhci_exec_cmd(41, 0xFFF0000, 0, 0);
     sdhci_exec_cmd(2, 0, 0, 0);
-    sdhci_exec_cmd(3, 0, 2, 0); /* 2 means getting response. */
+    sdhci_exec_cmd(3, 0, READ_SD_RESPONSE_FLAG, 0);
     uint rca = REGW(SDHCI_BASE, SDHCI_RESPONSE0);
     sdhci_exec_cmd(7, rca, 0, 0);
 }

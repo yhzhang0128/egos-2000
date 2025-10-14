@@ -30,7 +30,6 @@ struct process {
 };
 
 ulonglong mtime_get();
-void core_set_idle(uint);
 
 int proc_alloc();
 void proc_free(int);
@@ -43,3 +42,5 @@ void mlfq_reset_level();
 void mlfq_update_level(struct process* p, ulonglong runtime);
 void proc_sleep(int pid, uint usec);
 void proc_coresinfo();
+
+extern uint core_to_proc_idx[NCORES];
