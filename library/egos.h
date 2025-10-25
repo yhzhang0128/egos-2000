@@ -59,12 +59,12 @@ extern struct grass* grass;
 #define SDHCI_PCI_ECAM   0x30008000 /* QEMU */
 #define SDHCI_BASE       0x40000000 /* QEMU */
 #define SDSPI_BASE       0xF0008800 /* Hardware */
-#define ETHMAC_CSR_BASE  0xF0002000 /* Hardware */
-#define ETHMAC_RX_BUFFER 0x90000000 /* Hardware */
-#define ETHMAC_TX_BUFFER 0x90001000 /* Hardware */
+#define NIC_RX_BUFFER    0x90000000 /* Hardware */
+#define NIC_TX_BUFFER    0x90001000 /* Hardware */
+#define NIC_BASE         (earth->platform == QEMU ? 0x41000000UL : 0xF0002000UL)
 #define UART_BASE        (earth->platform == QEMU ? 0x10000000UL : 0xF0001000UL)
 #define CLINT_BASE       (earth->platform == QEMU ? 0x02000000UL : 0xF0010000UL)
-#define BOARD_FLASH_ROM  (earth->platform == QEMU ? 0x22000000UL : 0x20400000UL)
+#define FLASH_ROM_BASE   (earth->platform == QEMU ? 0x22000000UL : 0x20400000UL)
 #define VIDEO_FRAME_BASE (earth->platform == QEMU ? 0x42000000UL : 0x80600000UL)
 
 /* Below are some common macros/declarations for I/O, multicore and printing. */

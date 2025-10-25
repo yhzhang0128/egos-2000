@@ -18,7 +18,7 @@
 
 int main() {
     /* This is tools/images/Bohr.bmp loaded into the ROM image by mkfs.c. */
-    char* rgb = (char*)(BOARD_FLASH_ROM + EGOS_BIN_MAX_NBYTE * 5) +
+    char* rgb = (char*)(FLASH_ROM_BASE + EGOS_BIN_MAX_NBYTE * 5) +
                 (56 + HRES * VRES * 3) - 3;
 
     /* The resolution for VGA/HDMI video output is 800*600. */

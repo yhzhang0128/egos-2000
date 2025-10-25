@@ -166,7 +166,7 @@ static enum disk_type { SD_CARD, FLASH_ROM } type;
 
 void disk_read(uint block_no, uint nblocks, char* dst) {
     if (type == FLASH_ROM) {
-        char* src = (char*)BOARD_FLASH_ROM + block_no * BLOCK_SIZE;
+        char* src = (char*)FLASH_ROM_BASE + block_no * BLOCK_SIZE;
         memcpy(dst, src, nblocks * BLOCK_SIZE);
         return;
     }
