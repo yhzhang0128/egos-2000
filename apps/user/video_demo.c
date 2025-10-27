@@ -6,7 +6,7 @@
  * This app reads the BMP image file tools/images/Bohr.bmp and displays
  * this image onto a monitor through VGA or HDMI. This app works on the
  * FPGA boards, while QEMU requires some more code initializing the VGA
- * device. See QEMU_GRAPHIC in Makefile and QEMU's official document on
+ * device. See QEMU_GRAPHIC in Makefile and QEMU's document on standard
  * VGA device: https://www.qemu.org/docs/master/specs/standard-vga.html
  */
 

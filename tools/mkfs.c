@@ -143,7 +143,8 @@ int main() {
 
     fd      = open("qemuROM.bin", O_CREAT | O_WRONLY, 0666);
     int sz3 = write(fd, exec, SIZE_2MB);
-    for (int i = 0; i < 15; i++) sz3 += write(fd, fs, SIZE_2MB);
+    for (uint i = 0; i < 15; i++) sz3 += write(fd, fs, SIZE_2MB);
+    /* Simply pad the image to 32MB which is required by QEMU. */
     close(fd);
 
     assert(sz1 == SIZE_2MB * 2 && sz2 == SIZE_2MB * 4 && sz3 == SIZE_2MB * 16);

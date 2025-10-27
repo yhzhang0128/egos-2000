@@ -9,6 +9,9 @@
 #include "disk.h"
 #include <string.h>
 
+/* See the "SD Host Controller Simplified Specification" (Part A2) document
+   from the SD Association (https://www.sdcard.org/downloads/pls/) in which
+   Chapter 2 "SD Host Standard Register" defines the register offsets below. */
 #define SDHCI_DMA_ADDRESS      0x00
 #define SDHCI_BLK_CNT_AND_SIZE 0x04
 #define SDHCI_ARGUMENT         0x08
