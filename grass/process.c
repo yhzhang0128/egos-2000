@@ -24,7 +24,7 @@ void proc_set_pending(int pid) { proc_set_status(pid, PROC_PENDING_SYSCALL); }
 
 int proc_alloc() {
     static uint curr_pid = 0;
-    for (uint i = 0; i < MAX_NPROCESS; i++)
+    for (uint i = 1; i <= MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid    = ++curr_pid;
             proc_set[i].status = PROC_LOADING;
@@ -88,7 +88,6 @@ void proc_sleep(int pid, uint usec) {
 }
 
 void proc_coresinfo() {
-    extern uint core_to_proc_idx[NCORES + 1];
     /* Student's code goes here (Multicore & Locks). */
 
     /* Print out the pid of the process running on each CPU core. */

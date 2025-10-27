@@ -123,15 +123,9 @@ int main() {
         /* Understand the Gigabit Ethernet Controller (GEM) on QEMU
          * and send the UDP network packet through the emulated GEM. */
 
-        /* Reference#1: GEM in the sifive_u machine:
-         * https://github.com/qemu/qemu/blob/stable-9.0/include/hw/riscv/sifive_u.h#L54
-         * Reference#2: GEM memory-mapped I/O registers:
-         * https://github.com/qemu/qemu/blob/stable-9.0/hw/net/cadence_gem.c#L1422
-         */
-
         /* Student's code ends here. */
     } else {
-        char* txbuffer = (void*)(ETHMAC_TX_BUFFER);
+        char* txbuffer = (void*)(NIC_TX_BUFFER);
         memcpy(txbuffer, &eth_frame, sizeof(struct ethernet_frame));
 
         /* CRC is another checksum for the ETHMAC device on the Arty board. */
@@ -148,13 +142,13 @@ int main() {
 #define ETHMAC_CSR_SLOT_WRITE     0x24
 #define ETHMAC_CSR_SLOT_LEN_WRITE 0x28
 
-        while (!(REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_READY)));
-        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_WRITE) = 0;
+        while (!(REGW(NIC_BASE, ETHMAC_CSR_READY)));
+        REGW(NIC_BASE, ETHMAC_CSR_SLOT_WRITE) = 0;
         /* ETHMAC provides 2 TX slots. */
         /* TX slot#0 is at 0x90001000 (txbuffer). */
         /* TX slot#1 is at 0x90001800 (not used). */
-        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_SLOT_LEN_WRITE) = txlen;
-        REGW(ETHMAC_CSR_BASE, ETHMAC_CSR_START_WRITE)    = 1;
+        REGW(NIC_BASE, ETHMAC_CSR_SLOT_LEN_WRITE) = txlen;
+        REGW(NIC_BASE, ETHMAC_CSR_START_WRITE)    = 1;
     }
 
     return 0;

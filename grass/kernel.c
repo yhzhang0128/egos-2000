@@ -11,13 +11,9 @@
 #include <string.h>
 
 uint core_in_kernel;
-uint core_to_proc_idx[NCORES + 1];
-/* QEMU has cores with ID #1 .. #NCORES. */
-/* Hardware has cores with ID #0 .. #NCORES-1. */
-
+uint core_to_proc_idx[NCORES];
 struct process proc_set[MAX_NPROCESS + 1];
-void core_set_idle(uint core) { core_to_proc_idx[core] = MAX_NPROCESS; }
-/* proc_set[MAX_NPROCESS] is a place holder for idle cores. */
+/* proc_set[0] is a place holder for idle cores. */
 
 #define curr_proc_idx core_to_proc_idx[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
@@ -114,7 +110,7 @@ static void proc_yield() {
         /* [Multicore & Locks]
          * Release the kernel lock.
          * [Multicore & Locks | System Call & Protection]
-         * Set curr_proc_idx to MAX_NPROCESS; Reset the timer;
+         * Set curr_proc_idx to 0; Reset the timer;
          * Enable interrupts by setting the mstatus.MIE bit to 1;
          * Wait for the next interrupt using the wfi instruction. */
 
