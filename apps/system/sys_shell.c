@@ -6,7 +6,6 @@
  */
 
 #include "app.h"
-#include <string.h>
 
 int parse_request(char* buf, struct proc_request* req) {
     uint idx = 0, nargs = 0;

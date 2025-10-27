@@ -59,6 +59,7 @@ extern struct grass* grass;
 #define SDHCI_PCI_ECAM   0x30008000 /* QEMU */
 #define SDHCI_BASE       0x40000000 /* QEMU */
 #define SDSPI_BASE       0xF0008800 /* Hardware */
+#define NIC_PCI_ECAM     0x30018000 /* QEMU */
 #define NIC_RX_BUFFER    0x90000000 /* Hardware */
 #define NIC_TX_BUFFER    0x90001000 /* Hardware */
 #define NIC_BASE         (earth->platform == QEMU ? 0x41000000UL : 0xF0002000UL)

@@ -9,7 +9,6 @@
 
 #include "app.h"
 #include "egos.h"
-#include <string.h>
 
 int main() {
     memset((void*)APPS_PAGES_BASE, 0, RAM_END - APPS_PAGES_BASE);

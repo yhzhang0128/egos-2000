@@ -8,7 +8,6 @@
 
 #include "app.h"
 #include "inode.h"
-#include <string.h>
 
 int getsize(inode_intf bs, uint ino) { return FILE_SYS_DISK_SIZE / BLOCK_SIZE; }
 

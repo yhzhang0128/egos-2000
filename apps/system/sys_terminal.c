@@ -7,7 +7,6 @@
  */
 
 #include "app.h"
-#include "string.h"
 
 int main() {
     SUCCESS("Enter kernel process GPID_TERMINAL");
