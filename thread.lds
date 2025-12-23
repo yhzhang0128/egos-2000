@@ -45,5 +45,5 @@ SECTIONS
         PROVIDE( __heap_start = . );
     } >ram :ram
 
-    PROVIDE( __heap_max = 0x80200000 );
+    PROVIDE( __heap_end = 0x80200000 );
 }

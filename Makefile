@@ -11,14 +11,14 @@ CFLAGS      = -march=rv32ima_zicsr -mabi=ilp32 -Wl,--gc-sections -ffunction-sect
 DEBUG_FLAGS = --source --all-headers --demangle --line-numbers --wide
 
 all:
-	@echo "$(YELLOW)-------- Compile Multi-threading --------$(END)"
-	$(RISCV_CC) $(CFLAGS) thread.s context.s thread.c queue.c -Tthread.lds $(LDFLAGS) -o thread.elf
+	@printf "$(YELLOW)-------- Compile Multi-threading --------$(END)\n"
+	$(RISCV_CC) $(CFLAGS) thread.s thread.c -Tthread.lds $(LDFLAGS) -o thread.elf
 	$(OBJDUMP) $(DEBUG_FLAGS) thread.elf > thread.lst
 	$(OBJCOPY) -O binary thread.elf thread.bin
 
 qemu: all
-	@echo "$(YELLOW)-------- Run Multi-threading on QEMU --------$(END)"
-	$(QEMU) -nographic -machine virt -smp 1 -bios thread.bin
+	@printf "$(YELLOW)-------- Run Multi-threading on QEMU --------$(END)\n"
+	$(QEMU) -nographic -machine virt -smp 1 -m 4M -bios thread.bin
 
 clean:
 	rm -f hello.bin hello.lst hello.elf
