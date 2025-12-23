@@ -18,7 +18,7 @@ all:
 
 qemu: all
 	@printf "$(YELLOW)-------- Run Hello-World on QEMU --------$(END)\n"
-	$(QEMU) -nographic -machine virt -smp 1 -bios hello.bin
+	$(QEMU) -nographic -machine virt -smp 1 -m 4M -bios hello.bin
 
 clean:
 	rm -f hello.bin hello.lst hello.elf
