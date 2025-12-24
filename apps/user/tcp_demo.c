@@ -24,44 +24,39 @@ void esp32_putc(char c) {
     ESP32_EVPEND        = 1;
 }
 
-char rep[4096];
-void esp32_get_reply() {
-    memset(rep, 0, 4096);
-    for (int i = 0; i == 0 || rep[i - 1] != '\n'; i++) esp32_getc(rep + i);
-}
-
-void esp32_wait_ok() {
-    do {
-        esp32_get_reply();
-        if (rep[0] != '\r') printf("Get ESP32 reply=%s", rep);
-    } while (strcmp(rep, "OK\r\n") != 0);
+void esp32_wait(const char* ack) {
+    char rep[1024] = {0};
+    for (int i = 0; i < 1024; i++) {
+        if (i >= strlen(ack) && strcmp(rep + i - strlen(ack), ack) == 0) break;
+        esp32_getc(rep + i);
+    }
+    printf("# Get ESP32 reply:\n\r%s", rep);
 }
 
 int main() {
     CRITICAL("Press the button on Pmod ESP32");
-    while (strcmp(rep, "ready\r\n") != 0) esp32_get_reply();
+    esp32_wait("ready\r\n");
 
-    SUCCESS("Set ESP32 to WiFi Station mode");
-    const char* mode_cmd = "AT+CWMODE=1\r\n";
-    for (int i = 0; i < 13; i++) esp32_putc(mode_cmd[i]);
-    esp32_wait_ok();
+    /* AT+CWMODE   sets ESP32 to WiFi station mode (mode=1)
+     * AT+CWJAP    connects to a WiFi with a password
+     * AT+CIPSTART establishes a TCP connection
+     * AT+CIPSEND  tells ESP32 the length of string hello
+     *
+     * Read this document for more details of AP commands:
+     * http://espressif.com/sites/default/files/documentation/esp32_at_instruction_set_and_examples_en.pdf
+     */
+    char* AP_cmds[] = {
+        "AT+CWMODE=1\r\n", "AT+CWJAP=\"3602\",\"yunhao0128\"\r\n",
+        "AT+CIPSTART=\"TCP\",\"192.168.0.212\",8002\r\n", "AT+CIPSEND=23\r\n"};
 
-    SUCCESS("Connect to WiFi");
-    const char* wifi_cmd = "AT+CWJAP=\"3602\",\"yunhao0128\"\r\n";
-    for (int i = 0; i < 30; i++) esp32_putc(wifi_cmd[i]);
-    esp32_wait_ok();
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < strlen(AP_cmds[i]); j++) esp32_putc(AP_cmds[i][j]);
+        esp32_wait("OK\r\n");
+    }
 
-    SUCCESS("Establish a TCP connection to 192.168.0.212:8002");
-    const char* tcp_cmd = "AT+CIPSTART=\"TCP\",\"192.168.0.212\",8002\r\n";
-    for (int i = 0; i < 40; i++) esp32_putc(tcp_cmd[i]);
-    esp32_wait_ok();
-
-    SUCCESS("Send a hello-world string through TCP");
-    const char* hello    = "Hello, World!\n";
-    const char* send_cmd = "AT+CIPSEND=14\r\n";
-    for (int i = 0; i < 15; i++) esp32_putc(send_cmd[i]);
-    esp32_wait_ok();
-    for (int i = 0; i < 14; i++) esp32_putc(hello[i]);
+    /* Send the hello string through the TCP connection over WiFi. */
+    char* hello = "Hello from egos-2000!\n\r";
+    for (int i = 0; i < strlen(hello); i++) esp32_putc(hello[i]);
 
     return 0;
 }
