@@ -25,43 +25,43 @@ void esp32_putc(char c) {
 }
 
 char rep[4096];
-void esp32_get_reply(){
+void esp32_get_reply() {
     memset(rep, 0, 4096);
-    for (int i = 0; i == 0 || rep[i - 1] != '\n'; i++) {
-        esp32_getc(rep + i);
-        //INFO("getc: %d", rep[i]);
-    }
+    for (int i = 0; i == 0 || rep[i - 1] != '\n'; i++) esp32_getc(rep + i);
+}
+
+void esp32_wait_ok() {
+    do {
+        esp32_get_reply();
+        if (rep[0] != '\r') printf("Get ESP32 reply=%s", rep);
+    } while (strcmp(rep, "OK\r\n") != 0);
 }
 
 int main() {
     CRITICAL("Press the button on Pmod ESP32");
     while (strcmp(rep, "ready\r\n") != 0) esp32_get_reply();
 
-    /* INFO("Reset the ESP32 device"); */
-    /* const char* rst_cmd = "AT+RST\r\n"; */
-    /* for (int i = 0; i < 8; i++) esp32_putc(rst_cmd[i]); */
-    /* do { */
-    /*     esp32_get_reply(); */
-    /*     if (rep[0] != '\r') printf("Get ESP32 reply=%s", rep); */
-    /* } while (strcmp(rep, "ready\r\n") != 0); */
-
-    INFO("Set ESP32 to WiFi Station mode");
+    SUCCESS("Set ESP32 to WiFi Station mode");
     const char* mode_cmd = "AT+CWMODE=1\r\n";
     for (int i = 0; i < 13; i++) esp32_putc(mode_cmd[i]);
-    do {
-        esp32_get_reply();
-        if (rep[0] != '\r') printf("Get ESP32 reply=%s", rep);
-    } while (strcmp(rep, "OK\r\n") != 0);
+    esp32_wait_ok();
 
-
-    INFO("Connect to WiFi");
+    SUCCESS("Connect to WiFi");
     const char* wifi_cmd = "AT+CWJAP=\"3602\",\"yunhao0128\"\r\n";
     for (int i = 0; i < 30; i++) esp32_putc(wifi_cmd[i]);
+    esp32_wait_ok();
 
-    do {
-        esp32_get_reply();
-        if (rep[0] != '\r') printf("Get ESP32 reply=%s", rep);
-    } while (strcmp(rep, "OK\r\n") != 0);
+    SUCCESS("Establish a TCP connection to 192.168.0.212:8002");
+    const char* tcp_cmd = "AT+CIPSTART=\"TCP\",\"192.168.0.212\",8002\r\n";
+    for (int i = 0; i < 40; i++) esp32_putc(tcp_cmd[i]);
+    esp32_wait_ok();
+
+    SUCCESS("Send a hello-world string through TCP");
+    const char* hello    = "Hello, World!\n";
+    const char* send_cmd = "AT+CIPSEND=14\r\n";
+    for (int i = 0; i < 15; i++) esp32_putc(send_cmd[i]);
+    esp32_wait_ok();
+    for (int i = 0; i < 14; i++) esp32_putc(hello[i]);
 
     return 0;
 }
