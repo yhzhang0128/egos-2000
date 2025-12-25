@@ -145,7 +145,7 @@ int main() {
     /* Send out the Ethernet frame. */
     if (earth->platform == HARDWARE) {
         /* LiteX's liteeth Ethernet Controller. */
-        char* txbuffer = (void*)(NIC_TX_BUFFER);
+        char* txbuffer = (void*)(ETH_TXBUF_BASE);
         /* LiteX ETHMAC provides 2 TX slots. */
         /* TX slot#0 is at 0x90001000 (txbuffer). */
         /* TX slot#1 is at 0x90001800 (not used). */
@@ -155,10 +155,10 @@ int main() {
         uint txlen                   = sizeof(struct ethernet_frame);
         *((uint*)(txbuffer + txlen)) = crc32(&txbuffer[8], txlen - 8);
 
-        while (!(REGW(NIC_BASE, 0x1C)));
-        REGW(NIC_BASE, 0x24) = 0;
-        REGW(NIC_BASE, 0x28) = txlen + sizeof(uint) /* crc32 */;
-        REGW(NIC_BASE, 0x18) = 1;
+        while (!(REGW(ETH_NET_BASE, 0x1C)));
+        REGW(ETH_NET_BASE, 0x24) = 0;
+        REGW(ETH_NET_BASE, 0x28) = txlen + sizeof(uint) /* crc32 */;
+        REGW(ETH_NET_BASE, 0x18) = 1;
     } else {
         /* Intel 82540EM Gigabit Ethernet Controller. */
         /* Student's code goes here (Ethernet & TCP/IP). */

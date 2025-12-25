@@ -6,7 +6,7 @@
  * This app connects to a WiFi with a password, and then sends a
  * hello-world string to a destination IP+TCP port. This app can
  * only run on the Arty boards with Pmod ESP32 inserted as shown
- * in the README picture. Choose software TLB and you shall see:
+ * in the README picture. Run tcp_demo, and you shall see:
     ➜ /home/yunhao tcp_demo
     [CRITICAL] Press the button on Pmod ESP32
     ESP32 runs AP command:
@@ -30,11 +30,10 @@
     OK
  * This app connects to WiFi "3602" with password "yunhao0128",
  * connects to 192.168.0.212:8002 using TCP, and sends 23 bytes.
+ * Here is a demo video: https://youtube.com/shorts/h7HIpzuhEJo
  */
 
 #include "app.h"
-
-#define ESP32_BASE 0xF0002000UL /* TODO: this conflicts with NIC_BASE */
 
 void esp32_wait(const char* ack, int print) {
     char reply[1024] = {0};
@@ -42,9 +41,9 @@ void esp32_wait(const char* ack, int print) {
         /* Stop if we get the ack string from ESP32. */
         if (i >= strlen(ack) && !strcmp(reply + i - strlen(ack), ack)) break;
         /* Get one more char from ESP32. */
-        while (REGW(ESP32_BASE, 8UL));
-        reply[i]               = REGW(ESP32_BASE, 0) & 0xFF;
-        REGW(ESP32_BASE, 16UL) = 2;
+        while (REGW(WIFI_BASE, 8UL));
+        reply[i]              = REGW(WIFI_BASE, 0) & 0xFF;
+        REGW(WIFI_BASE, 16UL) = 2;
     }
     if (print) printf("\x1B[1;32mESP32 runs AP command:\x1B[1;0m\n\r%s", reply);
 }
@@ -69,9 +68,9 @@ int main() {
 
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < strlen(AP_cmds[i]); j++) {
-            while (REGW(ESP32_BASE, 4UL));
-            REGW(ESP32_BASE, 0)    = AP_cmds[i][j];
-            REGW(ESP32_BASE, 16UL) = 1;
+            while (REGW(WIFI_BASE, 4UL));
+            REGW(WIFI_BASE, 0)    = AP_cmds[i][j];
+            REGW(WIFI_BASE, 16UL) = 1;
         }
 
         if (i != 4) esp32_wait("OK\r\n", 1);
