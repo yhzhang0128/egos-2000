@@ -29,7 +29,7 @@ void kernel_entry() {
 
     /* Save the process context. */
     asm("csrr %0, mepc" : "=r"(proc_set[curr_proc_idx].mepc));
-    memcpy(curr_saved, SAVED_REGISTER_ADDR, SAVED_REGISTER_SIZE);
+    memcpy(curr_saved, (void*)(EGOS_STACK_TOP - 32 * 4), 32 * 4);
 
     uint mcause;
     asm("csrr %0, mcause" : "=r"(mcause));
@@ -37,7 +37,7 @@ void kernel_entry() {
 
     /* Restore the process context. */
     asm("csrw mepc, %0" ::"r"(proc_set[curr_proc_idx].mepc));
-    memcpy(SAVED_REGISTER_ADDR, curr_saved, SAVED_REGISTER_SIZE);
+    memcpy((void*)(EGOS_STACK_TOP - 32 * 4), curr_saved, 32 * 4);
 }
 
 #define INTR_ID_TIMER   7
