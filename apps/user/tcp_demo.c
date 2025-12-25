@@ -10,16 +10,16 @@
 #define ESP32_BASE 0xF0002000UL /* TODO: this conflicts with NIC_BASE */
 
 void esp32_wait(const char* ack, int print) {
-    char rep[1024] = {0};
+    char reply[1024] = {0};
     for (int i = 0; i < 1024; i++) {
         /* Stop if we get the ack string from ESP32. */
-        if (i >= strlen(ack) && strcmp(rep + i - strlen(ack), ack) == 0) break;
+        if (i >= strlen(ack) && !strcmp(reply + i - strlen(ack), ack)) break;
         /* Get one more char from ESP32. */
         while (REGW(ESP32_BASE, 8UL));
-        rep[i]                 = REGW(ESP32_BASE, 0) & 0xFF;
+        reply[i]               = REGW(ESP32_BASE, 0) & 0xFF;
         REGW(ESP32_BASE, 16UL) = 2;
     }
-    if (print) printf("\x1B[1;32mESP32 runs AP command:\x1B[1;0m\n\r%s", rep);
+    if (print) printf("\x1B[1;32mESP32 runs AP command:\x1B[1;0m\n\r%s", reply);
 }
 
 int main() {

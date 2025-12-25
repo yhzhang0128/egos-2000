@@ -1,6 +1,7 @@
 #pragma once
 
 #include "servers.h"
+#include <string.h>
 
 enum syscall_type {
     SYS_UNUSED,

@@ -8,7 +8,6 @@
 #include "egos.h"
 #include "syscall.h"
 #include <stdlib.h>
-#include <string.h>
 
 static int sender;
 static char buf[SYSCALL_MSG_LEN];

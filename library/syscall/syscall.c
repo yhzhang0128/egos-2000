@@ -7,7 +7,6 @@
 
 #include "egos.h"
 #include "syscall.h"
-#include <string.h>
 
 static struct syscall* sc = (struct syscall*)SYSCALL_ARG;
 
