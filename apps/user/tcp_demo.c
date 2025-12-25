@@ -2,7 +2,34 @@
  * (C) 2025, Cornell University
  * All rights reserved.
  *
- * Description: a simple TCP demo over WiFi
+ * Description: a simple TCP demo over WiFi (Arty board only)
+ * This app connects to a WiFi with a password, and then sends a
+ * hello-world string to a destination IP+TCP port. This app can
+ * only run on the Arty boards with Pmod ESP32 inserted as shown
+ * in the README picture. Choose software TLB and you shall see:
+    ➜ /home/yunhao tcp_demo
+    [CRITICAL] Press the button on Pmod ESP32
+    ESP32 runs AP command:
+    AT+CWMODE=1
+
+    OK
+    ESP32 runs AP command:
+    AT+CWJAP="3602","yunhao0128"
+    WIFI CONNECTED
+    WIFI GOT IP
+
+    OK
+    ESP32 runs AP command:
+    AT+CIPSTART="TCP","192.168.0.212",8002
+    CONNECT
+
+    OK
+    ESP32 runs AP command:
+    AT+CIPSEND=23
+
+    OK
+ * This app connects to WiFi "3602" with password "yunhao0128",
+ * connects to 192.168.0.212:8002 using TCP, and sends 23 bytes.
  */
 
 #include "app.h"
