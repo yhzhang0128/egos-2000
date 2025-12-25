@@ -114,11 +114,9 @@ void pagetable_identity_map(int pid) {
 
     if (earth->platform == QEMU) {
         setup_identity_region(pid, SDHCI_BASE, 1, USER_RWX);
-        setup_identity_region(pid, NIC_PCI_ECAM, 1, USER_RWX);
     } else {
         setup_identity_region(pid, SDSPI_BASE, 1, USER_RWX);
         setup_identity_region(pid, NIC_TX_BUFFER, 1, USER_RWX);
-        setup_identity_region(pid, NIC_RX_BUFFER, 1, USER_RWX);
     }
 }
 
