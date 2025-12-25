@@ -161,27 +161,12 @@ int main() {
         REGW(NIC_BASE, 0x18) = 1;
     } else {
         /* Intel 82540EM Gigabit Ethernet Controller. */
-        REGW(NIC_PCI_ECAM, 0x4)  = 6;
-        REGW(NIC_PCI_ECAM, 0x10) = NIC_BASE;
+        /* Student's code goes here (Ethernet & TCP/IP). */
 
-        static char txbuffer[sizeof(struct ethernet_frame)];
-        memcpy(txbuffer, &eth_frame, sizeof(struct ethernet_frame));
+        /* Read the reference manual of Intel 82540EM Ethernet
+         * Controller, and send eth_frame through this device. */
 
-        static __attribute__((aligned(16))) char txdesc[16];
-        REGW(txdesc, 0)  = (uint)txbuffer;       /* addr   */
-        REGB(txdesc, 11) = REGB(txdesc, 11) | 5; /* cmd    */
-        REGB(txdesc, 12) = REGB(txdesc, 12) | 5; /* status */
-
-        REGW(NIC_BASE, 0x3800) = (uint)&txdesc;
-        REGW(NIC_BASE, 0x3808) = 16;       /* tx descriptor length */
-        REGW(NIC_BASE, 0x3818) = 0;        /* tx descriptor tail */
-        REGW(NIC_BASE, 0x410)  = 0x60100A; /* tx inter-packet gap time */
-        REGW(NIC_BASE, 0x400) |= 0x4010A;  /* tx control */
-
-        while (!(REGB(txdesc, 12) & 1));
-        REGB(txdesc, 12)       = REGB(txdesc, 12) & ~1;
-        REGB(txdesc, 8)        = sizeof(struct ethernet_frame);
-        REGW(NIC_BASE, 0x3818) = 1;
+        /* Student's code ends here. */
     }
 
     return 0;
