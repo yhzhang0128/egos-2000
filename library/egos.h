@@ -60,6 +60,7 @@ extern struct grass* grass;
 #define SDHCI_BASE       0x40000000 /* QEMU */
 #define SDSPI_BASE       0xF0008000 /* Hardware */
 #define WIFI_BASE        0xF0003000 /* Hardware */
+#define ETH_PCI_ECAM     0x30018000 /* QEMU */
 #define ETH_BUF_BASE     0x90000000 /* Hardware */
 #define ETH_CTL_BASE     (earth->platform == QEMU ? 0x41000000UL : 0xF0002000UL)
 #define UART_BASE        (earth->platform == QEMU ? 0x10000000UL : 0xF0001000UL)

@@ -113,6 +113,7 @@ void pagetable_identity_map(int pid) {
     setup_identity_region(pid, VIDEO_FRAME_BASE, 512, USER_RWX);
 
     if (earth->platform == QEMU) {
+        setup_identity_region(pid, ETH_PCI_ECAM, 1, USER_RWX);
         setup_identity_region(pid, SDHCI_BASE, 1, USER_RWX);
     } else {
         setup_identity_region(pid, SDSPI_BASE, 1, USER_RWX);
