@@ -31,7 +31,7 @@ trap_entry:
     li sp, 0x80200000
 
     /* Step3 */
-    addi sp, sp, -128 /* now, sp == SAVED_REGISTER_ADDR */
+    addi sp, sp, -128 /* now, sp == EGOS_STACK_TOP-32*4 */
     sw a0,  0(sp)
     sw a1,  4(sp)
     sw a2,  8(sp)

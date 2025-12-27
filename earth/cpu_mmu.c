@@ -106,19 +106,19 @@ void pagetable_identity_map(int pid) {
     for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
         setup_identity_region(pid, i, 1024, USER_RWX);
 
-    setup_identity_region(pid, NIC_BASE, 4, USER_RWX);
+    setup_identity_region(pid, ETH_CTL_BASE, 4, USER_RWX);
     setup_identity_region(pid, UART_BASE, 1, USER_RWX);
     setup_identity_region(pid, CLINT_BASE, 16, USER_RWX);
     setup_identity_region(pid, FLASH_ROM_BASE, 1024, USER_RWX);
     setup_identity_region(pid, VIDEO_FRAME_BASE, 512, USER_RWX);
 
     if (earth->platform == QEMU) {
+        setup_identity_region(pid, ETH_PCI_ECAM, 1, USER_RWX);
         setup_identity_region(pid, SDHCI_BASE, 1, USER_RWX);
-        setup_identity_region(pid, NIC_PCI_ECAM, 1, USER_RWX);
     } else {
         setup_identity_region(pid, SDSPI_BASE, 1, USER_RWX);
-        setup_identity_region(pid, NIC_TX_BUFFER, 1, USER_RWX);
-        setup_identity_region(pid, NIC_RX_BUFFER, 1, USER_RWX);
+        setup_identity_region(pid, WIFI_BASE, 1, USER_RWX);
+        setup_identity_region(pid, ETH_BUF_BASE, 2, USER_RWX);
     }
 }
 

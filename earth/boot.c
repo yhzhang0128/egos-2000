@@ -14,8 +14,8 @@ void mmu_init();
 void intr_init(uint core_id);
 void grass_entry(uint core_id);
 
-struct grass* grass = (void*)GRASS_STRUCT_BASE;
-struct earth* earth = (void*)EARTH_STRUCT_BASE;
+struct grass* grass = (void*)GRASS_STRUCT;
+struct earth* earth = (void*)EARTH_STRUCT;
 
 void boot() {
     uint core_id, vendor_id;
@@ -35,6 +35,17 @@ void boot() {
         mmu_init();
         intr_init(core_id);
         SUCCESS("Finished initializing the MMU, timer and interrupts");
+
+        /* Student's code goes here (I/O Device Driver). */
+
+        /* Initialize QEMU's standard VGA device for apps/user/video_demo.c.
+         * Start with https://www.qemu.org/docs/master/specs/standard-vga.html,
+         * and you could ask ChatGPT about the Bochs Dispi (Display Interface).
+         * Your driver should setup the PCI ECAM for VGA, and then set the VGA
+         * screen resolution to 800*600 pixels, each using 4 bytes for its RGB
+         * information. Lastly, initialize all the pixels with white color. */
+
+        /* Student's code ends here. */
 
         grass_entry(core_id);
     } else {

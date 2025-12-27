@@ -19,12 +19,11 @@ uint uart_rx_empty() {
 }
 
 void uart_getc(char* c) {
+    while (uart_rx_empty());
     if (earth->platform == HARDWARE) {
-        while (REGW(UART_BASE, LITEX_UART_RXEMPTY));
         *c                                 = REGW(UART_BASE, 0) & 0xFF;
         REGW(UART_BASE, LITEX_UART_EVPEND) = 2;
     } else {
-        while (!(REGB(UART_BASE, VIRT_LINE_STATUS) & (1 << 0)));
         *c = REGW(UART_BASE, 0) & 0xFF;
     }
 }

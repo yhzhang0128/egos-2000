@@ -1,4 +1,5 @@
-clang-format -style=file:tools/style/style.txt -i \
+clang-format -style=file:tools/style/style -i \
+./apps/user/tcp_demo.c \
 ./apps/user/udp_demo.c \
 ./apps/user/video_demo.c \
 ./apps/user/ls.c \

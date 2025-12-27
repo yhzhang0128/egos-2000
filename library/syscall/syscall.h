@@ -1,11 +1,11 @@
 #pragma once
 
 #include "servers.h"
+#include <string.h>
 
 enum syscall_type {
-    SYS_UNUSED,
-    SYS_RECV, /* 1 */
-    SYS_SEND, /* 2 */
+    SYS_RECV = 1,
+    SYS_SEND = 2,
 };
 
 #define SYSCALL_MSG_LEN 1024

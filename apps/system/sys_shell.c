@@ -41,8 +41,6 @@ int main() {
         } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;
             grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
-        } else if (strcmp(buf, "clear") == 0) {
-            printf("\e[1;1H\e[2J");
         } else if (strcmp(buf, "pwd") == 0) {
             printf("%s\n\r", workdir);
         } else {

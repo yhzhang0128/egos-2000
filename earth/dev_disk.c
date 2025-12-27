@@ -174,7 +174,7 @@ void disk_read(uint block_no, uint nblocks, char* dst) {
         return;
     }
 
-    /* Student's code goes here (Serial Device Driver). */
+    /* Student's code goes here (I/O Device Driver). */
 
     /* Replace the loop below by reading multiple SD card
      * blocks altogether using the SD card command #18. */
@@ -188,7 +188,7 @@ void disk_read(uint block_no, uint nblocks, char* dst) {
 
 void disk_write(uint block_no, uint nblocks, char* src) {
     if (type == FLASH_ROM) FATAL("FLASH_ROM is read only");
-    /* Student's code goes here (Serial Device Driver). */
+    /* Student's code goes here (I/O Device Driver). */
 
     /* Implement SD card write using SPI or SDHCI+PCI. */
 
