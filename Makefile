@@ -73,7 +73,7 @@ program: install
 	openFPGALoader -b $(BOARD) -f tools/fpgaROM.bin
 
 clean:
-	rm -rf build tools/egos.bin tools/mkfs tools/disk.img tools/fpgaROM.bin tools/qemuROM.bin
+	rm -rf build tools/egos.bin tools/mkfs tools/disk.img tools/fpgaROM.bin tools/qemuROM.bin hello.bin hello.lst hello.elf thread.bin thread.lst thread.elf
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m
