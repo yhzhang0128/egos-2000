@@ -2,7 +2,7 @@
  * (C) 2024, Cornell University
  * All rights reserved.
  *
- * Description: entry point of the bootloader
+ * Description: entry point and context switch
  */
     .section .text.enter
     .global _start, _end, ctx_start, ctx_switch

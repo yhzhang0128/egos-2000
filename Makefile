@@ -23,7 +23,7 @@ qemu: all
 clean:
 	rm -f hello.bin hello.lst hello.elf
 	rm -f thread.bin thread.lst thread.elf
-	rm -rf build earth/kernel_entry.lds tools/mkfs tools/mkrom tools/qemu/egos.bin tools/disk.img tools/bootROM.bin
+	rm -rf build tools/egos.bin tools/mkfs tools/disk.img tools/fpgaROM.bin tools/qemuROM.bin
 
 GREEN = \033[1;32m
 YELLOW = \033[1;33m

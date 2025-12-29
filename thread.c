@@ -1,6 +1,6 @@
-#include "hello.c"
-#include "thread.h"
 #include <sys/queue.h>
+#include "print.c"
+#include "thread.h"
 
 /* Student's code goes here (Cooperative Threads). */
 /* Define the TCB and helper functions (if needed) for multi-threading. */
@@ -19,7 +19,7 @@ void ctx_entry() {
     /* Student's code ends here. */
 }
 
-void thread_create(void (*entry)(void *arg), void *arg, int stack_size) {
+void thread_create(void (*entry)(void *arg), void *arg) {
     /* Student's code goes here (Cooperative Threads). */
 
     /* Student's code ends here. */
@@ -72,7 +72,7 @@ void produce(void* arg) {
         /* At this point, the buffer is not full. */
 
         /* Student's code goes here (Cooperative Threads). */
-        /* Print out the producer thread ID with the arg pointer. */
+        /* Print out the producer ID with the arg pointer. */
 
         /* Student's code ends here. */
         buffer[tail] = arg;
@@ -88,7 +88,7 @@ void consume(void *arg) {
         /* At this point, the buffer is not empty. */
 
         /* Student's code goes here (Cooperative Threads). */
-        /* Print out the consumer thread ID with the arg pointer. */
+        /* Print out the consumer ID with the arg pointer. */
 
         /* Student's code ends here. */
         void* result = buffer[head];
@@ -105,17 +105,18 @@ int main() {
     for (int i = 0; i < 500; i++) ID[i] = i;
 
     for (int i = 0; i < 500; i++)
-        thread_create(consume, ID + i, STACK_SIZE);
+        thread_create(consume, ID + i);
 
     for (int i = 0; i < 500; i++)
-        thread_create(produce, ID + i, STACK_SIZE);
+        thread_create(produce, ID + i);
 
     printf("main thread exits\n\r");
     thread_exit();
 
-    /* The control flow should NOT get here. If the main thread is the last one
-     * calling thread_exit(), thread_exit() should then call _end() in thread.s.
+    /* The control flow should NEVER get here. If the main thread is the last to
+     * call thread_exit(), thread_exit() should terminate the program by calling
+     * the _end() in thread.s.
      * If the main thread is not the last, thread_exit() will switch the context
-     * to another thread. Later, when all threads have called thread_exit(), the
-     * last thread calling it should then call _end(). */
+     * to another thread. Later, when all the threads have called thread_exit(),
+     * the last one calling it should then call _end() within thread_exit(). */
 }
