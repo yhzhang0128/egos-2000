@@ -1,3 +1,10 @@
+/*
+ * (C) 2026, Cornell University
+ * All rights reserved.
+ *
+ * Description: cooperative multithreading and synchronization
+ */
+
 #include <sys/queue.h>
 #include "print.c"
 #include "thread.h"

@@ -1,5 +1,10 @@
-/* Code in this file is copy-pasted from P0: Hello, World!
- * You can copy-paste your P0 solution code into this file. */
+/*
+ * (C) 2026, Cornell University
+ * All rights reserved.
+ *
+ * Description: code in this file is copy-pasted from P0.
+ * You can copy-paste your P0 solution code into this file.
+ */
 
 void terminal_write(const char *str, int len) {
     for (int i = 0; i < len; i++) {
