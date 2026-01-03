@@ -20,20 +20,20 @@ It supports microSD and HDMI though.
 
 Setup your working directory and name it as `$EGOS`.
 
-```shell-session
-> export EGOS=/home/yunhao/egos
-> cd $EGOS
-> git clone https://github.com/yhzhang0128/egos-2000.git
+```shell
+export EGOS=/home/yunhao/egos
+cd $EGOS
+git clone https://github.com/yhzhang0128/egos-2000.git
 ```
 
 Download the [pre-built binaries of the RISC-V GNU compiler toolchain](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack/releases/tag/v14.2.0-3) from xPack to `$EGOS` and compile egos-2000.
 
-```shell-session
-> cd $EGOS
-> tar -zxf xpack-riscv-none-elf-gcc-14.2.0-3-{linux,darwin}-{x64,arm64}.tar.gz
-> export PATH=$PATH:$EGOS/xpack-riscv-none-elf-gcc-14.2.0-3/bin
-> cd $EGOS/egos-2000
-> make
+```shell
+cd $EGOS
+tar -zxf xpack-riscv-none-elf-gcc-14.2.0-3-{linux,darwin}-{x64,arm64}.tar.gz
+export PATH=$PATH:$EGOS/xpack-riscv-none-elf-gcc-14.2.0-3/bin
+cd $EGOS/egos-2000
+make
 ......
 ```
 
@@ -42,11 +42,11 @@ Download the [pre-built binaries of the RISC-V GNU compiler toolchain](https://g
 Download the [pre-built binaries of QEMU](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v8.2.2-1) from xPack.
 
 ```shell-session
-> cd $EGOS
-> tar -zxf xpack-qemu-riscv-8.2.2-1-xxxxxx.tar.gz
-> export PATH=$PATH:$EGOS/xpack-qemu-riscv-8.2.2-1-xxxxxx/bin
-> cd $EGOS/egos-2000
-> make qemu
+$ cd $EGOS
+$ tar -zxf xpack-qemu-riscv-8.2.2-1-xxxxxx.tar.gz
+$ export PATH=$PATH:$EGOS/xpack-qemu-riscv-8.2.2-1-xxxxxx/bin
+$ cd $EGOS/egos-2000
+$ make qemu
 -------- Simulate on QEMU-RISCV --------
 qemu-system-riscv32 -nographic -readconfig tools/qemu/config.toml
 [CRITICAL] --- Booting on QEMU with core #4 ---
@@ -71,8 +71,8 @@ Install **openFPGALoader** with [Homebrew](https://formulae.brew.sh/formula/open
 The `BOARD` in the command below can be `arty_a7_35t`, `arty_a7_100t`, `arty_s7_50`, or `tangnano20k`.
 
 ```shell-session
-> cd $EGOS/egos-2000
-> make program BOARD=tangnano20k
+$ cd $EGOS/egos-2000
+$ make program BOARD=tangnano20k
 -------- Program the tangnano20k on-board ROM --------
 openFPGALoader -b tangnano20k -f tools/fpgaROM.bin
 ......
@@ -86,8 +86,8 @@ Done
 To connect with the egos-2000 TTY:
 
 ```shell-session
-> sudo chmod 666 /dev/ttyUSB1
-> screen /dev/ttyUSB1 115200
+$ sudo chmod 666 /dev/ttyUSB1
+$ screen /dev/ttyUSB1 115200
 ......
 --============== Boot ==================--
 [INFO] LiteX + VexRiscv (vendorid: 666)
