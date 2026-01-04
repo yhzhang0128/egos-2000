@@ -41,12 +41,12 @@ make
 
 Download the [pre-built binaries of QEMU](https://github.com/xpack-dev-tools/qemu-riscv-xpack/releases/tag/v8.2.2-1) from xPack.
 
-```shell-session
-$ cd $EGOS
-$ tar -zxf xpack-qemu-riscv-8.2.2-1-xxxxxx.tar.gz
-$ export PATH=$PATH:$EGOS/xpack-qemu-riscv-8.2.2-1-xxxxxx/bin
-$ cd $EGOS/egos-2000
-$ make qemu
+```console
+> cd $EGOS
+> tar -zxf xpack-qemu-riscv-8.2.2-1-xxxxxx.tar.gz
+> export PATH=$PATH:$EGOS/xpack-qemu-riscv-8.2.2-1-xxxxxx/bin
+> cd $EGOS/egos-2000
+> make qemu
 -------- Simulate on QEMU-RISCV --------
 qemu-system-riscv32 -nographic -readconfig tools/qemu/config.toml
 [CRITICAL] --- Booting on QEMU with core #4 ---
@@ -70,9 +70,9 @@ To use a microSD card on the board, program the microSD card with `disk.img` usi
 Install **openFPGALoader** with [Homebrew](https://formulae.brew.sh/formula/openfpgaloader) on MacOS or [this guide](https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-Doc/flash-in-linux.html) on Linux.
 The `BOARD` in the command below can be `arty_a7_35t`, `arty_a7_100t`, `arty_s7_50`, or `tangnano20k`.
 
-```shell-session
-$ cd $EGOS/egos-2000
-$ make program BOARD=tangnano20k
+```console
+> cd $EGOS/egos-2000
+> make program BOARD=tangnano20k
 -------- Program the tangnano20k on-board ROM --------
 openFPGALoader -b tangnano20k -f tools/fpgaROM.bin
 ......
@@ -85,9 +85,9 @@ Done
 
 To connect with the egos-2000 TTY:
 
-```shell-session
-$ sudo chmod 666 /dev/ttyUSB1
-$ screen /dev/ttyUSB1 115200
+```console
+> sudo chmod 666 /dev/ttyUSB1
+> screen /dev/ttyUSB1 115200
 ......
 --============== Boot ==================--
 [INFO] LiteX + VexRiscv (vendorid: 666)
