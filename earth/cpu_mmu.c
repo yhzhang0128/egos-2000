@@ -134,15 +134,16 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      * +---------------+---------+--------+------------------------------------+
      * | 0x80000000    | 512     | 2 MB   | EGOS region (code+data+heap+stack) |
      * | 0x80200000    | 512     | 2 MB   | Apps region (code+data+heap+stack) |
-     * | 0x80400000    | 1024    | 4 MB   | Free memory and video framebuffer  |
+     * | 0x80400000    | 512     | 2 MB   | Initially free memory              |
      * | CLINT_BASE    | 16      | 64 KB  | Memory-mapped registers for timer  |
      * | UART_BASE     | 1       | 4 KB   | Memory-mapped registers for TTY    |
-     * | SPI_BASE      | 1       | 4 KB   | Memory-mapped registers for SD     |
+     * | SDHCI_BASE    | 1       | 4 KB   | Memory-mapped registers for SD     |
      *
      *   Case#2: pid >= GPID_USER_START
      * | Start Address | # Pages | Size   | Explanation                        |
      * +---------------+---------+--------+------------------------------------+
      * | 0x80302000    | 1       | 4 KB   | Work dir (see apps/app.h)          |
+     * You may also map the regions for the Ethernet, WiFi and VGA/HDMI devices.
      *
      * (2) After building page tables for pid (or if page tables for pid exist),
      *     update the page tables and map vpage_no to ppage_id based on Sv32. */
