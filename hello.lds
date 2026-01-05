@@ -38,7 +38,7 @@ SECTIONS
         *(.sbss*)
         *(.bss .bss.*)
         *(COMMON)
-    } >ram :ram 
+    } >ram :ram
 
     .heap (NOLOAD) : ALIGN(8) {
         PROVIDE( __heap_start = . );
