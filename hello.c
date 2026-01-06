@@ -64,7 +64,7 @@ int main() {
     /* Uncomment this line of code
      * when implementing formatted output
      */
-    /* printf("%s-%u is awesome!\n\r", "egos", 2000); */
+    /* printf("%s-%d is awesome!\n\r", "egos", 2000); */
 
     return 0;
 }
