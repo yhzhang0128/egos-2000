@@ -29,7 +29,8 @@
 
     OK
  * This app connects to WiFi "3602" with password "yunhao0128",
- * connects to 192.168.0.212:8002 using TCP, and sends 23 bytes.
+ * establishs a TCP connection to 192.168.0.212:8002, and sends
+ * the string "Hello from egos-2000!\n\r" to the TCP connection.
  * Here is a demo video: https://youtube.com/shorts/h7HIpzuhEJo
  */
 
@@ -56,7 +57,7 @@ int main() {
      *     AT+CWMODE   sets ESP32 to the WiFi station mode;
      *     AT+CWJAP    connects to a WiFi with a password;
      *     AT+CIPSTART establishes a TCP connection;
-     *     AT+CIPSEND  asks ESP32 to send a 23-byte string.
+     *     AT+CIPSEND  sends a string to the TCP connection.
      *
      * Read this document for more details on AP commands:
      * http://espressif.com/sites/default/files/documentation/esp32_at_instruction_set_and_examples_en.pdf
