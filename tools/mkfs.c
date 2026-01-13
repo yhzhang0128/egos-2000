@@ -43,7 +43,7 @@ char* contents[]  = {
     "With only 2000 lines of code, egos-2000 implements boot loader, SD card "
      "driver, tty driver, virtual memory with page tables, interrupt and "
      "exception handling, preemptive scheduler, system call, file system, "
-     "shell, an Ethernet/UDP demo, several user commands, and the mkfs tool. "
+     "shell, Ethernet & WiFi demos, several user commands, and the mkfs tool. "
      "Moreover, the EGOS book (https://egos.fun) contains 9 course projects.",
     bin_dir};
 #define BIN_DIR_INODE ((sizeof(contents) / sizeof(char*)) - 1)
