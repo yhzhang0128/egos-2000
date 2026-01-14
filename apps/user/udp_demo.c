@@ -64,9 +64,7 @@ struct checksum_fields {
 } __attribute__((packed));
 
 static ushort checksum(uint r, char* ptr, uint length, int complete) {
-    length >>= 1;
-
-    for (int i = 0; i < length; i++)
+    for (int i = 0; i < length / 2; i++)
         r += ((uint)(ptr[2 * i]) << 8) | (uint)(ptr[2 * i + 1]);
 
     /* Add overflows */
@@ -103,8 +101,7 @@ int main() {
     };
     /* clang-format on */
 
-    /* Setup payload. */
-    if (sizeof(HELLO_MSG) & 1) FATAL("Please send a message with even length");
+    /* Setup payload: eth_frame.payload needs to have an even length. */
     memcpy(eth_frame.payload, HELLO_MSG, sizeof(HELLO_MSG));
 
     /* Calculate the IP checksum. */

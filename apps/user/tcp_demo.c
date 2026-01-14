@@ -25,12 +25,17 @@
 
     OK
     ESP32 runs AP command:
-    AT+CIPSEND=23
+    AT+CIPSEND=22
+
+    OK
+    ESP32 runs AP command:
+    AT+CIPCLOSE
+    CLOSED
 
     OK
  * This app connects to WiFi "3602" with password "yunhao0128",
  * establishs a TCP connection to 192.168.0.212:8002, and sends
- * the string "Hello from egos-2000!\n\r" to the TCP connection.
+ * string "Hello from egos-2000!\n" through the TCP connection.
  * Here is a demo video: https://youtube.com/shorts/h7HIpzuhEJo
  */
 
@@ -53,28 +58,31 @@ int main() {
     CRITICAL("Press the button on Pmod ESP32");
     esp32_wait("ready\r\n", 0);
 
-    /* This app runs 4 AP commands on ESP32:
+    /* This app runs 5 AP commands on ESP32:
      *     AT+CWMODE   sets ESP32 to the WiFi station mode;
      *     AT+CWJAP    connects to a WiFi with a password;
      *     AT+CIPSTART establishes a TCP connection;
-     *     AT+CIPSEND  sends a string to the TCP connection.
+     *     AT+CIPSEND  sends a string to the TCP connection;
+     *     AT+CIPCLOSE closes the TCP connection.
      *
      * Read this document for more details on AP commands:
      * http://espressif.com/sites/default/files/documentation/esp32_at_instruction_set_and_examples_en.pdf
      */
-    char* AP_cmds[] = {"AT+CWMODE=1\r\n",
-                       "AT+CWJAP=\"3602\",\"yunhao0128\"\r\n",
-                       "AT+CIPSTART=\"TCP\",\"192.168.0.212\",8002\r\n",
-                       "AT+CIPSEND=23\r\n", "Hello from egos-2000!\n\r"};
+    const char* AP_cmds[] = {"AT+CWMODE=1\r\n",
+                             "AT+CWJAP=\"3602\",\"yunhao0128\"\r\n",
+                             "AT+CIPSTART=\"TCP\",\"192.168.0.212\",8002\r\n",
+                             "AT+CIPSEND=22\r\n",
+                             "Hello from egos-2000!\n",
+                             "AT+CIPCLOSE\r\n"};
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
         for (int j = 0; j < strlen(AP_cmds[i]); j++) {
             while (REGW(WIFI_BASE, 4UL));
             REGW(WIFI_BASE, 0)    = AP_cmds[i][j];
             REGW(WIFI_BASE, 16UL) = 1;
         }
 
-        if (i != 4) esp32_wait("OK\r\n", 1);
+        esp32_wait("OK\r\n", i != 4);
     }
 
     return 0;
