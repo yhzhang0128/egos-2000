@@ -23,7 +23,7 @@
 #define DEST_MAC  {0xae, 0xc9, 0x06, 0x72, 0xb2, 0x64}
 #define LOCAL_MAC {0x10, 0xe2, 0xd5, 0x00, 0x00, 0x00}
 uint dest_ip = IPTOINT(192, 168, 18, 1), dest_udp_port = 8002;
-uint local_ip = IPTOINT(192, 168, 1, 50), local_udp_port = 8001;
+uint local_ip = IPTOINT(192, 168, 18, 2), local_udp_port = 8001;
 
 /* Student's code ends here. */
 
