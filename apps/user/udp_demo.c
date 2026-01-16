@@ -11,14 +11,14 @@
 
 #include "app.h"
 
-#define HELLO_MSG "Hello from egos-2000!\n\r"
-
-/* Define the Mac addresses, IP addresses and UDP ports. */
-#define LOCAL_MAC           {0x10, 0xe2, 0xd5, 0x00, 0x00, 0x00}
-#define DEST_MAC            {0x98, 0x48, 0x27, 0x51, 0x53, 0x1e}
+#define HELLO_MSG           "Hello from egos-2000!\n\r"
 #define IPTOINT(a, b, c, d) ((a << 24) | (b << 16) | (c << 8) | d)
 
-uint dest_ip = IPTOINT(192, 168, 0, 212), dest_udp_port = 8002;
+/* Define the Mac addresses, IP addresses and UDP ports. */
+#define DEST_MAC {0xae, 0xc9, 0x06, 0x72, 0xb2, 0x64}
+uint dest_ip = IPTOINT(192, 168, 18, 1), dest_udp_port = 8002;
+
+#define LOCAL_MAC {0x10, 0xe2, 0xd5, 0x00, 0x00, 0x00}
 uint local_ip = IPTOINT(192, 168, 1, 50), local_udp_port = 8001;
 
 /* Define the data structures for an Ethernet frame. */

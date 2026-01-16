@@ -61,8 +61,10 @@ install: egos
 QEMU_MACHINE = -M virt -smp 4 -m 8M -bios tools/egos.bin
 QEMU_GRAPHIC = -nographic# -device VGA,addr=0x2 -serial mon:stdio
 QEMU_FLASH_1 = -drive if=pflash,format=raw,unit=1,file=tools/qemuROM.bin
-QEMU_ETH_NET = -device e1000,netdev=E1000,addr=0x3 -netdev socket,id=E1000,listen=:1234
 QEMU_SD_CARD = -device sdhci-pci,addr=0x1 -device sd-card,drive=MMC -drive if=none,file=tools/disk.img,format=raw,id=MMC
+
+# Create and use a virtual Ethernet device on MacOS.
+QEMU_ETH_NET = -device e1000,netdev=E1000,addr=0x3 -netdev vmnet-host,id=E1000
 
 qemu: install
 	@printf "$(YELLOW)-------- Simulate on QEMU-RISCV --------$(END)\n"
