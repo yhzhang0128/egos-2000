@@ -82,7 +82,7 @@ int main() {
             REGW(WIFI_BASE, 16UL) = 1;
         }
 
-        esp32_wait("OK\r\n", i != 4);
+        esp32_wait("OK\r\n", i != 4); /* AP_cmds[4] is not an AP command. */
     }
 
     return 0;
