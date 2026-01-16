@@ -14,12 +14,18 @@
 #define HELLO_MSG           "Hello from egos-2000!\n\r"
 #define IPTOINT(a, b, c, d) ((a << 24) | (b << 16) | (c << 8) | d)
 
-/* Define the Mac addresses, IP addresses and UDP ports. */
-#define DEST_MAC {0xae, 0xc9, 0x06, 0x72, 0xb2, 0x64}
-uint dest_ip = IPTOINT(192, 168, 18, 1), dest_udp_port = 8002;
+/* Student's code goes here (TCP/IP & the Web). */
 
+/* Update the destination MAC address, IP address, and UDP port so
+ * that this demo works in QEMU on your MacOS or Linux. If needed,
+ * you can further update the local MAC/IP addresses and UDP port. */
+
+#define DEST_MAC  {0xae, 0xc9, 0x06, 0x72, 0xb2, 0x64}
 #define LOCAL_MAC {0x10, 0xe2, 0xd5, 0x00, 0x00, 0x00}
+uint dest_ip = IPTOINT(192, 168, 18, 1), dest_udp_port = 8002;
 uint local_ip = IPTOINT(192, 168, 1, 50), local_udp_port = 8001;
+
+/* Student's code ends here. */
 
 /* Define the data structures for an Ethernet frame. */
 struct ethernet_header {
