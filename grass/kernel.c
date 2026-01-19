@@ -69,7 +69,7 @@ static void excp_entry(uint id) {
 }
 
 static void intr_entry(uint id) {
-    if (id != INTR_ID_TIMER) FATAL("excp_entry: kernel got interrupt %d", id);
+    if (id != INTR_ID_TIMER) FATAL("intr_entry: kernel got interrupt %d", id);
     /* Student's code goes here (Preemptive Scheduler). */
 
     /* Update the process lifecycle statistics. */
