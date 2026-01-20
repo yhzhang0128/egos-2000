@@ -21,7 +21,7 @@
  * you can further update the local MAC/IP addresses and UDP port. */
 
 #define DEST_MAC  {0xae, 0xc9, 0x06, 0x72, 0xb2, 0x64}
-#define LOCAL_MAC {0x10, 0xe2, 0xd5, 0x00, 0x00, 0x00}
+#define LOCAL_MAC {0x52, 0x54, 0x00, 0x12, 0x34, 0x56}
 uint dest_ip = IPTOINT(192, 168, 18, 1), dest_udp_port = 8002;
 uint local_ip = IPTOINT(192, 168, 18, 2), local_udp_port = 8001;
 
