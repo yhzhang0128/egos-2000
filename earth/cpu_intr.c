@@ -46,4 +46,12 @@ void intr_init(uint core_id) {
     asm("csrw mip, %0" ::"r"(0));
     asm("csrs mie, %0" ::"r"(0x80));
     asm("csrs mstatus, %0" ::"r"(0x88));
+
+    /* Student's code goes here (Ethernet & TCP/IP). */
+
+    /* Enable external interrupt. Find the IRQ number corresponding to the
+     * Ethernet controller device in PLIC, enable external interrupts from
+     * this IRQ number, and then set the priority of this IRQ number to 1. */
+
+    /* Student's code ends here. */
 }

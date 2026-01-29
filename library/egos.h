@@ -60,6 +60,7 @@ extern struct grass* grass;
 #define SDHCI_BASE       0x40000000UL /* QEMU     */
 #define SDSPI_BASE       0xF0008000UL /* Hardware */
 #define WIFI_BASE        0xF0003000UL /* Hardware */
+#define PLIC_BASE        0x0C000000UL /* QEMU     */
 #define ETH_PCI_ECAM     0x30018000UL /* QEMU     */
 #define ETH_BUF_BASE     0x90000000UL /* Hardware */
 #define ETH_CTL_BASE     (earth->platform == QEMU ? 0x41000000UL : 0xF0002000UL)
@@ -84,3 +85,12 @@ int FATAL(const char* format, ...);
 int SUCCESS(const char* format, ...);
 int CRITICAL(const char* format, ...);
 int my_printf(const char* format, ...);
+
+/* Student's code goes here (Ethernet & TCP/IP). */
+
+/* Define a data structure for Ethernet's RX descriptors. Declare the RX buffers
+ * and the RX descriptors array with `extern` -- they are needed in earth/boot.c
+ * for Ethernet controller initialization, and in grass/kernel.c for handling an
+ * external interrupt upon receiving an Ethernet frame. */
+
+/* Student's code ends here. */

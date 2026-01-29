@@ -17,6 +17,14 @@ void grass_entry(uint core_id);
 struct grass* grass = (void*)GRASS_STRUCT;
 struct earth* earth = (void*)EARTH_STRUCT;
 
+/* Student's code goes here (Ethernet & TCP/IP). */
+
+/* Define an array of 128 RX descriptors and a buffer of 128*2048 bytes. Every
+ * descriptor corresponds to a 2048-byte RX buffer for receiving from Ethernet.
+ */
+
+/* Student's code ends here. */
+
 void boot() {
     uint core_id, vendor_id;
     asm("csrr %0, mhartid" : "=r"(core_id));
@@ -44,6 +52,17 @@ void boot() {
          * Your driver should setup the PCI ECAM for VGA, and then set the VGA
          * screen resolution to 800*600 pixels, each using 4 bytes for its RGB
          * information. Lastly, initialize all the pixels with white color. */
+
+        /* Student's code ends here. */
+
+        /* Student's code goes here (Ethernet & TCP/IP). */
+
+        /* Use ETH_CTL_BASE as the BAR0 in Ethernet's PCIe configuration. Enable
+         * the Ethernet controller's RXT0 (Receiver Timer Interrupt). Initialize
+         * the MAC address register (Receive Address Low/High) and the registers
+         * for RX descriptors. Make sure the address field of each RX descriptor
+         * is written by the corresponding RX buffer address. Lastly, set the EN
+         * and SECRC bits of RCTL (Receive Control Register) to 1. */
 
         /* Student's code ends here. */
 
