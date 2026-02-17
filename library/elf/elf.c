@@ -29,7 +29,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
         uint memsz        = pheader[i].p_memsz;
         uint filesz       = pheader[i].p_filesz;
         uint curr_pageno  = addr / PAGE_SIZE;
-        uint end_pageno   = (addr + memsz) / PAGE_SIZE;
+        uint end_pageno   = (addr + memsz + PAGE_SIZE - 1) / PAGE_SIZE; // round up
         uint curr_blockno = pheader[i].p_offset / BLOCK_SIZE;
         for (uint ppage_id, off = 0; off < filesz; off += BLOCK_SIZE) {
             /* Allocate one page (4KB) for every 8 blocks (512 bytes). */
