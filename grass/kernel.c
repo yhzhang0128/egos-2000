@@ -23,6 +23,7 @@ struct process proc_set[MAX_NPROCESS + 1];
 static void intr_entry(uint);
 static void excp_entry(uint);
 
+// used to pick the next process to run, and to save/restore the context of the current process
 void kernel_entry() {
     /* With the kernel lock, only one core can enter this point at any time. */
     asm("csrr %0, mhartid" : "=r"(core_in_kernel));
@@ -32,6 +33,7 @@ void kernel_entry() {
     memcpy(curr_saved, (void*)(EGOS_STACK_TOP - 32 * 4), 32 * 4);
 
     uint mcause;
+    // intr_entry and excp_entry are used to call proc_yield, to get next process to run
     asm("csrr %0, mcause" : "=r"(mcause));
     (mcause & (1 << 31)) ? intr_entry(mcause & 0x3FF) : excp_entry(mcause);
 
@@ -46,9 +48,24 @@ void kernel_entry() {
 static void proc_yield();
 static void proc_try_syscall(struct process* proc);
 
+static ulonglong proc_record_runtime() {
+    if (curr_pid >= GPID_USER_START &&
+        proc_set[curr_proc_idx].last_start_time != 0) {
+        ulonglong now = mtime_get();
+        ulonglong runtime = now - proc_set[curr_proc_idx].last_start_time;
+        proc_set[curr_proc_idx].cpu_time += runtime;
+        proc_set[curr_proc_idx].last_start_time = 0;
+        return runtime;
+    }
+
+    return 0;
+}
+
 static void excp_entry(uint id) {
+    //previously in proc_yield, was not counting CPU time from exceptions properly
     if (id >= EXCP_ID_ECALL_U && id <= EXCP_ID_ECALL_M) {
         /* Copy the system call arguments from user space to the kernel. */
+        proc_record_runtime();
         uint syscall_paddr = earth->mmu_translate(curr_pid, SYSCALL_ARG);
         memcpy(&proc_set[curr_proc_idx].syscall, (void*)syscall_paddr,
                sizeof(struct syscall));
@@ -72,7 +89,12 @@ static void intr_entry(uint id) {
     /* Student's code goes here (Preemptive Scheduler). */
 
     /* Update the process lifecycle statistics. */
-
+    if (curr_status == PROC_RUNNING && id == INTR_ID_TIMER) {
+        proc_set[curr_proc_idx].num_timer_interrupts ++;
+    }
+    
+        /* [Preemptive Scheduler]
+        * If this is a timer interrupt, call proc_yield() to yield the CPU. */
     /* Student's code ends here. */
 
     if (id == INTR_ID_TIMER) return proc_yield();
@@ -89,7 +111,6 @@ static void intr_entry(uint id) {
 }
 
 static void proc_yield() {
-    if (curr_status == PROC_RUNNING) proc_set_runnable(curr_pid);
 
     /* Student's code goes here (Multiple Projects). */
 
@@ -98,6 +119,10 @@ static void proc_yield() {
      * Modify the loop below to find the next process to schedule with MLFQ.
      * [System Call & Protection]
      * Do not schedule a process that should still be sleeping at this time. */
+    if(curr_status == PROC_RUNNING){
+        proc_record_runtime();
+        proc_set_runnable(curr_pid);
+    }
 
     int next_idx = MAX_NPROCESS;
     for (uint i = 1; i <= MAX_NPROCESS; i++) {
@@ -115,7 +140,12 @@ static void proc_yield() {
          * Measure and record lifecycle statistics for the *next* process.
          * [System Call & Protection | Multicore & Locks]
          * Modify mstatus.MPP to enter machine or user mode after mret. */
-
+        unsigned long long now = mtime_get();
+        if(!proc_set[next_idx].has_been_scheduled) {
+            proc_set[next_idx].response_time = now - proc_set[next_idx].start_time;
+        }
+        proc_set[next_idx].has_been_scheduled = true;
+        proc_set[next_idx].last_start_time = now;
     } else {
         /* [Multicore & Locks]
          * Release the kernel lock.
@@ -123,7 +153,7 @@ static void proc_yield() {
          * Set curr_proc_idx to 0; Reset the timer;
          * Enable interrupts by setting the mstatus.MIE bit to 1;
          * Wait for the next interrupt using the wfi instruction. */
-
+        curr_proc_idx = 0;
         FATAL("proc_yield: no process to run on core %d", core_in_kernel);
     }
     /* Student's code ends here. */

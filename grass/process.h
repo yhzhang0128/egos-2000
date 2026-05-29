@@ -1,7 +1,8 @@
 #pragma once
 
 #include "egos.h"
-#include "syscall.h"
+#include "syscall/syscall.h"
+#include <stdbool.h>
 
 enum proc_status {
     PROC_UNUSED,
@@ -18,9 +19,17 @@ struct process {
     enum proc_status status;
     uint mepc, saved_registers[32];
     /* Student's code goes here (Preemptive Scheduler | System Call). */
-
     /* Add new fields for lifecycle statistics, MLFQ or process sleep. */
+    // use mtime_get to get diff in time, call twice
+    unsigned long long start_time;
+    unsigned long long turn_around_time;
+    unsigned long long response_time;
+    unsigned long long cpu_time;
+    unsigned long long num_timer_interrupts;
+    unsigned long long last_start_time; // used to calculate cpu_time
+    bool has_been_scheduled;
 
+    // final task is to implement MLFQ2
     /* Student's code ends here. */
 };
 #define MAX_NPROCESS 16

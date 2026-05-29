@@ -13,7 +13,7 @@
 extern struct process proc_set[MAX_NPROCESS + 1];
 
 static void proc_set_status(int pid, enum proc_status status) {
-    for (uint i = 0; i < MAX_NPROCESS; i++)
+    for (uint i = 0; i <= MAX_NPROCESS; i++)
         if (proc_set[i].pid == pid) proc_set[i].status = status;
 }
 
@@ -29,9 +29,14 @@ int proc_alloc() {
             proc_set[i].pid    = ++curr_pid;
             proc_set[i].status = PROC_LOADING;
             /* Student's code goes here (Preemptive Scheduler | System Call). */
-
             /* Initialization of lifecycle statistics, MLFQ or process sleep. */
-
+            proc_set[i].start_time = mtime_get();
+            proc_set[i].turn_around_time = 0;
+            proc_set[i].response_time = 0;
+            proc_set[i].cpu_time = 0;
+            proc_set[i].num_timer_interrupts = 0;
+            proc_set[i].has_been_scheduled = false;
+            proc_set[i].last_start_time = 0; //initializatino is not same as running
             /* Student's code ends here. */
             return curr_pid;
         }
@@ -41,7 +46,23 @@ int proc_alloc() {
 
 void proc_free(int pid) {
     /* Student's code goes here (Preemptive Scheduler). */
-
+    for(int i = 1; i <= MAX_NPROCESS; i++) {
+        if(proc_set[i].pid == pid) {
+            unsigned long long now = mtime_get();
+            if(proc_set[i].last_start_time != 0){
+                proc_set[i].cpu_time += now - proc_set[i].last_start_time;
+                proc_set[i].last_start_time = now;
+            }
+            proc_set[i].turn_around_time = now - proc_set[i].start_time; // why is this so off?
+            printf("start_time %llu \n", proc_set[i].start_time);
+            printf("now %llu \n", now);
+            printf("raw cpu %llu \n", proc_set[i].cpu_time);
+            printf("Process %d: response time = %llu ms, turn-around time = %llu ms, CPU time = %llu ms, number of timer interrupts = %d\n",
+                   pid, proc_set[i].response_time / 10000, proc_set[i].turn_around_time / 10000,
+                   proc_set[i].cpu_time / 10000, proc_set[i].num_timer_interrupts);
+            break;
+        }
+    }
     /* Print the lifecycle statistics of the terminated process or processes. */
     if (pid != GPID_ALL) {
         earth->mmu_free(pid);
