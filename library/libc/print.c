@@ -20,12 +20,72 @@ void format_to_str(char* out, const char* fmt, va_list args) {
             strncat(out, fmt, 1);
         } else {
             fmt++;
-            if (*fmt == 's') {
-                strcat(out, va_arg(args, char*));
-            } else if (*fmt == 'd') {
-                itoa(va_arg(args, int), out + strlen(out), 10);
-            } else if (*fmt == 'x') {
-                itoa(va_arg(args, int), out + strlen(out), 16);
+            switch (*fmt) {
+                case 's':
+                    strcat(out, va_arg(args, char*)); //va_arg(args, Type of next parameter)
+                    break;
+                case 'd':
+                    // integer to string; integer, memory location; initial pointer of out, then string length, base
+                    itoa(va_arg(args, int), out + strlen(out), 10);
+                    break;
+                case 'c':
+                    char c = va_arg(args,int);
+                    char s[2];
+                    s[0] = c;
+                    s[1] = '\0';
+                    strcat(out, s);
+                    break;
+                case 'x':
+                    itoa(va_arg(args,int), out + strlen(out), 16);
+                    break;
+                
+                case 'p':
+                    char* msg = va_arg(args, char*); // pointer, need to cast to int for itoa
+                    strcat(out, "0x");
+                    itoa((int)msg, out + strlen(out), 16);
+                    break;
+                
+                case 'u':{
+                    const size_t INT_LEN = 21;
+                    char uint_arr[INT_LEN];
+                    uint_arr[INT_LEN-1] = '\0';
+                    int ind = INT_LEN-2;
+
+                    unsigned int res = va_arg(args, unsigned int); // write digit by digit         
+                    if(res == 0){
+                        uint_arr[ind--] = '0';
+                    }              
+                    while(res > 0){ 
+                        uint_arr[ind] = (res%10) + '0';
+                        ind--;
+                        res/=10;
+                    }
+                    strcat(out, &uint_arr[ind+1]);
+                    break;
+                }
+                case 'l':{
+                    const size_t INT_LEN = 21;
+                    char uint_arr[INT_LEN];
+                    uint_arr[INT_LEN-1] = '\0';
+                    int ind = INT_LEN-2;
+                    const char* lu = fmt;
+                    lu++;
+                    if(*lu == 'l' && *(lu+1) == 'u'){
+                        unsigned long long res = va_arg(args, unsigned long long);
+                        if(res == 0){
+                            uint_arr[ind--] = '0';
+                        }       
+                        while(res > 0){ 
+                            uint_arr[ind] = (res%10) + '0';
+                            ind--;
+                            res/=10;
+                        }
+                        strcat(out, &uint_arr[ind+1]);
+                        fmt += 2;
+                        break;
+                    }
+                    break;
+                }
             }
             /* Student's code goes here (Hello, World!). */
 
