@@ -6,10 +6,6 @@
  */
 
 #include "process.h"
-
-#define MLFQ_NLEVELS          5
-#define MLFQ_RESET_PERIOD     10000000         /* 10 seconds */
-#define MLFQ_LEVEL_RUNTIME(x) (x + 1) * 100000 /* e.g., 100ms for level 0 */
 extern struct process proc_set[MAX_NPROCESS + 1];
 
 static void proc_set_status(int pid, enum proc_status status) {
@@ -37,6 +33,8 @@ int proc_alloc() {
             proc_set[i].num_timer_interrupts = 0;
             proc_set[i].has_been_scheduled = false;
             proc_set[i].last_start_time = 0; //initializatino is not same as running
+            proc_set[i].level = 0;
+            proc_set[i].remaining_runtime_on_level = MLFQ_LEVEL_RUNTIME(0);
             /* Student's code ends here. */
             return curr_pid;
         }
@@ -51,7 +49,7 @@ void proc_free(int pid) {
             unsigned long long now = mtime_get();
             if(proc_set[i].last_start_time != 0){
                 proc_set[i].cpu_time += now - proc_set[i].last_start_time;
-                proc_set[i].last_start_time = now;
+                proc_set[i].last_start_time = 0;
             }
             proc_set[i].turn_around_time = now - proc_set[i].start_time; // why is this so off?
             printf("start_time %llu \n", proc_set[i].start_time);
@@ -69,7 +67,7 @@ void proc_free(int pid) {
         proc_set_status(pid, PROC_UNUSED);
     } else {
         /* Free all user processes. */
-        for (uint i = 0; i < MAX_NPROCESS; i++)
+        for (uint i = 1; i <= MAX_NPROCESS; i++)
             if (proc_set[i].pid >= GPID_USER_START &&
                 proc_set[i].status != PROC_UNUSED) {
                 earth->mmu_free(proc_set[i].pid);
@@ -79,11 +77,39 @@ void proc_free(int pid) {
     /* Student's code ends here. */
 }
 
+/*
+implement MLFQ
+in process struct, need to maintain the following:
+- level
+- remaining runtime on the given level
+- when providing `runtime` argument, reuse measurements for CPU time
+
+then, need to modify for loop in proc_yield, to follow Rule 3
+
+call this function in proc_yield, where runtime == updated CPU time?
+*/
 void mlfq_update_level(struct process* p, ulonglong runtime) {
     /* Student's code goes here (Preemptive Scheduler). */
 
     /* Update the MLFQ-related fields in struct process* p after this
      * process has run on the CPU for another runtime microseconds. */
+    // oh the idea is to continue to consume, and continuously move down levels 
+    while(runtime > 0){
+        if(runtime >= p->remaining_runtime_on_level) {
+            runtime -= p->remaining_runtime_on_level;
+            if(p->level < MLFQ_NLEVELS - 1) {
+                p->level++;
+            }
+            p->remaining_runtime_on_level = MLFQ_LEVEL_RUNTIME(p->level);
+        } else {
+            p->remaining_runtime_on_level -= runtime;
+            runtime = 0;
+        }
+        if(p->level == MLFQ_NLEVELS - 1) {
+            break; // if we are at the lowest level, we dont need to keep track of remaining runtime
+        }
+    }
+    
 
     /* Student's code ends here. */
 }
@@ -92,9 +118,30 @@ void mlfq_reset_level() {
     /* Student's code goes here (Preemptive Scheduler). */
     if (!earth->tty_input_empty()) {
         /* Reset the level of GPID_SHELL if there is pending keyboard input. */
+        for (uint i = 1; i <= MAX_NPROCESS; i++) {
+            if (proc_set[i].pid == GPID_SHELL) {
+                proc_set[i].level = 0;
+                proc_set[i].remaining_runtime_on_level = MLFQ_LEVEL_RUNTIME(0);
+                break;
+            }
+        }
     }
 
-    static ulonglong MLFQ_last_reset_time = 0;
+    static ulonglong MLFQ_last_reset_time = 0; // static variable, has lifetime of the entire program
+    ulonglong now = mtime_get();
+    if(now - MLFQ_last_reset_time >= MLFQ_RESET_PERIOD) {
+        for(uint i = 1; i <= MAX_NPROCESS; i++) {
+            if(proc_set[i].status != PROC_UNUSED) {
+                proc_set[i].level = 0;
+                proc_set[i].remaining_runtime_on_level = MLFQ_LEVEL_RUNTIME(0);
+            }
+        }
+        MLFQ_last_reset_time = now;
+    }
+    /*
+    global vs static
+    - global can be accessed across files, static can only be accessed within the file or function it is defined in 
+    */
     /* Reset the level of all processes every MLFQ_RESET_PERIOD microseconds. */
 
     /* Student's code ends here. */

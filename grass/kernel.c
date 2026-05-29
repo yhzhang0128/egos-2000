@@ -65,7 +65,9 @@ static void excp_entry(uint id) {
     //previously in proc_yield, was not counting CPU time from exceptions properly
     if (id >= EXCP_ID_ECALL_U && id <= EXCP_ID_ECALL_M) {
         /* Copy the system call arguments from user space to the kernel. */
-        proc_record_runtime();
+        ulonglong runtime = proc_record_runtime();
+        mlfq_update_level(&proc_set[curr_proc_idx], runtime);
+
         uint syscall_paddr = earth->mmu_translate(curr_pid, SYSCALL_ARG);
         memcpy(&proc_set[curr_proc_idx].syscall, (void*)syscall_paddr,
                sizeof(struct syscall));
@@ -119,22 +121,29 @@ static void proc_yield() {
      * Modify the loop below to find the next process to schedule with MLFQ.
      * [System Call & Protection]
      * Do not schedule a process that should still be sleeping at this time. */
+    ulonglong runtime = 0;
     if(curr_status == PROC_RUNNING){
-        proc_record_runtime();
+        runtime = proc_record_runtime();
+        mlfq_update_level(&proc_set[curr_proc_idx], runtime);
         proc_set_runnable(curr_pid);
     }
+    mlfq_reset_level();
 
     int next_idx = MAX_NPROCESS;
-    for (uint i = 1; i <= MAX_NPROCESS; i++) {
-        struct process* p = &proc_set[(curr_proc_idx + i) % MAX_NPROCESS];
-        if (p->status == PROC_PENDING_SYSCALL) proc_try_syscall(p);
+    for(uint lvl = 0; lvl < MLFQ_NLEVELS; lvl++) {
+        for (uint i = 1; i <= MAX_NPROCESS; i++) {
+            struct process* p = &proc_set[(curr_proc_idx + i) % MAX_NPROCESS];
+            if (p->status == PROC_PENDING_SYSCALL) proc_try_syscall(p);
 
-        if (p->status == PROC_READY || p->status == PROC_RUNNABLE) {
-            next_idx = (curr_proc_idx + i) % MAX_NPROCESS;
-            break;
+            if (p->status == PROC_READY || p->status == PROC_RUNNABLE) {
+                if(p->level == lvl) {
+                    next_idx = (curr_proc_idx + i) % MAX_NPROCESS;
+                    break;
+                }
+            }
         }
+        if(next_idx < MAX_NPROCESS) break;
     }
-
     if (next_idx < MAX_NPROCESS) {
         /* [Preemptive Scheduler]
          * Measure and record lifecycle statistics for the *next* process.
@@ -219,3 +228,9 @@ static void proc_try_syscall(struct process* proc) {
         FATAL("proc_try_syscall: unknown syscall type=%d", proc->syscall.type);
     }
 }
+
+/*
+loop 500 vs loop 500 silent
+- loop 500 silent doesnt print; so its one continuous loop, so timer interrupts more likely to go off
+- loop 500 prints, which invokes syscalls, so it will switch to print, before there is time for timer interrupt to go off
+*/

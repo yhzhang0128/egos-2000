@@ -30,10 +30,15 @@ struct process {
     bool has_been_scheduled;
 
     // final task is to implement MLFQ2
+
+    uint level;
+    uint remaining_runtime_on_level;    
     /* Student's code ends here. */
 };
 #define MAX_NPROCESS 16
-
+#define MLFQ_NLEVELS          5
+#define MLFQ_RESET_PERIOD     10000000         /* 10 seconds */
+#define MLFQ_LEVEL_RUNTIME(x) (x + 1) * 100000 /* e.g., 100ms for level 0 */
 ulonglong mtime_get();
 
 int proc_alloc();
