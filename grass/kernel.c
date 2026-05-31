@@ -176,7 +176,9 @@ static void proc_yield() {
         // instead, temporarily run no process, and wait for next timer interrupt to fire, at which point we will check again for a process to run
         curr_proc_idx = 0;
         earth->timer_reset(core_in_kernel); // schedule next timer interrupt
-
+        /*
+        This handling is what i initially missed!!!
+        */
         uint mstatus;
         asm("csrr %0, mstatus" : "=r"(mstatus));
         mstatus |= (1 << 3);   // set MIE, Machine Interrupts Enabled
