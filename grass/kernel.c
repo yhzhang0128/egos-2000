@@ -90,8 +90,18 @@ static void excp_entry(uint id) {
     }
     /* Student's code goes here (System Call & Protection | Virtual Memory). */
 
+    
     /* Kill the current process if curr_pid is a user application. */
-
+    uint mstatus;
+    asm("csrr %0, mstatus" : "=r"(mstatus));
+    if ((mstatus & (3 << 11)) == (0 << 11)) {
+        //need to send an exit() message to the shell, so that it can update its state and print out the next prompt
+        struct proc_request req;
+        req.type = PROC_EXIT;
+        grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+        proc_yield();
+        return;
+    }
     /* Student's code ends here. */
     FATAL("excp_entry: kernel got exception %d", id);
 }
@@ -154,6 +164,12 @@ static void proc_yield() {
         }
         if(next_idx < MAX_NPROCESS) break;
     }
+/*
+Upon exception or interruption, CPU enters the kernel, and will automatically switch to machine  mode
+- this is a hardware guarantee, as need to handle exceptions etc.
+Then, it will switch to the mode specified by mstatus.MPP
+*/
+
     if (next_idx < MAX_NPROCESS) {
         /* [Preemptive Scheduler]
          * Measure and record lifecycle statistics for the *next* process.
@@ -165,6 +181,13 @@ static void proc_yield() {
         }
         proc_set[next_idx].has_been_scheduled = true;
         proc_set[next_idx].last_start_time = now;
+
+        uint mstatus, M_MODE = 3, U_MODE = 0;
+        uint next_mode = proc_set[next_idx].pid < GPID_USER_START ? M_MODE : U_MODE;
+        asm("csrr %0, mstatus" : "=r"(mstatus));
+        // turn the 11th and 12th bit off, then set them to what next_mode should be
+        mstatus = (mstatus & ~(3 << 11)) | (next_mode << 11); 
+        asm("csrw mstatus, %0" : : "r"(mstatus));
     } else {
         /* [Multicore & Locks]
          * Release the kernel lock.

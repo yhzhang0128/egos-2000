@@ -203,6 +203,8 @@ void mmu_init() {
 
     /* Replace the PMP region above with a NAPOT region 0x80200000 - 0x80400000
      * and set the permission for user mode access as r/w/x. */
+    asm("csrw pmpaddr0, %0" : : "r"(0x200BFFFF));
+    asm("csrw pmpcfg0, %0" : : "r"(0x1F));
 
     /* Student's code ends here. */
 
