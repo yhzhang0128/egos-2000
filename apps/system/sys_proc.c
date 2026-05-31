@@ -9,6 +9,9 @@
 #include "app.h"
 #include "elf.h"
 #include "disk.h"
+#include "servers.h"
+#include "syscall.h"
+#include <stdlib.h>
 
 static int app_ino, app_pid;
 static void sys_spawn(uint base);
@@ -69,8 +72,10 @@ int main(int unused, struct multicore* boot) {
             break;
         /* Student's code goes here (System Call & Protection). */
 
-        /* Add a case which handles process sleep. */
-
+        case PROC_SLEEP:
+            // printf("Process %d is going to sleep for %d microseconds\n\r", sender, req->sleep_time);
+            grass->proc_sleep(sender, req->sleep_time);
+            break;
         /* Student's code ends here. */
         default:
             FATAL("sys_process: invalid request %d", req->type);

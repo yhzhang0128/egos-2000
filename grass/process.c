@@ -35,6 +35,7 @@ int proc_alloc() {
             proc_set[i].last_start_time = 0; //initializatino is not same as running
             proc_set[i].level = 0;
             proc_set[i].remaining_runtime_on_level = MLFQ_LEVEL_RUNTIME(0);
+            proc_set[i].sleep_until_time = 0;
             /* Student's code ends here. */
             return curr_pid;
         }
@@ -150,7 +151,13 @@ void mlfq_reset_level() {
 void proc_sleep(int pid, uint usec) {
     /* Student's code goes here (System Call & Protection). */
 
-    /* Update the sleep-related fields in the struct process for process pid. */
+    unsigned long long now = mtime_get();
+    for(int i = 1; i <= MAX_NPROCESS; i++) {
+        if(proc_set[i].pid == pid) {
+            proc_set[i].sleep_until_time = now + (unsigned long long) usec * 10;
+            break;
+        }
+    }
 
     /* Student's code ends here. */
 }

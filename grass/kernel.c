@@ -61,6 +61,15 @@ static ulonglong proc_record_runtime() {
     return 0;
 }
 
+/*
+Exceptions vs Interrupts
+- Exceptions: something went wrong with the CPU instructions, and we throw an exception
+- Interrupt: triggered by devices outside of CPUs, like timers, disks etc
+
+U-Mode: User mode
+M-Mode: kernel mode or machine mode
+*/
+
 static void excp_entry(uint id) {
     //previously in proc_yield, was not counting CPU time from exceptions properly
     if (id >= EXCP_ID_ECALL_U && id <= EXCP_ID_ECALL_M) {
@@ -68,13 +77,13 @@ static void excp_entry(uint id) {
         ulonglong runtime = proc_record_runtime();
         mlfq_update_level(&proc_set[curr_proc_idx], runtime);
 
-        uint syscall_paddr = earth->mmu_translate(curr_pid, SYSCALL_ARG);
+        uint syscall_paddr = earth->mmu_translate(curr_pid, SYSCALL_ARG); //copies struct syscall, which is stored at memory address SYSCALL_ARG in user space, to the kernel space, so that we can read the system call arguments and execute the system call
         memcpy(&proc_set[curr_proc_idx].syscall, (void*)syscall_paddr,
                sizeof(struct syscall));
-        proc_set[curr_proc_idx].syscall.status = PENDING;
+        proc_set[curr_proc_idx].syscall.status = PENDING; //set the syscall to be pending
 
         proc_set_pending(curr_pid);
-        proc_set[curr_proc_idx].mepc += 4;
+        proc_set[curr_proc_idx].mepc += 4; //mepc is the PC when the exception occurs; saying that after exception is done, go to next instruction
         proc_try_syscall(&proc_set[curr_proc_idx]);
         proc_yield();
         return;
@@ -129,6 +138,7 @@ static void proc_yield() {
     }
     mlfq_reset_level();
 
+    // can only schedule, if not sleeping
     int next_idx = MAX_NPROCESS;
     for(uint lvl = 0; lvl < MLFQ_NLEVELS; lvl++) {
         for (uint i = 1; i <= MAX_NPROCESS; i++) {
@@ -136,7 +146,7 @@ static void proc_yield() {
             if (p->status == PROC_PENDING_SYSCALL) proc_try_syscall(p);
 
             if (p->status == PROC_READY || p->status == PROC_RUNNABLE) {
-                if(p->level == lvl) {
+                if(p->level == lvl && p->sleep_until_time <= mtime_get()) {
                     next_idx = (curr_proc_idx + i) % MAX_NPROCESS;
                     break;
                 }
@@ -162,8 +172,18 @@ static void proc_yield() {
          * Set curr_proc_idx to 0; Reset the timer;
          * Enable interrupts by setting the mstatus.MIE bit to 1;
          * Wait for the next interrupt using the wfi instruction. */
+        // if cant find a process, bc of timer, should not crash
+        // instead, temporarily run no process, and wait for next timer interrupt to fire, at which point we will check again for a process to run
         curr_proc_idx = 0;
-        FATAL("proc_yield: no process to run on core %d", core_in_kernel);
+        earth->timer_reset(core_in_kernel); // schedule next timer interrupt
+
+        uint mstatus;
+        asm("csrr %0, mstatus" : "=r"(mstatus));
+        mstatus |= (1 << 3);   // set MIE, Machine Interrupts Enabled
+        asm("csrw mstatus, %0" : : "r"(mstatus)); // update it, so we enable machine interrupts
+
+        asm("wfi"); // sleep until next timer interrupt
+        return;
     }
     /* Student's code ends here. */
 
@@ -184,20 +204,20 @@ static void proc_try_send(struct process* sender) {
     for (uint i = 0; i < MAX_NPROCESS; i++) {
         struct process* dst = &proc_set[i];
         if (dst->pid == sender->syscall.receiver &&
-            dst->status != PROC_UNUSED) {
+            dst->status != PROC_UNUSED) { // find the corresponding receiver, make sure proc is in use
             /* Return if dst is not receiving or not taking msg from sender. */
             if (!(dst->syscall.type == SYS_RECV &&
-                  dst->syscall.status == PENDING))
+                  dst->syscall.status == PENDING)) // make sure the receiver is actually a receiver, and is pending
                 return;
             if (!(dst->syscall.sender == GPID_ALL ||
-                  dst->syscall.sender == sender->pid))
+                  dst->syscall.sender == sender->pid)) // we either receive from everyone, or a specific sender
                 return;
 
             dst->syscall.status = DONE;
-            dst->syscall.sender = sender->pid;
+            dst->syscall.sender = sender->pid; //override, in case we are accepting from EVERYONE
             /* Copy the system call arguments within the kernel PCB. */
             memcpy(dst->syscall.content, sender->syscall.content,
-                   SYSCALL_MSG_LEN);
+                   SYSCALL_MSG_LEN); // copy into the receivers kenrel process control block
             return;
         }
     }
@@ -205,13 +225,16 @@ static void proc_try_send(struct process* sender) {
 }
 
 static void proc_try_recv(struct process* receiver) {
+    // only gets marked as done, if sender sends data to receiver; it is on onus of sender to PUSH data to receiver
     if (receiver->syscall.status == PENDING) return;
 
+    //now, we acc have the correct data, copy from kernel back to user space
     /* Copy the system call struct from the kernel back to user space. */
     uint syscall_paddr = earth->mmu_translate(receiver->pid, SYSCALL_ARG);
     memcpy((void*)syscall_paddr, &receiver->syscall, sizeof(struct syscall));
 
     /* Set the receiver and sender back to RUNNABLE. */
+    // now, the transaction is complete, so both sender and receiver are runnable once more
     proc_set_runnable(receiver->pid);
     proc_set_runnable(receiver->syscall.sender);
 }

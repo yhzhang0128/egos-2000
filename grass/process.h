@@ -33,6 +33,10 @@ struct process {
 
     uint level;
     uint remaining_runtime_on_level;    
+
+    // sleep
+    unsigned long long sleep_until_time; // sleep until this time
+
     /* Student's code ends here. */
 };
 #define MAX_NPROCESS 16

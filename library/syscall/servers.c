@@ -25,7 +25,12 @@ void sleep(uint usec) {
     /* Send a message to GPID_PROCESS for process sleep. For simplicity,
      * you can assume that GPID_PROCESS will be scheduled and handle the
      * message before the kernel re-schedules the current process. */
-
+    struct proc_request req;
+    req.type = PROC_SLEEP;
+    req.argc = 1;
+    req.argv[0][0] = 0; 
+    req.sleep_time = usec;
+    sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
     /* Student's code ends here. */
 }
 
