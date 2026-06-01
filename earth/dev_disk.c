@@ -39,11 +39,21 @@ static char sdhci_exec_cmd(uint idx, uint arg, uchar flag, uint mode) {
     while (!(REGW(SDHCI_BASE, SDHCI_INT_STAT) & 0x1));
 }
 
+static void sdhci_exec_stop_cmd() {
+    while (REGW(SDHCI_BASE, SDHCI_PRESENT_STATE) & 0x1);
+    REGW(SDHCI_BASE, SDHCI_INT_STAT) = 0xFFFFFFFF;
+    REGW(SDHCI_BASE, SDHCI_ARGUMENT) = 0;
+    REGW(SDHCI_BASE, SDHCI_CMD_AND_MODE) = (((12 << 8) | 3) << 16);
+    while (!(REGW(SDHCI_BASE, SDHCI_INT_STAT) & 0x1));
+}
+
 static void sdhci_read(uint offset, char* dst) {
     /* Prepare DMA (SDMA mode of SDHCI). */
     static __attribute__((aligned(BLOCK_SIZE))) char aligned_buf[BLOCK_SIZE];
     REGW(SDHCI_BASE, SDHCI_DMA_ADDRESS)      = (uint)aligned_buf;
     REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) = (1 << 16) | BLOCK_SIZE;
+    // asks SDHCI to write 1 block of BLOCK_SIZE bytes to aligned_buf, when executing upcoming SD read command
+
 
 #define DATA_PRESENT_FLAG         (1 << 5)
 #define READ_WITH_DMA_ENABLE_MODE ((1 << 4) | (1 << 0))
@@ -96,7 +106,7 @@ static char spi_exchange(char byte) {
 static char sdspi_exec_cmd(char* cmd) {
     /* Send a 6-byte SD card command through the SPI bus. */
     for (uint i = 0; i < 6; i++) spi_exchange(cmd[i]);
-    for (uint reply, i = 0; i < 8000; i++)
+    for (uint reply, i = 0; i < 8000; i++) // 8000 is TIMEOUT; waits for the reply to happen, then returns the reply; otherwise, returns 0xFF after timeout
         if ((reply = spi_exchange(0xFF)) != 0xFF) return reply;
 
     return 0xFF;
@@ -111,17 +121,29 @@ static char sdspi_exec_acmd(char* cmd) {
     return sdspi_exec_cmd(cmd);
 }
 
+/*
+SD card command 17 is defined for reading a block
+- SD card block is 512 bytes
+- when read/writing an SD card, OS will do it in blocks of 512 bytes
+
+offset is used to determine which block should be read
+read a block from SD card to memory address specified by dst
+*/
 static void sdspi_read(uint offset, char* dst) {
     /* Wait until SD card is ready for a new command. */
     while (spi_exchange(0xFF) != 0xFF);
 
     /* Send a read request with command #17. */
     char* arg = (void*)&offset;
+    // 4 bytes in the middle encode offset
+    // 
     char reply, cmd17[] = {17 | (1 << 6), arg[3], arg[2], arg[1], arg[0], 0xFF};
     if (reply = sdspi_exec_cmd(cmd17))
         FATAL("cmd17 returns status 0x%.2x", reply);
 
     /* Wait for the data packet and ignore the 2-byte checksum. */
+    // receive 512 bytes from the SD, and use 2 byte checksum
+    // checksum is just a quick way to ensure the data is correct
     while (spi_exchange(0xFF) != 0xFE);
     for (uint i = 0; i < BLOCK_SIZE; i++) dst[i] = spi_exchange(0xFF);
     spi_exchange(0xFF);
@@ -167,7 +189,77 @@ static int sdspi_init() {
 
 static enum disk_type { SD_CARD, FLASH_ROM } type;
 
+/*
+SD card standard provides command 18/25 for read/writes consecutive blocks together
+- replace loop in disk_read
+- implement disk_write with own SD card driver using 18/25
+
+*/
+
+static void sdspi_read_multi(uint offset, uint nblocks, char* dst){
+    // wait until exchange is ready
+    while(spi_exchange(0xFF) != 0xFF);
+    char* arg = (void*)&offset;
+    char reply, cmd18[] = {18 | (1 << 6), arg[3], arg[2], arg[1], arg[0], 0xFF};
+
+    // exec 18, then run until down, then 12 to end the data stream
+    if ((reply = sdspi_exec_cmd(cmd18)))
+        FATAL("cmd18 returns status 0x%.2x", reply);
+
+    for (uint b = 0; b < nblocks; b++) {
+        while (spi_exchange(0xFF) != 0xFE);
+
+        for (uint i = 0; i < BLOCK_SIZE; i++)
+            dst[b * BLOCK_SIZE + i] = spi_exchange(0xFF);
+
+        spi_exchange(0xFF);
+        spi_exchange(0xFF);
+    }
+
+    char cmd12[] = {12 | (1 << 6), 0, 0, 0, 0, 0xFF};
+
+    for (uint i = 0; i < 6; i++) spi_exchange(cmd12[i]);
+    spi_exchange(0xFF); /* stuff byte after CMD12, cant use sdspi_exec_cmd, bc of stuff byte; otherwise, format is same*/
+
+    for (uint i = 0; i < 8000; i++)
+        if ((reply = spi_exchange(0xFF)) != 0xFF) break;
+
+    if (reply) FATAL("cmd12 returns status 0x%.2x", reply);
+
+    while (spi_exchange(0xFF) != 0xFF);
+}
+
+static void sdhci_read_multi(uint offset, uint nblocks, char* dst) {
+#define SDHCI_READ_MULTI_MAX_BLOCKS 128
+    if (nblocks == 0) return;
+
+    //starting address is forced to be BLOCK_SIZE aligned, so we can read multiple blocks together; otherwise, SDHCI will return an error
+    static __attribute__((aligned(BLOCK_SIZE)))
+    char aligned_buf[SDHCI_READ_MULTI_MAX_BLOCKS * BLOCK_SIZE];
+
+#define DATA_PRESENT_FLAG               (1 << 5)
+#define READ_MULTI_WITH_DMA_ENABLE_MODE ((1 << 5) | (1 << 4) | (1 << 1) | (1 << 0))
+
+    if (nblocks > SDHCI_READ_MULTI_MAX_BLOCKS)
+        FATAL("sdhci_read_multi: too many blocks %d", nblocks);
+
+    REGW(SDHCI_BASE, SDHCI_DMA_ADDRESS) = (uint)aligned_buf;
+    REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) =
+        (nblocks << 16) | BLOCK_SIZE;
+
+    sdhci_exec_cmd(18, offset * BLOCK_SIZE,
+                   DATA_PRESENT_FLAG,
+                   READ_MULTI_WITH_DMA_ENABLE_MODE);
+
+    while (!(REGW(SDHCI_BASE, SDHCI_INT_STAT) & (1 << 1)));
+    sdhci_exec_stop_cmd();
+
+    memcpy(dst, aligned_buf, nblocks * BLOCK_SIZE);
+}
+
 void disk_read(uint block_no, uint nblocks, char* dst) {
+    if (nblocks == 0) return;
+
     if (type == FLASH_ROM) {
         char* src = (char*)FLASH_ROM_BASE + block_no * BLOCK_SIZE;
         memcpy(dst, src, nblocks * BLOCK_SIZE);
@@ -178,19 +270,79 @@ void disk_read(uint block_no, uint nblocks, char* dst) {
 
     /* Replace the loop below by reading multiple SD card
      * blocks altogether using the SD card command #18. */
-    for (uint i = 0; i < nblocks; i++)
-        (earth->platform == HARDWARE)
-            ? sdspi_read(block_no + i, dst + BLOCK_SIZE * i)
-            : sdhci_read(block_no + i, dst + BLOCK_SIZE * i);
+    (earth->platform == HARDWARE)
+        ? sdspi_read_multi(block_no, nblocks, dst)
+        : sdhci_read_multi(block_no, nblocks, dst);
+    // read from block_no + i (which is the offset, within SD card) to dst + BLOCK_SIZE * i (which is the destination memory address for the block read from SD card)
 
     /* Student's code ends here. */
 }
 
+static void sdspi_write_multi(uint offset, uint nblocks, char* src) {
+    if (nblocks == 0) return;
+
+    while (spi_exchange(0xFF) != 0xFF);
+
+    char* arg = (void*)&offset;
+    char reply, cmd25[] = {25 | (1 << 6), arg[3], arg[2], arg[1], arg[0], 0xFF};
+    if ((reply = sdspi_exec_cmd(cmd25)))
+        FATAL("cmd25 returns status 0x%.2x", reply);
+
+    for (uint b = 0; b < nblocks; b++) {
+        spi_exchange(0xFC); /* Start multi-block write token. */
+
+        for (uint i = 0; i < BLOCK_SIZE; i++)
+            spi_exchange(src[b * BLOCK_SIZE + i]);
+
+        spi_exchange(0xFF); /* Dummy CRC. */
+        spi_exchange(0xFF);
+
+        reply = spi_exchange(0xFF);
+        if ((reply & 0x1F) != 0x05)
+            FATAL("cmd25 data response 0x%.2x", reply);
+
+        while (spi_exchange(0xFF) != 0xFF);
+    }
+
+    spi_exchange(0xFD); /* Stop transmission token for SPI multi-write. */
+    while (spi_exchange(0xFF) != 0xFF);
+}
+
+static void sdhci_write_multi(uint offset, uint nblocks, char* src) {
+#define SDHCI_WRITE_MULTI_MAX_BLOCKS 128
+    if (nblocks == 0) return;
+
+    static __attribute__((aligned(BLOCK_SIZE)))
+    char aligned_buf[SDHCI_WRITE_MULTI_MAX_BLOCKS * BLOCK_SIZE];
+
+#define WRITE_MULTI_WITH_DMA_ENABLE_MODE ((1 << 5) | (1 << 1) | (1 << 0))
+
+    if (nblocks > SDHCI_WRITE_MULTI_MAX_BLOCKS)
+        FATAL("sdhci_write_multi: too many blocks %d", nblocks);
+
+    memcpy(aligned_buf, src, nblocks * BLOCK_SIZE);
+
+    REGW(SDHCI_BASE, SDHCI_DMA_ADDRESS) = (uint)aligned_buf;
+    REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) =
+        (nblocks << 16) | BLOCK_SIZE;
+
+    sdhci_exec_cmd(25, offset * BLOCK_SIZE,
+                   DATA_PRESENT_FLAG,
+                   WRITE_MULTI_WITH_DMA_ENABLE_MODE);
+
+    while (!(REGW(SDHCI_BASE, SDHCI_INT_STAT) & (1 << 1)));
+    sdhci_exec_stop_cmd();
+}
+
 void disk_write(uint block_no, uint nblocks, char* src) {
+    if (nblocks == 0) return;
     if (type == FLASH_ROM) FATAL("FLASH_ROM is read only");
     /* Student's code goes here (I/O Device Driver). */
 
     /* Implement SD card write using SPI or SDHCI+PCI. */
+    (earth->platform == HARDWARE)
+        ? sdspi_write_multi(block_no, nblocks, src)
+        : sdhci_write_multi(block_no, nblocks, src);
 
     /* Student's code ends here. */
 }
@@ -208,3 +360,24 @@ void disk_init() {
         if (type == FLASH_ROM) CRITICAL("Using FLASH_ROM instead of SD_CARD");
     }
 }
+
+/*
+SPI is simple way to access SD card, but its slow
+- SPI devices need manual setup, can't be automatically detected
+- restricted to 512byte chunks at a time
+
+Introduce PLUG AND PLAY and DIRECT MEMORY ACCESS
+
+Plug and Play
+- allow OS to detect a new device connected with the CPU, and configure memory mapped IO for the device
+
+DMA 
+- allows hardware to read/write directly to disk, without CPU having to run SPI
+
+P&P and DMA are possible bc of Peripheral Component Interconnect (PCI or PCIe) bus, which is a standard for connecting peripheral devices to CPU
+
+in EGOS, memory regions are allocated for PCIe
+
+PCIe bus provides advanced memory mapped IO interface for SD cards called Secure Digital Host Controller Interface (SDHCI)
+- 
+*/

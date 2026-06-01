@@ -18,6 +18,34 @@ uint uart_rx_empty() {
                : !(REGB(UART_BASE, VIRT_LINE_STATUS) & (1 << 0));
 }
 
+/*
+when receiving a byte, bit0 of the register at UART_BASE + VIRT_LINE_STATUS is set to 1, and the byte can be read from UART_BASE
+
+when sending a byte, uart_putc waits for UART to be idle, by checking bit5 of the line register
+- after UART is ready, it will write to UART_BASE the byte to be printed on the terminal
+
+Memory Mapped IO
+- hardware can define special areas in memory used to contorl IO devices
+- based on if ran on RISCV or QEMU, UART_BASE is mapped to different addresses, but the same code can be used to read/write UART registers
+
+SPI and SD card
+- computer needs a disk storing blocks of data when the computer is off, (in this case, SD Card)
+- in RISCV, SD card is connected with CPU using Serial Peripheral Interface (SPI), which is a simple protocol to send commands and data between CPU and SD card
+    - this has 4 hardware pins
+
+CPU is SPI Main, SD card is SPI Sub
+- Chip Select (CS) resets the SD card before starting to use it.
+- Serial Clock (SCLK) provides clock signals from the CPU (e.g., 20MHz).
+- Main Out Sub In (MOSI) is used by the CPU to send bytes to the SD card.
+- Main In Sub Out (MISO) is used by the SD card to send bytes to the CPU.
+
+SPI Main and SPI sub EXCHANGE bytes during communication
+
+SPI is synchronous (always receives a byte after sending a byte)
+- spi_exchange uses MOSI and MISO pins to send a byte and receive a byte at the same time, and uses SCLK to synchronize the communication between CPU and SD card
+
+*/
+
 void uart_getc(char* c) {
     while (uart_rx_empty());
     if (earth->platform == HARDWARE) {
