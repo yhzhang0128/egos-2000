@@ -8,20 +8,28 @@
  */
 
 #include "egos.h"
+#include "servers.h"
 #include <string.h>
 
 #define PAGE_SIZE          4096
 #define PAGE_NO_TO_ADDR(x) (char*)(x * PAGE_SIZE)
 #define PAGE_ID_TO_ADDR(x) ((char*)APPS_PAGES_BASE + x * PAGE_SIZE)
 #define APPS_PAGES_CNT     (RAM_END - APPS_PAGES_BASE) / PAGE_SIZE
+// 2MB data, is split into 512 pages; each page is 4kb
 
+//assigned to a specific physical page
 struct page_info {
-    int use;
-    int pid;
-    uint vpage_no;
+    int use; // is the physical page currently in use or not
+    int pid; // which process is this page associated with
+    uint vpage_no; // virtual page number (i.e., virtual address / PAGE_SIZE) mapped to this page
+    int is_page_table; // whether this physical page stores a page table
+    // 0x803FF is virtual page number, XXX is offset
+    // 0x80406 is physical page number
+    // 0x803FFXXX --> 0x80406XXX
 } page_info_table[APPS_PAGES_CNT];
+// since page is 4kb = 2^12 bytes, so last 3 digits in hexadecimal is wtv; every other gets translated from virtual to physical
 
-uint mmu_alloc() {
+uint mmu_alloc() { //returns a physical page id, thats free to use
     for (uint i = 0; i < APPS_PAGES_CNT; i++)
         if (!page_info_table[i].use) {
             page_info_table[i].use = 1;
@@ -31,18 +39,35 @@ uint mmu_alloc() {
 }
 
 void mmu_free(int pid) {
-    for (uint i = 0; i < APPS_PAGES_CNT; i++)
-        if (page_info_table[i].use && page_info_table[i].pid == pid)
+    uint released_pages = 0, page_table_pages = 0;
+
+    for (uint i = 0; i < APPS_PAGES_CNT; i++) {
+        if (page_info_table[i].use && page_info_table[i].pid == pid) {
+            released_pages++;
+            if (page_info_table[i].is_page_table) page_table_pages++;
             memset(&page_info_table[i], 0, sizeof(struct page_info));
+        }
+    }
+
+    INFO("mmu_free released %d pages (%d are page tables) for process %d",
+         released_pages, page_table_pages, pid);
 }
 
-void soft_tlb_map(int pid, uint vpage_no, uint ppage_id) {
+void soft_tlb_map(int pid, uint vpage_no, uint ppage_id) { //ppage_id is phyiscal page id
     page_info_table[ppage_id].pid      = pid;
     page_info_table[ppage_id].vpage_no = vpage_no;
 }
+/*
+we dont do a translation of memory addresses
+- this version of TLB just copies data back and forth?
+no hardware address translation at runtime
+- we just copy data from physical page to virtual page, and vice versa, when we switch processes
 
+this is current implementation:
+- our goal is to implement Page Table Translation
+*/
 void soft_tlb_switch(int pid) {
-    static int curr_vm_pid = -1;
+    static int curr_vm_pid = -1; // which process's virtual memory is currently mapped to the user address space; -1 means no process is mapped (e.g., when we are running the kernel or idle)
     if (pid == curr_vm_pid) return;
 
     /* Unmap curr_vm_pid from the user address space. */
@@ -73,23 +98,28 @@ static uint* leaf;
 static uint* pid_to_pagetable_base[MAX_NPROCESS];
 /* Assume at most MAX_NPROCESS unique processes just for simplicity. */
 
+// how to set up table translation, to translate identity
 void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
     uint vpn1 = addr >> 22;
-
+    // root[vpn1] points to one leaf page, that can map a 4MB chunk of virtual memory
+    // stores in root[vpn1] as (address >> 2) | flags
     if (root[vpn1] & 0x1) {
         /* Leaf has been allocated. */
-        leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000);
+        leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000); // get the memory address, page aligned
     } else {
         /* Allocate the leaf page table. */
         uint ppage_id                 = earth->mmu_alloc();
-        leaf                          = (void*)PAGE_ID_TO_ADDR(ppage_id);
+        leaf                          = (void*)PAGE_ID_TO_ADDR(ppage_id); // convert physical page id to physical address
         page_info_table[ppage_id].pid = pid;
-        memset(leaf, 0, PAGE_SIZE);
-        root[vpn1] = ((uint)leaf >> 2) | 0x1;
+        page_info_table[ppage_id].is_page_table = 1;
+        memset(leaf, 0, PAGE_SIZE); // clear the newly allocated leaf page table
+        root[vpn1] = ((uint)leaf >> 2) | 0x1; // denote it as allocated, shift by 2 
     }
 
     /* Setup the entries in the leaf page table. */
-    uint vpn0 = (addr >> 12) & 0x3FF;
+    uint vpn0 = (addr >> 12) & 0x3FF; // get VPN0, clear out the last 12 bits, and get the last 10 bits
+    // 0x3FF is 10 bits of 1s, so we get the last 10 bits of the virtual page number, which is the index into the leaf page table
+    // maps each leaf entry to a physical page, with the given flag; each leaf entry is (physical address >> 2) | flag
     for (uint i = 0; i < npages; i++)
         leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | flag;
 }
@@ -99,13 +129,16 @@ void pagetable_identity_map(int pid) {
     uint ppage_id                 = earth->mmu_alloc();
     root                          = (void*)PAGE_ID_TO_ADDR(ppage_id);
     page_info_table[ppage_id].pid = pid;
-    pid_to_pagetable_base[pid]    = root;
-    memset(root, 0, PAGE_SIZE);
+    page_info_table[ppage_id].is_page_table = 1;
+    pid_to_pagetable_base[pid]    = root; // for a given PID, where is the root of page table held
+    memset(root, 0, PAGE_SIZE); //set all to 0
 
     /* Setup the identity map for various memory regions. */
+    // PAGE_size = 4kb, so the loop does 4MB at a time, since each leaf page table can map 4MB of virtual memory
     for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
         setup_identity_region(pid, i, 1024, USER_RWX);
 
+    //set up memory mapped IO regions
     setup_identity_region(pid, ETH_CTL_BASE, 4, USER_RWX);
     setup_identity_region(pid, UART_BASE, 1, USER_RWX);
     setup_identity_region(pid, CLINT_BASE, 16, USER_RWX);
@@ -121,6 +154,32 @@ void pagetable_identity_map(int pid) {
         setup_identity_region(pid, ETH_BUF_BASE, 2, USER_RWX);
     }
 }
+/*
+Page table translation
+- two layer approach
+- last 12 bits are offset (4kb), like before
+
+so we have |VPN[1] | VPN[0] | offset|
+- VPN[1] (10 bits) is index into root page table, which gives us the physical address of the leaf page table
+- VPN[0] (10 bits) is index into leaf page table, which gives us the physical address of the page
+- offset (12 bits) is the offset within the page
+
+satp CSR register tells us the physical address of root page table
+- note that this address is page-aligned
+
+When a process accesses a virtual address:
+- extract VPN[1] and VPN[0]
+- use VPN[1] to index into root page table, get physical address of leaf page table
+- use VPN[0] to index into leaf page table, get physical address of page
+- use offset to get the final physical address
+
+Translation Lookaside Buffer (TLB) is a cache for page table entries, to speed up the translation process
+- without TLB, would have to walk the page tables every time we access a virtual address, which is slow
+- with TLB, we can cache the recent translations, so that we can translate virtual addresses faster
+
+
+*/
+
 
 void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     if (pid >= MAX_NPROCESS) FATAL("page_table_map: pid too large");
@@ -147,8 +206,45 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
      *
      * (2) After building page tables for pid (or if page tables for pid exist),
      *     update the page tables and map vpage_no to ppage_id based on Sv32. */
-    soft_tlb_map(pid, vpage_no, ppage_id);
+    
+    //  soft_tlb_map(pid, vpage_no, ppage_id); // soft TLB map does the copying of memory, replace it with identity map for now
+    
+    if (!pid_to_pagetable_base[pid]) {
+        if (pid < GPID_USER_START) {
+            pagetable_identity_map(pid);
+        } else {
+            uint root_ppage_id = earth->mmu_alloc();
+            root = (void*)PAGE_ID_TO_ADDR(root_ppage_id);
+            memset(root, 0, PAGE_SIZE);
 
+            page_info_table[root_ppage_id].pid = pid;
+            page_info_table[root_ppage_id].is_page_table = 1;
+            pid_to_pagetable_base[pid] = root;
+            setup_identity_region(pid, SHELL_WORK_DIR, 1, USER_RWX);
+        }
+    }
+    uint* page_table_root = pid_to_pagetable_base[pid];
+    root = page_table_root;
+    if (!page_table_root) FATAL("page_table_map: no page table for pid %d", pid);
+    uint vpn1 = vpage_no >> 10; // get the VPN[1] from the virtual page number
+    uint vpn0 = vpage_no & 0x3FF; // get the VPN[0] from the virtual page number
+
+    if (root[vpn1] & 0x1) {
+        leaf = (void*)((root[vpn1] << 2) & 0xFFFFF000);
+    } else {
+        /* Allocate the leaf page table. */
+        uint ppage_id                 = earth->mmu_alloc();
+        leaf                          = (void*)PAGE_ID_TO_ADDR(ppage_id); // convert physical page id to physical address
+        page_info_table[ppage_id].pid = pid;
+        page_info_table[ppage_id].is_page_table = 1;
+        memset(leaf, 0, PAGE_SIZE); // clear the newly allocated leaf page table
+        root[vpn1] = ((uint)leaf >> 2) | 0x1; // denote it as allocated, shift by 2 
+    }
+
+    leaf[vpn0] = ((APPS_PAGES_BASE + ppage_id * PAGE_SIZE) >> 2) | USER_RWX; // map the virtual page to the physical page, with the given flag
+
+    page_info_table[ppage_id].pid      = pid;
+    page_info_table[ppage_id].vpage_no = vpage_no;
     /* Student's code ends here. */
 }
 
@@ -158,7 +254,12 @@ void page_table_switch(int pid) {
     /* Remove the soft_tlb_switch below and, instead, update the page table
      * base register (satp) using the value of pid_to_pagetable_base[pid].
      * An example of updating the satp CSR is given in function mmu_init. */
-    soft_tlb_switch(pid);
+    // soft_tlb_switch(pid);
+
+    if (pid >= MAX_NPROCESS) FATAL("page_table_switch: pid too large");
+    uint* page_table_root = pid_to_pagetable_base[pid];
+    if (!page_table_root) FATAL("page_table_switch: no page table for pid %d", pid);    
+    asm("csrw satp, %0" ::"r"(((uint)page_table_root >> 12 | (1 << 31))));
 
     /* Student's code ends here. */
 }
@@ -168,7 +269,20 @@ uint page_table_translate(int pid, uint vaddr) {
 
     /* Remove the following line of code. Walk through the page tables
      * for process pid and return the physical address mapped from vaddr. */
-    return soft_tlb_translate(pid, vaddr);
+    
+    if (pid >= MAX_NPROCESS) FATAL("page_table_translate: pid too large");
+    
+    uint* page_table_root = pid_to_pagetable_base[pid];
+    if (!page_table_root) FATAL("page_table_translate: no page table for pid %d", pid);
+    uint vpn1 = vaddr >> 22;
+    if(!(page_table_root[vpn1] & 0x1)) FATAL("No allocated root page found for pid %d and vaddr %x", pid, vaddr);
+    uint* leaf = (void*)((page_table_root[vpn1] << 2) & 0xFFFFF000);
+    uint vpn0 = (vaddr >> 12) & 0x3FF;
+    if(!(leaf[vpn0] & 0x1)) FATAL("No allocated leaf page found for pid %d and vaddr 0x%x", pid, vaddr);
+    uint paddr = ((leaf[vpn0] << 2) & (0xFFFFF000)) | (vaddr & 0xFFF);
+    return paddr;
+
+    // return soft_tlb_translate(pid, vaddr);
 
     /* Student's code ends here. */
 }
@@ -199,15 +313,6 @@ void mmu_init() {
     asm("csrw pmpaddr0, %0" : : "r"(0x40000000));
     asm("csrw pmpcfg0, %0" : : "r"(0xF));
 
-    /* Student's code goes here (System Call & Protection). */
-
-    /* Replace the PMP region above with a NAPOT region 0x80200000 - 0x80400000
-     * and set the permission for user mode access as r/w/x. */
-    asm("csrw pmpaddr0, %0" : : "r"(0x200BFFFF));
-    asm("csrw pmpcfg0, %0" : : "r"(0x1F));
-
-    /* Student's code ends here. */
-
     CRITICAL("Choose a memory translation mechanism:");
     printf("Enter 0: page tables\n\rEnter 1: software TLB\n\r");
 
@@ -216,6 +321,17 @@ void mmu_init() {
     earth->translation = (buf[0] == '0') ? PAGE_TABLE : SOFT_TLB;
     INFO("%s translation is chosen",
          earth->translation == PAGE_TABLE ? "Page table" : "Software");
+
+    /* Student's code goes here (System Call & Protection). */
+
+    /* Replace the PMP region above with a NAPOT region 0x80200000 - 0x80400000
+     * and set the permission for user mode access as r/w/x. */
+    if (earth->translation == SOFT_TLB) {
+        asm("csrw pmpaddr0, %0" : : "r"(0x200BFFFF));
+        asm("csrw pmpcfg0, %0" : : "r"(0x1F));
+    }
+
+    /* Student's code ends here. */
 
     if (earth->translation == PAGE_TABLE) {
         /* Setup an identity map using page tables. */

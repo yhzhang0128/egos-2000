@@ -84,6 +84,8 @@ static void excp_entry(uint id) {
 
         proc_set_pending(curr_pid);
         proc_set[curr_proc_idx].mepc += 4; //mepc is the PC when the exception occurs; saying that after exception is done, go to next instruction
+
+        // here? for excp handling
         proc_try_syscall(&proc_set[curr_proc_idx]);
         proc_yield();
         return;
@@ -92,13 +94,29 @@ static void excp_entry(uint id) {
 
     
     /* Kill the current process if curr_pid is a user application. */
-    uint mstatus;
-    asm("csrr %0, mstatus" : "=r"(mstatus));
-    if ((mstatus & (3 << 11)) == (0 << 11)) {
+    if (curr_pid >= GPID_USER_START) {
         //need to send an exit() message to the shell, so that it can update its state and print out the next prompt
+        // change how we kill, when we are using virtual addresses
+        /*
+            in this project, CPU enters the kernel in machine mode, so hence uses physical addresses
+            for page tables, want processes to run in user mode
+            grass->sys_send is meant for process/app code, not in kernel, so we need to do the copying of data and sending of message manually here
+
+            avoid SYSCALL_ARG, virtual address
+            already in kernel, so use physical address
+        */
+
         struct proc_request req;
+        memset(&req, 0, sizeof(req));
         req.type = PROC_EXIT;
-        grass->sys_send(GPID_PROCESS, (void*)&req, sizeof(req));
+
+        proc_set[curr_proc_idx].syscall.type = SYS_SEND;
+        proc_set[curr_proc_idx].syscall.receiver = GPID_PROCESS;
+        memcpy(proc_set[curr_proc_idx].syscall.content, &req, sizeof(req));
+        proc_set[curr_proc_idx].syscall.status = PENDING;
+
+        proc_set_pending(curr_pid);
+        proc_try_syscall(&proc_set[curr_proc_idx]);
         proc_yield();
         return;
     }
@@ -183,7 +201,13 @@ Then, it will switch to the mode specified by mstatus.MPP
         proc_set[next_idx].last_start_time = now;
 
         uint mstatus, M_MODE = 3, U_MODE = 0;
-        uint next_mode = proc_set[next_idx].pid < GPID_USER_START ? M_MODE : U_MODE;
+        // software TLB, copy back and forth
+        // page table is kernel managed copying
+        uint next_mode =
+            (earth->translation == SOFT_TLB &&
+            proc_set[next_idx].pid < GPID_USER_START) ? M_MODE : U_MODE;
+        // with page tables, all processes run in U mode, only kernel trap handler runs in M mode
+        
         asm("csrr %0, mstatus" : "=r"(mstatus));
         // turn the 11th and 12th bit off, then set them to what next_mode should be
         mstatus = (mstatus & ~(3 << 11)) | (next_mode << 11); 
@@ -213,7 +237,7 @@ Then, it will switch to the mode specified by mstatus.MPP
     /* Student's code ends here. */
 
     curr_proc_idx = next_idx;
-    earth->mmu_switch(curr_pid);
+    earth->mmu_switch(curr_pid); //switch from process A to process B
     earth->mmu_flush_cache();
     if (curr_status == PROC_READY) {
         /* Setup argc, argv and program counter for a newly created process. */
@@ -281,4 +305,10 @@ static void proc_try_syscall(struct process* proc) {
 loop 500 vs loop 500 silent
 - loop 500 silent doesnt print; so its one continuous loop, so timer interrupts more likely to go off
 - loop 500 prints, which invokes syscalls, so it will switch to print, before there is time for timer interrupt to go off
+*/
+/*
+    after p3: can only run with software TLB
+
+    basically, software TLB with PMP is already impl
+        - our job is to implement page tables, which is not working 
 */
