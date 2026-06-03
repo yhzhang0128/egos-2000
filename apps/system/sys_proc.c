@@ -28,6 +28,8 @@ int main(int unused, struct multicore* boot) {
 
     /* Release the boot lock, so the other 3 cores can start
      * to run; Wait for all the 4 cores to finish booting. */
+    release(boot->boot_lock);
+    while (ACCESS(&boot->booted_core_cnt) < NCORES);
 
     /* Student's code ends here. */
 

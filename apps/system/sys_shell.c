@@ -36,7 +36,8 @@ int main() {
 
             /* Add proc_coresinfo() from process.c into the grass interface;
              * Invoke proc_coresinfo() to show the pid running on each core. */
-
+            req.type  = PROC_CORES_INFO;
+            grass-> proc_coresinfo();
             /* Student's code ends here. */
         } else if (strcmp(buf, "killall") == 0) {
             req.type = PROC_KILLALL;

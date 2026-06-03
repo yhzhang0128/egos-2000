@@ -304,6 +304,24 @@ void flush_cache() {
     }
 }
 
+// global structures only need to be init once
+void mmu_init_core() {
+    asm("csrw pmpaddr0, %0" : : "r"(0x40000000));
+    asm("csrw pmpcfg0, %0" : : "r"(0xF));
+
+    if (earth->translation == SOFT_TLB) {
+        asm("csrw pmpaddr0, %0" : : "r"(0x200BFFFF));
+        asm("csrw pmpcfg0, %0" : : "r"(0x1F));
+    }
+
+    if (earth->translation == PAGE_TABLE) {
+        uint* page_table_root = pid_to_pagetable_base[0];
+        asm("csrw satp, %0" ::"r"(((uint)page_table_root >> 12) | (1 << 31)));
+        asm("sfence.vma zero,zero"); // flush all cached address translations
+        // flushes TLB of current CPU core
+    }
+}
+
 void mmu_init() {
     earth->mmu_free        = mmu_free;
     earth->mmu_alloc       = mmu_alloc;

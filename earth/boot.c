@@ -11,6 +11,7 @@
 void tty_init();
 void disk_init();
 void mmu_init();
+void mmu_init_core();
 void intr_init(uint core_id);
 void grass_entry(uint core_id);
 
@@ -74,10 +75,27 @@ void boot() {
 
         /* Initialize the MMU and interrupts on this CPU core.
          * Read mmu_init() and intr_init(), and decide what to do here. */
-
+        mmu_init_core();
+        intr_init(core_id); 
         /* Reset the timer, release the boot lock, and then hang the core
            by waiting for a timer interrupt using the wfi instruction. */
+        earth->timer_reset(core_id);
+        release(boot_lock);
+        // machine interrupts enabled by intr_init) alr
+
+        while(1) asm("wfi"); // sleep until next timer interrupt
 
         /* Student's code ends here. */
     }
 }
+
+/*
+Currently:
+- Multicore CPUs are booting up properly, but it is crashing
+- crashes are a result of lack of kernel locking
+    - each core will try to run interrupts/exception handling, which messes w the kernel stack
+job:
+- implement kernel_lock
+- oh wait, its in assembly LMFAOO
+
+*/

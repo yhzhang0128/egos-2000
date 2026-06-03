@@ -166,6 +166,11 @@ void proc_coresinfo() {
     /* Student's code goes here (Multicore & Locks). */
 
     /* Print out the pid of the process running on each CPU core. */
-
+    for (uint i =0; i < NCORES; i++){
+        uint proc_idx = core_to_proc_idx[i];
+        int pid = proc_set[proc_idx].pid;
+        if(proc_idx == 0) printf("Core %d: idle\n", i+1);
+        else printf("Core %d: process %d\n", i+1, pid);
+    }
     /* Student's code ends here. */
 }

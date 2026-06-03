@@ -35,7 +35,7 @@ struct grass {
     /* Student's code goes here (System Call | Multicore & Locks). */
     void (*proc_sleep)(int pid, uint usec);
     /* Add interface functions for process sleep and multicore information. */
-
+    void (*proc_coresinfo)();
     /* Student's code ends here. */
 };
 
@@ -77,6 +77,12 @@ extern struct grass* grass;
 #define NCORES     4
 #define release(x) __sync_lock_release(&x);
 #define acquire(x) while (__sync_lock_test_and_set(&x, 1) != 0);
+
+/*
+In general, a lock is a 4byte variable holding either 0/1
+*/
+
+
 extern int boot_lock, kernel_lock, booted_core_cnt;
 
 #define printf my_printf

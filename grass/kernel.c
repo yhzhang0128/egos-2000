@@ -222,16 +222,17 @@ Then, it will switch to the mode specified by mstatus.MPP
         // if cant find a process, bc of timer, should not crash
         // instead, temporarily run no process, and wait for next timer interrupt to fire, at which point we will check again for a process to run
         curr_proc_idx = 0;
-        earth->timer_reset(core_in_kernel); // schedule next timer interrupt
-        /*
-        This handling is what i initially missed!!!
-        */
+        earth->timer_reset(core_in_kernel); 
+
+        release(kernel_lock); // not just sleep case, but now if more cores than runnable processes
+        //release the lock, let others use kernel, while core goes to sleep
         uint mstatus;
         asm("csrr %0, mstatus" : "=r"(mstatus));
         mstatus |= (1 << 3);   // set MIE, Machine Interrupts Enabled
         asm("csrw mstatus, %0" : : "r"(mstatus)); // update it, so we enable machine interrupts
 
         asm("wfi"); // sleep until next timer interrupt
+        acquire(kernel_lock); // acquire after wake up, to finish executing kernel_entry in asm
         return;
     }
     /* Student's code ends here. */
