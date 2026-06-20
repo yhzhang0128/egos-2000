@@ -1,11 +1,17 @@
+/*
+ * (C) 2026, Cornell University
+ * All rights reserved.
+ *
+ * Description: starter code for implementing printf()
+ */
+
 void terminal_write(const char *str, int len) {
     for (int i = 0; i < len; i++) {
         *(char*)(0x10000000) = str[i];
     }
 }
 
-/* Uncomment line11 - line39
- * when implementing formatted output
+/* Uncomment the code block below when implementing formatted output.
  */
 /*
 #include <stdlib.h>  // for itoa() and utoa()
@@ -39,8 +45,7 @@ int printf(const char* format, ...) {
 }
 */
 
-/* Uncomment line46 - line57
- * when implementing dynamic memory allocation
+/* Uncomment the code block below when implementing dynamic memory allocation.
  */
 /*
 extern char __heap_start, __heap_end;
@@ -61,9 +66,7 @@ int main() {
     char* msg = "Hello, World!\n\r";
     terminal_write(msg, 15);
 
-    /* Uncomment this line of code
-     * when implementing formatted output
-     */
+    /* Uncomment this line of code when implementing formatted output. */
     /* printf("%s-%d is awesome!\n\r", "egos", 2000); */
 
     return 0;
