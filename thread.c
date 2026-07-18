@@ -107,6 +107,8 @@ void consume(void *arg) {
 
 int main() {
     thread_init();
+    cv_init(&nonfull);
+    cv_init(&nonempty);
 
     int ID[500];
     for (int i = 0; i < 500; i++) ID[i] = i;
