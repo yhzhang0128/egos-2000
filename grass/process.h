@@ -17,7 +17,7 @@ struct process {
     struct syscall syscall;
     enum proc_status status;
     uint mepc, saved_registers[32];
-    /* Student's code goes here (Preemptive Scheduler | System Call). */
+    /* Student's code goes here (Preemptive Scheduling | System Call). */
 
     /* Add new fields for lifecycle statistics, MLFQ or process sleep. */
 

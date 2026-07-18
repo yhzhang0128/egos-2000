@@ -48,7 +48,7 @@ void boot() {
 
         /* Initialize QEMU's standard VGA device for apps/user/video_demo.c.
          * Start with https://www.qemu.org/docs/master/specs/standard-vga.html,
-         * and you could ask ChatGPT about the Bochs Dispi (Display Interface).
+         * and you could ask AI/LLMs about the Bochs Dispi (Display Interface).
          * Your driver should setup the PCI ECAM for VGA, and then set the VGA
          * screen resolution to 800*600 pixels, each using 4 bytes for its RGB
          * information. Lastly, initialize all the pixels with white color. */

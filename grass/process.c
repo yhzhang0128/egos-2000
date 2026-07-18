@@ -8,7 +8,7 @@
 #include "process.h"
 
 #define MLFQ_NLEVELS          5
-#define MLFQ_RESET_PERIOD     10000000         /* 10 seconds */
+#define MLFQ_RESET_PERIOD     100000000        /* 10 seconds */
 #define MLFQ_LEVEL_RUNTIME(x) (x + 1) * 100000 /* e.g., 100ms for level 0 */
 extern struct process proc_set[MAX_NPROCESS + 1];
 
@@ -28,9 +28,12 @@ int proc_alloc() {
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid    = ++curr_pid;
             proc_set[i].status = PROC_LOADING;
-            /* Student's code goes here (Preemptive Scheduler | System Call). */
+            /* Student's code goes here (Multiple Projects). */
 
-            /* Initialization of lifecycle statistics, MLFQ or process sleep. */
+            /* [Preemptive Scheduling]
+             * Initialize the fields for lifecycle statistics and MLFQ.
+             * [System Call & Protection]
+             * Initialize the fields for the process sleep system call. */
 
             /* Student's code ends here. */
             return curr_pid;
@@ -40,7 +43,7 @@ int proc_alloc() {
 }
 
 void proc_free(int pid) {
-    /* Student's code goes here (Preemptive Scheduler). */
+    /* Student's code goes here (Preemptive Scheduling). */
 
     /* Print the lifecycle statistics of the terminated process or processes. */
     if (pid != GPID_ALL) {
@@ -59,22 +62,22 @@ void proc_free(int pid) {
 }
 
 void mlfq_update_level(struct process* p, ulonglong runtime) {
-    /* Student's code goes here (Preemptive Scheduler). */
+    /* Student's code goes here (Preemptive Scheduling). */
 
     /* Update the MLFQ-related fields in struct process* p after this
-     * process has run on the CPU for another runtime microseconds. */
+     * process has run on the CPU for another ulonglong runtime time units. */
 
     /* Student's code ends here. */
 }
 
 void mlfq_reset_level() {
-    /* Student's code goes here (Preemptive Scheduler). */
+    /* Student's code goes here (Preemptive Scheduling). */
     if (!earth->tty_input_empty()) {
         /* Reset the level of GPID_SHELL if there is pending keyboard input. */
     }
 
     static ulonglong MLFQ_last_reset_time = 0;
-    /* Reset the level of all processes every MLFQ_RESET_PERIOD microseconds. */
+    /* Reset the level of all processes every MLFQ_RESET_PERIOD time units. */
 
     /* Student's code ends here. */
 }
