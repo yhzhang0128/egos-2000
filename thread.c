@@ -2,7 +2,7 @@
  * (C) 2026, Cornell University
  * All rights reserved.
  *
- * Description: cooperative multithreading and synchronization
+ * Description: cooperative threads and synchronization
  */
 
 #include <sys/queue.h>
@@ -10,7 +10,7 @@
 #include "thread.h"
 
 /* Student's code goes here (Cooperative Threads). */
-/* Define the TCB and helper functions (if needed) for multi-threading. */
+/* Define the TCB and helper functions (if needed) for cooperative threads. */
 
 /* Student's code ends here. */
 
@@ -79,7 +79,7 @@ void produce(void* arg) {
         /* At this point, the buffer is not full. */
 
         /* Student's code goes here (Cooperative Threads). */
-        /* Print out the producer ID with the arg pointer. */
+        /* Print out the producer ID using the arg parameter. */
 
         /* Student's code ends here. */
         buffer[tail] = arg;
@@ -95,7 +95,7 @@ void consume(void *arg) {
         /* At this point, the buffer is not empty. */
 
         /* Student's code goes here (Cooperative Threads). */
-        /* Print out the consumer ID with the arg pointer. */
+        /* Print out the consumer ID using the arg parameter. */
 
         /* Student's code ends here. */
         void* result = buffer[head];
@@ -124,6 +124,6 @@ int main() {
      * call thread_exit(), thread_exit() should terminate the program by calling
      * the _end() in thread.s.
      * If the main thread is not the last, thread_exit() will switch the context
-     * to another thread. Later, when all the threads have called thread_exit(),
-     * the last one calling it should then call _end() within thread_exit(). */
+     * to another thread. Later, when all threads have called thread_exit(), the
+     * last exited thread should then call _end() when running thread_exit(). */
 }

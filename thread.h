@@ -19,61 +19,70 @@ struct cv {
 };
 /* Student's code ends here. */
 
-/* Every thread created by thread_create() has a 1KB stack.
-   When creating 1000 threads, 1000*1KB ≈ 1MB memory will be
-   allocated from the **heap** as the stack of these threads. */
+
+
+
+/* Every thread created by thread_create() has a 1024-byte
+   stack. When creating 1000 threads, 1000*1KB≈1MB will be
+   allocated from the *heap* as the stack of these threads. */
 #define STACK_SIZE 1024
 
-/* ctx_start() and ctx_switch() are defined in context.s */
-void  ctx_start(void **sp_old, void *sp_new);
+/* ctx_start() and ctx_switch() are defined in context.s;
+   They are called by thread_create(), etc., in thread.c. */
+void ctx_start(void **sp_old, void *sp_new);
 void ctx_switch(void **sp_old, void *sp_new);
 
-/* _end() is defined in thread.s */
+/* _end() is defined in thread.s. */
 void _end();
 
 /**
- * ctx_entry(): Executing in the context of a newly created thread. The thread will
- * set up its own state (e.g., point its own TCB entry as currently running), and then
- * run its entry function held in its TCB entry. Once the thread finishes its work, it
- * will return to this function and exit by calling thread_exit().
+ * ctx_entry(): Executing in the context of a newly created thread. The thread
+ * sets up its own state (e.g., point its own TCB entry as currently running),
+ * and call its entry function held in its TCB entry. Once the entry function
+ * returns to ctx_entry(), ctx_entry() should call thread_exit().
  */
 void ctx_entry();
 
 /**
- * thread_init(): Initialize the data structures for multi-threading, which includes
+ * thread_init(): Initialize the data structures for multi-threading, such as
  * allocating a TCB entry for the main thread.
  */
 void thread_init();
 
 /**
- * thread_create(void (*entry)(void *arg), void *arg): Create a new thread with a
- * stack of STACK_SIZE (defined above) bytes, and schedule it to run.
+ * thread_create(void (*entry)(void *arg), void *arg): Create a new thread with
+ * a stack of STACK_SIZE (defined above) bytes, and schedule it to run.
  *
  * Let T denote the thread that called thread_create().
  * Let T' denote the newly created thread.
  *
- * In thread_create(), T will allocate a TCB entry for T' along with the stack of T',
- * and then T will schedule T' to run using ctx_start().
+ * In thread_create(), T will allocate a TCB entry for T' along with the stack
+ * of T', and then T will schedule T' to run by calling ctx_start().
  *
- * When thread T'' context switches back to T, T will return back to thread_create(),
- * and possibly clean up T'' if T'' has terminated.
+ * When some thread context switches back to T, T returns from ctx_switch() to
+ * thread_create() as if ctx_start() returns. See thread.s for the details.
+ *
+ * After ctx_start() returns, the current thread should check if the previously
+ * running thread has terminated. If so, it should free the stack and TCB of the
+ * previously running thread.
  */
 void thread_create(void (*entry)(void *arg), void *arg);
 
 /**
- * thread_yield(): Switch to another thread using ctx_switch(). If no other thread
- * can be switched to, continue to run the current thread (if it has not exited or
- * been waiting on a semaphore).
+ * thread_yield(): Switch to another thread by calling ctx_switch(). If no other
+ * thread can be switched to, continue to run the current thread (if it has not
+ * exited or been waiting on a semaphore).
  *
- * Once some thread T' context switches back to T, T will return to thread_yield()
- * and cleanup T' if T' has terminated.
+ * After ctx_switch() returns, the current thread should check if the previously
+ * running thread has terminated. If so, it should free the stack and TCB of the
+ * previously running thread.
  */
 void thread_yield();
 
 /**
- * thread_exit(): The current thread will set its status ZOMBIE (cannot be scheduled),
- * and yield to another thread. If all the other threads have exited by thread_exit(),
- * call the _end() in thread.s which just infinitely loops.
+ * thread_exit(): The current thread will set its status to TERMINATED (or call
+ * it ZOMBIE), and yield by calling thread_yield(). If thread_yield() finds that
+ * all other threads have terminated, it should call the _end() in thread.s.
  */
 void thread_exit();
 
@@ -83,15 +92,15 @@ void thread_exit();
 void cv_init(struct cv *condition);
 
 /**
- * cv_wait(struct cv *condition): Remove the current thread from the TCB, and add it
- * to the conditional variable. Try to yield to another thread in the TCB.
+ * cv_wait(struct cv *condition): Remove the current thread from the TCB, and
+ * add it to the conditional variable. Try to yield to another thread.
  */
 void cv_wait(struct cv *condition);
 
 /**
- * cv_signal(struct cv *condition): Remove a thread (if exists) from the conditional
- * variable, and add it back to the TCB so that it can be scheduled later. However,
- * cv_signal should not switch the CPU context to another thread (i.e., the current
- * thread should continue to run).
+ * cv_signal(struct cv *condition): Remove a waiting thread (if exists) from the
+ * conditional variable, and add it back to the TCB so that it can be scheduled.
+ * However, cv_signal() should not switch the context to another thread (i.e.,
+ * the current thread should continue to run).
  */
 void cv_signal(struct cv *condition);

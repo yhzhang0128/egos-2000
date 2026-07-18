@@ -13,6 +13,8 @@ _start:
 _end:
     call _end
 
+/* Define the SAVE_ALL_REGISTERS macro. */
+
 .macro SAVE_ALL_REGISTERS
     sw ra, 0(sp)
     sw t0, 4(sp)
@@ -46,6 +48,8 @@ _end:
     sw tp,  116(sp)
     sw sp,  120(sp)
 .endm
+
+/* Define the RESTORE_ALL_REGISTERS macro. */
 
 .macro RESTORE_ALL_REGISTERS
     lw ra, 0(sp)
@@ -88,9 +92,9 @@ _end:
 ctx_start:
     addi sp,sp,-128
     SAVE_ALL_REGISTERS
-    sw sp,0(a0)       /* Remember the sp of the current thread */
-    mv sp,a1          /* Switch to the stack of the newly created thread */
-    call ctx_entry    /* Call ctx_entry(), which further calls the entry function of the newly created thread */
+    sw sp,0(a0)   /* Save the current thread's sp to memory address old_sp. */
+    mv sp,a1      /* Switch sp to the new thread's stack, i.e., new_sp. */
+    call ctx_entry
 
 /* void ctx_switch(void** old_sp, void* new_sp); */
 /*                        ^             ^        */
@@ -99,8 +103,9 @@ ctx_start:
 ctx_switch:
     addi sp,sp,-128
     SAVE_ALL_REGISTERS
-    sw sp,0(a0)       /* Remember the sp of the current thread */
-    mv sp,a1          /* Switch to the stack of the next thread */
+    sw sp,0(a0)   /* Save the current thread's sp to memory address old_sp. */
+    mv sp,a1      /* Switch sp to another thread's stack, i.e., new_sp. */
     RESTORE_ALL_REGISTERS
     addi sp,sp,128
-    ret
+    ret           /* Return from ctx_switch() to thread_yield() or whichever
+                     function that called ctx_switch() in this other thread. */

@@ -2,13 +2,13 @@
  * (C) 2026, Cornell University
  * All rights reserved.
  *
- * Description: code in this file is copy-pasted from P0.
- * You can copy-paste your P0 solution code into this file.
+ * Description: this file is the same as hello.c in P0.
+ * Feel free to add your P0 solution code in this file.
  */
 
 void terminal_write(const char *str, int len) {
     for (int i = 0; i < len; i++) {
-        *(char*)(0x10000000UL) = str[i];
+        *(char*)(0x10000000) = str[i];
     }
 }
 
