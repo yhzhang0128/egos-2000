@@ -8,8 +8,8 @@
 #include "process.h"
 
 #define MLFQ_NLEVELS          5
-#define MLFQ_RESET_PERIOD     100000000        /* 10 seconds */
-#define MLFQ_LEVEL_RUNTIME(x) (x + 1) * 100000 /* e.g., 100ms for level 0 */
+#define MLFQ_RESET_PERIOD     100000000         /* 10 seconds */
+#define MLFQ_LEVEL_RUNTIME(x) (x + 1) * 1000000 /* e.g., 100ms for level 0 */
 extern struct process proc_set[MAX_NPROCESS + 1];
 
 static void proc_set_status(int pid, enum proc_status status) {
