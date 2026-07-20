@@ -201,8 +201,9 @@ void mmu_init() {
 
     /* Student's code goes here (System Call & Protection). */
 
-    /* Replace the PMP region above with a NAPOT region 0x80200000 - 0x80400000
-     * and set the permission for user mode access as r/w/x. */
+    /* Replace the PMP region above with two PMP NAPOT regions:
+     * [APPS_ENTRY, APPS_ENTRY + 2MB) with permission R/W/X;
+     * [SHELL_WORK_DIR, SHELL_WORK_DIR + 4KB) with permission R/W. */
 
     /* Student's code ends here. */
 

@@ -46,11 +46,11 @@ extern struct grass* grass;
 #define RAM_END         0x80600000UL /* 6MB memory starting at RAM_START */
 #define APPS_PAGES_BASE 0x80400000UL /* 2MB free for mmu_alloc           */
 #define APPS_STACK_TOP  0x80400000UL /* 1MB app stack (growing down)     */
-#define SHELL_WORK_DIR  0x80302000UL /* current work directory for shell */
 #define SYSCALL_ARG     0x80301000UL /* struct syscall                   */
 #define APPS_ARG        0x80300000UL /* main() arguments (argc and argv) */
 #define APPS_ENTRY      0x80200000UL /* 1MB app code and data            */
 #define EGOS_STACK_TOP  0x80200000UL /* 1MB egos stack (growing down)    */
+#define SHELL_WORK_DIR  0x80102000UL /* sys_shell current work directory */
 #define GRASS_STRUCT    0x80101000UL /* struct grass                     */
 #define EARTH_STRUCT    0x80100000UL /* struct earth                     */
 #define RAM_START       0x80000000UL /* 1MB egos code and data           */
