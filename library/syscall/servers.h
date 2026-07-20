@@ -24,7 +24,7 @@ enum grass_servers {
 struct proc_request {
     /* Student's code goes here (System Call & Protection). */
 
-    /* Update struct proc_request to support process sleep. */
+    /* Update struct proc_request for process sleep. */
     enum { PROC_SPAWN, PROC_EXIT, PROC_KILLALL } type;
     int argc;
     char argv[CMD_NARGS][CMD_ARG_LEN];

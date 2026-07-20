@@ -104,7 +104,7 @@ To reboot egos-2000, press one of the two white buttons on Tang Nano 20K or the 
 
 ### Step3.2: Windows (only for the Arty boards)
 
-Install Vivado Lab Edition which can be downloaded [here](https://www.xilinx.com/support/download.html).
+Install Vivado Lab Edition, which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
 
 1. Open Vivado Lab Edition and click "Open Hardware Manager"

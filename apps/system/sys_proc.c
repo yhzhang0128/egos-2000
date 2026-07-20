@@ -69,7 +69,7 @@ int main(int unused, struct multicore* boot) {
             break;
         /* Student's code goes here (System Call & Protection). */
 
-        /* Add a case which handles process sleep. */
+        /* Add a case that handles process sleep. */
 
         /* Student's code ends here. */
         default:

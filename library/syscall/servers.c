@@ -24,7 +24,7 @@ void sleep(uint usec) {
 
     /* Send a message to GPID_PROCESS for process sleep. For simplicity,
      * you can assume that GPID_PROCESS will be scheduled and handle the
-     * message before the kernel re-schedules the current process. */
+     * message before the kernel reschedules the current process. */
 
     /* Student's code ends here. */
 }

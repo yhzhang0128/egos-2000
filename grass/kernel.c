@@ -120,7 +120,7 @@ static void proc_yield() {
         /* [Multicore & Locks]
          * Release the kernel lock.
          * [Multicore & Locks | System Call & Protection]
-         * Set curr_proc_idx to 0; Reset the timer;
+         * Set curr_proc_idx to MAX_NPROCESS; Reset the timer;
          * Enable interrupts by setting the mstatus.MIE bit to 1;
          * Wait for the next interrupt using the wfi instruction. */
 

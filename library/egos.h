@@ -34,7 +34,7 @@ struct grass {
     void (*sys_recv)(int from, int* sender, char* buf, uint size);
     /* Student's code goes here (System Call | Multicore & Locks). */
 
-    /* Add interface functions for process sleep and multicore information. */
+    /* Add interface functions for process sleep or multicore information. */
 
     /* Student's code ends here. */
 };
