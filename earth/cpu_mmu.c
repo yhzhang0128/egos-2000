@@ -128,25 +128,25 @@ void page_table_map(int pid, uint vpage_no, uint ppage_id) {
     /* Student's code goes here (Virtual Memory). */
 
     /* Remove the soft_tlb_map below and do the following.
-     * (1) If page tables for pid do not exist, build the tables.
-     *   Case#1: pid < GPID_USER_START
-     * | Start Address | # Pages | Size   | Explanation                        |
-     * +---------------+---------+--------+------------------------------------+
-     * | 0x80000000    | 512     | 2 MB   | EGOS region (code+data+heap+stack) |
-     * | 0x80200000    | 512     | 2 MB   | Apps region (code+data+heap+stack) |
-     * | 0x80400000    | 512     | 2 MB   | Initially free memory              |
-     * | CLINT_BASE    | 16      | 64 KB  | Memory-mapped registers for timer  |
-     * | UART_BASE     | 1       | 4 KB   | Memory-mapped registers for TTY    |
-     * | SDHCI_BASE    | 1       | 4 KB   | Memory-mapped registers for SD     |
+     * (1) If page tables for process pid do not exist, initialize page tables.
+     *   * Initialization Case#1: pid < GPID_USER_START
+     * | Start Address   | # Pages | Size  | Explanation                       |
+     * +-----------------+---------+-------+-----------------------------------+
+     * | RAM_START       | 512     | 2 MB  | EGOS code, data, heap, stack      |
+     * | APPS_ENTRY      | 512     | 2 MB  | Apps code, data, heap, stack      |
+     * | APPS_PAGES_BASE | 512     | 2 MB  | Memory pages for page_alloc()     |
+     * | UART_BASE       | 1       | 4 KB  | Memory-mapped registers for TTY   |
+     * | SDHCI_BASE      | 1       | 4 KB  | Memory-mapped registers for SD    |
+     * | CLINT_BASE      | 16      | 64 KB | Memory-mapped registers for timer |
      *
-     *   Case#2: pid >= GPID_USER_START
-     * | Start Address | # Pages | Size   | Explanation                        |
-     * +---------------+---------+--------+------------------------------------+
-     * | 0x80302000    | 1       | 4 KB   | Work dir (see apps/app.h)          |
-     * You may also map the regions for the Ethernet, WiFi and VGA/HDMI devices.
+     *   * Initialization Case#2: pid >= GPID_USER_START
+     * | Start Address   | # Pages | Size  | Explanation                       |
+     * +-----------------+---------+-------+-----------------------------------+
+     * | SHELL_WORK_DIR  | 1       | 4 KB  | Work dir (see apps/app.h)         |
+     * In later projects, you can add mappings for Ethernet, Wi-Fi, or VGA/HDMI.
      *
-     * (2) After building page tables for pid (or if page tables for pid exist),
-     *     update the page tables and map vpage_no to ppage_id based on Sv32. */
+     * (2) After page tables for process pid have been initialized, update the
+     *     page tables and map *vpage_no* to *ppage_id* according to Sv32. */
     soft_tlb_map(pid, vpage_no, ppage_id);
 
     /* Student's code ends here. */
@@ -157,7 +157,7 @@ void page_table_switch(int pid) {
 
     /* Remove the soft_tlb_switch below and, instead, update the page table
      * base register (satp) using the value of pid_to_pagetable_base[pid].
-     * An example of updating the satp CSR is given in function mmu_init. */
+     * An example of updating the satp CSR is given in mmu_init(). */
     soft_tlb_switch(pid);
 
     /* Student's code ends here. */
