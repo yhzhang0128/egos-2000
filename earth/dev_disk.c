@@ -25,7 +25,7 @@
 #define SDHCI_INT_SIG_ENABLE   0x38
 
 static char sdhci_exec_cmd(uint idx, uint arg, uchar flag, uint mode) {
-    /* Wait until the SD controller to be ready for a new command. */
+    /* Wait until the SD controller is ready for a new command. */
     while (REGW(SDHCI_BASE, SDHCI_PRESENT_STATE) & 0x3);
 
     /* Clear the interrupt status register. */
@@ -56,16 +56,16 @@ static void sdhci_read(uint offset, char* dst) {
 
 static int sdhci_init() {
 #define PCI_ECAM_ALLOW_MMIO_AND_DMA ((1 << 1) | (1 << 2))
-    /* Set the PCI ECAM base address register as SDHCI_BASE. */
+    /* Set the PCI ECAM base address register to SDHCI_BASE. */
     REGW(SDHCI_PCI_ECAM, 0x4)  = PCI_ECAM_ALLOW_MMIO_AND_DMA;
     REGW(SDHCI_PCI_ECAM, 0x10) = SDHCI_BASE;
 
-    /* Reset the SD card and enable clock. */
+    /* Reset the SD card and enable the clock. */
     REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) = 0x1;
     while (REGB(SDHCI_BASE, SDHCI_SOFTWARE_RESET) & 0x1);
     REGB(SDHCI_BASE, SDHCI_CLKCON) = 0x5;
 
-    /* Enable interrupt status, but disable interrupt signal. */
+    /* Enable interrupt status, but disable interrupt signals. */
     REGW(SDHCI_BASE, SDHCI_INT_SIG_ENABLE)  = 0x0;
     REGW(SDHCI_BASE, SDHCI_INT_STAT_ENABLE) = 0x27F003B;
 
@@ -112,7 +112,7 @@ static char sdspi_exec_acmd(char* cmd) {
 }
 
 static void sdspi_read(uint offset, char* dst) {
-    /* Wait until SD card is ready for a new command. */
+    /* Wait until the SD card is ready for a new command. */
     while (spi_exchange(0xFF) != 0xFF);
 
     /* Send a read request with command #17. */
@@ -195,7 +195,7 @@ void disk_write(uint block_no, uint nblocks, char* src) {
 
     /* Implement the SD card multi-block write driver with command #25. Add
      * a testing function disk_test() as explained below, which should call
-     * this disk_write() and test whether multi-block write works correctly. */
+     * disk_write() and test whether multi-block write works correctly. */
 
     /* Student's code ends here. */
 }
@@ -216,7 +216,7 @@ void disk_init() {
         /* QEMU uses the PCI bus and the SDHCI standard. */
         sdhci_init();
     } else {
-        /* Hardware uses the SPI bus to control SD card. */
+        /* Hardware uses the SPI bus to control the SD card. */
         type = (sdspi_init() == 0) ? SD_CARD : FLASH_ROM;
         if (type == FLASH_ROM) CRITICAL("Using FLASH_ROM instead of SD_CARD");
     }

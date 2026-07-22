@@ -71,7 +71,7 @@ uint soft_tlb_translate(int pid, uint vaddr) {
 static uint* root;
 static uint* leaf;
 static uint* pid_to_pagetable_base[MAX_NPROCESS];
-/* Assume at most MAX_NPROCESS unique processes just for simplicity. */
+/* Assume at most MAX_NPROCESS unique processes, just for simplicity. */
 
 void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
     uint vpn1 = addr >> 22;
@@ -88,7 +88,7 @@ void setup_identity_region(int pid, uint addr, uint npages, uint flag) {
         root[vpn1] = ((uint)leaf >> 2) | 0x1;
     }
 
-    /* Setup the entries in the leaf page table. */
+    /* Set up the entries in the leaf page table. */
     uint vpn0 = (addr >> 12) & 0x3FF;
     for (uint i = 0; i < npages; i++)
         leaf[vpn0 + i] = ((addr + i * PAGE_SIZE) >> 2) | flag;
@@ -102,7 +102,7 @@ void pagetable_identity_map(int pid) {
     pid_to_pagetable_base[pid]    = root;
     memset(root, 0, PAGE_SIZE);
 
-    /* Setup the identity map for various memory regions. */
+    /* Set up the identity map for various memory regions. */
     for (uint i = RAM_START; i < RAM_END; i += PAGE_SIZE * 1024)
         setup_identity_region(pid, i, 1024, USER_RWX);
 
@@ -208,7 +208,7 @@ void mmu_init() {
     /* Student's code ends here. */
 
     CRITICAL("Choose a memory translation mechanism:");
-    printf("Enter 0: page tables\n\rEnter 1: software TLB\n\r");
+    printf("Enter 0: page tables.\n\rEnter 1: software TLB.\n\r");
 
     char buf[2];
     for (buf[0] = 0; buf[0] != '0' && buf[0] != '1'; earth->tty_read(&buf[0]));
@@ -217,7 +217,7 @@ void mmu_init() {
          earth->translation == PAGE_TABLE ? "Page table" : "Software");
 
     if (earth->translation == PAGE_TABLE) {
-        /* Setup an identity map using page tables. */
+        /* Set up an identity map using page tables. */
         pagetable_identity_map(0);
         asm("csrw satp, %0" ::"r"(((uint)root >> 12) | (1 << 31)));
 

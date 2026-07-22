@@ -38,7 +38,7 @@ void intr_init(uint core_id) {
     earth->timer_reset = timer_reset;
     mtimecmp_set(0x0FFFFFFFFFFFFFFFUL, core_id);
 
-    /* Setup the interrupt/exception handling entry. */
+    /* Set up the interrupt/exception handling entry. */
     asm("csrw mtvec, %0" ::"r"(trap_entry));
     INFO("Use direct mode and put the address of the trap_entry into mtvec");
 

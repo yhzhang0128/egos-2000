@@ -59,10 +59,10 @@ void boot() {
 
         /* Use ETH_CTL_BASE as the BAR0 in Ethernet's PCIe configuration. Enable
          * the Ethernet controller's RXT0 (Receiver Timer Interrupt). Initialize
-         * the MAC address register (Receive Address Low/High) and the registers
-         * for RX descriptors. Make sure the address field of each RX descriptor
-         * is written by the corresponding RX buffer address. Lastly, set the EN
-         * and SECRC bits of RCTL (Receive Control Register) to 1. */
+         * the MAC address register and the RX descriptor registers. Ensure that
+         * every RX descriptor's address field is written with its corresponding
+         * RX buffer's address. Read the descriptions for RCTL (Receive Control)
+         * and decide which bits should be set to 1. */
 
         /* Student's code ends here. */
 
@@ -73,11 +73,11 @@ void boot() {
         /* Student's code goes here (Multicore & Locks). */
 
         /* Refer to mmu_init() and intr_init(), and decide how to initialize
-           the CSRs for virtual memory and interrupts on this CPU core. */
+         * the CSRs for virtual memory and interrupts on this CPU core. */
 
         /* Reset the timer, release the boot lock, and run the wfi instruction.
-           After the next timer interrupt, this CPU core will enter the kernel,
-           and the kernel could schedule a process to run on this CPU core. */
+         * After the next timer interrupt, this CPU core will enter the kernel,
+         * and the kernel could schedule a process to run on this CPU core. */
 
         /* Student's code ends here. */
     }
