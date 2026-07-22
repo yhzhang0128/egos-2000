@@ -46,6 +46,6 @@ void grass_entry(uint core_id) {
     asm("mv a0, %0" ::"r"(APPS_ARG));
     asm("mv a1, %0" ::"r"(&boot_lock));
     asm("mret");
-    /* If using page table translation, the CPU will enter the user mode after
-     * this mret and thus page table translation will start to take effect. */
+    /* If using page table translation, the CPU will enter user mode after
+     * this mret, and page table translation will start to take effect. */
 }

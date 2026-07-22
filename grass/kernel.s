@@ -62,8 +62,8 @@ trap_entry:
     sw ra,  108(sp)
     sw gp,  112(sp)
     sw tp,  116(sp)
-    csrr t0, mscratch /* Step1 has written sp to mscratch */
-    sw t0,  120(sp)   /* t0 holds the value of the old sp before trap_entry */
+    csrr t0, mscratch /* Step1 has written sp to mscratch. */
+    sw t0,  120(sp)   /* t0 holds the value of the old sp before trap_entry. */
 
     /* Step4 */
     call kernel_entry

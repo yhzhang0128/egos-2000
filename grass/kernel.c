@@ -13,7 +13,7 @@
 uint core_in_kernel;
 uint core_to_proc_idx[NCORES];
 struct process proc_set[MAX_NPROCESS + 1];
-/* proc_set[MAX_NPROCESS] is a place holder for idle cores. */
+/* proc_set[MAX_NPROCESS] is a placeholder for idle cores. */
 
 #define curr_proc_idx core_to_proc_idx[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid
@@ -132,7 +132,8 @@ static void proc_yield() {
     earth->mmu_switch(curr_pid);
     earth->mmu_flush_cache();
     if (curr_status == PROC_READY) {
-        /* Setup argc, argv and program counter for a newly created process. */
+        /* Set up the argc, argv, and initial program
+         * counter for a newly created process. */
         curr_saved[0]                = APPS_ARG;
         curr_saved[1]                = APPS_ARG + 4;
         proc_set[curr_proc_idx].mepc = APPS_ENTRY;
@@ -146,7 +147,8 @@ static void proc_try_send(struct process* sender) {
         struct process* dst = &proc_set[i];
         if (dst->pid == sender->syscall.receiver &&
             dst->status != PROC_UNUSED) {
-            /* Return if dst is not receiving or not taking msg from sender. */
+            /* Return if process dst is not receiving messages or
+             * is not taking messages from the sender process. */
             if (!(dst->syscall.type == SYS_RECV &&
                   dst->syscall.status == PENDING))
                 return;
