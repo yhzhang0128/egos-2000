@@ -18,8 +18,9 @@
 
 /* Student's code goes here (File System). */
 
-/* Include necessary header files; Define data structures for your file system;
-   Define helper functions; You can also put these to a separate header file. */
+/* Add a header file similar to file1.h, which defines data structures in your
+   file system. Include this header file and other header files you need, such
+   as string.h. Define helper functions shared by the file system functions. */
 
 /* Student's code ends here. */
 
@@ -46,7 +47,7 @@ int mydisk_write(inode_intf self, uint ino, uint offset, block_t* block) {
 int mydisk_getsize(inode_intf self, uint ino) {
     /* Student's code goes here (File System). */
 
-    /* Replace the code below with code for getting the size of an inode. */
+    /* Replace the error printing with code for getting an inode's size. */
 #ifdef MKFS
     fprintf(stderr, "mydisk_getsize not implemented");
     while (1);
@@ -59,7 +60,7 @@ int mydisk_getsize(inode_intf self, uint ino) {
 int mydisk_setsize(inode_intf self, uint ino, uint nblocks) {
     /* Student's code goes here (File System). */
 
-    /* Replace the code below with code for changing the size of an inode. */
+    /* Replace the error printing with code for changing an inode's size. */
 #ifdef MKFS
     fprintf(stderr, "mydisk_setsize not implemented");
     while (1);
@@ -72,7 +73,7 @@ int mydisk_setsize(inode_intf self, uint ino, uint nblocks) {
 int mydisk_create(inode_intf below, uint below_ino, uint ninodes) {
     /* Student's code goes here (File System). */
 
-    /* Initialize the on-disk data structures for your file system. */
+    /* Create the initial on-disk data structures for your file system. */
 
     /* Student's code ends here. */
     return 0;
@@ -81,7 +82,7 @@ int mydisk_create(inode_intf below, uint below_ino, uint ninodes) {
 inode_intf mydisk_init(inode_intf below, uint below_ino) {
     /* Student's code goes here (File System). */
 
-    /* Feel free to modify anything below if necessary. */
+    /* Feel free to add or modify anything here. */
     inode_intf self = malloc(sizeof(struct inode_store));
     self->getsize   = mydisk_getsize;
     self->setsize   = mydisk_setsize;
