@@ -34,8 +34,8 @@ int main() {
         if (strcmp(buf, "coresinfo") == 0) {
             /* Student's code goes here (Multicore & Locks). */
 
-            /* Add proc_coresinfo() from process.c into the grass interface;
-             * Invoke proc_coresinfo() to show the pid running on each core. */
+            /* Print out the process pid running on each core using
+             * the proc_coresinfo() function in grass/process.c. */
 
             /* Student's code ends here. */
         } else if (strcmp(buf, "killall") == 0) {

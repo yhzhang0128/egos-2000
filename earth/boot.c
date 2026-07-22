@@ -72,11 +72,12 @@ void boot() {
 
         /* Student's code goes here (Multicore & Locks). */
 
-        /* Initialize the MMU and interrupts on this CPU core.
-         * Read mmu_init() and intr_init(), and decide what to do here. */
+        /* Refer to mmu_init() and intr_init(), and decide how to initialize
+           the CSRs for virtual memory and interrupts on this CPU core. */
 
-        /* Reset the timer, release the boot lock, and then hang the core
-           by waiting for a timer interrupt using the wfi instruction. */
+        /* Reset the timer, release the boot lock, and run the wfi instruction.
+           After the next timer interrupt, this CPU core will enter the kernel,
+           and the kernel could schedule a process to run on this CPU core. */
 
         /* Student's code ends here. */
     }

@@ -21,8 +21,8 @@ trap_entry:
 
     /* Step1 */
     /* Student's code goes here (Multicore & Locks). */
-    /* Acquire the kernel lock and make sure not to modify any registers, */
-    /* so you may need to use sscratch just like how Step2 uses mscratch. */
+    /* Acquire the kernel lock without modifying the value of any registers,
+     * so you may need the sscratch CSR just like how Step2 uses mscratch. */
 
     /* Student's code ends here. */
 
@@ -105,8 +105,8 @@ trap_entry:
 
     /* Step7 */
     /* Student's code goes here (Multicore & Locks). */
-    /* Release the kernel lock and make sure not to modify any registers, */
-    /* so you may need to use sscratch just like how Step2 uses mscratch. */
+    /* Release the kernel lock without modifying the value of any registers,
+     * so you may need the sscratch CSR just like how Step2 uses mscratch. */
 
     /* Student's code ends here. */
 

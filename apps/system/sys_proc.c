@@ -23,8 +23,8 @@ int main(int unused, struct multicore* boot) {
 
     /* Student's code goes here (Multicore & Locks). */
 
-    /* Release the boot lock, so the other 3 cores can start
-     * to run; Wait for all the 4 cores to finish booting. */
+    /* Release the boot lock, so the other 3 cores can enter the
+     * boot loader. Then wait for all 4 cores to finish booting. */
 
     /* Student's code ends here. */
 
