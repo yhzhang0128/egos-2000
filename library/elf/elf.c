@@ -54,7 +54,7 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
         if (pid <= GPID_SHELL) INFO("Load 0x%x bytes to 0x%x", filesz, addr);
     }
 
-    /* Setup a page for main() arguments (argc and argv). */
+    /* Set up a page for main() arguments (argc and argv). */
     uint ppage_id = earth->mmu_alloc();
     earth->mmu_map(pid, APPS_ARG / PAGE_SIZE, ppage_id);
 
@@ -69,11 +69,11 @@ void elf_load(int pid, elf_reader reader, int argc, void** argv) {
         argv_addr[i] = APPS_ARG + sizeof(uint) /* argc */ +
                        sizeof(void*) * CMD_NARGS /* argv */ + i * CMD_ARG_LEN;
 
-    /* Setup a page for system call arguments. */
+    /* Set up a page for system call arguments. */
     ppage_id = earth->mmu_alloc();
     earth->mmu_map(pid, SYSCALL_ARG / PAGE_SIZE, ppage_id);
 
-    /* Setup 2 pages for user stack (enough for teaching purpose). */
+    /* Set up 2 pages for the user stack (enough for teaching purposes). */
     for (uint i = 1; i <= 2; i++) {
         ppage_id = earth->mmu_alloc();
         earth->mmu_map(pid, APPS_STACK_TOP / PAGE_SIZE - i, ppage_id);

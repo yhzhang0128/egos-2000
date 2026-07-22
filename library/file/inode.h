@@ -9,8 +9,8 @@
  * maintains one or more "inodes", each representing an array of blocks.
  * A physical disk would typically just have one inode (inode 0), while
  * a virtualized disk may have many.  Each inode store module has an
- * 'init' function that returns a inode_intf.  The inode_intf is
- * a pointer to a structure that contains the following four methods:
+ * 'init' function that returns an inode_intf. The inode_intf is a
+ * pointer to a structure that contains the following four methods:
  *
  * int getsize(inode_intf self, unsigned int ino)
  *   - returns the size of the inode store at the given inode number

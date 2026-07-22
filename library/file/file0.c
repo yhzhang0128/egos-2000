@@ -19,8 +19,8 @@
 /* Student's code goes here (File System). */
 
 /* Add a header file similar to file1.h, which defines data structures in your
-   file system. Include this header file and other header files you need, such
-   as string.h. Define helper functions shared by the file system functions. */
+ * file system. Include this header file and other header files you need, such
+ * as string.h. Define helper functions shared by the file system functions. */
 
 /* Student's code ends here. */
 

@@ -69,7 +69,7 @@ extern struct grass* grass;
 #define FLASH_ROM_BASE   (earth->platform == QEMU ? 0x22000000UL : 0x20400000UL)
 #define VIDEO_FRAME_BASE (earth->platform == QEMU ? 0x41000000UL : 0x80600000UL)
 
-/* Below are some common macros/declarations for I/O, multicore and printing. */
+/* Below are some common macros or declarations for I/O or multicore. */
 #define ACCESS(x)          (*(__typeof__(*x) volatile*)(x))
 #define REGW(base, offset) (ACCESS((uint*)(base + offset)))
 #define REGB(base, offset) (ACCESS((uchar*)(base + offset)))

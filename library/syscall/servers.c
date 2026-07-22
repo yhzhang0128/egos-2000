@@ -59,7 +59,7 @@ int file_read(int file_ino, uint offset, char* block) {
 
 #ifndef KERNEL
 
-/* Terminal read/write for user applications send messages to GPID_TERMINAL. */
+/* Terminal read/write for user apps to send messages to GPID_TERMINAL. */
 int term_read(char* buf, uint len) {
     struct term_request req;
     struct term_reply reply;
@@ -81,7 +81,7 @@ void term_write(char* str, uint len) {
 
 #else
 
-/* Terminal read/write for the kernel directly use the TTY earth interface. */
+/* Terminal read/write for the kernel directly uses the TTY earth interface. */
 int term_read(char* buf, uint len) {
     char c;
     for (int i = 0; i < len - 1; i++) {
