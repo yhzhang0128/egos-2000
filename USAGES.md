@@ -46,17 +46,14 @@ Download the [pre-built binaries of QEMU](https://github.com/xpack-dev-tools/qem
 > export PATH=$PATH:$EGOS/xpack-qemu-riscv-8.2.2-1-xxxxxx/bin
 > cd $EGOS/egos-2000
 > make qemu
+...
 -------- Simulate on QEMU-RISCV --------
-qemu-system-riscv32 -nographic -readconfig tools/qemu/config.toml
-[CRITICAL] --- Booting on QEMU with core #4 ---
-[INFO] Set the CS pin to HIGH and toggle clock
-[INFO] Set the CS pin to LOW and send cmd0 to SD card
-[INFO] Check SD card type and voltage with cmd8
-[INFO] SD card replies cmd8 with status 1
+qemu-system-riscv32 -M virt -smp 4 -m 8M -bios tools/egos.bin -nographic -drive if=pflash,format=raw,unit=1,file=tools/qemuROM.bin -device sdhci-pci,addr=0x1 -device sd-card,drive=MMC -drive if=none,file=tools/disk.img,format=raw,id=MMC
+[CRITICAL] --- Booting on QEMU with core #0 ---
 [SUCCESS] Finished initializing the tty and disk devices
 [CRITICAL] Choose a memory translation mechanism:
-Enter 0: page tables
-Enter 1: software TLB
+Enter 0: page tables.
+Enter 1: software TLB.
 ```
 
 ## Step3: Run egos-2000 on a board
