@@ -40,7 +40,7 @@ static char sdhci_exec_cmd(uint idx, uint arg, uchar flag, uint mode) {
 }
 
 static void sdhci_read(uint offset, char* dst) {
-    /* Prepare DMA (SDMA mode of SDHCI). */
+    /* Prepare DMA (SDHCI SDMA mode). */
     static __attribute__((aligned(BLOCK_SIZE))) char aligned_buf[BLOCK_SIZE];
     REGW(SDHCI_BASE, SDHCI_DMA_ADDRESS)      = (uint)aligned_buf;
     REGW(SDHCI_BASE, SDHCI_BLK_CNT_AND_SIZE) = (1 << 16) | BLOCK_SIZE;

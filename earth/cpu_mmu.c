@@ -195,7 +195,7 @@ void mmu_init() {
     earth->mmu_alloc       = mmu_alloc;
     earth->mmu_flush_cache = flush_cache;
 
-    /* Setup a PMP region for the whole 4GB address space. */
+    /* Set up a PMP region for the whole 4GB address space. */
     asm("csrw pmpaddr0, %0" : : "r"(0x40000000));
     asm("csrw pmpcfg0, %0" : : "r"(0xF));
 
