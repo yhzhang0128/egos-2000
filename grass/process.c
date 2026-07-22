@@ -24,7 +24,7 @@ void proc_set_pending(int pid) { proc_set_status(pid, PROC_PENDING_SYSCALL); }
 
 int proc_alloc() {
     static uint curr_pid = 0;
-    for (uint i = 1; i <= MAX_NPROCESS; i++)
+    for (uint i = 0; i < MAX_NPROCESS; i++)
         if (proc_set[i].status == PROC_UNUSED) {
             proc_set[i].pid    = ++curr_pid;
             proc_set[i].status = PROC_LOADING;

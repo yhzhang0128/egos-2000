@@ -13,7 +13,7 @@
 uint core_in_kernel;
 uint core_to_proc_idx[NCORES];
 struct process proc_set[MAX_NPROCESS + 1];
-/* proc_set[0] is a place holder for idle cores. */
+/* proc_set[MAX_NPROCESS] is a place holder for idle cores. */
 
 #define curr_proc_idx core_to_proc_idx[core_in_kernel]
 #define curr_pid      proc_set[curr_proc_idx].pid

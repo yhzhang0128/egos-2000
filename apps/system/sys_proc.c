@@ -14,8 +14,10 @@ static int app_ino, app_pid;
 static void sys_spawn(uint base);
 static int app_spawn(struct proc_request* req);
 
+/* See earth/boot.s */
 struct multicore {
-    int boot_lock, booted_core_cnt; /* See earth/boot.s */
+    int boot_lock;
+    int booted_core_cnt;
 };
 
 int main(int unused, struct multicore* boot) {

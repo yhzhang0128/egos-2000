@@ -38,7 +38,7 @@ egos: $(USRAPP_ELFS) $(SYSAPP_ELFS) $(RELEASE)/egos.elf
 
 $(RELEASE)/egos.elf: $(EGOS_DEPS)
 	@printf "$(YELLOW)-------- Compile EGOS --------$(END)\n"
-	$(RISCV_CC) $(CFLAGS) $(INCLUDE) -DKERNEL $(filter %.s, $(wildcard $^)) $(filter %.c, $(wildcard $^)) -Tlibrary/elf/egos.lds $(LDFLAGS) -o $@
+	$(RISCV_CC) $(CFLAGS) $(INCLUDE) -I grass -DKERNEL $(filter %.s, $(wildcard $^)) $(filter %.c, $(wildcard $^)) -Tlibrary/elf/egos.lds $(LDFLAGS) -o $@
 	@$(OBJDUMP) $(DEBUG_FLAGS) $@ > $(DEBUG)/egos.lst
 
 $(SYSAPP_ELFS): $(RELEASE)/%.elf : apps/system/%.c $(APPS_DEPS)
