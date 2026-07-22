@@ -26,27 +26,27 @@ SUM:                            43            548            837           2000 
 
 ## Earth and Grass Operating System
 
-The **egos** part of egos-2000 is named after its three-layer architecture.
+The "egos" part of egos-2000 is named after its three-layer architecture.
 
 * The **earth layer** implements hardware-specific abstractions.
     * tty and disk device interface
     * timer and memory management interface
 * The **grass layer** implements hardware-independent abstractions.
     * process control block and system call interface
-* The **application layer** implements file system, shell and user commands.
+* The **application layer** implements file system, shell, and user commands.
 
-The definitions of `struct earth` and `struct grass` in header file [egos.h](library/egos.h) specify the layer interface.
-Please read [USAGES.md](USAGES.md) for running egos-2000 and
+The definitions of `struct earth` and `struct grass` in the header file [egos.h](library/egos.h) specify the layer interface.
+Please read [USAGES.md](USAGES.md) for running egos-2000, and
 the [instruction set manuals](https://github.com/riscv/riscv-isa-manual/releases) for the RISC-V privileged ISA.
 
 ## Acknowledgements
 
 Many thanks to Meta for a [Facebook fellowship](https://research.facebook.com/blog/2021/4/announcing-the-recipients-of-the-2021-facebook-fellowship-awards/).
 Many thanks to [Robbert van Renesse](https://www.cs.cornell.edu/home/rvr/), [Lorenzo Alvisi](https://www.cs.cornell.edu/lorenzo/), [Shan Lu](https://people.cs.uchicago.edu/~shanlu/), [Hakim Weatherspoon](https://www.cs.cornell.edu/~hweather/) and [Christopher Batten](https://www.csl.cornell.edu/~cbatten/) for their support.
-Many thanks to [Cheng Tan](https://naizhengtan.github.io/) and [Yu-Ju Huang](https://yuju-huang.github.io/) for providing valuable feedback to the EGOS book and using egos-2000 in [Northeastern CS4973/6640](https://naizhengtan.github.io/25spring/) and [Cornell CS4411/5411](https://www.cs.cornell.edu/courses/cs4411/2025sp/).
+Many thanks to [Cheng Tan](https://naizhengtan.github.io/) and [Yu-Ju Huang](https://yuju-huang.github.io/) for providing valuable feedback on the EGOS book and using egos-2000 in [Northeastern CS4973/6640](https://naizhengtan.github.io/25spring/) and [Cornell CS4411/5411](https://www.cs.cornell.edu/courses/cs4411/2025sp/).
 Many thanks to [Haobin Ni](https://haobin.cx/) and [Hongbo Zhang](https://www.cs.cornell.edu/~hongbo/) for [porting egos-2000 to mriscv](https://github.com/0x486F626F/mriscv/tree/egos), a simple processor written in SystemVerilog.
 Many thanks to [Brandon Fusi](https://www.linkedin.com/in/brandon-cheo-fusi-b94b1a171/) for [porting egos-2000 to Allwinner D1](https://github.com/cheofusi/egos-2000-d1) and Sipeed's [Lichee RV64 Nezha compute module](https://wiki.sipeed.com/hardware/en/lichee/RV/RV.html).
-Many thanks to [Zack Light](https://zacklight.com/) for making [a Youtube video](https://www.youtube.com/watch?v=zPZzq2KO8ew) introducing egos-2000, and
+Many thanks to [Zack Light](https://zacklight.com/) for making [a YouTube video](https://www.youtube.com/watch?v=zPZzq2KO8ew) introducing egos-2000, and
 many thanks to Christopher Allison for [making the DOOM video game work](https://www.youtube.com/watch?v=Lx5DFdnfv7Q) on egos-2000.
 
 For any questions, please contact [Yunhao Zhang](https://dolobyte.net/).

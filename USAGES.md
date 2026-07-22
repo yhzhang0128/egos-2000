@@ -1,8 +1,8 @@
 # Compile and run egos-2000
 
-You can use MacOS, Linux or Windows and here are the tutorial videos:
-[MacOS](https://youtu.be/VJgQFcKG0uc), [Linux](https://youtu.be/2FT7AN0wPlg) and [Windows](https://youtu.be/hCDMnGGyGqM).
-MacOS users can follow the same tutorial no matter you have an Apple chip or Intel CPU.
+You can use macOS, Linux, or Windows, and here are the tutorial videos:
+[macOS](https://youtu.be/VJgQFcKG0uc), [Linux](https://youtu.be/2FT7AN0wPlg), and [Windows](https://youtu.be/hCDMnGGyGqM).
+Mac users can follow the same tutorial, whether you have an Apple chip or an Intel CPU. 
 You can run egos-2000 on the QEMU emulator or RISC-V boards.
 Using QEMU is easier, but if you wish to run it on real hardware for fun,
 you have 2 options:
@@ -13,12 +13,11 @@ a [VGA Pmod](https://digilent.com/reference/pmod/pmodvga/start),
 an [ESP32 Pmod](https://digilent.com/reference/pmod/pmodesp32/start),
 a [microSD Pmod](https://digilent.com/reference/pmod/pmodmicrosd/start?redirect=1), a [microSD reader](https://www.amazon.com/dp/B07G5JV2B5?psc=1&ref=ppx_yo2_dt_b_product_details), and a microSD card
 
-The option of Tang Nano 20K is cheaper, but it does not support multicore, Ethernet, or Wi-Fi.
-It supports microSD and HDMI though.
+The Tang Nano 20K option is cheaper, but it does not support multicore, Ethernet, or Wi-Fi. It supports microSD and HDMI, though.
 
-## Step1: Setup the compiler and compile egos-2000
+## Step1: Set up the compiler and compile egos-2000
 
-Setup your working directory and name it as `$EGOS`.
+Set up your working directory and name it `$EGOS`.
 
 ```shell
 export EGOS=/home/yunhao/egos
@@ -65,9 +64,9 @@ Enter 1: software TLB
 You can use the Tang Nano 20K, Arty A7-35t, A7-100t, or S7-50 board.
 To use a microSD card on the board, program the microSD card with `disk.img` using tools like [balena Etcher](https://www.balena.io/etcher/).
 
-### Step3.1: MacOS or Linux
+### Step3.1: macOS or Linux
 
-Install **openFPGALoader** with [Homebrew](https://formulae.brew.sh/formula/openfpgaloader) on MacOS or [this guide](https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-Doc/flash-in-linux.html) on Linux.
+Install **openFPGALoader** with [Homebrew](https://formulae.brew.sh/formula/openfpgaloader) on macOS or follow [this guide](https://wiki.sipeed.com/hardware/en/tang/Tang-Nano-Doc/flash-in-linux.html) on Linux.
 The `BOARD` in the command below can be `arty_a7_35t`, `arty_a7_100t`, `arty_s7_50`, or `tangnano20k`.
 
 ```console
@@ -99,7 +98,7 @@ To connect with the egos-2000 TTY:
 ......
 ```
 
-For MacOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`).
+For macOS users, check your `/dev` directory for the TTY device name (e.g., `/dev/tty.usbserial-xxxxxx`).
 To reboot egos-2000, press one of the two white buttons on Tang Nano 20K or the top-right `RESET` button on the Arty boards.
 
 ### Step3.2: Windows (only for the Arty boards)
@@ -107,16 +106,16 @@ To reboot egos-2000, press one of the two white buttons on Tang Nano 20K or the 
 Install Vivado Lab Edition, which can be downloaded [here](https://www.xilinx.com/support/download.html).
 You may need to register a Xilinx account, but the software is free.
 
-1. Open Vivado Lab Edition and click "Open Hardware Manager"
-2. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window
-3. In the "Hardware" window, right click `xc7a35t` and click "Add Configuration Memory Device"
-4. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device"
-5. In the "Configuration file" field, choose the `fpgaROM.bin` file created in step 2; Note that the [tutorial video](https://youtu.be/hCDMnGGyGqM) has shown how to generate this `fpgaROM.bin` file using Docker in Windows
-6. Click "OK" and wait for the program to finish
+1. Open Vivado Lab Edition and click "Open Hardware Manager".
+2. Click "Open target" and "Auto Connect"; the Arty board should appear in the "Hardware" window.
+3. In the "Hardware" window, right-click `xc7a35t` and click "Add Configuration Memory Device".
+4. Choose memory device "mt25ql128-spi-x1_x2_x4" and click "Program Configuration Memory Device".
+5. In the "Configuration file" field, choose the `fpgaROM.bin` file created in step 2; Note that the [tutorial video](https://youtu.be/hCDMnGGyGqM) shows how to generate this `fpgaROM.bin` file using Docker on Windows.
+6. Click "OK" and wait for the program to finish.
 
-In **2**, if the Arty board doesn't appear, try to install [Digilent Adept](https://digilent.com/reference/software/adept/start) or reinstall the USB cable drivers following [this post](https://support.xilinx.com/s/article/59128?language=en_US).
+In step **2**, if the Arty board doesn't appear, try installing [Digilent Adept](https://digilent.com/reference/software/adept/start) or reinstalling the USB cable drivers following [this post](https://support.xilinx.com/s/article/59128?language=en_US).
 
-In **4**, some Arty boards may use "s25fl128sxxxxxx0" or other memory device. If you choose the wrong one, **6** will tell you.
+In step **4**, some Arty boards may use "s25fl128sxxxxxx0" or another memory device. If you choose the wrong one, step **6** will tell you.
 
 ![This is an image](tools/images/vivado.png)
 
