@@ -3,11 +3,11 @@
  * All rights reserved.
  *
  * Description: a simple video output demo
- * This app reads the BMP image file tools/images/Bohr.bmp and displays
- * this image onto a monitor through VGA or HDMI. This app works on the
- * FPGA boards, while QEMU requires some more code initializing the VGA
+ * This app reads the image file tools/images/Bohr.bmp and displays the
+ * image on a monitor through VGA or HDMI. The app works out-of-the-box
+ * on FPGAs, while QEMU requires some driver code to initialize the VGA
  * device. See QEMU_GRAPHIC in Makefile and QEMU's document on standard
- * VGA device: https://www.qemu.org/docs/master/specs/standard-vga.html
+ * VGA device: https://www.qemu.org/docs/master/specs/standard-vga.html.
  */
 
 #include "app.h"
@@ -27,7 +27,7 @@ int main() {
             /* Every 4 bytes from VGA_MMIO_START correspond to a pixel. */
             uint* pix = (uint*)(VIDEO_FRAME_BASE + 4 * (i * HRES + (HRES - j)));
 
-            /* Only 3 bytes are used for RGB and the 4th byte is unused. */
+            /* Only 3 bytes are used for RGB, and the 4th byte is unused. */
             *pix = rgb[0] | (((uint)rgb[1]) << 8) | (((uint)rgb[2]) << 16);
             rgb -= 3;
         }

@@ -17,7 +17,7 @@
 /* Student's code goes here (TCP/IP & the Web). */
 
 /* Update the destination MAC address, IP address, and UDP port so
- * that this demo works in QEMU on your MacOS or Linux. If needed,
+ * that this demo works in QEMU on your macOS or Linux. If needed,
  * you can further update the local MAC/IP addresses and UDP port. */
 
 #define DEST_MAC  {0xae, 0xc9, 0x06, 0x72, 0xb2, 0x64}
@@ -107,7 +107,7 @@ int main() {
     };
     /* clang-format on */
 
-    /* Setup payload: eth_frame.payload needs to have an even length. */
+    /* Set up payload: eth_frame.payload needs to have an even length. */
     memcpy(eth_frame.payload, HELLO_MSG, sizeof(HELLO_MSG));
 
     /* Calculate the IP checksum. */

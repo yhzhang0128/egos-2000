@@ -34,8 +34,8 @@
 
     OK
  * This app connects to WiFi "3602" with password "yunhao0128",
- * establishs a TCP connection to 192.168.0.212:8002, and sends
- * string "Hello from egos-2000!\n" through the TCP connection.
+ * establishes a TCP connection to 192.168.0.212:8002, and sends
+ * the string "Hello from egos-2000!\n" through the TCP connection.
  * Here is a demo video: https://youtube.com/shorts/h7HIpzuhEJo
  */
 
