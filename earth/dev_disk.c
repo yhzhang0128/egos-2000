@@ -176,8 +176,11 @@ void disk_read(uint block_no, uint nblocks, char* dst) {
 
     /* Student's code goes here (I/O Device Driver). */
 
-    /* Replace the loop below by reading multiple SD card
-     * blocks altogether using the SD card command #18. */
+    /* Replace the loop below by reading multiple SD card blocks altogether
+     * with the SD card command #18. Since SDMA cannot conduct a DMA across
+     * page boundaries, you can read at most PAGE_SIZE/BLOCK_SIZE==8 blocks
+     * using SDMA. Start with SDMA and assume nblocks<=8. After command #18
+     * using SDMA works, you can try the more complicated ADMA mechanism. */
     for (uint i = 0; i < nblocks; i++)
         (earth->platform == HARDWARE)
             ? sdspi_read(block_no + i, dst + BLOCK_SIZE * i)
@@ -190,10 +193,20 @@ void disk_write(uint block_no, uint nblocks, char* src) {
     if (type == FLASH_ROM) FATAL("FLASH_ROM is read only");
     /* Student's code goes here (I/O Device Driver). */
 
-    /* Implement SD card write using SPI or SDHCI+PCI. */
+    /* Implement the SD card multi-block write driver with command #25. Add
+     * a testing function disk_test() as explained below, which should call
+     * this disk_write() and test whether multi-block write works correctly. */
 
     /* Student's code ends here. */
 }
+
+/* Student's code goes here (I/O Device Driver). */
+
+/* Add a disk_test() function and call it at the end of disk_init(), so the
+ * testing is conducted during boot time. You need to call disk_write() and
+ * change the disk content, and revert all changes after finishing the test. */
+
+/* Student's code ends here. */
 
 void disk_init() {
     earth->disk_read  = disk_read;
